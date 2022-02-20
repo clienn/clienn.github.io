@@ -18,6 +18,8 @@ window.onload = function() {
     var timer = 0;
     var gameover = false;
     var isWinner = false;
+    var dayTime = 0;
+    var currHex = '#ffffff';
 
     canvas.width = width;
     canvas.height = height;
@@ -47,7 +49,9 @@ window.onload = function() {
 
     function animate() {
         if (!gameover) {
-            ctx.clearRect(0, 0, width, height);
+            // ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = currHex;
+            ctx.fillRect(0, 0, width, height);
         
             let now = Date.now();
             let delta = now - last;
@@ -107,6 +111,18 @@ window.onload = function() {
         }
     }
 
+    function lerpColor(a, b, amount) { 
+        var ah = +a.replace('#', '0x'),
+            ar = ah >> 16, ag = ah >> 8 & 0xff, ab = ah & 0xff,
+            bh = +b.replace('#', '0x'),
+            br = bh >> 16, bg = bh >> 8 & 0xff, bb = bh & 0xff,
+            rr = ar + amount * (br - ar),
+            rg = ag + amount * (bg - ag),
+            rb = ab + amount * (bb - ab);
+    
+        return '#' + ((1 << 24) + (rr << 16) + (rg << 8) + rb | 0).toString(16).slice(1);
+    }
+
     function setTimer(delta) {
         timer += 1 * delta;
         let t = timer / 1000;
@@ -116,6 +132,7 @@ window.onload = function() {
 
         if (minutes >= 3) {
             isWinnter = true;
+            gameover = true;
         }
 
         populate(t);
@@ -124,8 +141,20 @@ window.onload = function() {
     }
     
     function populate(t) {
-        if (t / POPULATION_SPEED > balls.length && balls.length < LIMIT) {
-            balls.push(new Ball(getRandomColor(), getRandomColor(), { x: width, y: height }));
+        if (t / POPULATION_SPEED > balls.length) {
+            if (balls.length < LIMIT) {
+                balls.push(new Ball(getRandomColor(), getRandomColor(), { x: width, y: height }));
+            }
+
+            if (t >= 90) {
+                dayTime = 1 * ((t - 90) / 90);
+                currHex = lerpColor('#f79459', '#172c3c', dayTime); //'#172c3c'
+            } else {
+                dayTime = 1 * (t / 90);
+                currHex = lerpColor('#ffffff', '#f79459', dayTime); //'#172c3c'
+            }
+
+            // currHex = lerpColor('#ffffff', '#f79459', dayTime); //'#172c3c'
         }
     }
 
