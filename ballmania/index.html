@@ -10,6 +10,18 @@
                 /* margin: 0; */
                 /* background: #172c3c; */
             /* } */
+            html, body {
+                -moz-user-select: none;
+                -khtml-user-select: none;
+                -webkit-user-select: none;
+
+                /*
+                    Introduced in Internet Explorer 10.
+                    See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+                */
+                -ms-user-select: none;
+                user-select: none;
+            }
 
             .title-1 {
                 font-family: "Times New Roman", Times, serif;
