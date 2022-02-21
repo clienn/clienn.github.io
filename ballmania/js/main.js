@@ -1,8 +1,9 @@
 const balls = [];
 const speed = 0.0005;
 const gravity = 0.01;
-const width = 1048;
-const height = 600;
+var width = 1048;
+const centerCanvas = width / 2;
+var height = 600;
 const LIMIT = 40;
 const POPULATION_SPEED = 3;
 
@@ -13,6 +14,7 @@ const KEY_RIGHT = 39;
 window.onload = function() {
     var timerDiv = document.getElementById('timer');
     var canvas = document.getElementById("renderCanvas");
+    var container = document.getElementById("container");
     var ctx = canvas.getContext("2d");
 
     var timer = 0;
@@ -21,8 +23,10 @@ window.onload = function() {
     var dayTime = 0;
     var currHex = '#ffffff';
 
-    canvas.width = width;
-    canvas.height = height;
+    // canvas.width = width;
+    // canvas.height = height;
+
+    resize();
 
     // canvas.addEventListener('click', (e) => {
     //     // console.log('test')
@@ -46,6 +50,17 @@ window.onload = function() {
         hero.setSprite(heroImg);
         animate();
     };
+
+    function resize() {
+        width = width > screen.width ? window.innerWidth - 20 : width;
+        height = height > screen.height ? window.innerHeight : height;
+
+        canvas.width = width;
+        canvas.height = height;
+
+        container.style.width = width + "px";
+        container.style.height = height + "px";
+    }
 
     function animate() {
         if (!gameover) {
@@ -194,6 +209,28 @@ window.onload = function() {
         }
     });
 
+    document.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+
+        var x = 0;
+
+        if (e.type == 'touchstart' || e.type == 'touchmove' || e.type == 'touchend' || e.type == 'touchcancel'){
+            var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+            var touch = evt.touches[0] || evt.changedTouches[0];
+            x = touch.pageX;
+            y = touch.pageY;
+        } else if (e.type == 'mousedown' || e.type == 'mouseup' || e.type == 'mousemove' || e.type == 'mouseover'|| e.type=='mouseout' || e.type=='mouseenter' || e.type=='mouseleave') {
+            x = e.clientX;
+            y = e.clientY;
+        }
+
+        if (x >= screen.width) {
+            hero.initMovement(1);
+        } else {
+            hero.initMovement(-1);
+        }
+    });
+
     function rgbToHex(r, g, b) {
         if (r > 255 || g > 255 || b > 255)
             throw "Invalid color component";
@@ -205,6 +242,10 @@ window.onload = function() {
         hero.initMovement(0);
     });
 
+    document.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        hero.initMovement(0);
+    });
 
 }
 
