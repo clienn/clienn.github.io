@@ -83,7 +83,7 @@ window.onload = function() {
         } else {
             ctx.font = "50px Comic Sans MS";
             if (isWinner) {
-                ctx.fillStyle = "#172c3c";
+                ctx.fillStyle = "#aef359";
                 ctx.fillText("Congratulations! You Won!!! ^_^", width / 6, height / 2);
             } else {
                 ctx.fillStyle = "#ff0000";
@@ -146,7 +146,7 @@ window.onload = function() {
         let minutes = Math.floor(timer / 60000);
 
         if (minutes >= 3) {
-            isWinnter = true;
+            isWinner = true;
             gameover = true;
         }
 
