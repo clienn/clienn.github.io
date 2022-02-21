@@ -3,6 +3,10 @@ class Ball {
         const bounceThreshold = 40;
 
         this.radius = Math.max(this.getRNG() / 100 * 60, 10);
+        if (this.radius == 10) {
+            this.radius = Math.max(this.getRNG() / 100 * 60 + 10);
+        }
+
         this.color = color;
         this.stroke = stroke;
 
