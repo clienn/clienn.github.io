@@ -28,7 +28,8 @@ class Ball {
         this.restitutionX = 0;
         this.restitutionY = 1;
 
-        this.bounceForce = -(bounceThreshold - this.radius / 2);
+        let randomBounceForce = Math.max(this.getRNG() / 100 * 60, 10);
+        this.bounceForce = -(bounceThreshold - randomBounceForce / 2);
     }
 
     setPos(x, y) {
