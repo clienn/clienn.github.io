@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Attack on Ball</title>
+
+        <style>
+            html, body {
+                -moz-user-select: none;
+                -khtml-user-select: none;
+                -webkit-user-select: none;
+
+                /*
+                    Introduced in Internet Explorer 10.
+                    See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+                */
+                -ms-user-select: none;
+                user-select: none;
+            }
+
+            canvas {
+                border: 3px solid #000;
+            }
+
+            #timer {
+                position: absolute;
+                text-align: right;
+                font-family: "Times New Roman", Times, serif;
+                font-size: 24pt;
+                font-weight: bold;
+                color: #fff;
+            }
+
+            #result {
+                position: absolute;
+                text-align: center;
+                font-family: "Times New Roman", Times, serif;
+                font-size: 24pt;
+                font-weight: bold;
+                color: #fff;
+                display: none;
+            }
+
+            #instructions {
+                position: absolute;
+                text-align: center;
+                font-family: "Times New Roman", Times, serif;
+                font-size: 14pt;
+                font-weight: bold;
+            }
+        </style>
+
+        <script src="js/ball.js"></script>
+        <script src="js/hero.js"></script>
+        <script src="js/main.js"></script>
+    </head>
+    <body onload="main()">
+        <div id="timer">0:00</div>
+        <div id="result">You Won!</div>
+        <canvas id="game-surface"></canvas>
+        <div id="instructions">Survive for 3 minutes. (use the arrow keys left and right / for mobile tap left and right of screen to move the character.)</div>
+    </body>
+</html>
