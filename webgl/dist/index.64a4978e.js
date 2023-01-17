@@ -543,10 +543,12 @@ const Ny = 4;
 const mass = 1;
 const clothSize = 0.30;
 const dist = clothSize / Nx;
-const flagTextures = [];
-(0, _countriesDefault.default).forEach((country)=>{
-    flagTextures.push(new _three.TextureLoader().load("./flags/" + country.flag));
-});
+const flagTextures = [
+    new _three.TextureLoader().load("./phflag.png")
+];
+// countries.forEach(country => {
+//     flagTextures.push(new THREE.TextureLoader().load('./flags/' + country.flag))
+// });
 const renderer = new _three.WebGLRenderer({
     antialias: true
 });
@@ -585,9 +587,9 @@ var toggleWind = false;
 var toggleFlag = false;
 const width = window.innerWidth;
 const height = window.innerHeight;
-cameraOrtho = new _three.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, 1, 10);
+const cameraOrtho = new _three.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, 1, 10);
 cameraOrtho.position.z = 10;
-sceneOrtho = new _three.Scene();
+const sceneOrtho = new _three.Scene();
 for(let i = 0; i < Nx + 1; i++){
     particles.push([]);
     for(let j = 0; j < Ny + 1; j++){
@@ -719,7 +721,8 @@ function nextRound() {
     if (toggleWind) {
         toggleFlag = !toggleFlag;
         for(let i = 0; i < cloths.length; ++i){
-            cloths[i].material.map = flagTextures[Math.floor(Math.random() * flagTextures.length)];
+            let rng = Math.floor(Math.random() * (0, _countriesDefault.default).length);
+            cloths[i].material.map = new _three.TextureLoader().load("./flags/" + (0, _countriesDefault.default)[rng].flag);
             cloths[i].material.needsUpdate = true;
         }
     }
