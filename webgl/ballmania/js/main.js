@@ -10,7 +10,7 @@
 // Monster: https://sketchfab.com/3d-models/monster-run-2bd3ffa56ae8450a826de7386031a0a1
 // Girl 2: https://sketchfab.com/3d-models/dawn-run-3af58663b6944db0a847afe9514030f9
 
-const BALL_COUNT = 30;
+const BALL_COUNT = 100;
 const EXPLOSION_COUNT = 300;
 const VERTEX_SIZE = 6 * Float32Array.BYTES_PER_ELEMENT;
 const SCALE_VERTEX_OFFSET = 2 * Float32Array.BYTES_PER_ELEMENT;
@@ -95,14 +95,20 @@ const main = function() {
 
     if (window.innerHeight > window.innerWidth) {
         let newW = window.innerWidth - 20;
-        canvas.width = newW;
-        canvas.height = 600;
+        // canvas.width = newW;
+        // canvas.height = 600;
+        
+        canvas.width = document.documentElement.clientWidth;
+        canvas.height = document.documentElement.clientHeight;
         resultDiv.style.width = newW + 'px';
         timerDiv.style.width = newW + 'px';
         instructionDiv.style.width = newW + 'px';
     } else {
-        canvas.width = 800;
-        canvas.height = 600;
+        // canvas.width = 800;
+        // canvas.height = 600;
+
+        canvas.width = document.documentElement.clientWidth;
+        canvas.height = document.documentElement.clientHeight;
         resultDiv.style.width = '800px';
         timerDiv.style.width = '800px';
         instructionDiv.style.width = '800px';
@@ -421,7 +427,8 @@ const main = function() {
             }
 
             // for (let i in balls) {
-            for (let i = 0; i < level; ++i) {
+            // for (let i = 0; i < level; ++i) {
+            for (let i = 0; i < BALL_COUNT; ++i) {
                 balls[i].move();
 
                 // process ground collision
@@ -457,8 +464,8 @@ const main = function() {
                 
                 if (!isExplode && rectCircleCollision(balls[i], hero)) {
                     // gameover = true;
-                    isExplode = true;
-                    displayGameResult('You Lose!');
+                    // isExplode = true;
+                    // displayGameResult('You Lose!');
                 }
 
                 let idx = i * 6;
@@ -483,63 +490,63 @@ const main = function() {
                 gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, n, EXPLOSION_COUNT);
             }
 
-            if (!isExplode) {
-                heroData[0] = hero.x;
+            // if (!isExplode) {
+            //     heroData[0] = hero.x;
 
-                // initHeroBuffer();
-                // // // var offset = gl.getUniformLocation(program, "heroPosition");
-                // // // gl.uniform2fv(offset, [hero.x, 0.0]);
-                // gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
+            //     // initHeroBuffer();
+            //     // // // var offset = gl.getUniformLocation(program, "heroPosition");
+            //     // // // gl.uniform2fv(offset, [hero.x, 0.0]);
+            //     // gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
 
-                // draw test
-                // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-                gl.useProgram(heroProgram);
-                gl.bindVertexArray(vao2);
+            //     // draw test
+            //     // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            //     gl.useProgram(heroProgram);
+            //     gl.bindVertexArray(vao2);
 
-                gl.bindTexture(gl.TEXTURE_2D, boxTexture);
-                // gl.activeTexture(gl.TEXTURE0);
+            //     gl.bindTexture(gl.TEXTURE_2D, boxTexture);
+            //     // gl.activeTexture(gl.TEXTURE0);
 
-                gl.bindBuffer(gl.ARRAY_BUFFER, triangleBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, triangle, gl.DYNAMIC_DRAW);
+            //     gl.bindBuffer(gl.ARRAY_BUFFER, triangleBuffer);
+            //     gl.bufferData(gl.ARRAY_BUFFER, triangle, gl.DYNAMIC_DRAW);
 
-                // var triangleAttribLocation = gl.getAttribLocation(heroProgram, 'vertPosition');
-                gl.vertexAttribPointer(
-                    triangleAttribLocation,
-                    2, // number of elements per attribute
-                    gl.FLOAT,
-                    gl.FALSE,
-                    2 * Float32Array.BYTES_PER_ELEMENT, // size of vertex
-                    0 // offset from beginning of a single vertext to this attribute
-                );
+            //     // var triangleAttribLocation = gl.getAttribLocation(heroProgram, 'vertPosition');
+            //     gl.vertexAttribPointer(
+            //         triangleAttribLocation,
+            //         2, // number of elements per attribute
+            //         gl.FLOAT,
+            //         gl.FALSE,
+            //         2 * Float32Array.BYTES_PER_ELEMENT, // size of vertex
+            //         0 // offset from beginning of a single vertext to this attribute
+            //     );
 
-                gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.DYNAMIC_DRAW);
+            //     gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
+            //     gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.DYNAMIC_DRAW);
 
-                gl.vertexAttribPointer(
-                    textAttribLocation,
-                    2, // number of elements per attribute
-                    gl.FLOAT,
-                    gl.FALSE,
-                    2 * Float32Array.BYTES_PER_ELEMENT, // size of vertex
-                    0 // offset from beginning of a single vertext to this attribute
-                );
+            //     gl.vertexAttribPointer(
+            //         textAttribLocation,
+            //         2, // number of elements per attribute
+            //         gl.FLOAT,
+            //         gl.FALSE,
+            //         2 * Float32Array.BYTES_PER_ELEMENT, // size of vertex
+            //         0 // offset from beginning of a single vertext to this attribute
+            //     );
 
-                // gl.vertexAttribDivisor(triangleAttribLocation, 1);
-                gl.enableVertexAttribArray(triangleAttribLocation);
-                gl.enableVertexAttribArray(textAttribLocation);
+            //     // gl.vertexAttribDivisor(triangleAttribLocation, 1);
+            //     gl.enableVertexAttribArray(triangleAttribLocation);
+            //     gl.enableVertexAttribArray(textAttribLocation);
 
-                tmp += 20 * delta;
+            //     tmp += 20 * delta;
                 
-                frameIdx = Math.floor(tmp) % heroFrames.length;
+            //     frameIdx = Math.floor(tmp) % heroFrames.length;
 
-                gl.uniform2fv(heroLocation, [hero.x, -0.85]);
-                gl.uniform1f(heroDirectionLocation, hero.lastDirection);
-                gl.uniform1f(frameLocation, heroFrames[frameIdx]);
+            //     gl.uniform2fv(heroLocation, [hero.x, -0.85]);
+            //     gl.uniform1f(heroDirectionLocation, hero.lastDirection);
+            //     gl.uniform1f(frameLocation, heroFrames[frameIdx]);
                 
-                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 6);
+            //     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 6);
 
-                setTimer(delta);
-            }
+            //     setTimer(delta);
+            // }
             
             requestAnimationFrame( render );
         } else {

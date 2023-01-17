@@ -28,21 +28,21 @@ window.onload = function() {
 
     resize();
 
-    // canvas.addEventListener('click', (e) => {
-    //     // console.log('test')
-    //     var rect = e.target.getBoundingClientRect();
-    //     var x = e.clientX - rect.left; //x position within the element.
-    //     var y = e.clientY - rect.top;  //y position within the element.
+    canvas.addEventListener('click', (e) => {
+        // console.log('test')
+        var rect = e.target.getBoundingClientRect();
+        var x = e.clientX - rect.left; //x position within the element.
+        var y = e.clientY - rect.top;  //y position within the element.
 
-    //     var p = ctx.getImageData(x, y, 1, 1).data; 
-    //     var hex = "#" + ("000000" + rgbToHex(p[0], p[1], p[2])).slice(-6);
-    //     console.log(hex);
-    // });
+        var p = ctx.getImageData(x, y, 1, 1).data; 
+        var hex = "#" + ("000000" + rgbToHex(p[0], p[1], p[2])).slice(-6);
+        console.log(hex);
+    });
 
     let last = Date.now();
 
     let heroImg = new Image();
-    heroImg.src = 'assets/hero2.png';
+    heroImg.src = 'assets/hero.png';
 
     const hero = new Hero(width / 2, height - 30, 17, width);
 
