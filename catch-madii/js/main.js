@@ -59,6 +59,8 @@ var halfH = 0;
 var textSize = 80;
 var textCenter = 130;
 
+var totalMoves = 0;
+
 const directions = {
     'ArrowRight': [1, 0],
     'ArrowLeft': [-1, 0],
@@ -203,10 +205,12 @@ function moveOnClick(x, y, mx, my) {
         hero.move = [cellW * mx, cellH * my];
         hero.t = 0;
 
+        totalMoves++;
+
         if (!isMadiiCaught()) {
             aiMove();
         } else {
-            alert('You caught Madii!');
+            alert('You caught Madii in ' + totalMoves + ' moves.');
         }
     } else {
         console.log('Invalid Move!');
