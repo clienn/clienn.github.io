@@ -211,6 +211,7 @@ function moveOnClick(x, y, mx, my) {
             aiMove();
         } else {
             alert('You caught Madii in ' + totalMoves + ' moves.');
+            location.href = '';
         }
     } else {
         console.log('Invalid Move!');
