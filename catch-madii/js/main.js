@@ -257,8 +257,8 @@ function aiMove() {
 
             // add weights favoring even distances with +1 point
             let r = d + ((d & 1) ? 1 : 2);
-            if (d == 2) r += 5;
-            if (d == 4) r += 3;
+            if (d == 2) r += 2;
+            if (my < 0) r += 2;
 
             r += countValidMoves(x, y) / 10;
 
