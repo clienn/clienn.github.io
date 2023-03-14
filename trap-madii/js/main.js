@@ -424,6 +424,8 @@ function controls() {
 
                                 if (src < 3) {
                                     console.log('madii escaped!')
+                                    alert('madii escaped!');
+                                    location.href = '';
                                 }
                                 //
 
