@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Get in shape - Prototype
+        </title>
+        <style>
+            html, body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+            canvas {
+                border: 1px solid #000;
+                touch-action: manipulation;
+                display: none;
+            }
+            #game-instructions {
+                padding: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="game-surface"></canvas>
+        <div id="game-instructions">
+            <h1>Get In Shape!</h1>
+            <p>Directions: Drag a shape inside the portal to its appropriate container.</p>
+            <p>Turn the phone's orientation to landscape to start the game.</p>
+            <button id="btnStart">Start Game</button>
+        </div>
+        <script type="text/javascript" src="js/shape.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript">
+            // main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+            window.addEventListener("orientationchange", function() {
+                if (!startGame) {
+                    startGame = isPortrait();
+                }
+            }, false);
+
+            btnStart.addEventListener('click', (e) => {
+                if (startGame) {
+                    main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+                } else if (!isPortrait()) {
+                    startGame = true;
+                    main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+                } else {
+                    alert('Rotate to landscape to start game.');
+                }
+            });
+        </script>
+    </body>
+</html>
