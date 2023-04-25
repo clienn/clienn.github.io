@@ -37,8 +37,8 @@ var portal = {
         }
     },
     move: (w, h) => {
-        w -= portal.w / 2;
-        h -= portal.h / 2;
+        w -= portal.w * scaleX / 2;
+        h -= portal.h * scaleY / 2;
 
         let flag = Math.floor(Math.random() * 2);
         if (flag) {
@@ -321,7 +321,9 @@ function mousemoveE(mx, my) {
 
 function mouseupE() {
     if (isDraggable) {
-        if (shapesContainer[hoveredContainerID] == dragID) {
+        let id = shapesContainer[hoveredContainerID];
+        if (correctAnswers[hoveredContainerID] < 0 && shapes[id].id == shapes[dragID].id) {
+            // correctAnswers[hoveredContainerID] = dragID;
             correctAnswers[hoveredContainerID] = dragID;
             score += 10 * portal.duration + portal.bonus;
             checkAnswers();
@@ -346,7 +348,7 @@ function drawShapesContainer() {
         ctx.globalAlpha = 0.5;
 
         if (correctAnswers[i] > -1) {
-            let idx = correctAnswers[i];
+            // let idx = correctAnswers[i];
             ctx.strokeStyle = '#b3d23b';
             ctx.globalAlpha = 1;
         } else if (i == hoveredContainerID) {
@@ -455,7 +457,7 @@ function gameCycle() {
         
         if (!portal.isRefreshing) {
             for (let i = 0; i < nContainers; ++i) {
-                if (dragID == shapes[i].id) {
+                if (dragID == i) {
                     ctx.globalAlpha = 1;
                 } else {
                     ctx.globalAlpha = portal.shapesOpacity;
