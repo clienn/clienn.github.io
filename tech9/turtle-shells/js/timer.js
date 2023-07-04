@@ -24,12 +24,12 @@ class Timer {
         ctx.beginPath();
 
         ctx.strokeStyle = this.colors[Math.floor(this.timer / this.div)];
-        ctx.lineWidth = '10';
+        ctx.lineWidth = '20';
         
         ctx.arc(this.x, this.y, this.r, (Math.PI / 180) * 270, (Math.PI / 180) * (270 + this.timer), false);
         ctx.stroke();
 
-        ctx.font = this.fontSize + "px arial";
+        ctx.font = this.fontSize + "px Montserrat";
         ctx.fillStyle = '#2f2f2f';
         ctx.textBaseline = 'top'; // important!
 
