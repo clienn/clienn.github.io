@@ -34,7 +34,8 @@ var sounds = {
     loaded: 0,
     load: (obj, fn, ext) => {
         obj.audio = new Audio();
-        obj.audio.src = 'http://192.168.1.2:5501/assets/' + fn + '.' + ext;
+        // obj.audio.src = 'http://192.168.1.2:5501/assets/' + fn + '.' + ext;
+        obj.audio.src = 'assets/' + fn + '.' + ext;
         obj.audio.preload = 'auto';
         obj.audio.autoplay = (/iPad|iPhone|iPod/).test(navigator.userAgent);
         // obj.audio.canplaythrough = function() {
