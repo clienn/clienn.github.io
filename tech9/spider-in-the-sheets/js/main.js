@@ -7,10 +7,10 @@ var btnStart = document.getElementById("btnStart");
 var last = 0;
 var delta = 0;
 var startGame = false; // orientation prep
-var gameStart = true; // start game
+var gameStart = false; // start game
 var gameover = false; // end game
+var canReset = false;
 var mDown = false;
-
 
 var timer = null;
 
@@ -34,9 +34,53 @@ var assets = {
     }
 };
 
+var sounds = {
+    count: 0,
+    loaded: 0,
+    load: (obj, fn, ext) => {
+        obj.audio = new Audio();
+        // obj.audio.src = 'http://192.168.1.2:5501/assets/' + fn + '.' + ext;
+        obj.audio.src = 'assets/' + fn + '.' + ext;
+        obj.audio.preload = 'auto';
+        obj.audio.autoplay = (/iPad|iPhone|iPod/).test(navigator.userAgent);
+        // obj.audio.canplaythrough = function() {
+        //     ++sounds.loaded;
+        // }
+        // obj.audio.addEventListener("loadeddata", () => {
+        //     //audio is ready to play all the way through
+        //     ++sounds.loaded;
+        // });
+
+        obj.audio.addEventListener("loadedmetadata", () => {
+            //audio is ready to play all the way through
+            ++sounds.loaded;
+        });
+
+        // obj.audio.addEventListener("canplaythrough", () => {
+        //     //audio is ready to play all the way through
+        //     ++sounds.loaded;
+        // });
+
+        sounds.count++;
+    }
+};
+
 var images = {
     bg: {
         src: 'bg',
+        obj: {},
+    },
+
+    intro: {
+        src: 'intro',
+        obj: {},
+    },
+    life: {
+        src: 'life',
+        obj: {},
+    },
+    gameover: {
+        src: 'gameover',
         obj: {},
     },
     spider: {
@@ -129,11 +173,39 @@ var images = {
     },
 };
 
+var music = {
+    bg: {
+        src: 'sounds/bg2',
+        obj: {},
+        ext: 'mp3',
+    }, 
+    crawl: {
+        src: 'sounds/crawl',
+        obj: {},
+        ext: 'wav',
+    }, 
+    // shuffle: {
+    //     src: 'sounds/shuffle',
+    //     obj: {},
+    //     ext: 'wav',
+    // }, 
+
+}
+
 var spiderInfo = {
     w: 100,
     h: 100,
     cw: 633,
     ch: 633,
+}
+
+var gameoverInfo = {
+    x: 0,
+    y: 0,
+    w: 221,
+    h: 45,
+    cw: 221,
+    ch: 45,
 }
 
 var bounds =  {
@@ -145,7 +217,14 @@ var bounds =  {
     pady: 10
 }
 
-const spiders = [];
+var btnBegin = {
+    x: 0,
+    y: 0,
+    w: 400,
+    h: 100
+};
+
+var spiders = [];
 const sheetPadding = {
     left: 15,
     right: 28,
@@ -180,6 +259,61 @@ var score = 0;
 var mistakes = 0;
 var round = 0;
 
+var TM = new TextManager(ctx);
+var textList = {
+    gameover: {
+        obj: null,
+        desc: TM.addTextObj('Game Over!', 'Montserrat', 'bold', 50, 0, 0, 100, 70, '#fb2121'),
+    },
+    scoreN: {
+        obj: null,
+        desc: TM.addTextObj('Score: 00', 'Montserrat', 'bold', 25, 0, 0, 55, 25, '#fff'),
+    },
+    scoreLabel: {
+        obj: null,
+        desc: TM.addTextObj('You Scored:', 'Montserrat', 'normal', 50, 0, 0, 70, 55, '#fff'),
+    },
+    finalScore: {
+        obj: null,
+        desc: TM.addTextObj('00', 'Montserrat', 'bold', 65, 0, 0, 30, 70, '#f9a139'),
+    },
+    resetMsg: {
+        obj: null,
+        desc: TM.addTextObj('Tap to play again.', 'Montserrat', 'bold', 20, 0, 0, 250, 50, '#fff'),
+    }
+};
+
+const topHUDInfo = {
+    w: 250,
+    h: 100,
+    score: {
+        x: 0,
+        y: 50,
+        w: 100,
+        h: 50,
+        pw: 150,
+        fontsize: 20,
+        fontsize2: 25,
+        fontX: 0,
+        fontY: 0,
+        fontXadj: 37
+    },
+    life: {
+        x: 0,
+        y: 45,
+        w: 45,
+        h: 45,
+        cw: 45,
+        ch: 45,
+        lives: 3,
+        totalW: 0,
+        sx: 0,
+        pad: 0
+    }
+}
+
+var lives = topHUDInfo.life.lives;
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
@@ -189,6 +323,12 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    btnBegin.w *= scaleX;
+    btnBegin.h *= scaleY;
+
+    btnBegin.x = w / 2 - btnBegin.w / 2;
+    btnBegin.y = h - 235 * scaleY;
 
     sheetPadding.left *= scaleX;
     sheetPadding.right *= scaleX;
@@ -203,6 +343,7 @@ function main(w, h) {
 
     rescaleSize(spiderInfo);
     rescaleSize(phraseInfo);
+    rescaleSize(gameoverInfo);
 
     phraseInfo.h *= percentage;
 
@@ -225,13 +366,38 @@ function main(w, h) {
         timerAdjX = [8, 22];
     }
 
-    timer = new Timer(w / 2, timerY, timerRadius, '#fb2121');
+    timer = new Timer(w / 2, h / 2, timerRadius, '#fb2121');
     timer.fontSize = timerFontSize;
     timer.adjX = timerAdjX;
 
     setPhrases();
     loadAssets();
 
+    initTopHUD();
+
+
+    for (let k in textList) {
+        if (textList[k].desc != null) {
+            textList[k].obj = TM.generateTextObj(textList[k].desc, scaleX, scaleY);
+        }
+    }
+
+    textList.scoreN.obj.tx = w / 2 - (textList.scoreN.desc.w + 30) / 2 * scaleX;
+    textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h * scaleY / 2);
+
+    // textList.complete.obj.tx = w / 2 - textList.complete.desc.w / 2 * scaleX - 10 * scaleX;
+    // textList.complete.obj.ty = 75 * scaleY;
+    textList.scoreLabel.obj.tx = w / 2 - textList.scoreLabel.desc.w / 2 * scaleX - 100 * scaleX;
+    textList.scoreLabel.obj.ty = 240 * scaleY;
+    textList.finalScore.obj.tx = w / 2 - textList.finalScore.desc.w / 2 * scaleX - 50 * scaleX;
+    textList.finalScore.obj.ty = 300 * scaleY;
+    textList.resetMsg.obj.tx = w / 2 - textList.resetMsg.desc.w / 2 * scaleX - 20 * scaleX;
+    textList.resetMsg.obj.ty = h / 2 - textList.resetMsg.desc.h / 2 * scaleY;
+
+    // gameoverInfo.x = w / 2 - gameoverInfo.w / 2;
+    textList.gameover.obj.tx = w / 2 - (textList.gameover.desc.w + 100) * scaleX;
+    textList.gameover.obj.ty = 100 * scaleY;
+    
     canvas.addEventListener('touchstart', e => {
         // mousedownE(e.touches[0].clientX, e.touches[0].clientY);
         
@@ -272,12 +438,19 @@ function main(w, h) {
                         isTalking = true;
                         talkTime = 3;
                         mistakes++;
+                        reduceHP();
                     }
-
+                    
                     // accuracy.push(checkAccuracy(mx, my));
                     // console.log(accuracy);
                 }
             } else {
+                if (isBtnClicked(mx, my, btnBegin)) {
+                    gameStart = true;
+                    music.bg.obj.audio.volume = 0.3;
+                    music.bg.obj.audio.loop = true;
+                    music.bg.obj.audio.play();
+                }
                 // gameStart = true;
                 // isCrawl = true;
                 // ctx.beginPath();
@@ -297,6 +470,15 @@ function main(w, h) {
         // mouseupE();
         if (mDown) {
             mDown = false;
+
+            if (gameover) {
+                if (canReset) {
+                    resetGame();
+                } else {
+                    canReset = true;
+                }
+                
+            }
         }
     });
 
@@ -308,6 +490,132 @@ function main(w, h) {
     timer.setTimer(5);
     
     gameCycle();
+}
+
+function initTopHUD() {
+    let isMobile = detectMob();
+
+    if (isMobile) {
+        topHUDInfo.score.w = 130;
+        topHUDInfo.score.h = 65;
+        topHUDInfo.score.pw = 195;
+        // topHUDInfo.score.y = 3;
+
+        topHUDInfo.score.fontX = 15;
+        topHUDInfo.score.fontsize = 20;
+        topHUDInfo.score.fontsize2 = 20;
+        topHUDInfo.life.y += 5;
+    }
+
+    rescaleSize(topHUDInfo);
+
+    
+    topHUDInfo.score.w *= scaleX;
+    topHUDInfo.score.h *= scaleY;
+    topHUDInfo.score.pw *= scaleX;
+    
+
+    let sx = canvas.width / 2 - topHUDInfo.w / 2;
+    // topHUDInfo.score.x = sx + (topHUDInfo.w  - topHUDInfo.score.w) / 2;
+    topHUDInfo.score.x = sx + (topHUDInfo.w - topHUDInfo.score.pw) / 2;
+    topHUDInfo.score.y *= scaleY;
+
+    topHUDInfo.score.fontX += topHUDInfo.score.x + (topHUDInfo.w - topHUDInfo.score.pw) / 2 + 10 * scaleX;
+    topHUDInfo.score.fontY += topHUDInfo.score.y + topHUDInfo.score.h / 2;
+    topHUDInfo.score.fontXadj *= scaleX;
+
+    topHUDInfo.life.w *= scaleX;
+    topHUDInfo.life.h *= scaleY;
+    topHUDInfo.life.pad = 20 * scaleX;
+    let lifeW = topHUDInfo.life.pad * 2 + topHUDInfo.life.w * topHUDInfo.life.lives;
+    sx = (canvas.width - topHUDInfo.w);
+    topHUDInfo.life.x = sx + (topHUDInfo.w - lifeW) / 2;
+    topHUDInfo.life.y *= scaleY;
+}
+
+function drawScoreHUD() {
+    // const h = 50;
+    
+    // const progW = 100;
+    // let x = canvas.width / 2;
+    // let y = topHUD.timer.timecircle.h / 2 - h / 2 + 30;
+
+    const { x, y, w, h, pw } = topHUDInfo.score;
+    const p = pw;
+    
+    ctx.beginPath();
+    ctx.arc(h / 2 + x, h / 2+ y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
+    ctx.lineTo(p - 2 * h + x, 0 + y);
+    ctx.arc(p - (h / 2) + x, h / 2 + y, h / 2, 3 / 2 * Math.PI,Math.PI / 2);
+    ctx.lineTo(h / 2 + x, h + y);
+    ctx.fillStyle = "#9F51FE";
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = '2';
+    ctx.stroke();
+
+    textList.scoreN.obj.str = 'Score: ' + zeroPad(score, 2);
+    TM.draw(textList.scoreN.obj);
+}
+
+function drawLives() {
+    const { x, y, cw, ch, w, h, pad } = topHUDInfo.life;
+    
+    for (let i = 0; i < lives; ++i) {
+        ctx.drawImage(images.life.obj.img, 0, 0, cw, ch, x + i * w + i * pad, y, w, h);
+    }
+}
+
+function reduceHP() {
+    if (--lives < 0) {
+        gameover = true;
+    }
+}
+
+function resetGame() {
+    score = 0;
+    
+    gameover = false;
+    canReset = false;
+    lives = topHUDInfo.life.lives;
+
+    spiders = [];
+}
+
+function zeroPad(num, places) {
+    return String(num).padStart(places, '0');
+}
+
+function rescaleSize(obj) {
+    obj.w *= scaleX;
+    obj.h *= scaleY;
+}
+
+function rescaleAll(obj) {
+    obj.x *= scaleX;
+    obj.y *= scaleY;
+    obj.w *= scaleX;
+    obj.h *= scaleY;
+}
+
+function detectMob() {
+    const toMatch = [
+        /Android/i,
+        /webOS/i,
+        /iPhone/i,
+        /iPad/i,
+        /iPod/i,
+        /BlackBerry/i,
+        /Windows Phone/i
+    ];
+    
+    return toMatch.some((toMatchItem) => {
+        return navigator.userAgent.match(toMatchItem);
+    });
+}
+
+function isBtnClicked(mx, my, btn) {
+    return (mx >= btn.x && mx <= btn.x + btn.w && my >= btn.y && my <= btn.y + btn.h);
 }
 
 // #80b1d3
@@ -343,6 +651,8 @@ function moveSpiders() {
             spiders[i].move(1, 1, Math.floor(Math.random() * 2) + 1);
         }
     }
+
+    music.crawl.obj.audio.play();
 }
 
 function checkAccuracy(mx, my) {
@@ -382,6 +692,8 @@ function reset() {
     }
 
     isCrawl = true;
+
+    music.crawl.obj.audio.play();
 }
 
 function checkCollission(mx, my) {
@@ -481,6 +793,10 @@ function loadAssets() {
     for (let k in images) {
         assets.load(images[k].obj, images[k].src);
     }
+
+    for (let k in music) {
+        sounds.load(music[k].obj, music[k].src, music[k].ext);
+    }
 }
 
 function rescaleSize(obj) {
@@ -551,17 +867,17 @@ function update() {
     }
     
 }
-
+//#9F51FE
 function gameCycle() {
     let now = Date.now();
     delta = (now - last) / 1000;
     last = now;
     
     if (!gameover) {
-        if (assets.loaded == assets.count) {
+        if (assets.loaded == assets.count && sounds.loaded == sounds.count) {
             
             if (gameStart) {
-                if (isCrawl) {
+                if (isCrawl || nextRoundTime) {
                     // bg 
                     ctx.drawImage(images.bg.obj.img, 0, 0, 1265, 712, 0, 0, canvas.width, canvas.height);
                 } else {
@@ -576,13 +892,15 @@ function gameCycle() {
                     // ctx.drawImage(images.spider.obj.img, 0, 0, 633, 633, 0, 0, 100, 100);
                 }
 
+                drawScoreHUD();
+                drawLives();
+
                 drawSpiders();
                 talk();
                 update();
 
             } else {
-            
-                ctx.drawImage(images.bg.obj.img, 0, 0, 1265, 712, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(images.intro.obj.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
                 // ctx.beginPath();
                 // ctx.rect(btnBegin.x, btnBegin.y, btnBegin.w, btnBegin.h);
                 // ctx.stroke();
@@ -590,12 +908,15 @@ function gameCycle() {
             }
             
         }
-
-        requestAnimationFrame(gameCycle);
     } else {
-        let p = Math.max(0, ((score - mistakes) / score) * 100);
-        alert('You scored: ' + score + ', Accuracy: ' + p.toFixed(2) + '%');
+        TM.draw(textList.gameover.obj);
+        TM.draw(textList.scoreLabel.obj);
+        TM.draw(textList.finalScore.obj);
+        TM.draw(textList.resetMsg.obj);
+        // ctx.drawImage(images.gameover.obj.img, 0, 0, gameoverInfo.cw, gameoverInfo.ch, gameoverInfo.x, gameoverInfo.y, gameoverInfo.w, gameoverInfo.h);
     }
+
+    requestAnimationFrame(gameCycle);
 }
 
 // main(document.documentElement.clientWidth, document.documentElement.clientHeight);

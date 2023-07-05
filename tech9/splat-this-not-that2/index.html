@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Boilerplate Landscape - Prototype
+        </title>
+        <style>
+            html, body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+            canvas {
+                border: 1px solid #000;
+                touch-action: manipulation;
+                display: none;
+            }
+            #game-instructions {
+                padding: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="game-surface"></canvas>
+        <div id="game-instructions">
+            <h1>Title</h1>
+            <p>Directions: ...</p>
+            <p>Turn the phone's orientation to landscape to start the game.</p>
+            <button id="btnStart">Start Game</button>
+        </div>
+        <script type="text/javascript" src="js/sprite.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript">
+            window.addEventListener("orientationchange", function() {
+                if (!startGame) {
+                    startGame = isPortrait();
+                }
+            }, false);
+
+            btnStart.addEventListener('click', (e) => {
+                if (startGame) {
+                    main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+                } else if (!isPortrait()) {
+                    startGame = true;
+                    main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+                } else {
+                    alert('Rotate to landscape to start game.');
+                }
+            });
+        </script>
+    </body>
+</html>
