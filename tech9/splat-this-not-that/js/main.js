@@ -1233,7 +1233,10 @@ function update() {
     // projectiles[0].vy += g * 50 * delta;
     timer.tick(delta);
 
-    if (timer.timer <= 0) gameover = true;
+    if (timer.timer <= 0) {
+        canReset = true;
+        gameover = true;
+    }
 
     moveClouds();
 }
