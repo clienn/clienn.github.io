@@ -1076,6 +1076,7 @@ function resetGame() {
     fade = false;
     pulseT = 0;
     lives = topHUDInfo.life.lives;
+    timer.setTimer(maxTimer);
 }
 
 function isBtnClicked(mx, my, btn) {
