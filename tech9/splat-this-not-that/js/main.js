@@ -44,9 +44,9 @@ var sounds = {
         // });
 
         if (fn == 'bg') {
-            obj.audio.volume = 0.1;
+            obj.audio.volume = 0.0;
         } else {
-            obj.audio.volume = 0.5;
+            obj.audio.volume = 1;
         }
 
         obj.audio.addEventListener("loadedmetadata", () => {
@@ -71,6 +71,16 @@ var music = {
     }, 
     explosion: {
         src: 'sounds/explosion',
+        obj: {},
+        ext: 'wav',
+    },
+    score: {
+        src: 'sounds/score',
+        obj: {},
+        ext: 'wav',
+    },
+    ouch: {
+        src: 'sounds/ouch',
         obj: {},
         ext: 'wav',
     },
@@ -985,11 +995,11 @@ function controls() {
                 if (isBtnClicked(mx, my, btnBegin)) {
                     gameStart = true;
 
-                    music.bg.obj.audio.volume = 0.1;
+                    music.bg.obj.audio.volume = 0.01;
                     music.bg.obj.audio.loop = true;
                     music.bg.obj.audio.play();
 
-                    music.explosion.obj.audio.volume = 0.5;
+                    music.explosion.obj.audio.volume = 0.2;
                     music.explosion.obj.audio.loop = true;
                     music.explosion.obj.audio.play();
                 }
@@ -1277,9 +1287,15 @@ function splat(mx, my) {
                 // console.log('ouch!');
                 score += OUCH_MINUS;
                 reduceHP();
+                music.ouch.obj.audio.pause();
+                music.ouch.obj.audio.currentTime = 0;
+                music.ouch.obj.audio.play();
             } else {
                 // console.log('splatted!');
                 score += SPLAT_POINTS;
+                music.score.obj.audio.pause();
+                music.score.obj.audio.currentTime = 0;
+                music.score.obj.audio.play();
             }
             resetProjectile([i]);
             break;
