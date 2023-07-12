@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Boilerplate Landscape - Prototype
+        </title>
+        <style>
+            @font-face {
+                font-family: 'Montserrat';
+                src: url('assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf');
+            }
+            html, body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                background: #10aad7;
+            }
+            canvas {
+                border: 1px solid #000;
+                touch-action: manipulation;
+                display: none;
+            }
+            #game-instructions {
+                padding: 10px;
+            }
+
+            .center {
+                margin: 0;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+            }
+            .directions {
+                font-family: 'Montserrat';
+                color: #fff;
+                font-size: 48px;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="game-surface"></canvas>
+        <div id="game-instructions" class="center">
+            <h1 id="directions-text" class="directions"></h1>
+            <!-- <p>Directions: Find the turtle by clicking on the shell after the shuffle.</p>
+            <p>Turn the phone's orientation to landscape to start the game.</p> -->
+            <!-- <button id="btnStart">Start Game</button> -->
+        </div>
+        <script type="text/javascript" src="js/textmanager.js"></script>
+        <script type="text/javascript" src="js/sprite.js"></script>
+        <script type="text/javascript" src="js/timer.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript">
+            var e = document.getElementById('directions-text');
+
+            if (isPortrait()) {
+               e.innerHTML = "Rotate to landscape to start the game.";
+            } else {
+                e.innerHTML = "Loading...";
+                setTimeout(() => {
+                    main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+                }, 1000);
+            }
+
+            window.addEventListener("orientationchange", function() {
+                if (!isPortrait()) {
+                    canvas.style.display = 'none';
+                    startGame = false;
+                    location.href = '';
+                }
+
+                if (!startGame) {
+                    startGame = isPortrait();
+
+                    if (startGame) {
+                        e.innerHTML = "Loading...";
+                        setTimeout(() => {
+                            main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+                        }, 1000);
+                    } else if (!isPortrait()) {
+                        startGame = true;
+                        e.innerHTML = "Loading...";
+                        setTimeout(() => {
+                            main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+                        }, 1000);
+                        // main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+                    } else {
+                        alert('Rotate to landscape to start game.');
+                    }
+                }
+            }, false);
+
+            // btnStart.addEventListener('click', (e) => {
+            //     if (startGame) {
+            //         main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+            //     } else if (!isPortrait()) {
+            //         startGame = true;
+            //         main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+            //     } else {
+            //         alert('Rotate to landscape to start game.');
+            //     }
+            // });
+        </script>
+    </body>
+</html>

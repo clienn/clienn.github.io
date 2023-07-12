@@ -43,6 +43,12 @@ var sounds = {
         //     ++sounds.loaded;
         // });
 
+        if (fn == 'bg') {
+            obj.audio.volume = 0.1;
+        } else {
+            obj.audio.volume = 0.5;
+        }
+
         obj.audio.addEventListener("loadedmetadata", () => {
             //audio is ready to play all the way through
             ++sounds.loaded;
@@ -59,7 +65,7 @@ var sounds = {
 
 var music = {
     bg: {
-        src: 'sounds/bg',
+        src: 'sounds/bg-area12',
         obj: {},
         ext: 'mp3',
     }, 
@@ -161,7 +167,26 @@ var images = {
         src: 'cloud3',
         obj: {},
     },
+    volume: {
+        src: 'volume',
+        obj: {},
+    },
+    mute: {
+        src: 'mute',
+        obj: {},
+    },
 }
+
+var volumeInfo = {
+    x: 55,
+    y: 60,
+    w: 25,
+    h: 25,
+    cw: 50,
+    ch: 50,
+}
+
+var volumeOn = true;
 
 var canons = {
     black: {
@@ -510,6 +535,8 @@ var canReset = false;
 // canvas.width / 2 - 200, canvas.height - 225, 400, 100
 const cloudMovements = [-100, 100, 100];
 
+var scaleProj = 1.5;
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
@@ -539,10 +566,24 @@ function main(w, h) {
     let compassAdjX = 10;
     let compassAdjY = 5;
 
+    let scoreNAdjY = 0;
+
     if (isMobile) {
         compassAdjX = 17;
         compassAdjY = 13;
         trophyInfo.y = 70;
+        scaleProj = 1.7;
+
+        volumeInfo.x = 45;
+        volumeInfo.y = 85;
+        volumeInfo.w = 35;
+        volumeInfo.h = 35;
+
+        textList.topTimer.desc.weight = 'normal';
+        textList.scoreN.desc.weight = 'normal';
+
+        scoreNAdjY = 2;
+        
     }
 
     timer = new Timer(w / 2, 0, 50, '#fb2121');
@@ -574,6 +615,8 @@ function main(w, h) {
     rescaleSize(trophyInfo);
     rescaleAll(waterInfo);
 
+    rescaleAll(volumeInfo);
+
     waterInfo.y = h - waterInfo.h;
 
     shineInfo.w *= 2;
@@ -597,7 +640,7 @@ function main(w, h) {
     textList.scoreX.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw / 2 - 5 * scaleX;
     textList.scoreN.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw - (textList.scoreN.desc.w + 70) / 2 * scaleX;
     textList.scoreX.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreX.desc.h * scaleY / 2);
-    textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h * scaleY / 2);
+    textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h * scaleY / 2) - scoreNAdjY;
 
     textList.topTimer.obj.tx = topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2 - (textList.topTimer.desc.w - 5) / 2 * scaleX;
     textList.topTimer.obj.ty = topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2 - textList.topTimer.desc.h / 2 * scaleY;
@@ -916,17 +959,37 @@ function controls() {
 
             // mDown = true;
             if (gameStart) {
-                splat(mx, my);
-                updateLevel();
+                if (isBtnClicked(mx, my, {
+                    x: volumeInfo.x,
+                    y: volumeInfo.y + topHUDInfo.timer.y,
+                    w: volumeInfo.w,
+                    h: volumeInfo.h
+                })) {
+                    volumeOn = !volumeOn; 
+                    if (volumeOn) {
+                        music.bg.obj.audio.currentTime = 0;
+                        music.bg.obj.audio.play();
+
+                        music.explosion.obj.audio.currentTime = 0;
+                        music.explosion.obj.audio.play();
+                    } else {
+                        music.bg.obj.audio.pause();
+                        music.explosion.obj.audio.pause();
+                    }
+                } else {
+                    splat(mx, my);
+                    updateLevel();
+                }
+                
             } else {
                 if (isBtnClicked(mx, my, btnBegin)) {
                     gameStart = true;
 
-                    music.bg.obj.audio.volume = 0.5;
+                    music.bg.obj.audio.volume = 0.1;
                     music.bg.obj.audio.loop = true;
                     music.bg.obj.audio.play();
 
-                    music.explosion.obj.audio.volume = 0.8;
+                    music.explosion.obj.audio.volume = 0.5;
                     music.explosion.obj.audio.loop = true;
                     music.explosion.obj.audio.play();
                 }
@@ -957,8 +1020,30 @@ function controls() {
             let my = e.offsetY;
 
             if (gameStart) {
-                splat(mx, my);
-                updateLevel();
+                if (isBtnClicked(mx, my, {
+                    x: volumeInfo.x,
+                    y: volumeInfo.y + topHUDInfo.timer.y,
+                    w: volumeInfo.w,
+                    h: volumeInfo.h
+                })) {
+                    volumeOn = !volumeOn; 
+                    if (volumeOn) {
+                        music.bg.obj.audio.currentTime = 0;
+                        music.bg.obj.audio.play();
+
+                        music.explosion.obj.audio.currentTime = 0;
+                        music.explosion.obj.audio.play();
+                    } else {
+                        music.bg.obj.audio.pause();
+                        music.correct.obj.volume = 0;
+
+                        music.explosion.obj.audio.pause();
+                        music.explosion.obj.volume = 0;
+                    }
+                } else {
+                    splat(mx, my);
+                    updateLevel();
+                }
             } else {
                 if (isBtnClicked(mx, my, btnBegin)) {
                     gameStart = true;
@@ -1033,9 +1118,11 @@ function init() {
         rescale(projectiles[i]);
     }
 
+
+
     for (let i = 0; i < clips.length; ++i) {
-        clips[i].w *= scaleX;
-        clips[i].h *= scaleY;
+        clips[i].w *= scaleX * scaleProj;
+        clips[i].h *= scaleY * scaleProj;
     }
 
     canons.init();
@@ -1187,11 +1274,11 @@ function splat(mx, my) {
     for (let i = 0; i < projectiles.length; ++i) {
         if (isSplatted(projectiles[i], { x: mx, y: my })) {
             if (projectiles[i].clipY > 0) {
-                console.log('ouch!');
+                // console.log('ouch!');
                 score += OUCH_MINUS;
                 reduceHP();
             } else {
-                console.log('splatted!');
+                // console.log('splatted!');
                 score += SPLAT_POINTS;
             }
             resetProjectile([i]);
@@ -1261,6 +1348,14 @@ function gameCycle() {
                 drawTopHUD();
                 drawScoreHUD();
                 drawLives();
+
+                let volumeKey = 'mute';
+                if (volumeOn) {
+                    volumeKey = 'volume';
+                }
+
+                ctx.drawImage(images[volumeKey].obj.img, 0, 0, volumeInfo.cw, 
+                    volumeInfo.ch, volumeInfo.x, volumeInfo.y + topHUDInfo.timer.y, volumeInfo.w, volumeInfo.h);
 
                 // lands
                 ctx.drawImage(images.landLeft.obj.img, 0, 0, 157, 206, images.landLeft.x, images.landLeft.y, images.landLeft.w, images.landLeft.h);

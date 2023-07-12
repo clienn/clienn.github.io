@@ -22,6 +22,9 @@ class Spirte {
         this.rangeX = 0;
         this.rangeY = 0;
 
+        this.jump = 0;
+        this.degrees = 0;
+
         this.isAnimating = false;
     }
 

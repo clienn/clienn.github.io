@@ -38,6 +38,13 @@ var sounds = {
         obj.audio.src = 'assets/' + fn + '.' + ext;
         obj.audio.preload = 'auto';
         obj.audio.autoplay = (/iPad|iPhone|iPod/).test(navigator.userAgent);
+
+        if (fn == 'bg') {
+            obj.audio.volume = 0.1;
+        } else {
+            obj.audio.volume = 0.5;
+        }
+        
         // obj.audio.canplaythrough = function() {
         //     ++sounds.loaded;
         // }
@@ -139,6 +146,14 @@ var images = {
     },
     shine: {
         src: 'shine',
+        obj: {},
+    },
+    volume: {
+        src: 'volume',
+        obj: {},
+    },
+    mute: {
+        src: 'mute',
         obj: {},
     },
 };
@@ -303,6 +318,15 @@ var shineInfo = {
     ch: 290,
 }
 
+var volumeInfo = {
+    x: 55,
+    y: 60,
+    w: 25,
+    h: 25,
+    cw: 50,
+    ch: 50,
+}
+
 const topHUD = {
     timer: {
         timecircle: {
@@ -330,19 +354,24 @@ const topHUD = {
 
 var sorts = {
     bubble: () => {
-        let arr = generateSwaps();
+        let hasSwap = false;
+        while (!hasSwap) {
+            let arr = generateSwaps();
 
-        for (let i = 0; i < arr.length; ++i) {
-            for (let j = i + 1; j < arr.length; ++j) {
-                if (arr[i] > arr[j]) {
-                    let tmp = arr[i];
-                    arr[i] = arr[j];
-                    arr[j] = tmp;
+            for (let i = 0; i < arr.length; ++i) {
+                for (let j = i + 1; j < arr.length; ++j) {
+                    if (arr[i] > arr[j]) {
+                        let tmp = arr[i];
+                        arr[i] = arr[j];
+                        arr[j] = tmp;
 
-                    swaps.unshift([i, j]);
+                        swaps.unshift([i, j]);
+                        hasSwap = true;
+                    }
                 }
             }
         }
+        
 
         // console.log(swaps);
         // swaps.push([0, 9]);
@@ -447,55 +476,72 @@ var pulseT = 0;
 // var TM = null;
 // var tmpText = null;
 
-var TM = new TextManager(ctx);
+// var TM = new TextManager(ctx);
 // var tmpText = TM.generateTextObj('Hello World!', 'Montserrat', 'normal', 30, 0, 0, 500, 100);
 
-var textList = {
-    topTimer: {
-        obj: null,
-        desc: TM.addTextObj('09', 'Montserrat', 'bold', 20, 0, 0, 20, 20, '#000'),
-    },
-    scoreX: {
-        obj: null,
-        desc: TM.addTextObj('x', 'Montserrat', 'normal', 20, 0, 0, 10, 20, '#fff'),
-    },
-    scoreN: {
-        obj: null,
-        desc: TM.addTextObj('00', 'Montserrat', 'bold', 25, 0, 0, 20, 27, '#fff'),
-    },
-    resetMsg: {
-        obj: null,
-        desc: null,
-    },
-    correct: {
-        obj: null,
-        desc: TM.addTextObj('Correct!', 'Montserrat', 'bold', 20, 0, 200, 150, 50, '#fff'),
-    },
-    wrong: {
-        obj: null,
-        desc: TM.addTextObj('Wrong!', 'Montserrat', 'bold', 20, 0, 200, 120, 50, '#fb2121'),
-    },
-    tooslow: {
-        obj: null,
-        desc: TM.addTextObj('Too Slow!', 'Montserrat', 'bold', 20, 0, 200, 170, 50, '#fb2121'),
-    },
-    complete: {
-        obj: null,
-        desc: TM.addTextObj('Complete!', 'Montserrat', 'bold', 20, 0, 0, 140, 40, '#fff'),
-    },
-    scoreLabel: {
-        obj: null,
-        desc: TM.addTextObj('Score', 'Montserrat', 'normal', 20, 0, 0, 40, 30, '#fff'),
-    },
-    finalScore: {
-        obj: null,
-        desc: TM.addTextObj('00', 'Montserrat', 'bold', 25, 0, 0, 25, 30, '#fff'),
-    },
-    resetMsg: {
-        obj: null,
-        desc: TM.addTextObj('Tap to play again.', 'Montserrat', 'bold', 20, 0, 0, 250, 50, '#fff'),
-    }
-};
+var TXT = null;
+
+// var textList = {
+//     topTimer: {
+//         obj: null,
+//         desc: TM.addTextObj('09', 'Montserrat', 'bold', 20, 0, 0, 20, 20, '#000'),
+//     },
+//     scoreX: {
+//         obj: null,
+//         desc: TM.addTextObj('x', 'Montserrat', 'normal', 20, 0, 0, 10, 20, '#fff'),
+//     },
+//     scoreN: {
+//         obj: null,
+//         desc: TM.addTextObj('00', 'Montserrat', 'bold', 25, 0, 0, 20, 27, '#fff'),
+//     },
+//     correct: {
+//         obj: null,
+//         desc: TM.addTextObj('Correct!', 'Montserrat', 'bold', 20, 0, 200, 150, 50, '#fff'),
+//     },
+//     wrong: {
+//         obj: null,
+//         desc: TM.addTextObj('Wrong!', 'Montserrat', 'bold', 20, 0, 200, 120, 50, '#fb2121'),
+//     },
+//     tooslow: {
+//         obj: null,
+//         desc: TM.addTextObj('Too Slow!', 'Montserrat', 'bold', 20, 0, 200, 170, 50, '#fb2121'),
+//     },
+//     complete: {
+//         obj: null,
+//         desc: TM.addTextObj('Complete!', 'Montserrat', 'bold', 20, 0, 0, 140, 40, '#fff'),
+//     },
+//     scoreLabel: {
+//         obj: null,
+//         desc: TM.addTextObj('Score', 'Montserrat', 'normal', 20, 0, 0, 40, 30, '#fff'),
+//     },
+//     finalScore: {
+//         obj: null,
+//         desc: TM.addTextObj('00', 'Montserrat', 'bold', 25, 0, 0, 25, 30, '#fff'),
+//     },
+//     resetMsg: {
+//         obj: null,
+//         desc: TM.addTextObj('Tap to play again.', 'Montserrat', 'bold', 20, 0, 0, 250, 50, '#fff'),
+//     }
+// };
+
+const TEXT_ID = {
+    'CORRECT': 1,
+    'WRONG': 2,
+    'TOOSLOW': 3,
+    'COMPLETE': 4,
+    'SCORELABEL': 5,
+    'FINALSCORE': 6,
+    'RESETMSG': 7,
+    'TOPTIMER': 8,
+    'SCOREX': 9,
+    'SCORE': 10,
+}
+
+var answerIdx = -1;
+var showAnswerT = 0;
+var jumpHeight = 10;
+
+var volumeOn = true;
 
 function main(w, h) {
     canvas.width = w;
@@ -504,13 +550,19 @@ function main(w, h) {
     canvas.style.display = 'block';
     instrucions.style.display = 'none';
 
+    
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    TXT = new Text(ctx, w, h);
+    TXT.setScale(scaleX, scaleY);
 
     let isMobile = detectMob();
     timerY = h / 2;
     textPos.x = w / 2;
     textPos.y = timerY / 2;
+
+    let scoreAdjY = 13;
 
     if (isMobile) {
         timerRadius = 70;
@@ -522,6 +574,13 @@ function main(w, h) {
         textPos.y -= 25;
 
         bgInfo.water.y = 350;
+
+        scoreAdjY = 20;
+
+        volumeInfo.x = 45;
+        volumeInfo.y = 85;
+        volumeInfo.w = 35;
+        volumeInfo.h = 35;
     }
 
     resetMsgY *= scaleY;
@@ -539,6 +598,7 @@ function main(w, h) {
     
     rescaleSize(turtleInfo);
     rescaleSize(shellInfo);
+    rescaleAll(volumeInfo);
 
     initTopHUD();
 
@@ -556,6 +616,24 @@ function main(w, h) {
     rescaleAll(bgInfo.cloud2);
     rescaleAll(bgInfo.cloud3);
     rescaleAll(shineInfo);
+
+    // Texts
+    TXT.addText(canvas, TEXT_ID.CORRECT, 'Correct!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
+    TXT.addText(canvas, TEXT_ID.WRONG, 'Wrong!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
+    TXT.addText(canvas, TEXT_ID.TOOSLOW, 'Too Slow!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
+    TXT.addText(canvas, TEXT_ID.COMPLETE, 'Complete!', 'bold', 20, 'Montserrat', w / 2, 75 * scaleY, 200, 40, '#fff', true); 
+    TXT.addText(canvas, TEXT_ID.SCORELABEL, 'Score', 'bold', 20, 'Montserrat', w / 2, 270 * scaleY, 70, 30, '#fff', true); 
+    TXT.addText(canvas, TEXT_ID.FINALSCORE, '00', 'bold', 20, 'Montserrat', w / 2, 300 * scaleY, 35, 30, '#fff', true); 
+    TXT.addText(canvas, TEXT_ID.RESETMSG, 'Tap to play again.', 'bold', 20, 'Montserrat', w / 2, h / 2, 300, 50, '#fff', true); 
+    TXT.addText(canvas, TEXT_ID.TOPTIMER, '09', (isMobile ? 'normal' : 'bold'), 20, 'Montserrat', 
+        topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2, 40 * scaleY, 20, 20, '#000', true); 
+
+    TXT.addText(canvas, TEXT_ID.SCOREX, 'x', 'normal', 20, 'Montserrat', 
+        w / 2, topHUDInfo.score.y + (scoreAdjY + 2) * scaleY, 10, 20, '#fff', true); 
+
+    TXT.addText(canvas, TEXT_ID.SCORE, '00', (isMobile ? 'normal' : 'bold'), 25, 'Montserrat', 
+        w / 2 + 50 * scaleX, topHUDInfo.score.y + scoreAdjY * scaleY, 20, 25, '#fff', true);
+    // 
 
     shineInfo.w *= 1.5;
     shineInfo.h *= 1.5;
@@ -581,37 +659,37 @@ function main(w, h) {
     bgInfo.sand.y = h - 376 * scaleY;
     bgInfo.sand2.y = h - 336 * scaleY;
 
-    for (let k in textList) {
-        if (textList[k].desc != null) {
-            textList[k].obj = TM.generateTextObj(textList[k].desc, scaleX, scaleY);
-        }
-    }
+    // for (let k in textList) {
+    //     if (textList[k].desc != null) {
+    //         textList[k].obj = TM.generateTextObj(textList[k].desc, scaleX, scaleY);
+    //     }
+    // }
 
-    textList.correct.obj.tx = w / 2 - textList.correct.desc.w * scaleX / 2;
-    textList.wrong.obj.tx = w / 2 - textList.wrong.desc.w * scaleX / 2;
-    textList.tooslow.obj.tx = w / 2 - textList.tooslow.desc.w * scaleX / 2;
+    // textList.correct.obj.tx = w / 2 - textList.correct.desc.w * scaleX / 2;
+    // textList.wrong.obj.tx = w / 2 - textList.wrong.desc.w * scaleX / 2;
+    // textList.tooslow.obj.tx = w / 2 - textList.tooslow.desc.w * scaleX / 2;
 
-    textList.scoreX.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw / 2 - 5 * scaleX;
-    textList.scoreN.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw - (textList.scoreN.desc.w + 70) / 2 * scaleX;
-    textList.scoreX.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreX.desc.h * scaleY / 2);
-    textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h * scaleY / 2);
+    // textList.scoreX.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw / 2 - 5 * scaleX;
+    // textList.scoreN.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw - (textList.scoreN.desc.w + 70) / 2 * scaleX;
+    // textList.scoreX.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreX.desc.h * scaleY / 2);
+    // textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h * scaleY / 2);
 
-    // textList.scoreX.obj.tx = topHUDInfo.score.x + (topHUDInfo.score.pw / 2 - textList.scoreX.desc.w / 2);
-    // textList.scoreN.obj.tx = topHUDInfo.score.x + (topHUDInfo.score.pw - textList.scoreN.desc.w * 2.2);
-    // textList.scoreX.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreX.desc.h / 2);
-    // textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h / 2);
+    // // textList.scoreX.obj.tx = topHUDInfo.score.x + (topHUDInfo.score.pw / 2 - textList.scoreX.desc.w / 2);
+    // // textList.scoreN.obj.tx = topHUDInfo.score.x + (topHUDInfo.score.pw - textList.scoreN.desc.w * 2.2);
+    // // textList.scoreX.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreX.desc.h / 2);
+    // // textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h / 2);
 
-    textList.topTimer.obj.tx = topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2 - (textList.topTimer.desc.w - 5) / 2 * scaleX;
-    textList.topTimer.obj.ty = topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2 - textList.topTimer.desc.h / 2 * scaleY;
+    // textList.topTimer.obj.tx = topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2 - (textList.topTimer.desc.w - 5) / 2 * scaleX;
+    // textList.topTimer.obj.ty = topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2 - textList.topTimer.desc.h / 2 * scaleY;
 
-    textList.complete.obj.tx = w / 2 - textList.complete.desc.w / 2 * scaleX - 10 * scaleX;
-    textList.complete.obj.ty = 75 * scaleY;
-    textList.scoreLabel.obj.tx = w / 2 - textList.scoreLabel.desc.w / 2 * scaleX;
-    textList.scoreLabel.obj.ty = 270 * scaleY;
-    textList.finalScore.obj.tx = w / 2 - textList.finalScore.desc.w / 2 * scaleX - 2 * scaleX;
-    textList.finalScore.obj.ty = 300 * scaleY;
-    textList.resetMsg.obj.tx = w / 2 - textList.resetMsg.desc.w / 2 * scaleX - 20 * scaleX;
-    textList.resetMsg.obj.ty = h / 2 - textList.resetMsg.desc.h / 2 * scaleY;
+    // textList.complete.obj.tx = w / 2 - textList.complete.desc.w / 2 * scaleX - 10 * scaleX;
+    // textList.complete.obj.ty = 75 * scaleY;
+    // textList.scoreLabel.obj.tx = w / 2 - textList.scoreLabel.desc.w / 2 * scaleX;
+    // textList.scoreLabel.obj.ty = 270 * scaleY;
+    // textList.finalScore.obj.tx = w / 2 - textList.finalScore.desc.w / 2 * scaleX - 2 * scaleX;
+    // textList.finalScore.obj.ty = 300 * scaleY;
+    // textList.resetMsg.obj.tx = w / 2 - textList.resetMsg.desc.w / 2 * scaleX - 20 * scaleX;
+    // textList.resetMsg.obj.ty = h / 2 - textList.resetMsg.desc.h / 2 * scaleY;
 
 
     // ctx.font = topHUDInfo.score.fontsize + 'px Montserrat';
@@ -650,39 +728,66 @@ function main(w, h) {
                 // turtles[2].move(-1);
                 // turtles[0].move(1);
                 // turtles[2].goto(-2);
-                if (startTimer && swaps.length == 0) {
+                if (isBtnClicked(mx, my, {
+                    x: volumeInfo.x,
+                    y: volumeInfo.y + topHUDInfo.timer.y,
+                    w: volumeInfo.w,
+                    h: volumeInfo.h
+                })) {
+                    volumeOn = !volumeOn; 
+                    if (volumeOn) {
+                        music.bg.obj.audio.currentTime = 0;
+                        music.bg.obj.audio.play();
+                    } else {
+                        music.bg.obj.audio.pause();
+                        // music.correct.obj.volume = 0;
+                    }
+                } else if (startTimer && swaps.length == 0 && showAnswerT == 0) {
                     let p = clickBucket(mx, my);
                     if (p == turtles[target].pos) {
                         // alert('you win');
                         // msg = 'Correct!';
-                        msg = 'correct';
+                        // msg = 'correct';
+                        msg = TEXT_ID.CORRECT;
                         score++;
                         // if (!music.correct.obj.audio.paused) {
                         //     music.correct.obj.audio.currentTime = 0;
                         //     music.correct.obj.audio.play();
                         // }
                         
-                        music.correct.obj.audio.play();
+                        if (volumeOn)
+                            music.correct.obj.audio.play();
+                        turtles[target].jump = jumpHeight;
                         
                     } else {
                         // alert('you lose');
-                        msg = 'wrong';
+                        // msg = 'wrong';
+                        msg = TEXT_ID.WRONG;
                         // msg = 'Wrong!';
                         reduceHP();
-                        music.wrong.obj.audio.play();
+
+                        if (volumeOn)
+                            music.wrong.obj.audio.play();
                     }
 
-                    if (rounds < totalRounds) {
-                        nextRound();
-                    } else {
-                        // alert('You scored: ' + score + ' out of ' + rounds + '.');
-                        gameover = true;
-                    }
+                    // showAnswer = true;
+                    showAnswerT = 5;
+                    answerIdx = target;
+                    startTimer = false;
+                    
+
+                    // if (rounds < totalRounds) {
+                    //     nextRound();
+                    // } else {
+                    //     // alert('You scored: ' + score + ' out of ' + rounds + '.');
+                    //     gameover = true;
+                    // }
                 }
             } else {
                 if (isBtnClicked(mx, my, btnBegin)) {
                     gameStart = true;
-                    music.bg.obj.audio.volume = 0.2;
+                    music.bg.obj.audio.volume = 0.08;
+                    // music.bg.obj.audio.volume = 1;
                     music.bg.obj.audio.loop = true;
                     music.bg.obj.audio.play();
                 }
@@ -712,6 +817,7 @@ function main(w, h) {
             if (gameover) {
                 if (canReset) {
                     init();
+                    // location.href = '';
                 } else {
                     canReset = true;
                 }
@@ -721,26 +827,6 @@ function main(w, h) {
         }
     });
 
-    // addTurtle();
-    // addTurtle();
-    // addTurtle();
-    // // addTurtle();
-    // // addTurtle();
-    // // addTurtle();
-    // // addTurtle();
-    // // addTurtle();
-    // // addTurtle();
-    // // addTurtle();
-    // // addTurtle();
-
-    // updateTurtleInitialPos();
-    
-    // // if (swaps.length == 0) {
-    // //     sorts.bubble();
-    // //     startTimer = true;
-    // // }
-
-    // timer.setTimer(showTurtleDuration);
     setCloudSpeed(30);
     setBucketSizes();
     init();
@@ -846,6 +932,9 @@ function init() {
     fade = false;
     pulseT = 0;
 
+    showAnswerT = 0;
+    answerIdx = -1;
+
     target = Math.floor(Math.random() * turtles.length);
 }
 
@@ -885,6 +974,7 @@ function initTopHUD() {
     rescaleSize(topHUD.timer.stopwatch);
     // rescaleSize(topHUD.score.turtleshine);
     rescaleAll(topHUD.score.turtleshine);
+    
     rescaleSize(topHUDInfo);
 
     topHUDInfo.timer.w = topHUD.timer.timecircle.w / 2 + 100 * scaleX;
@@ -939,8 +1029,41 @@ function addTurtle() {
 
 function drawTurtle() {
     for (let i = 0; i < turtles.length; ++i) {
-        if (showTarget && i == target) {
-            turtles[i].draw(ctx, images.turtle.obj.img);
+        if ((showTarget && i == target && showAnswerT == 0) || answerIdx == i) {
+            if (answerIdx > -1) {
+                if (msg == TEXT_ID.WRONG || msg == TEXT_ID.TOOSLOW) {
+                    ctx.save();
+
+                    // move to the center of the canvas
+                    ctx.translate(turtles[i].ox + turtles[i].w / 2, turtles[i].oy + turtles[i].h / 2);
+                    
+                    turtles[i].degrees = Math.sin(showAnswerT * 20) * 45;
+                    // rotate the canvas to the specified degrees
+                    ctx.rotate(turtles[i].degrees*Math.PI/180);
+
+                    // draw the image
+                    turtles[i].x = -0.5 * turtles[i].w;
+                    turtles[i].y = -0.5 * turtles[i].h;
+                    turtles[i].draw(ctx, images.turtle.obj.img);
+
+                    // we’re done with the rotating so restore the unrotated context
+                    ctx.restore();
+                } else {
+                    turtles[i].y -= turtles[i].jump;
+                    turtles[i].jump -= 9.8 * delta * 5;
+                    if (turtles[i].y > turtles[i].oy) {
+                        turtles[i].y = turtles[i].oy;
+                        turtles[i].jump = jumpHeight;
+                    }
+
+                    turtles[i].draw(ctx, images.turtle.obj.img);
+                }
+                
+            } else {
+                turtles[i].draw(ctx, images.turtle.obj.img);
+            }
+            
+            
         } else {
             turtles[i].draw(ctx, images.shell.obj.img);
         }
@@ -1096,7 +1219,7 @@ function moveClouds() {
             if (mul == 0) {
                 cloudMovements[i - 1] = -rngSpeed;
                 bgInfo[key].x = canvas.width;
-                console.log('test', )
+                // console.log('test', )
             } else {
                 cloudMovements[i - 1] = rngSpeed;
                 bgInfo[key].x = -bgInfo[key].w;
@@ -1132,33 +1255,52 @@ function update() {
     }
 
     if (startTimer && swaps.length == 0) {
-        // timer.draw(ctx);
-        // if (!music.shuffle.obj.audio.paused) {
-        //     // music.shuffle.obj.audio.pause();
-        //     music.shuffle.obj.audio.loop = false;
-        // }
-
         timer.tick(delta);
 
         if (timer.timer <= 0) {
             if (msg == '') {
                 // msg = 'Too slow!';
-                msg = 'tooslow';
+                // msg = 'tooslow';
+                msg = TEXT_ID.TOOSLOW;
                 reduceHP();
-                music.wrong2.obj.audio.play();
+
+                if (volumeOn)
+                    music.wrong2.obj.audio.play();
             }
                 
 
-            nextRound();
+            // nextRound();
+            showAnswerT = 5;
+            answerIdx = target;
+            startTimer = false;
+            // turtles[answerIdx].jump = jumpHeight;
         }
 
+    } else if (showAnswerT > 0) {
+        if (msg) {
+            // TM.draw(textList[msg].obj);
+            TXT.draw(msg);
+            
+        }
+        
+        showAnswerT -= 1 * delta;
+        if (showAnswerT <= 0) {
+            showAnswerT = 0;
+            turtles[answerIdx].jump = 0;
+            turtles[answerIdx].y = turtles[answerIdx].oy;
+
+            if (rounds < totalRounds) {
+                nextRound();
+            } else {
+                // alert('You scored: ' + score + ' out of ' + rounds + '.');
+                gameover = true;
+            }
+        }
     } else if (showTarget) {
         timer.draw(ctx);
         timer.tick(delta);
 
-        if (msg) {
-            TM.draw(textList[msg].obj);
-        }
+        
             // drawMessage(msg);
 
         if (timer.timer <= 0) {
@@ -1167,9 +1309,6 @@ function update() {
             startTimer = true;
             msg = '';
             sorts.bubble();
-
-            // music.shuffle.obj.audio.volume = 0.3;
-            // music.shuffle.obj.audio.play();
         }
     }
 
@@ -1180,6 +1319,8 @@ function nextRound() {
     timer.setTimer(showTurtleDuration);
     showTarget = true;
     startTimer = false;
+    answerIdx = -1;
+    showAnswerT = 0;
     target = Math.floor(Math.random() * turtles.length);
 
     if (turtles.length < 10) {
@@ -1246,7 +1387,14 @@ function drawTopHUD() {
 
     ctx.drawImage(images.stopwatch.obj.img, 0, 0, topHUD.timer.stopwatch.cw, 
         topHUD.timer.stopwatch.ch, x, y, topHUD.timer.stopwatch.w, topHUD.timer.stopwatch.h);
+    
+    let volumeKey = 'mute';
+    if (volumeOn) {
+        volumeKey = 'volume';
+    }
 
+    ctx.drawImage(images[volumeKey].obj.img, 0, 0, volumeInfo.cw, 
+        volumeInfo.ch, volumeInfo.x, volumeInfo.y + y, volumeInfo.w, volumeInfo.h);
     
     // ctx.font = 'bold ' + topHUDInfo.timer.text.fontsize + 'px Montserrat';
     // ctx.fillStyle = 'black';
@@ -1254,8 +1402,10 @@ function drawTopHUD() {
 
     
     let timeText = showTarget ? '09' : zeroPad(Math.floor(timer.timer / 24), 2);
-    textList.topTimer.obj.str = timeText;
-    TM.draw(textList.topTimer.obj);
+    // textList.topTimer.obj.str = timeText;
+    // TM.draw(textList.topTimer.obj);
+    TXT.texts[TEXT_ID.TOPTIMER].str = timeText;
+    TXT.draw(TEXT_ID.TOPTIMER);
 
     // ctx.fillText(timeText, topHUDInfo.timer.text.x, topHUDInfo.timer.text.y);
     // ctx.fillText('25', topHUD.timer.timecircle.w / 2 - 23 / 2, topHUD.timer.timecircle.h / 2 + 3);
@@ -1332,9 +1482,12 @@ function drawScoreHUD() {
     ctx.drawImage(images.turtleshine.obj.img, 0, 0, topHUD.score.turtleshine.cw, 
         topHUD.score.turtleshine.ch, x + 5 * scaleX, y, topHUD.score.turtleshine.w, topHUD.score.turtleshine.h);
 
-    TM.draw(textList.scoreX.obj);
-    textList.scoreN.obj.str = zeroPad(score, 2);
-    TM.draw(textList.scoreN.obj);
+    // TM.draw(textList.scoreX.obj);
+    TXT.draw(TEXT_ID.SCOREX);
+    // textList.scoreN.obj.str = zeroPad(score, 2);
+    // TM.draw(textList.scoreN.obj);
+    TXT.texts[TEXT_ID.SCORE].str = zeroPad(score, 2);
+    TXT.draw(TEXT_ID.SCORE);
 }
 
 function drawProgress() {
@@ -1422,6 +1575,8 @@ function gameCycle() {
             } else {
             
                 ctx.drawImage(images.splash.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+                
+                // TXT.draw(0);
                 // ctx.drawImage(images.turtleshine.obj.img, 0, 0, topHUD.score.turtleshine.cw, 
                 //     topHUD.score.turtleshine.ch, 0, 0, topHUD.score.turtleshine.w, topHUD.score.turtleshine.h);
                 // ctx.beginPath();
@@ -1481,31 +1636,19 @@ function gameCycle() {
                 ctx.drawImage(images.turtle.obj.img, 0, 0, turtleInfo.cw, 
                     turtleInfo.ch, x, y, turtleInfo.w, turtleInfo.h);
                 
-                
-                // let fonsizes = [40, 30, 50];
-                // let isMobile = detectMob();
-                // if (isMobile) {
-                //     fonsizes = [20, 15, 25];
-                // }
+            
 
-                // x = shineInfo.x + (shineInfo.w / 2 - (220 * scaleX) / 2);
-                // // y = 100 * scaleY;
-                // displayMsg('Complete!', fonsizes[0], '#fff', x, 100 * scaleY);
-                // x = shineInfo.x + (shineInfo.w / 2 - (85 * scaleX) / 2);
-                // y += 20 * scaleY;
-                // displayMsg('Score', fonsizes[1], '#fff', x, y + turtleInfo.h);
-                // x = shineInfo.x + (shineInfo.w / 2 - (70 * scaleX) / 2);
-                // y += 40 * scaleY;
-                // displayMsg(zeroPad(score, 2), fonsizes[2], '#fff', x, y + turtleInfo.h);
+                // TM.draw(textList.complete.obj);
+                // TM.draw(textList.scoreLabel.obj);
+                // textList.finalScore.obj.str = zeroPad(score, 2);
+                // TM.draw(textList.finalScore.obj);
+                // TM.draw(textList.resetMsg.obj);
 
-                // drawResetMessage();
-                // fade = 2;
-
-                TM.draw(textList.complete.obj);
-                TM.draw(textList.scoreLabel.obj);
-                textList.finalScore.obj.str = zeroPad(score, 2);
-                TM.draw(textList.finalScore.obj);
-                TM.draw(textList.resetMsg.obj);
+                TXT.draw(TEXT_ID.COMPLETE);
+                TXT.draw(TEXT_ID.SCORELABEL);
+                TXT.texts[TEXT_ID.FINALSCORE].str = zeroPad(score, 2);
+                TXT.draw(TEXT_ID.FINALSCORE);
+                TXT.draw(TEXT_ID.RESETMSG);
             }
             
         }
