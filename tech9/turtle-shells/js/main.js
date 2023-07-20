@@ -391,8 +391,9 @@ const topHUD = {
 var sorts = {
     bubble: () => {
         let hasSwap = false;
-        // while (!hasSwap) {
-            let arr = generateSwaps();
+        let arr = generateSwaps();
+        
+        while (!hasSwap) {
             swaps.length = 0;
 
             for (let i = 0; i < arr.length; ++i) {
@@ -403,12 +404,14 @@ var sorts = {
                         arr[j] = tmp;
 
                         swaps.unshift([i, j]);
-                        // hasSwap = true;
+                        hasSwap = true;
                     }
                 }
             }
+
+            shuffleArr(arr);
             // arr.length = 0;
-        // }
+        }
         // console.log(swaps);
         // swaps.push([0, 9]);
         // swaps.push([1, 3]);
@@ -1004,6 +1007,8 @@ function init() {
 
     target = Math.floor(Math.random() * turtles.length);
     turtles[target].activateSpriteAnimation = true;
+    turtles[target].clipX = 0;
+    turtles[target].clipAnimT = 0;
     speed = 3;
 }
 
@@ -1136,7 +1141,7 @@ function drawTurtle() {
                 }
                 
             } else {
-                turtles[i].animateSprite(delta, turtlehideInfo, 8, 7);
+                turtles[i].animateSprite(delta, turtlehideInfo, 5, 7);
                 if (turtles[i].activateSpriteAnimation) {
                     turtles[i].draw(ctx, images.turtlehide.obj.img, 1, turtlehideInfo);
                 } else {
@@ -1408,7 +1413,7 @@ function nextRound() {
     if (turtles.length < 8) {
         addTurtle();
 
-        turtles[target].activateSpriteAnimation = true;
+        // turtles[target].activateSpriteAnimation = true;
         // if (turtles.length > 7) {
         //     setBucketSizes();
         // }
@@ -1417,6 +1422,10 @@ function nextRound() {
         
         speed += 0.5;
     }
+
+    turtles[target].activateSpriteAnimation = true;
+    turtles[target].clipX = 0;
+    turtles[target].clipAnimT = 0;
 
     rounds++;
 }
