@@ -84,6 +84,18 @@ var images = {
         src: 'shell',
         obj: {},
     },
+    turtlehide: {
+        src: 'turtlehide',
+        obj: {},
+    },
+    turtlehappy: {
+        src: 'turtlehappy',
+        obj: {},
+    },
+    seagull: {
+        src: 'seagull',
+        obj: {},
+    },
     turtleshine: {
         src: 'turtleshine',
         obj: {},
@@ -309,6 +321,30 @@ var shellInfo = {
     bucketSize: 0
 }
 
+var turtlehideInfo = {
+    w: 120,
+    h: 121,
+    cw: 120,
+    ch: 121,
+    bucketSize: 0
+}
+
+var turtlehappyInfo = {
+    w: 120,
+    h: 121,
+    cw: 120,
+    ch: 121,
+    bucketSize: 0
+}
+
+var seagullInfo = {
+    w: 144,
+    h: 77,
+    cw: 576,
+    ch: 288,
+    bucketSize: 0
+}
+
 var shineInfo = {
     x: 0,
     y: 0,
@@ -355,8 +391,9 @@ const topHUD = {
 var sorts = {
     bubble: () => {
         let hasSwap = false;
-        while (!hasSwap) {
+        // while (!hasSwap) {
             let arr = generateSwaps();
+            swaps.length = 0;
 
             for (let i = 0; i < arr.length; ++i) {
                 for (let j = i + 1; j < arr.length; ++j) {
@@ -366,13 +403,12 @@ var sorts = {
                         arr[j] = tmp;
 
                         swaps.unshift([i, j]);
-                        hasSwap = true;
+                        // hasSwap = true;
                     }
                 }
             }
-        }
-        
-
+            // arr.length = 0;
+        // }
         // console.log(swaps);
         // swaps.push([0, 9]);
         // swaps.push([1, 3]);
@@ -543,6 +579,9 @@ var jumpHeight = 10;
 
 var volumeOn = true;
 
+var seagulls = [];
+var seagullDirections = [];
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
@@ -598,6 +637,9 @@ function main(w, h) {
     
     rescaleSize(turtleInfo);
     rescaleSize(shellInfo);
+    rescaleAll(turtlehideInfo);
+    rescaleAll(turtlehappyInfo);
+    rescaleAll(seagullInfo);
     rescaleAll(volumeInfo);
 
     initTopHUD();
@@ -659,49 +701,6 @@ function main(w, h) {
     bgInfo.sand.y = h - 376 * scaleY;
     bgInfo.sand2.y = h - 336 * scaleY;
 
-    // for (let k in textList) {
-    //     if (textList[k].desc != null) {
-    //         textList[k].obj = TM.generateTextObj(textList[k].desc, scaleX, scaleY);
-    //     }
-    // }
-
-    // textList.correct.obj.tx = w / 2 - textList.correct.desc.w * scaleX / 2;
-    // textList.wrong.obj.tx = w / 2 - textList.wrong.desc.w * scaleX / 2;
-    // textList.tooslow.obj.tx = w / 2 - textList.tooslow.desc.w * scaleX / 2;
-
-    // textList.scoreX.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw / 2 - 5 * scaleX;
-    // textList.scoreN.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw - (textList.scoreN.desc.w + 70) / 2 * scaleX;
-    // textList.scoreX.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreX.desc.h * scaleY / 2);
-    // textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h * scaleY / 2);
-
-    // // textList.scoreX.obj.tx = topHUDInfo.score.x + (topHUDInfo.score.pw / 2 - textList.scoreX.desc.w / 2);
-    // // textList.scoreN.obj.tx = topHUDInfo.score.x + (topHUDInfo.score.pw - textList.scoreN.desc.w * 2.2);
-    // // textList.scoreX.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreX.desc.h / 2);
-    // // textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h / 2);
-
-    // textList.topTimer.obj.tx = topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2 - (textList.topTimer.desc.w - 5) / 2 * scaleX;
-    // textList.topTimer.obj.ty = topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2 - textList.topTimer.desc.h / 2 * scaleY;
-
-    // textList.complete.obj.tx = w / 2 - textList.complete.desc.w / 2 * scaleX - 10 * scaleX;
-    // textList.complete.obj.ty = 75 * scaleY;
-    // textList.scoreLabel.obj.tx = w / 2 - textList.scoreLabel.desc.w / 2 * scaleX;
-    // textList.scoreLabel.obj.ty = 270 * scaleY;
-    // textList.finalScore.obj.tx = w / 2 - textList.finalScore.desc.w / 2 * scaleX - 2 * scaleX;
-    // textList.finalScore.obj.ty = 300 * scaleY;
-    // textList.resetMsg.obj.tx = w / 2 - textList.resetMsg.desc.w / 2 * scaleX - 20 * scaleX;
-    // textList.resetMsg.obj.ty = h / 2 - textList.resetMsg.desc.h / 2 * scaleY;
-
-
-    // ctx.font = topHUDInfo.score.fontsize + 'px Montserrat';
-    // ctx.fillStyle = '#fff';
-    // ctx.textBaseline = 'middle';
-    // ctx.fillText('x', topHUDInfo.score.fontX, topHUDInfo.score.fontY);
-
-    // ctx.font = 'bold ' + topHUDInfo.score.fontsize2 + 'px Montserrat';
-    // ctx.fillStyle = '#fff';
-    // ctx.textBaseline = 'middle';
-    // ctx.fillText(zeroPad(score, 2), topHUDInfo.score.fontX + topHUDInfo.score.fontXadj, topHUDInfo.score.fontY);
-
     loadAssets();
 
     canvas.addEventListener('touchstart', e => {
@@ -757,7 +756,11 @@ function main(w, h) {
                         
                         if (volumeOn)
                             music.correct.obj.audio.play();
+
                         turtles[target].jump = jumpHeight;
+                        turtles[target].activateSpriteAnimation = true;
+                        turtles[target].clipX = 0;
+                        turtles[target].clipAnimT = 0;
                         
                     } else {
                         // alert('you lose');
@@ -829,6 +832,13 @@ function main(w, h) {
 
     setCloudSpeed(30);
     setBucketSizes();
+
+    addSeagull();
+    addSeagull();
+    addSeagull();
+    addSeagull();
+    addSeagull();
+
     init();
 
     gameCycle();
@@ -867,6 +877,46 @@ function setBucketSizes() {
         turtleInfo.bucketSize *= 1.5;
         shellInfo.bucketSize *= 1.5;
         updateTurtleInitialPos();
+    }
+}
+
+function addSeagull() {
+    let x = Math.floor(Math.random() * canvas.width);
+    let y = Math.floor(Math.random() * 300 * scaleY);
+    
+
+    let seagull = new Spirte(x, y, seagullInfo.w, seagullInfo.h, seagullInfo.cw, seagullInfo.ch);
+    seagull.activateSpriteAnimation = true;
+
+    seagulls.push(seagull);
+    seagullDirections.push(setSeagullDirection(70, true));
+}
+
+function setSeagullDirection(speedLimit, randomD) {
+    let d = Math.floor(Math.random() * 2);
+    if (randomD) {
+        return (Math.floor(Math.random() * speedLimit) + 10) * (d ? 1 : -1);
+    }
+
+    return Math.floor(Math.random() * speedLimit) + 10;
+}
+
+function drawSeagulls() {
+    for (let i = 0; i < seagulls.length; ++i) {
+        seagulls[i].animateSprite(delta, seagullInfo, 15, 17, true);
+        seagulls[i].draw(ctx, images.seagull.obj.img, 1, seagullInfo);
+    }
+}
+
+function updateSeagulls() {
+    for (let i = 0; i < seagulls.length; ++i) {
+        seagulls[i].x += seagullDirections[i] * delta;
+
+        if (seagullDirections[i] > 0 && seagulls[i].x > canvas.width + 10) {
+            seagullDirections[i] = setSeagullDirection(30, false) * -1;
+        } else if (seagullDirections[i] < 0 && (seagulls[i].x + seagulls[i].w) < 0) {
+            seagullDirections[i] = setSeagullDirection(30, false);
+        }
     }
 }
 
@@ -911,7 +961,22 @@ function drawClouds() {
 }
 
 function init() {
+    while (turtles.length > 0) {
+        turtles.pop();
+    }
+
+    turtles.length = 0;
+    turtles = null;
     turtles = [];
+
+    swaps.length = 0;
+    swaps = null;
+    swaps = [];
+
+    turtlePos.length = 0;
+    turtlePos = null;
+    turtlePos = [];
+
     lives = topHUDInfo.life.lives;
     // lives = 0;
     score = 0;
@@ -920,6 +985,8 @@ function init() {
     for (let i = 0; i < 3; ++i) {
         addTurtle();
     }
+
+    // console.log(turtles.length, swaps.length, turtlePos.length);
 
     updateTurtleInitialPos();
     timer.setTimer(showTurtleDuration);
@@ -936,6 +1003,8 @@ function init() {
     answerIdx = -1;
 
     target = Math.floor(Math.random() * turtles.length);
+    turtles[target].activateSpriteAnimation = true;
+    speed = 3;
 }
 
 function initTopHUD() {
@@ -1037,14 +1106,14 @@ function drawTurtle() {
                     // move to the center of the canvas
                     ctx.translate(turtles[i].ox + turtles[i].w / 2, turtles[i].oy + turtles[i].h / 2);
                     
-                    turtles[i].degrees = Math.sin(showAnswerT * 20) * 45;
+                    turtles[i].degrees = Math.sin(showAnswerT * 20) * 15;
                     // rotate the canvas to the specified degrees
-                    ctx.rotate(turtles[i].degrees*Math.PI/180);
+                    ctx.rotate(turtles[i].degrees * Math.PI/180);
 
                     // draw the image
                     turtles[i].x = -0.5 * turtles[i].w;
                     turtles[i].y = -0.5 * turtles[i].h;
-                    turtles[i].draw(ctx, images.turtle.obj.img);
+                    turtles[i].draw(ctx, images.shell.obj.img);
 
                     // we’re done with the rotating so restore the unrotated context
                     ctx.restore();
@@ -1056,14 +1125,25 @@ function drawTurtle() {
                         turtles[i].jump = jumpHeight;
                     }
 
-                    turtles[i].draw(ctx, images.turtle.obj.img);
+                    turtles[i].animateSprite(delta, turtlehappyInfo, 8, 8, true);
+                    turtles[i].draw(ctx, images.turtlehappy.obj.img, 1, turtlehappyInfo);
+                    // if (turtles[i].activateSpriteAnimation) {
+                        
+                    // } else {
+                    //     turtles[i].draw(ctx, images.turtle.obj.img);
+                    // }
+                    
                 }
                 
             } else {
-                turtles[i].draw(ctx, images.turtle.obj.img);
+                turtles[i].animateSprite(delta, turtlehideInfo, 8, 7);
+                if (turtles[i].activateSpriteAnimation) {
+                    turtles[i].draw(ctx, images.turtlehide.obj.img, 1, turtlehideInfo);
+                } else {
+                    turtles[i].draw(ctx, images.shell.obj.img, 1, turtlehideInfo);
+                }
+                
             }
-            
-            
         } else {
             turtles[i].draw(ctx, images.shell.obj.img);
         }
@@ -1313,6 +1393,7 @@ function update() {
     }
 
     moveClouds();
+    updateSeagulls();
 }
 
 function nextRound() {
@@ -1323,13 +1404,17 @@ function nextRound() {
     showAnswerT = 0;
     target = Math.floor(Math.random() * turtles.length);
 
-    if (turtles.length < 10) {
+    
+    if (turtles.length < 8) {
         addTurtle();
-        if (turtles.length > 7) {
-            setBucketSizes();
-        }
+
+        turtles[target].activateSpriteAnimation = true;
+        // if (turtles.length > 7) {
+        //     setBucketSizes();
+        // }
         updateTurtleInitialPos();
     } else {
+        
         speed += 0.5;
     }
 
@@ -1447,37 +1532,37 @@ function drawScoreHUD() {
     const p = pw;
     
     /* To visalize ------------------------------------------------------*/
-    // ctx.beginPath();
-    // ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
-    // ctx.lineTo(w + x, 0 + y);
-    // ctx.arc((h / 2) + w + x, h / 2 + y, h / 2, 3 / 2 *Math.PI,Math.PI / 2);
-    // ctx.lineTo(h / 2 + x, h + y);
-    // ctx.strokeStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
+    ctx.lineTo(w + x, 0 + y);
+    ctx.arc((h / 2) + w + x, h / 2 + y, h / 2, 3 / 2 *Math.PI,Math.PI / 2);
+    ctx.lineTo(h / 2 + x, h + y);
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 5;
+    ctx.stroke();
+    ctx.closePath();
+
+    ctx.beginPath();
+    ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
+    ctx.lineTo(w + x, 0 + y);
+    ctx.arc((h / 2) + w + x, h / 2 + y, h / 2, 3 / 2 *Math.PI,Math.PI / 2);
+    ctx.lineTo(h / 2 + x, h + y);
+    ctx.fillStyle = '#569E1A';
     // ctx.lineWidth = 5;
-    // ctx.stroke();
-    // ctx.closePath();
+    ctx.fill();
+    ctx.closePath();
     /* ------------------------------------------------------------------*/
 
-    if(p <= h){
-        // ctx.beginPath();
-        // ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI - Math.acos((h - p) / h), Math.PI + Math.acos((h - p) / h));
-        // ctx.save();
-        // ctx.scale(-1, 1);
-        // ctx.arc((h / 2) - p + x, h / 2 + y, h / 2, Math.PI - Math.acos((h - p) / h), Math.PI + Math.acos((h - p) / h));
-        // ctx.restore();
-        // ctx.fillStyle = "#569E1A";
-        // ctx.fill();
-    } else {
-        ctx.beginPath();
-        ctx.arc(h / 2 + x, h / 2+ y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
-        ctx.lineTo(p - 2 * h + x, 0 + y);
-        ctx.arc(p - (h / 2) + x, h / 2 + y, h / 2, 3 / 2 * Math.PI,Math.PI / 2);
-        ctx.lineTo(h / 2 + x, h + y);
-        ctx.fillStyle = "#569E1A";
-        ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.stroke();
-    }
+
+    // ctx.beginPath();
+    // ctx.arc(h / 2 + x, h / 2+ y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
+    // ctx.lineTo(p - 2 * h + x, 0 + y);
+    // ctx.arc(p - (h / 2) + x, h / 2 + y, h / 2, 3 / 2 * Math.PI,Math.PI / 2);
+    // ctx.lineTo(h / 2 + x, h + y);
+    // ctx.fillStyle = "#569E1A";
+    // ctx.fill();
+    // ctx.strokeStyle = '#fff';
+    // ctx.stroke();
 
     ctx.drawImage(images.turtleshine.obj.img, 0, 0, topHUD.score.turtleshine.cw, 
         topHUD.score.turtleshine.ch, x + 5 * scaleX, y, topHUD.score.turtleshine.w, topHUD.score.turtleshine.h);
@@ -1500,21 +1585,31 @@ function drawProgress() {
     // }
 
     // const grd = ctx.createRadialGradient(75, 50, 5, 90, 60, 100);
-    const grd = ctx.createLinearGradient(0, 0, 0, p);
+    // const grd = ctx.createLinearGradient(0, 0, 0, p);
     // grd.addColorStop(0, "#F8E7CD");
     // grd.addColorStop(1, "#FEB466"); 
 
     let percent = p / (max * scaleX);
-    
+
+    let pColor = '';
+
     if (percent > 0.7) {
-        grd.addColorStop(0, "#4ED20E");
-        grd.addColorStop(0.5, "#83DF56");
-        grd.addColorStop(1, "#59DC19");
+        pColor = '#4ED20E';
+    } else if (percent > 0.20) {
+        pColor = '#83DF56';
     } else {
-        grd.addColorStop(0, "#fb2121");
-        grd.addColorStop(0.5, "#f9a139");
-        grd.addColorStop(1, "#fb2121");
+        pColor = '#fb2121';
     }
+    
+    // if (percent > 0.7) {
+    //     grd.addColorStop(0, "#4ED20E");
+    //     grd.addColorStop(0.5, "#83DF56");
+    //     grd.addColorStop(1, "#59DC19");
+    // } else {
+    //     grd.addColorStop(0, "#fb2121");
+    //     grd.addColorStop(0.5, "#f9a139");
+    //     grd.addColorStop(1, "#fb2121");
+    // }
 
     /* To visalize ------------------------------------------------------*/
     ctx.beginPath();
@@ -1543,7 +1638,8 @@ function drawProgress() {
         ctx.lineTo(p - 2 * h + x, 0 + y);
         ctx.arc(p - (h / 2) + x, h / 2 + y, h / 2, 3 / 2 *Math.PI,Math.PI / 2);
         ctx.lineTo(h / 2 + x, h + y);
-        ctx.fillStyle = grd;
+        // ctx.fillStyle = grd;
+        ctx.fillStyle = pColor;
         ctx.fill();
     }
 }
@@ -1560,12 +1656,14 @@ function gameCycle() {
                 
                 // bg
                 drawBGs();
-
+                drawSeagulls();
                 // hud
                 drawProgress();
                 drawTopHUD();
                 drawScoreHUD();
                 drawLives();
+
+                
 
                 // game
                 drawTurtle();
@@ -1590,7 +1688,7 @@ function gameCycle() {
             if (!fade) {
                 // bg
                 drawBGs();
-
+                drawSeagulls();
                 // hud
                 drawProgress();
                 drawTopHUD();
@@ -1601,10 +1699,12 @@ function gameCycle() {
                 drawTurtle();
                 // update();
 
+                ctx.save();
                 ctx.globalAlpha = 0.85;
                 ctx.fillStyle = '#000';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.globalAlpha = 1.0;
+                ctx.restore();
+                // ctx.globalAlpha = 1.0;
 
                 pulseT += 2 * delta;
                 let w = Math.sin(pulseT) * (shineInfo.w + 10);

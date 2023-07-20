@@ -26,10 +26,33 @@ class Spirte {
         this.degrees = 0;
 
         this.isAnimating = false;
+        this.clipAnimT = 0;
+        this.activateSpriteAnimation = false;
     }
 
-    draw(ctx, img) {
-        ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, this.x, this.y, this.w, this.h);
+    animateSprite(delta, info, speed, frames, loop) {
+        if (this.activateSpriteAnimation) {
+            this.clipAnimT += speed * delta;
+            let t = Math.floor(this.clipAnimT);
+            if (loop) {
+                t = t % frames;
+                this.clipX = t * info.cw;
+            } else if (t < frames) {
+                this.clipX = t * info.cw;
+            } else {
+                this.clipX = this.clipAnimT = 0;
+                this.activateSpriteAnimation = false;
+            }
+        }
+    }
+
+    draw(ctx, img, status, info) {
+        if (status == 1) {
+            ctx.drawImage(img, this.clipX, this.clipY, info.cw, info.ch, this.x, this.y, info.w, info.h);
+        } else {
+            ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, this.x, this.y, this.w, this.h);
+        }
+        
 
         // ctx.beginPath();
         // ctx.arc(this.x + this.w / 2, this.y + this.h / 2, 15.3125, 0, 2 * Math.PI);

@@ -69,8 +69,6 @@ class Text {
         this.ctx.textAlign = 'left';
         this.ctx.textBaseline = 'top';
 
-        this.ctx.save();
-
         this.ctx.translate(x, y);
         
         this.ctx.scale(sx, sy);
