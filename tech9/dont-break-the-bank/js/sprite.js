@@ -15,12 +15,16 @@ class Sprite {
         this.vx = 0;
         this.vy = 0;
 
-        this.id = Math.floor(Math.random() * 5) + 1;
+        this.id = 0;
 
         this.dropSpeed = 1;
         this.dropSine = 0;
+        this.restitution = 0;
+        this.degrees = 0;
+        this.dropDist = 0;
 
         this.t = 0;
+        this.rotationT = 0;
         this.isAnimating = false;
     }
 
