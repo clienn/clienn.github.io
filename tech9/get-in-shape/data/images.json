@@ -1,0 +1,193 @@
+{
+    "data": [
+        {
+            "id": "bg",
+            "src": "bg",
+            "ext": "png",
+            "cw": 926,
+            "ch": 428
+        },
+        {
+            "id": "intro",
+            "src": "intro",
+            "ext": "png",
+            "cw": 926,
+            "ch": 428
+        },
+        {
+            "id": "portal",
+            "src": "rings",
+            "ext": "png",
+            "cw": 401,
+            "ch": 401
+        },
+        {
+            "id": "container_1",
+            "src": "shapes/container_1",
+            "ext": "png",
+            "cw": 48,
+            "ch": 48
+        },
+        {
+            "id": "container_2",
+            "src": "shapes/container_2",
+            "ext": "png",
+            "cw": 58,
+            "ch": 22
+        },
+        {
+            "id": "container_3",
+            "src": "shapes/container_3",
+            "ext": "png",
+            "cw": 61,
+            "ch": 58
+        },
+        {
+            "id": "container_4",
+            "src": "shapes/container_4",
+            "ext": "png",
+            "cw": 44,
+            "ch": 48
+        },
+        {
+            "id": "container_5",
+            "src": "shapes/container_5",
+            "ext": "png",
+            "cw": 52,
+            "ch": 52
+        },
+        {
+            "id": "container_6",
+            "src": "shapes/container_6",
+            "ext": "png",
+            "cw": 42,
+            "ch": 59
+        },
+        {
+            "id": "container_7",
+            "src": "shapes/container_7",
+            "ext": "png",
+            "cw": 52,
+            "ch": 49
+        },
+        {
+            "id": "container_8",
+            "src": "shapes/container_8",
+            "ext": "png",
+            "cw": 42,
+            "ch": 53
+        },
+        {
+            "id": "shape_1",
+            "src": "shapes/shape_1",
+            "ext": "png",
+            "cw": 45,
+            "ch": 45
+        },
+        {
+            "id": "shape_2",
+            "src": "shapes/shape_2",
+            "ext": "png",
+            "cw": 55,
+            "ch": 19
+        },
+        {
+            "id": "shape_3",
+            "src": "shapes/shape_3",
+            "ext": "png",
+            "cw": 51,
+            "ch": 49
+        },
+        {
+            "id": "shape_4",
+            "src": "shapes/shape_4",
+            "ext": "png",
+            "cw": 41,
+            "ch": 45
+        },
+        {
+            "id": "shape_5",
+            "src": "shapes/shape_5",
+            "ext": "png",
+            "cw": 49,
+            "ch": 49
+        },
+        {
+            "id": "shape_6",
+            "src": "shapes/shape_6",
+            "ext": "png",
+            "cw": 38,
+            "ch": 54
+        },
+        {
+            "id": "shape_7",
+            "src": "shapes/shape_7",
+            "ext": "png",
+            "cw": 49,
+            "ch": 45
+        },
+        {
+            "id": "shape_8",
+            "src": "shapes/shape_8",
+            "ext": "png",
+            "cw": 39,
+            "ch": 49
+        },
+        {
+            "id": "hourglass",
+            "src": "huds/hourglass",
+            "ext": "png",
+            "cw": 30,
+            "ch": 51
+        },
+        {
+            "id": "star",
+            "src": "huds/star",
+            "ext": "png",
+            "cw": 34,
+            "ch": 35
+        },
+        {
+            "id": "emptystar",
+            "src": "huds/emptystar",
+            "ext": "png",
+            "cw": 36,
+            "ch": 37
+        },
+        {
+            "id": "shine",
+            "src": "huds/shine",
+            "ext": "png",
+            "cw": 209,
+            "ch": 209
+        },
+        {
+            "id": "rays",
+            "src": "huds/rays",
+            "ext": "png",
+            "cw": 137,
+            "ch": 137
+        },
+        {
+            "id": "complete",
+            "src": "huds/complete",
+            "ext": "png",
+            "cw": 185,
+            "ch": 25
+        },
+        {
+            "id": "volume",
+            "src": "huds/volume_white",
+            "ext": "png",
+            "cw": 256,
+            "ch": 256
+        },
+        {
+            "id": "mute",
+            "src": "huds/mute_white",
+            "ext": "png",
+            "cw": 256,
+            "ch": 256
+        }
+    ]
+}

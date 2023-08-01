@@ -1,0 +1,19 @@
+{
+    "data": [
+        {
+            "id": "bg",
+            "src": "sounds/space",
+            "ext": "mp3"
+        }, 
+        {
+            "id": "score",
+            "src": "sounds/score",
+            "ext": "wav"
+        }, 
+        {
+            "id": "kaboom",
+            "src": "sounds/error",
+            "ext": "wav"
+        }
+    ]
+}

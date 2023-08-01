@@ -2,61 +2,84 @@ const canvas = document.getElementById('game-surface');
 const ctx = canvas.getContext('2d');
 
 var instrucions = document.getElementById("game-instructions");
-var btnStart = document.getElementById("btnStart");
+// var btnStart = document.getElementById("btnStart");
 
 var last = 0;
 var delta = 0;
+var timer = null;
+var gameDuration = 60;
 var startGame = false;
+var gameStart = false;
+var gameover = false;
+var canReset = false;
 
-var bg = null;
+var HUD = null;
 
 var portal = {
     x: 0,
     y: 0,
-    img: null,
+    // img: null,
     w: 401,
     h: 401,
     t: 0,
     et: 1.5,
     duration: 5,
-    bonus: 100,
+    bonus: 5,
     isAnimating: true,
     isRefreshing: false,
     shapesOpacity: 0,
     gridDim: 75,
+    gridDimX: 65,
+    gridDimY: 65,
     sx: 0,
+    sy: 0,
     rng: [...Array(9).keys()],
     init: () => {
+        portal.w *= scaleX;
+        portal.h *= scaleY;
+        portal.gridDimX = portal.gridDim * scaleX;
+        portal.gridDimY = portal.gridDim * scaleY;
+        
         shuffleArr(portal.rng);
-        portal.sx = (portal.w) / 2 - (portal.gridDim * 3) / 2;
+        portal.sx = (portal.w) / 2 - (portal.gridDimX * 3) / 2;
+        portal.sy = (portal.h) / 2 - (portal.gridDimY * 3) / 2;
     },
     getPos: (i) => {
         return {
-            x: (portal.rng[i] % 3) * portal.gridDim + portal.sx,
-            y: (Math.floor(portal.rng[i] / 3)) * portal.gridDim + portal.sx
+            x: (portal.rng[i] % 3) * portal.gridDimX + portal.sx,
+            y: (Math.floor(portal.rng[i] / 3)) * portal.gridDimY + portal.sy
         }
     },
     move: (w, h) => {
-        w -= portal.w * scaleX / 2;
-        h -= portal.h * scaleY / 2;
+        w -= portal.w;
+        h -= portal.h;
+        
+        let rangeY = containerGridAdjY + totalContainerGridRows * containerShapeH;
+        // console.log(canvas.height, h)
+        
+        // let flag = Math.floor(Math.random() * 2);
+        // if (flag) {
+        //     portal.x = Math.floor(Math.random() * w);
+        //     portal.y = rangeY;
+        // } else {
+        //     portal.x = 0;
+            
+        //     portal.y = Math.floor(Math.random() * (h - rangeY)) + rangeY;
+        // }
 
-        let flag = Math.floor(Math.random() * 2);
-        if (flag) {
-            portal.x = Math.floor(Math.random() * w);
-            portal.y = 0;
-        } else {
-            portal.x = 0;
-            portal.y = Math.floor(Math.random() * h);
-        }
+        portal.x = Math.floor(Math.random() * w);
+        // portal.x = 0;
+        portal.y = Math.floor(Math.random() * (h - rangeY)) + rangeY;
+        // portal.y = 0;
 
         shuffleArr(portal.rng);
 
         shapes.forEach((shape, i) => {
             let pos = portal.getPos(i);
-            shape.shuffle(pos.x * scaleX, pos.y * scaleY);
+            shape.setPos(pos.x, pos.y);
 
-            shape.x = shape.ox + portal.x * scaleX;
-            shape.y = shape.oy + portal.y * scaleY;
+            shape.x = shape.ox + portal.x;
+            shape.y = shape.oy + portal.y;
         });
     },
     animate: () => {
@@ -115,7 +138,15 @@ var portal = {
 
 var shapes = []; 
 var shapeImages = []; 
+var shapesContainer = [];
+var shapesContainerPos = [];
+var shapesContainerKeys = [];
 var shapeDim = 75;
+var shapeDimX = shapeDim;
+var shapeDimY = shapeDim;
+
+var containerShapeW = 100;
+var containerShapeH = 100;
 
 var sizes = [
     [34, 34],
@@ -134,14 +165,14 @@ var cc_y = 0; // center container y
 var containerRectDim = 75;
 var containerRectDimX = 75;
 var containerRectDimY = 75;
-var nContainers = 5;
+var nContainers = 8;
 
 var isDraggable = false;
 
 var dragID = -1;
 var hoveredContainerID = -1;
-var shapesContainer = [];
-var correctAnswers = new Array(5).fill(-1);
+
+var correctAnswers = new Array(nContainers).fill(-1);
 var score = 0;
 
 var scaleX = 1;
@@ -154,6 +185,26 @@ var textPos = {
 }
 
 // 1792 922
+// #00ABC8- score
+// #06C3F6 - blue
+// #F78A3B - orange
+
+var totalContainerGridCols = 0;
+var totalContainerGridRows = 3;
+var containerGridAdjX = 0;
+var containerGridAdjY = 200;
+
+var jump = 0;
+var jumpPos = 0;
+var jumpHeight = 20;
+var jumpSpeed = 5;
+var TXT = null;
+
+var G = 9.8;
+
+var mDown = false;
+var mouseX = 0;
+var mouseY = 0;
 
 function main(w, h) {
     canvas.width = w;
@@ -164,93 +215,135 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    TXT = new Text(ctx, w, h); 
+    TXT.setScale(scaleX, scaleY);
+    
+    TXT.addText('points', '+1', 'bold', 20, 'Montserrat', 0, 0, 40, 30, '#10aad7', true); 
+    jumpHeight *= scaleY;
+
+    HUD = new Template_1(ctx, w, h, scaleX, scaleY);
+
+    timer = new Timer(0, 0, 0, '#fff');
+    timer.setTimer(gameDuration);
+
     textPos.x = w - 100;
     textPos.y = 50;
 
     containerRectDimX *= scaleX;
     containerRectDimY *= scaleY;
+    
+    containerShapeW *= scaleX;
+    containerShapeH *= scaleY;
+
+    
 
     cx = w / 2;
     cy = h / 2;
     cc_x = cx - containerRectDimX * nContainers / 2;
     cc_y = cy - containerRectDimY / 2;
 
-    bg = new Image();
-    bg.src = 'assets/bg.png';
-    bg.onload = function() {
-        isLoaded++;
-    }
+    // bg = new Image();
+    // bg.src = 'assets/bg.png';
+    // bg.onload = function() {
+    //     isLoaded++;
+    // }
 
-    portal.img = new Image();
-    portal.img.src = 'assets/rings.png';
-    portal.img.onload = function() {
-        isLoaded++;
-    }
+    // portal.img = new Image();
+    // portal.img.src = 'assets/rings.png';
+    // portal.img.onload = function() {
+    //     isLoaded++;
+    // }
 
     portal.init();
+    
 
-    for (let i = 0; i < 5; ++i) {
-        shapeImages[i] = new Image();
-        shapeImages[i].src = 'assets/shape' + (i + 1) + '.png';
-        shapeImages[i].onload = function() {
-            isLoaded++;
-        }
+    totalContainerGridCols = Math.floor(w / containerShapeW);
 
-        let pos = portal.getPos(i);
-        shapes.push(new Shape(i, sizes[i][0], sizes[i][1], pos.x * scaleX, pos.y * scaleY));
-        // shapes.push(new Shape(i + 5, sizes[i][0], sizes[i][1], pos.x * scaleX, pos.y * scaleY));
-    }
+    containerGridAdjX = (w - totalContainerGridCols * containerShapeW) / 2;
+    containerGridAdjY *= scaleY;
 
-    for (let i = 5; i < 9; ++i) {
-        let rng = Math.floor(Math.random() * 5);
-        let pos = portal.getPos(rng);
-        shapes.push(new Shape(rng, sizes[rng][0], sizes[rng][1], pos.x * scaleX, pos.y * scaleY));
-    }
+    shapesContainerPos = [...Array(totalContainerGridCols * totalContainerGridRows).keys()];
+    shuffleArr(shapesContainerPos);
+
+    
+    // for (let i = 0; i < 5; ++i) {
+    //     shapeImages[i] = new Image();
+    //     shapeImages[i].src = 'assets/shape' + (i + 1) + '.png';
+    //     shapeImages[i].onload = function() {
+    //         isLoaded++;
+    //     }
+
+    //     let pos = portal.getPos(i);
+    //     shapes.push(new Shape(i, sizes[i][0], sizes[i][1], pos.x * scaleX, pos.y * scaleY));
+    //     // shapes.push(new Shape(i + 5, sizes[i][0], sizes[i][1], pos.x * scaleX, pos.y * scaleY));
+    // }
+
+    // for (let i = 5; i < 9; ++i) {
+    //     let rng = Math.floor(Math.random() * 5);
+    //     let pos = portal.getPos(rng);
+    //     shapes.push(new Shape(rng, sizes[rng][0], sizes[rng][1], pos.x * scaleX, pos.y * scaleY));
+    // }
 
     // console.log(shapes[0].x, shapes[0].y)
 
-    canvas.addEventListener('touchstart', e => {
-        mousedownE(e.touches[0].clientX, e.touches[0].clientY);
-    });
+    shapeDimX *= scaleX;
+    shapeDimY *= scaleY;
 
-    canvas.addEventListener('touchmove', e => {
-        mousemoveE(e.touches[0].clientX, e.touches[0].clientY);
-    });
+    for (let i = 0; i < 8; ++i) {
+        // let rng = Math.floor(Math.random() * 5);
+        let pos = portal.getPos(i);
+        let id = 'shape_' + (i + 1);
+        let shape = new Sprite(pos.x, pos.y, shapeDimX, shapeDimY, AM.images[id].cw, AM.images[id].ch);
+        shape.id = id;
+        shapes.push(shape);
+    }
 
-    canvas.addEventListener('touchend', e => {
-        mouseupE();
-    });
+    portal.move(w, h);
 
-    canvas.addEventListener('mousedown', e => {
-        mousedownE(e.offsetX, e.offsetY);
-    });
-
-    canvas.addEventListener('mousemove', e => {
-        mousemoveE(e.offsetX, e.offsetY);
-    });
+    if (isMobile()) {
+        canvas.addEventListener('touchstart', e => {
+            mousedownE(e.touches[0].clientX, e.touches[0].clientY);
+        });
     
-    canvas.addEventListener('mouseup', e => {
-        mouseupE();
-    });
+        canvas.addEventListener('touchmove', e => {
+            mousemoveE(e.touches[0].clientX, e.touches[0].clientY);
+        });
+    
+        canvas.addEventListener('touchend', e => {
+            mouseupE();
+        });
+    } else {
+        canvas.addEventListener('mousedown', e => {
+            mousedownE(e.offsetX, e.offsetY);
+        });
+    
+        canvas.addEventListener('mousemove', e => {
+            mousemoveE(e.offsetX, e.offsetY);
+        });
+        
+        canvas.addEventListener('mouseup', e => {
+            mouseupE();
+        });
+    }
     
     initShapesContainer();
     gameCycle();
 }
 
-function isPortrait() {
-    return window.innerHeight > window.innerWidth;
-}
-
 function initShapesContainer() {
     shapesContainer = [...Array(nContainers).keys()];
-    shuffleArr(shapesContainer);
-}
+    rngShapes();
 
-function shuffleArr (array){
-    for (var i = array.length - 1; i > 0; i--) {
-        var rand = Math.floor(Math.random() * (i + 1));
-        [array[i], array[rand]] = [array[rand], array[i]]
+    for (let i = 0; i < shapesContainer.length; ++i) {
+        // shapesContainer[i] = ;
+        shapesContainerKeys[i] = parseInt(shapes[shapesContainer[i]].id.replace(/shape_/, ''));
     }
+
+    shuffleArr(shapesContainer);
+    shuffleArr(shapesContainerPos);
+
+    correctAnswers.fill(-1, 0, correctAnswers.length);
 }
 
 function drawGrid(x, y, dim) {
@@ -259,14 +352,30 @@ function drawGrid(x, y, dim) {
     for (let i = 0; i < 3; ++i) {
         for (let j = 0; j < 3; ++j) {
             ctx.strokeRect(
-                x + j * portal.gridDim + portal.sx + portal.x, 
-                y + i * portal.gridDim + portal.sx + portal.y, 
-                dim, 
-                dim
+                x + j * portal.gridDimX + portal.sx + portal.x, 
+                y + i * portal.gridDimY + portal.sx + portal.y, 
+                portal.gridDimX, 
+                portal.gridDimY
             ); 
         }
     }
-    
+}
+
+function drawContainerGrid() {
+    ctx.strokeStyle = '#f9a139';
+    for (let i = 0; i < totalContainerGridRows; ++i) {
+        for (let j = 0; j < totalContainerGridCols; ++j) {
+            ctx.strokeRect(
+                containerGridAdjX + j * containerShapeW, 
+                containerGridAdjY + i * containerShapeH, 
+                containerShapeW, 
+                containerShapeH
+            ); 
+            
+        }
+
+        // if (i == 2) console.log(containerGridAdjY + i * containerShapeH);
+    }
 }
 
 function displayScore() {
@@ -283,11 +392,19 @@ function displayScore() {
     }
 }
 
-function mousedownE(mx, my) {
-    if (!portal.isAnimating)  {
+function mousedownE(mx, my) {    
+    if (!mDown) {
+        mouseX = mx;
+        mouseY = my;
+        mDown = true;
+    }
+    
+    if (gameover) {
+        canReset = true;
+    } else if (!portal.isAnimating)  {
         for (let i = 0; i < nContainers; ++i) {
             if (!correctAnswers.includes(i)) {
-                let r = collission(mx, my, shapes[i].x, shapes[i].y, portal.gridDim * scaleX, portal.gridDim * scaleY);
+                let r = collission(mx, my, shapes[i].x, shapes[i].y, portal.gridDimX, portal.gridDimY);
 
                 if (r) {
                     // center to mouse
@@ -320,26 +437,104 @@ function mousemoveE(mx, my) {
 }
 
 function mouseupE() {
-    if (isDraggable) {
-        let id = shapesContainer[hoveredContainerID];
-        if (correctAnswers[hoveredContainerID] < 0 && shapes[id].id == shapes[dragID].id) {
-            // correctAnswers[hoveredContainerID] = dragID;
-            correctAnswers[hoveredContainerID] = dragID;
-            score += 10 * portal.duration + portal.bonus;
-            checkAnswers();
-        } else {
-            score -= 10;
-            score = score < 0 ? 0 : score;
+    if (mDown) {
+        if (isBtnClicked(mouseX, mouseY, {
+            x: HUD.volume.x,
+            y: HUD.volume.y,
+            w: HUD.volume.w,
+            h: HUD.volume.h
+        })) {
+            HUD.volumeOn = !HUD.volumeOn; 
+            if (HUD.volumeOn) {
+                AM.audio.bg.img.currentTime = 0;
+                AM.audio.bg.img.play();
+            } else {
+                AM.audio.bg.img.pause();
+                // music.correct.obj.volume = 0;
+            }
+            console.log('test')
         }
-
-        shapes[dragID].x = shapes[dragID].ox + portal.x * scaleX;
-        shapes[dragID].y = shapes[dragID].oy + portal.y * scaleY;
-        dragID = -1;
-        isDraggable = false;
-        hoveredContainerID = -1;
+        mDown = false;
     }
+
+    if (gameover) {
+        if (canReset) {
+            gameover = false;
+            canReset = false;
+
+            restart();
+        }
+    } else {
+
+        if (!gameStart) {
+            // AM.audio.bg.img.volume = 0.2;
+            // AM.audio.bg.img.loop = true;
+            // AM.audio.bg.img.play();
+    
+            gameStart = true;
+
+            AM.audio.bg.img.volume = 0.2;
+            AM.audio.bg.img.loop = true;
+            AM.audio.bg.img.play();
+        } else if (isDraggable) {
+            
+            let id = shapesContainer[hoveredContainerID];
+            // console.log(hoveredContainerID, dragID, shapes[id].id, shapes[dragID].id)
+            if (correctAnswers[hoveredContainerID] < 0 && shapes[id].id == shapes[dragID].id) {
+                // correctAnswers[hoveredContainerID] = dragID;
+                correctAnswers[hoveredContainerID] = dragID;
+                // score += 10 * portal.duration + portal.bonus;
+                score += 1 + portal.bonus;
+                let scoreFormat = zeroPad(Math.floor(score), 2);
+                HUD.txt.texts['score'].str = scoreFormat;
+                HUD.txt.texts['total'].str = scoreFormat;
+
+                TXT.texts['points'].color = '#4ED20E';
+                TXT.texts['points'].str = '+' + Math.floor(1 + portal.bonus);
+
+                jump = jumpHeight;
+                jumpPos = shapesContainerPos[hoveredContainerID];
+                checkAnswers();
+
+                if (HUD.volumeOn) {
+                    AM.audio.score.img.pause();
+                    AM.audio.score.img.currentTime = 0;
+                    AM.audio.score.img.play();
+                }
+            } else {
+                if (hoveredContainerID > -1) {
+                    score -= 1;
+                    score = score < 0 ? 0 : score;
+
+                    TXT.texts['points'].color = '#fb2121';
+                    TXT.texts['points'].str = '-1';
+
+                    jump = jumpHeight;
+                    jumpPos = shapesContainerPos[hoveredContainerID];
+
+                    if (HUD.volumeOn) {
+                        AM.audio.kaboom.img.pause();
+                        AM.audio.kaboom.img.currentTime = 0;
+                        AM.audio.kaboom.img.play();
+                    }
+                }
+            }
+    
+            shapes[dragID].x = shapes[dragID].ox + portal.x;
+            shapes[dragID].y = shapes[dragID].oy + portal.y;
+            dragID = -1;
+            isDraggable = false;
+            hoveredContainerID = -1;
+        }
+    }
+    
 }
 
+function restart() {
+    initShapesContainer();
+    portal.move(canvas.width, canvas.height);
+    timer.setTimer(gameDuration);
+}
 
 function drawShapesContainer() {
     // const colors = ['#10aad7', '#b3d23b', '#10aad7', '#f9a139'];
@@ -347,45 +542,63 @@ function drawShapesContainer() {
     for (let i = 0; i < nContainers; ++i) {
         ctx.globalAlpha = 0.5;
 
+        let id = shapesContainer[i];
+        // let key = 'container_' + (id + 1);
+        let key = 'container_' + (shapesContainerKeys[id]);
+        
         if (correctAnswers[i] > -1) {
             // let idx = correctAnswers[i];
             ctx.strokeStyle = '#b3d23b';
             ctx.globalAlpha = 1;
+            // key = 'shape_' + (id + 1);
+            key = 'shape_' + (shapesContainerKeys[id]);
         } else if (i == hoveredContainerID) {
             ctx.strokeStyle = '#10aad7';
+            ctx.globalAlpha = 1;
         } else {
             ctx.strokeStyle = '#f9a139';
         }
 
-        let id = shapesContainer[i];
+        let x = shapesContainerPos[i] % totalContainerGridCols;
+        let y = Math.floor(shapesContainerPos[i] / totalContainerGridCols);
         
-        ctx.drawImage(shapeImages[shapes[id].id], 0, 0, shapes[id].w, shapes[id].h, i * containerRectDimX + cc_x, cc_y, containerRectDimX, containerRectDimY);
+        // ctx.drawImage(shapeImages[key], 0, 0, shapes[id].w, shapes[id].h, i * containerRectDimX + cc_x, cc_y, containerRectDimX, containerRectDimY);
+        // ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, 
+        //     x * portal.gridDimX + containerGridAdjX, y * portal.gridDimY + containerGridAdjY, portal.gridDimX, portal.gridDimY);
+            
+        ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, 
+            x * containerShapeW + containerGridAdjX, y * containerShapeH + containerGridAdjY, containerShapeW, containerShapeH);
         ctx.globalAlpha = 1;
 
-        ctx.strokeRect(
-            i * containerRectDimX + cc_x, 
-            cc_y, 
-            containerRectDimX, 
-            containerRectDimY
-        ); 
+        // ctx.strokeRect(
+        //     i * containerRectDimX + cc_x, 
+        //     cc_y, 
+        //     containerRectDimX, 
+        //     containerRectDimY
+        // ); 
     }
 }
 
 function checkContainerCollision() {
     let x = shapes[dragID].x;
     let y = shapes[dragID].y;
-    let xw = x + containerRectDimX;
-    let yh = y + containerRectDimY;
 
-    let ex = cc_x + containerRectDimX * nContainers;
-    let ey = cc_y + containerRectDimY;
+    hoveredContainerID = -1;
 
-    if (x >= cc_x && x <= ex && y >= cc_y && y <= ey) {
-        hoveredContainerID = Math.floor((x - cc_x) / containerRectDimX);
-    } else if (xw >= cc_x && xw <= ex && yh >= cc_y && yh <= ey) {
-        hoveredContainerID = Math.floor((xw - cc_x) / containerRectDimX);
-    } else {
-        hoveredContainerID = -1;
+    for (let i = 0; i < nContainers; ++i) {
+        let row = Math.floor(shapesContainerPos[i] / totalContainerGridCols);
+        let col = shapesContainerPos[i] % totalContainerGridCols;
+
+        if (isBtnClicked(x, y, {
+            x: col * containerShapeW + containerGridAdjX,
+            y: row * containerShapeH + containerGridAdjY,
+            w: containerShapeW,
+            h: containerShapeH,
+        })) {
+            hoveredContainerID = i;
+            break;
+
+        }
     }
 
     return hoveredContainerID > -1;
@@ -400,29 +613,34 @@ function checkAnswers() {
     }
 
     if (total == correctAnswers.length) {
-        nContainers = (nContainers + 1) % 9;
-        cc_x = cx - containerRectDimX * nContainers / 2;
-        cc_y = cy - containerRectDimY / 2;
-        correctAnswers = new Array(nContainers).fill(-1);   
+        // nContainers = (nContainers + 1) % 9;
+        // cc_x = cx - containerRectDimX * nContainers / 2;
+        // cc_y = cy - containerRectDimY / 2;
+        // correctAnswers = new Array(nContainers).fill(-1);   
         portal.duration = 0;
         portal.isRefreshing = true;
 
-        updateShapes();
+        // updateShapes();
         initShapesContainer();
-        
+        portal.move(canvas.width, canvas.height);
     }
 }
 
-function updateShapes() {
+function rngShapes() {
     for (let i = 0; i < nContainers; ++i) {
-        let rng = Math.floor(Math.random() * 5);
+        let rng = Math.floor(Math.random() * nContainers);
         
         let pos = portal.getPos(rng);
-        shapes[i].id = rng;
-        shapes[i].w = sizes[rng][0];
-        shapes[i].h = sizes[rng][1];
-        shapes[i].x = pos.x * scaleX;
-        shapes[i].y = pos.y * scaleY;
+        let id = 'shape_' + (rng + 1);
+        shapes[i].id = id;
+        shapes[i].clipW = AM.images[id].cw;
+        shapes[i].clipH = AM.images[id].ch;
+
+        // let shape = new Sprite(pos.x, pos.y, shapeDimX, shapeDimY, AM.images[id].cw, AM.images[id].ch);
+        // shapes[i].w = sizes[rng][0];
+        // shapes[i].h = sizes[rng][1];
+        // shapes[i].x = pos.x * scaleX;
+        // shapes[i].y = pos.y * scaleY;
     }
 }
 
@@ -430,52 +648,89 @@ function collission(mx, my, x, y, w, h) {
     return mx >= x && mx <= x + w && my >= y && my <= y + h;
 }
 
-function lerp(a, b, t) {
-    return a + (b - a) * t;
+function showPoints() {
+    if (jump > 0) {
+        let px = (jumpPos % totalContainerGridCols) * containerShapeW + containerGridAdjX;
+        let py = Math.floor(jumpPos / totalContainerGridCols) * containerShapeH + containerGridAdjY;
+
+        let y = py + jump - containerShapeH;
+        TXT.follow('points', px, y, containerShapeW, containerShapeH);
+        TXT.draw('points');
+        jump -= G * jumpSpeed * delta;
+    }
 }
 
 function update() {
     // placeholder
+    // HUD.txt.texts['time'].str = zeroPad(Math.floor(timer.timer / 24), 2);
+
+    if (delta < 1) {
+        HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24) / gameDuration * 100);
+        console.log( Math.floor(timer.timer / 24) / gameDuration * 100)
+        timer.tick(delta);
+
+        if (timer.timer <= 0) {
+            gameover = true;
+        }
+    }
 }
 
 function gameCycle() {
     let now = Date.now();
     delta = (now - last) / 1000;
     last = now;
-    
-    if (isLoaded == 7) {
-        ctx.drawImage(bg, 0, 0, 926, 428, 0, 0, canvas.width, canvas.height);
 
-        displayScore();
+    if (!gameover) {
+        if (gameStart) {
+            ctx.drawImage(AM.images.bg.img, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 0, 0, canvas.width, canvas.height);
+            HUD.draw(ctx);
+            // displayScore();
 
-        let a = Math.sin(portal.t);
-        let pw = a * portal.w;
-        let tmp = (portal.w - pw) / 2;
+            let a = Math.sin(portal.t);
+            let pw = a * portal.w;
+            let ph = a * portal.h;
+            let tmp = (portal.w - pw) / 2;
+            let tmpH = (portal.h - ph) / 2;
 
-        ctx.drawImage(portal.img, 0, 0, portal.w, portal.h, (portal.x + tmp) * scaleX, (portal.y + tmp) * scaleY, pw * scaleX, pw * scaleY);
-        // console.log(portal.shapesOpacity)
-        
-        if (!portal.isRefreshing) {
-            for (let i = 0; i < nContainers; ++i) {
-                if (dragID == i) {
-                    ctx.globalAlpha = 1;
-                } else {
-                    ctx.globalAlpha = portal.shapesOpacity;
+            ctx.drawImage(AM.images.portal.img, 0, 0, AM.images.portal.cw, AM.images.portal.ch, (portal.x + tmp), (portal.y + tmpH), pw, ph);
+            // console.log(portal.shapesOpacity)
+            
+            if (!portal.isRefreshing) {
+                for (let i = 0; i < nContainers; ++i) {
+                    if (dragID == i) {
+                        ctx.globalAlpha = 1;
+                    } else {
+                        ctx.globalAlpha = portal.shapesOpacity;
+                    }
+
+                    if (!correctAnswers.includes(i)) {
+                        // shapes[i].draw(ctx, shapeImages[shapes[i].id], shapeDim * scaleX, shapeDim * scaleY);
+                        shapes[i].draw(ctx, AM.images[shapes[i].id].img);
+                    }
                 }
-
-                if (!correctAnswers.includes(i)) {
-                    shapes[i].draw(ctx, shapeImages[shapes[i].id], shapeDim * scaleX, shapeDim * scaleY);
-                }
+                ctx.globalAlpha = 1;
+                // drawGrid(portal.x, portal.y, portal.gridDim)
             }
-            ctx.globalAlpha = 1;
+
+            // drawGrid(portal.x, portal.y, portal.gridDim)
+
+            drawShapesContainer();
+            // drawContainerGrid();
+
+            portal.animate();
+
+            portal.trigger();
+
+            showPoints();
+
+            update();
+        } else {
+            ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
         }
-
-        drawShapesContainer();
-
-        portal.animate();
-
-        portal.trigger();
+    } else {
+        // HUD.draw(ctx);
         
+        HUD.gameover(ctx);
     }
 
     requestAnimationFrame(gameCycle);
