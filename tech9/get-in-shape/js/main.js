@@ -130,7 +130,7 @@ var portal = {
             if (portal.duration <= 0) {
                 portal.toggle();
                 
-                portal.duration = portal.et == 1.5 ? (Math.floor(Math.random() * 3) + 1) : 1;
+                portal.duration = portal.et == 1.5 ? (Math.floor(Math.random() * 7) + 1) : 1;
             }
         }
     }
@@ -538,6 +538,12 @@ function restart() {
     initShapesContainer();
     portal.move(canvas.width, canvas.height);
     timer.setTimer(gameDuration);
+
+    score = 0;
+
+    let scoreFormat = zeroPad(Math.floor(score), 2);
+    HUD.txt.texts['score'].str = scoreFormat;
+    HUD.txt.texts['total'].str = scoreFormat;
 }
 
 function drawShapesContainer() {
