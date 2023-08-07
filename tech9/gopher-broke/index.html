@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Boilerplate Landscape - Prototype
+        </title>
+        <style>
+            @font-face {
+                font-family: 'Montserrat';
+                src: url('assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf');
+            }
+            html, body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden !important;
+                background: #97DE54;
+                -webkit-touch-callout: none; /* iOS Safari */
+                -webkit-user-select: none; /* Safari */
+                -khtml-user-select: none; /* Konqueror HTML */
+                -moz-user-select: none; /* Old versions of Firefox */
+                    -ms-user-select: none; /* Internet Explorer/Edge */
+                        user-select: none; /* Non-prefixed version, currently
+                                            supported by Chrome, Edge, Opera and Firefox */
+            }
+            canvas {
+                border: 1px solid #000;
+                touch-action: manipulation;
+                display: none;
+                -webkit-touch-callout: none; /* iOS Safari */
+                -webkit-user-select: none; /* Safari */
+                -khtml-user-select: none; /* Konqueror HTML */
+                -moz-user-select: none; /* Old versions of Firefox */
+                    -ms-user-select: none; /* Internet Explorer/Edge */
+                        user-select: none; /* Non-prefixed version, currently
+                                            supported by Chrome, Edge, Opera and Firefox */
+            }
+            #game-instructions {
+                padding: 10px;
+            }
+            .center {
+                margin: 0;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+            }
+            .directions {
+                font-family: 'Montserrat';
+                color: #fff;
+                font-size: 48px;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="game-surface"></canvas>
+        <div id="game-instructions" class="center">
+            <h1 id="directions-text" class="directions"></h1>
+        </div>
+        <script type="text/javascript" src="js/helpers/globals.js"></script>
+        <script type="text/javascript" src="js/helpers/progressbar.js"></script>
+        <script type="text/javascript" src="js/helpers/assetmanager.js"></script>
+        <script type="text/javascript" src="js/helpers/text.js"></script>
+        <script type="text/javascript" src="js/helpers/timer.js"></script>
+    
+        <script type="text/javascript" src="js/sprite.js"></script>
+        <script type="text/javascript" src="js/staticsprite.js"></script>
+        <script type="text/javascript" src="js/helpers/huds/template_1.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+        
+        <script type="text/javascript">
+            var e = document.getElementById('directions-text');
+
+            if (isPortrait()) {
+               e.innerHTML = "Rotate to landscape to start the game.";
+            } else {
+                initializeGame();
+            }
+
+            window.addEventListener("orientationchange", function() {
+                if (!isPortrait()) {
+                    canvas.style.display = 'none';
+                    startGame = false;
+                    location.href = '';
+                }
+
+                if (!startGame) {
+                    startGame = isPortrait();
+
+                    if (startGame) {
+                        initializeGame();
+                    } 
+                }
+            }, false);
+
+            function initializeGame() {
+                e.innerHTML = "Loading...";
+                setTimeout(() => {
+                    AM = new AssetManager(() => {
+                        setTimeout(() => {
+                            main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+                        }, 2000);
+                    });
+
+                    AM.initImageAssets('data/images.json');
+                    AM.initAudioAssets('data/audio.json');
+                }, 1000);
+
+            }
+
+            // document.addEventListener('click', (e) => {
+            //     for (let k in AM.audio) {
+            //         console.log(k)
+            //     }
+            //     // AM.audio.bg.img.play();
+            // })
+        </script>
+    </body>
+</html>
