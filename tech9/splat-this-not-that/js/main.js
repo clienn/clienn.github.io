@@ -105,6 +105,38 @@ var images = {
         src: 'splash-screen',
         obj: {},
     },
+    title: {
+        src: 'title',
+        obj: {},
+    },
+    hand: {
+        src: 'hand',
+        obj: {},
+    },
+    startballoon: {
+        src: 'startballoon',
+        obj: {},
+    },
+    startmine: {
+        src: 'startmine',
+        obj: {},
+    },
+    text1: {
+        src: 'text1',
+        obj: {},
+    },
+    text2: {
+        src: 'text2',
+        obj: {},
+    },
+    text3: {
+        src: 'text3',
+        obj: {},
+    },
+    beginbutton: {
+        src: 'beginbutton',
+        obj: {},
+    },
     landLeft: {
         src: 'land',
         obj: {},
@@ -561,6 +593,79 @@ const cloudMovements = [-100, 100, 100];
 var scaleProj = 1.5;
 var kaboomT = 0;
 
+var startPageInfo = {
+    title: {
+        x: 0,
+        y: 70,
+        w: 261 * 2,
+        h: 101 * 2,
+        cw: 261,
+        ch: 101,
+    },
+    hand: {
+        x: 557,
+        y: 333,
+        w: 64 * 2,
+        h: 65 * 2,
+        cw: 64,
+        ch: 65,
+    },
+    startballoon: {
+        x: 837,
+        y: 345,
+        w: 56 * 2,
+        h: 57 * 2,
+        cw: 56,
+        ch: 57,
+    },
+    startmine: {
+        x: 1113,
+        y: 345,
+        ox: 1113,
+        oy: 345,
+        w: 56 * 2,
+        h: 57 * 2,
+        cw: 56,
+        ch: 57,
+    },
+    text1: {
+        x: 505,
+        y: 485,
+        w: 119 * 2,
+        h: 25 * 2,
+        cw: 119,
+        ch: 25,
+    },
+    text2: {
+        x: 780,
+        y: 485,
+        w: 115 * 2,
+        h: 27 * 2,
+        cw: 115,
+        ch: 27,
+    },
+    text3: {
+        x: 1080,
+        y: 485,
+        w: 89 * 2,
+        h: 27 * 2,
+        cw: 89,
+        ch: 27,
+    },
+    beginbutton: {
+        x: 0,
+        y: 690,
+        w: 213 * 2,
+        h: 49 * 2,
+        cw: 213,
+        ch: 49,
+    },
+}
+
+var startScreenTimerAnimT = 0;
+var startScreenHandAnimT = 0;
+var startPulseT = 0;
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
@@ -575,6 +680,8 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    initStartPage();
 
     radius *= scaleX;
     dradius *= scaleX;
@@ -720,6 +827,20 @@ function main(w, h) {
     setCloudSpeed(30);
     
     gameCycle();
+}
+
+function initStartPage() {
+    for (let k in startPageInfo) {
+        startPageInfo[k].x *= scaleX;
+        startPageInfo[k].y *= scaleY;
+        startPageInfo[k].w *= scaleX;
+        startPageInfo[k].h *= scaleY;
+    }
+    startPageInfo.startmine.ox *= scaleX;
+    startPageInfo.startmine.oy *= scaleY;
+
+    startPageInfo.title.x = canvas.width / 2 - startPageInfo.title.w / 2;
+    startPageInfo.beginbutton.x = canvas.width / 2 - startPageInfo.beginbutton.w / 2;
 }
 
 function initTopHUD() {
@@ -1426,12 +1547,64 @@ function gameCycle() {
                 // displayScore();
                 update();
             } else {
-            
-                ctx.drawImage(images.splash.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+                let handx = Math.sin(startScreenHandAnimT) * 20;
+                let handy = Math.cos(startScreenHandAnimT) * 20;
+                // ctx.drawImage(images.splash.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(images.sky.obj.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
+                ctx.beginPath();
+                ctx.fillStyle = '#70D2ED';
+                ctx.rect(0, waterInfo.y, canvas.width, waterInfo.h);
+                ctx.fill();
+                drawClouds();
+
+                // lands
+                ctx.drawImage(images.landLeft.obj.img, 0, 0, 157, 206, images.landLeft.x, images.landLeft.y, images.landLeft.w, images.landLeft.h);
+                ctx.drawImage(images.landRight.obj.img, 0, 0, 157, 206, images.landRight.x, images.landRight.y, images.landRight.w, images.landRight.h);
+
+                // canons
+                canons.draw();
+                
+                ctx.drawImage(images.title.obj.img, 0, 0, startPageInfo.title.cw, startPageInfo.title.ch, startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
+                ctx.drawImage(images.hand.obj.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x + handx, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                ctx.drawImage(images.startballoon.obj.img, 0, 0, startPageInfo.startballoon.cw, startPageInfo.startballoon.ch, startPageInfo.startballoon.x + handx, startPageInfo.startballoon.y + handy, startPageInfo.startballoon.w, startPageInfo.startballoon.h);
+                
+                //
+                    ctx.save();
+
+                    // move to the center of the canvas
+                    ctx.translate(startPageInfo.startmine.ox + startPageInfo.startmine.w / 2, startPageInfo.startmine.oy + startPageInfo.startmine.h / 2);
+                    
+                    let degrees = Math.sin(startPulseT * 10) * 15;
+                    // rotate the canvas to the specified degrees
+                    ctx.rotate(degrees * Math.PI/180);
+
+                    // draw the image
+                    startPageInfo.startmine.x = -0.5 * startPageInfo.startmine.w;
+                    startPageInfo.startmine.y = -0.5 * startPageInfo.startmine.h;
+
+                    ctx.drawImage(images.startmine.obj.img, 0, 0, startPageInfo.startmine.cw, startPageInfo.startmine.ch, startPageInfo.startmine.x, startPageInfo.startmine.y, startPageInfo.startmine.w, startPageInfo.startmine.h);
+                    // we’re done with the rotating so restore the unrotated context
+                    ctx.restore();
+                //
+
+                
+
+                for (let i = 1; i < 4; ++i) {
+                    let key = 'text' + i;
+                    ctx.drawImage(images[key].obj.img, 0, 0, startPageInfo[key].cw, startPageInfo[key].ch, startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
+                }
+
+                ctx.drawImage(images.beginbutton.obj.img, 0, 0, startPageInfo.beginbutton.cw, startPageInfo.beginbutton.ch, startPageInfo.beginbutton.x, startPageInfo.beginbutton.y, startPageInfo.beginbutton.w, startPageInfo.beginbutton.h);
+                
 
                 // ctx.beginPath();
                 // ctx.rect(btnBegin.x, btnBegin.y, btnBegin.w, btnBegin.h);
                 // ctx.stroke();
+
+                if (delta < 1) {
+                    startPulseT += 2 * delta;
+                    startScreenHandAnimT += 5 * delta;
+                }
             }
         } else {
             if (!fade) {
