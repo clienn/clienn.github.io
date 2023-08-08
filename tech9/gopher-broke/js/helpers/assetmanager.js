@@ -53,7 +53,7 @@ class AssetManager {
         }
     }
 
-    load(obj, url, callback) {
+    load(obj, url, callback, type) {
         var xmlHTTP = new XMLHttpRequest();
         xmlHTTP.open('GET', url, true);
         xmlHTTP.responseType = 'arraybuffer';
@@ -63,7 +63,17 @@ class AssetManager {
             // obj.img.src = window.URL.createObjectURL(blob);
             // console.log(obj.completedPercentage)
             // console.log()
+            
             obj.img.src = url;
+
+            if (type == 1) {
+                // obj.img.preload = 'auto';
+            //     // obj.img.autoplay = (/iPad|iPhone|iPod/).test(navigator.userAgent);
+                obj.img.autoplay = "";
+                // obj.img.muted=true;
+                
+            }
+            
         };
 
         xmlHTTP.onprogress = (e) => {
@@ -114,7 +124,7 @@ class AssetManager {
             completedPercentage: 0,
             totalsize: 0
         }
-
-        this.load(this.audio[id], url, callback);
+        // this.audio[id].img.autoplay = true;
+        this.load(this.audio[id], url, callback, 1);
     }
 }

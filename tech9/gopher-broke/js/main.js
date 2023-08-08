@@ -120,10 +120,65 @@ var nextRoundT = 0;
 var gameDuration = 99;
 var startT = 2;
 
+var startScreenTimerAnimT = 0;
+var startScreenHandAnimT = 0;
+
+var startPage = {
+    hand: {
+        x: 475,
+        y: 280,
+        w: 128,
+        h: 130,
+    },
+    handcover: {
+        x: 400,
+        y: 280,
+        w: 280,
+        h: 150,
+    },
+    gopher: {
+        x: 815,
+        y: 265,
+        w: 165,
+        h: 165,
+    },
+    gophercover: {
+        x: 740,
+        y: 280,
+        w: 310,
+        h: 150,
+    },
+    halo: {
+        x: 840,
+        y: 280,
+        ox: 840,
+        oy: 280,
+        w: 110,
+        h: 40,
+    },
+    star: {
+        x: 840,
+        y: 280,
+        ox: 840,
+        oy: 280,
+        w: 16,
+        h: 14,
+    },
+    timer: {
+        x: 1253,
+        y: 351,
+        w: 34,
+        h: 39,
+    }
+}
+
 /*
  * GAME INITIATLIZATIONS AND CONTROLS
  */
 function main(w, h) {
+    //
+    
+
     canvas.width = w;
     canvas.height = h;
 
@@ -132,6 +187,8 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    initStartPage();
 
     TXT = new Text(ctx, w, h); 
     TXT.setScale(scaleX, scaleY);
@@ -182,6 +239,11 @@ function main(w, h) {
     moveGopher();
 
     controls();
+
+    AM.audio.bg.img.volume = 0.2;
+    AM.audio.bg.img.loop = true;
+    AM.audio.bg.img.play();
+
     gameCycle();
 }
 
@@ -230,8 +292,12 @@ function controls() {
                             let dx = mx - gopher_hide.x;
                             let dy = my - gopher_hide.y;
                             let dist = Math.sqrt(dx * dx + dy * dy);
-                            
-                            if (dist < 100) {
+
+                            if (dist < 50) {
+                                chatID = 0;
+                                damageGopher(50);
+                                playKaboom();
+                            } else if (dist < 120) {
                                 damageGopher(25);
                                 chatID = 1;
 
@@ -266,9 +332,13 @@ function controls() {
     canvas.addEventListener('mouseup', e => {
         // mouseupE();
         if (!gameStart) {
-            AM.audio.bg.img.volume = 0.2;
-            AM.audio.bg.img.loop = true;
-            AM.audio.bg.img.play();
+            if (AM.audio.bg.img.paused) {
+                AM.audio.bg.img.volume = 0.2;
+                AM.audio.bg.img.loop = true;
+                AM.audio.bg.img.play();
+                console.log('test')
+            }
+            
 
             gameStart = true;
             
@@ -283,6 +353,18 @@ function controls() {
             
         }
     });
+}
+
+function initStartPage() {
+    for (let k in startPage) {
+        startPage[k].x *= scaleX;
+        startPage[k].y *= scaleY;
+        startPage[k].w *= scaleX;
+        startPage[k].h *= scaleY;
+    }
+
+    startPage.halo.ox *= scaleX;
+    startPage.halo.oy *= scaleY;
 }
 // *********************************** GAME INITIATLIZATIONS AND CONTROLS END ******************************************************** //
 
@@ -486,7 +568,8 @@ function playScore() {
 
 // *********************************** SOUNDS END ******************************************************** //
 
-
+// #11A5CC
+// #F8E7CD
 /*
  * GAME UPDATES AND CYCLES
  */
@@ -546,6 +629,83 @@ function update() {
     }
 }
 
+function drawStunHalo(d) {
+    ctx.save();
+
+    // move to the center of the canvas
+    ctx.translate(startPage.halo.ox + startPage.halo.w / 2, startPage.halo.oy + startPage.halo.h / 2);
+    
+    let stunDegrees = Math.sin(startScreenHandAnimT * 20) * 20 * d;
+    // rotate the canvas to the specified degrees
+    ctx.rotate(stunDegrees * Math.PI/180);
+
+    // draw the image
+    startPage.halo.x = -0.5 * startPage.halo.w;
+    startPage.halo.y = -0.5 * startPage.halo.h;
+
+    ctx.drawImage(AM.images.halo.img, 0, 0, AM.images.halo.cw, AM.images.halo.ch, startPage.halo.x, startPage.halo.y, startPage.halo.w, startPage.halo.h);
+    
+
+    // we’re done with the rotating so restore the unrotated context
+    ctx.restore();
+}
+
+function startPageAnimations() {
+    ctx.beginPath();
+    ctx.fillStyle = '#F8E7CD';
+    ctx.rect(startPage.handcover.x, startPage.handcover.y, startPage.handcover.w, startPage.handcover.h);
+    ctx.rect(startPage.gophercover.x, startPage.gophercover.y, startPage.gophercover.w, startPage.gophercover.h);
+
+    // ctx.rect(740, 280, 310, 150);
+    // ctx.rect(1100, 280, 310, 150);
+    ctx.fill();
+
+    let handx = Math.sin(startScreenHandAnimT) * 20;
+
+    ctx.drawImage(AM.images.hand.img, 0, 0, AM.images.hand.cw, AM.images.hand.ch, startPage.hand.x + handx, startPage.hand.y, startPage.hand.w, startPage.hand.h);
+    ctx.drawImage(AM.images.gopher.img, 0, 0, AM.images.gopher.cw, AM.images.gopher.ch, startPage.gopher.x, startPage.gopher.y, startPage.gopher.w, startPage.gopher.h);
+    
+    //
+    drawStunHalo(1);
+    drawStunHalo(-1);
+    //
+
+    let starx1 = Math.sin(startScreenHandAnimT) * 20 * scaleY;
+    let starx2 = Math.sin(startScreenHandAnimT * 1.5) * 10 * scaleY;
+    let starx3 = Math.sin(startScreenHandAnimT * 2) * 20 * scaleY;
+    ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 3.5, startPage.star.y + starx1, startPage.star.w, startPage.star.h);
+    ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 2, startPage.star.y + starx3, startPage.star.w, startPage.star.h);
+    ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 2.5, startPage.star.y + starx2, startPage.star.w, startPage.star.h);
+    ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 1.5, startPage.star.y + starx1, startPage.star.w, startPage.star.h);
+
+    // ctx.beginPath();
+    // ctx.arc(1250, 350, 30, 0, 2 * Math.PI);
+    // ctx.stroke();
+
+    ctx.beginPath();
+    ctx.fillStyle = '#11A5CC';
+    ctx.ellipse(startPage.timer.x, startPage.timer.y, startPage.timer.w, startPage.timer.h, 0, 0, 2 * Math.PI);
+    
+    ctx.fill();
+    if (delta < 1) {
+        startScreenTimerAnimT += 15 * delta;
+        var radians = Math.PI / 180 * startScreenTimerAnimT;
+
+        ctx.save();
+        ctx.globalAlpha = 0.95;
+        ctx.beginPath();
+        ctx.moveTo(startPage.timer.x, startPage.timer.y);
+        ctx.fillStyle = '#fff';
+        ctx.ellipse(startPage.timer.x, startPage.timer.y, startPage.timer.w, startPage.timer.h, 0, radians, Math.PI + Math.PI / 2);
+        ctx.closePath();
+        
+        ctx.fill();
+        ctx.restore();
+
+        startScreenHandAnimT += 10 * delta;
+    }
+}
+
 function gameCycle() {
     let now = Date.now();
     delta = (now - last) / 1000;
@@ -576,10 +736,10 @@ function gameCycle() {
         } else {
         
             ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
+            
 
-            // ctx.beginPath();
-            // ctx.rect(btnBegin.x, btnBegin.y, btnBegin.w, btnBegin.h);
-            // ctx.stroke();
+            
+            startPageAnimations();
         }
 
         

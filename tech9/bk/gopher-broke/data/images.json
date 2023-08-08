@@ -1,0 +1,159 @@
+{
+    "data": [
+        {
+            "id": "bg",
+            "src": "bg",
+            "ext": "png",
+            "cw": 865,
+            "ch": 333
+        },
+        {
+            "id": "bg_rect",
+            "src": "bg_rect",
+            "ext": "png",
+            "cw": 895,
+            "ch": 357
+        },
+        {
+            "id": "soil",
+            "src": "soil",
+            "ext": "png",
+            "cw": 266,
+            "ch": 28
+        },
+        {
+            "id": "intro",
+            "src": "intro",
+            "ext": "png",
+            "cw": 926,
+            "ch": 428
+        },
+        {
+            "id": "gopher",
+            "src": "gopher",
+            "ext": "png",
+            "cw": 55,
+            "ch": 55
+        },
+        {
+            "id": "gopher_stun",
+            "src": "gopher_stun",
+            "ext": "png",
+            "cw": 55,
+            "ch": 56
+        },
+        {
+            "id": "gopher_steal",
+            "src": "gopher_steal",
+            "ext": "png",
+            "cw": 55,
+            "ch": 56
+        },
+        {
+            "id": "gopher_x",
+            "src": "gopher_x",
+            "ext": "png",
+            "cw": 55,
+            "ch": 56
+        },
+        {
+            "id": "gopher_hide",
+            "src": "gopher_hide",
+            "ext": "png",
+            "cw": 53,
+            "ch": 27
+        },
+        {
+            "id": "gopher_show",
+            "src": "gopher_show",
+            "ext": "png",
+            "cw": 171,
+            "ch": 123
+        },
+        {
+            "id": "carrot",
+            "src": "carrot",
+            "ext": "png",
+            "cw": 63,
+            "ch": 132
+        },
+        {
+            "id": "carrot_score",
+            "src": "carrot_score",
+            "ext": "png",
+            "cw": 40,
+            "ch": 49
+        },
+        {
+            "id": "carrot_score_x",
+            "src": "carrot_score_x",
+            "ext": "png",
+            "cw": 40,
+            "ch": 49
+        },
+        {
+            "id": "chat_1",
+            "src": "chat_1",
+            "ext": "png",
+            "cw": 111,
+            "ch": 51
+        },
+        {
+            "id": "chat_2",
+            "src": "chat_2",
+            "ext": "png",
+            "cw": 111,
+            "ch": 51
+        },
+        {
+            "id": "chat_3",
+            "src": "chat_3",
+            "ext": "png",
+            "cw": 133,
+            "ch": 62
+        },
+        {
+            "id": "win",
+            "src": "win",
+            "ext": "png",
+            "cw": 352,
+            "ch": 291
+        },
+        {
+            "id": "lose",
+            "src": "lose",
+            "ext": "png",
+            "cw": 352,
+            "ch": 291
+        },
+        {
+            "id": "stopwatch",
+            "src": "hud/stopwatch",
+            "ext": "png",
+            "cw": 43,
+            "ch": 45
+        },
+        {
+            "id": "timecircle",
+            "src": "hud/timecircle",
+            "ext": "png",
+            "cw": 45,
+            "ch": 45
+        },
+        
+        {
+            "id": "volume",
+            "src": "hud/volume",
+            "ext": "png",
+            "cw": 50,
+            "ch": 50
+        },
+        {
+            "id": "mute",
+            "src": "hud/mute",
+            "ext": "png",
+            "cw": 50,
+            "ch": 50
+        }
+    ]
+}

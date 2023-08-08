@@ -140,7 +140,27 @@
             "cw": 45,
             "ch": 45
         },
-        
+        {
+            "id": "hand",
+            "src": "hand",
+            "ext": "png",
+            "cw": 64,
+            "ch": 65
+        },
+        {
+            "id": "halo",
+            "src": "halo",
+            "ext": "png",
+            "cw": 55,
+            "ch": 20
+        },
+        {
+            "id": "star",
+            "src": "star",
+            "ext": "png",
+            "cw": 8,
+            "ch": 7
+        },
         {
             "id": "volume",
             "src": "hud/volume",
