@@ -154,7 +154,7 @@ var images = {
         obj: {},
     },
     t6: {
-        src: 'texts/Gotcha!',
+        src: 'texts/gotcha',
         obj: {},
     },
     t7: {
@@ -213,7 +213,7 @@ var images = {
 
 var music = {
     bg: {
-        src: 'sounds/bg3',
+        src: 'sounds/bg4',
         obj: {},
         ext: 'mp3',
     }, 
@@ -223,12 +223,12 @@ var music = {
         ext: 'wav',
     }, 
     squish: {
-        src: 'sounds/squish',
+        src: 'sounds/squish2',
         obj: {},
-        ext: 'wav',
+        ext: 'mp3',
     }, 
-    squishBonus: {
-        src: 'sounds/squish_bonus',
+    hidelaugh: {
+        src: 'sounds/laugh2',
         obj: {},
         ext: 'wav',
     }, 
@@ -332,7 +332,7 @@ var squash = [];
 
 var crawlXPos = [0];
 var levelSpeed = 5;
-var shuffleDuration = 1;
+var shuffleDuration = 0.1;
 var isTalking = false;
 var talkTime = 0;
 var isClickable = false;
@@ -569,10 +569,10 @@ function main(w, h) {
                 } else if (isClickable && nextRoundTime == 0 && !isCrawl && !isTalking) {
                     isClickable = false;
                     
-                    if (checkCollission(mx, my)) {
+                    if (checkCollission(mx, my) || minDist < 50) {
                         ++score;
                         music.squish.obj.audio.play();
-                        music.squishBonus.obj.audio.play();
+                        // music.squish.obj.audio.play();
 
                         if (nextRound()) {
                             nextRoundTime = 5;
@@ -585,9 +585,9 @@ function main(w, h) {
                         }
                     } else {
                         // console.log(minDist);
-                        if (minDist > 100) {
+                        if (minDist > 250) {
                             reduceHP();
-                        } else if (minDist > 50) {
+                        } else {
                             score--;
                             if (score < 0) score = 0;
                         }
@@ -800,9 +800,22 @@ function drawSpiders() {
                 spiders[i].draw(ctx, images.moving.obj.img, 3);
             } else if (spiders[i].t2 < shuffleDuration) {
                 spiders[i].draw(ctx, images.hiding.obj.img, 3);
+                if (!music.crawl.obj.audio.paused) {
+                    music.crawl.obj.audio.pause();
+                    if (volumeOn) {
+                        music.hidelaugh.obj.audio.currentTime = 0;
+                        music.hidelaugh.obj.audio.play();
+                    }
+                }
+                    
             } else {
                 if (squash[i] == 1) {
                     spiders[i].draw(ctx, images.squash_2.obj.img, 2);
+                    let x = spiders[i].x + spiders[i].w / 2;
+                    let y = spiders[i].y - phraseInfo.h;
+                    let w = phrasesWidth[5];
+                    let cw = phrasesClipWidth[5];
+                    ctx.drawImage(images['t6'].obj.img, 0, 0, cw, phraseInfo.ch, x - w / 2.5, y, w, phraseInfo.h);
                 } else if (isTalking) {
                     spiders[i].draw(ctx, images.angry.obj.img, true);
                 } else {
@@ -822,8 +835,12 @@ function moveSpiders() {
         }
     }
 
-    if (volumeOn)
+    if (volumeOn) {
+        music.crawl.obj.audio.loop = true;
+        music.crawl.obj.audio.currentTime = 0;
         music.crawl.obj.audio.play();
+    }
+        
 }
 
 function checkAccuracy(mx, my) {
@@ -849,7 +866,7 @@ function nextRound() {
 
 function reset() {
     if (score % 2 == 0) {
-        if (spiders.length < 3) {
+        if (spiders.length < 1) {
             addSpider();
             levelSpeed += 2.5;
             // shuffleDuration += 10;
@@ -868,8 +885,12 @@ function reset() {
 
     isCrawl = true;
 
-    if (volumeOn)
+    if (volumeOn) {
+        music.crawl.obj.audio.loop = true;
+        music.crawl.obj.audio.currentTime = 0;
         music.crawl.obj.audio.play();
+    }
+        
 }
 
 function checkCollission(mx, my) {
@@ -1040,6 +1061,7 @@ function update() {
             if (crawlT >= 0.05) {
                 isCrawl = false;
                 crawlT = 0;
+                
                 for (let i = 0; i < spiders.length; ++i) {
                     spiders[i].ox = spiders[i].tmpX = spiders[i].x;
                     spiders[i].oy = spiders[i].tmpY = spiders[i].y;

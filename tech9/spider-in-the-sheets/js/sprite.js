@@ -38,7 +38,7 @@ class Sprite {
         if (isAngry == 1) {
             ctx.drawImage(img, this.clipX, this.clipY, 895, 979, this.x, this.y, this.w, this.h);
         } else if (isAngry == 2) {
-            ctx.drawImage(img, 0, 0, 117, 128, this.x, this.y, this.w, this.h);
+            ctx.drawImage(img, 0, 0, 117, 128, this.x, this.y, this.w * 1.5, this.h * 1.5);
         } else if (isAngry == 3) {
             ctx.drawImage(img, 0, 0, 895, 979, this.x, this.y, this.w, this.h);
             for (let i = 0; i < this.trail.length; ++i) {
