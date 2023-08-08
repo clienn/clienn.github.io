@@ -92,7 +92,7 @@ var health = 100;
 // physics
 var forceD = 0;
 var friction = 0.98;
-var F = 50;
+var F = 25;
 var T = 0;
 const G = 9.8;
 var kaboomT = 0;
@@ -205,6 +205,8 @@ function main(w, h) {
     scaleX = w / 1792;
     scaleY = h / 922;
 
+    F *= scaleX;
+    
     initStartPage();
 
     TXT = new Text(ctx, w, h); 
