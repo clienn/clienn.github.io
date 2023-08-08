@@ -125,6 +125,10 @@ var images = {
         src: 'black-canon',
         obj: {}
     },
+    kaboom: {
+        src: 'kaboom',
+        obj: {}
+    },
     blackCanonRight: {
         src: 'black-canon-2',
         obj: {}
@@ -194,6 +198,15 @@ var volumeInfo = {
     h: 25,
     cw: 50,
     ch: 50,
+}
+
+var kaboomInfo = {
+    x: 0,
+    y: 0,
+    w: 108,
+    h: 28,
+    cw: 108,
+    ch: 28,
 }
 
 var volumeOn = true;
@@ -326,8 +339,8 @@ const clips = [
 ];
 
 const projectileRanges = {
-    x: [200, 500],
-    y: [220, 300]
+    x: [50, 500],
+    y: [50, 300]
 }
 
 var radius = 28;
@@ -546,6 +559,7 @@ var canReset = false;
 const cloudMovements = [-100, 100, 100];
 
 var scaleProj = 1.5;
+var kaboomT = 0;
 
 function main(w, h) {
     canvas.width = w;
@@ -553,8 +567,10 @@ function main(w, h) {
 
     let cols = [0, 1, 2, 3];
     shuffleArr(cols);
-    difficulty[cols[0]] = 0.2;
-    difficulty[cols[1]] = 0.2;
+    difficulty[cols[0]] = Math.floor(Math.random() * 100) / 100 + 0.2;
+    difficulty[cols[1]] = Math.floor(Math.random() * 100) / 100 + 0.2;
+    difficulty[cols[2]] = Math.floor(Math.random() * 100) / 100 + 0.2;
+    difficulty[cols[3]] = Math.floor(Math.random() * 100) / 100 + 0.2;
     // 980 452
 
     scaleX = w / 1792;
@@ -624,6 +640,7 @@ function main(w, h) {
     rescaleSize(completeInfo);
     rescaleSize(trophyInfo);
     rescaleAll(waterInfo);
+    rescaleAll(kaboomInfo);
 
     rescaleAll(volumeInfo);
 
@@ -1189,15 +1206,15 @@ function updateLevel() {
 }
 
 function updateDifficulty() {
-    let cols = [];
-    for (let i = 0; i < difficulty.length; ++i) {
-        if (difficulty[i] < 1) {
-            cols.push(i);
-        }
-    }
+    let cols = [0, 1, 2, 3];
+    // for (let i = 0; i < difficulty.length; ++i) {
+    //     if (difficulty[i] < 1) {
+    //         cols.push(i);
+    //     }
+    // }
 
     if (cols.length > 0) {
-        let rng = Math.floor(Math.random() * cols.length);
+        let rng = Math.floor(Math.random() * cols.length) + 0.3;
         difficulty[cols[rng]] += 0.2;
     }
 }
@@ -1290,6 +1307,9 @@ function splat(mx, my) {
                 music.ouch.obj.audio.pause();
                 music.ouch.obj.audio.currentTime = 0;
                 music.ouch.obj.audio.play();
+                kaboomT = 0.5;
+                kaboomInfo.x = projectiles[i].x;
+                kaboomInfo.y = projectiles[i].y;
             } else {
                 // console.log('splatted!');
                 score += SPLAT_POINTS;
@@ -1342,6 +1362,11 @@ function update() {
     }
 
     moveClouds();
+
+    if (kaboomT > 0) {
+        kaboomT -= 1 * delta;
+        if (kaboomT <= 0) kaboomT = 0;
+    }
 }
 
 function gameCycle() {
@@ -1386,9 +1411,14 @@ function gameCycle() {
                         let r = projectiles[i].update(delta * difficulty[i], g, projectileRanges);
                         
                         if (r) {
+                            difficulty[i] = Math.floor(Math.random() * 100) / 100 + 0.2;
                             updateSprite(i);
                         }
                     }
+                }
+
+                if (kaboomT) {
+                    ctx.drawImage(images.kaboom.obj.img, 0, 0, kaboomInfo.cw, kaboomInfo.ch, kaboomInfo.x, kaboomInfo.y, kaboomInfo.w, kaboomInfo.h);
                 }
 
                 checkProjectileCollisions();
