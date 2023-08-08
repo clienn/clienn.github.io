@@ -76,6 +76,34 @@ var images = {
         src: 'bg',
         obj: {},
     },
+    startbg: {
+        src: 'startbg',
+        obj: {},
+    },
+    title: {
+        src: 'title',
+        obj: {},
+    },
+    hand: {
+        src: 'hand',
+        obj: {},
+    },
+    text1: {
+        src: 'text1',
+        obj: {},
+    },
+    text2: {
+        src: 'text2',
+        obj: {},
+    },
+    text3: {
+        src: 'text3',
+        obj: {},
+    },
+    beginbutton: {
+        src: 'beginbutton',
+        obj: {},
+    },
     turtle: {
         src: 'turtle',
         obj: {},
@@ -365,6 +393,9 @@ var volumeInfo = {
 
 const topHUD = {
     timer: {
+        fontS: 20,
+        fontW: 20,
+        fontH: 20,
         timecircle: {
             w: 45,
             h: 45,
@@ -379,6 +410,9 @@ const topHUD = {
         },
     },
     score: {
+        fontS: 20,
+        fontW: 20,
+        fontH: 20,
         turtleshine: {
             w: 45,
             h: 45,
@@ -585,6 +619,77 @@ var volumeOn = true;
 var seagulls = [];
 var seagullDirections = [];
 
+var startPageInfo = {
+    title: {
+        x: 0,
+        y: 110,
+        w: 492 * 2,
+        h: 40 * 2,
+        cw: 492,
+        ch: 40,
+    },
+    hand: {
+        x: 475,
+        y: 280,
+        w: 64 * 2,
+        h: 65 * 2,
+        cw: 64,
+        ch: 65,
+    },
+    turtle: {
+        x: 817,
+        y: 270,
+        w: 120 * 1.2,
+        h: 121 * 1.2,
+        cw: 120,
+        ch: 121,
+    },
+    shell: {
+        x: 1183,
+        y: 251,
+        w: 105 * 1.2,
+        h: 116 * 1.2,
+        cw: 105,
+        ch: 116,
+    },
+    text1: {
+        x: 385,
+        y: 435,
+        w: 156 * 2,
+        h: 25 * 2,
+        cw: 156,
+        ch: 25,
+    },
+    text2: {
+        x: 740,
+        y: 435,
+        w: 145 * 2,
+        h: 28 * 2,
+        cw: 145,
+        ch: 28,
+    },
+    text3: {
+        x: 1110,
+        y: 435,
+        w: 142 * 2,
+        h: 25 * 2,
+        cw: 142,
+        ch: 25,
+    },
+    beginbutton: {
+        x: 0,
+        y: 690,
+        w: 213 * 2,
+        h: 49 * 2,
+        cw: 213,
+        ch: 49,
+    },
+}
+
+var startScreenTimerAnimT = 0;
+var startScreenHandAnimT = 0;
+var startTurtleBlinkT = 0;
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
@@ -595,6 +700,8 @@ function main(w, h) {
     
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    initStartPage();
 
     TXT = new Text(ctx, w, h);
     TXT.setScale(scaleX, scaleY);
@@ -623,6 +730,14 @@ function main(w, h) {
         volumeInfo.y = 85;
         volumeInfo.w = 35;
         volumeInfo.h = 35;
+
+        topHUD.timer.fontS = 30;
+        topHUD.timer.fontW = 30;
+        topHUD.timer.fontH = 30;
+
+        topHUD.score.fontS = 30;
+        topHUD.score.fontW = 30;
+        topHUD.score.fontH = 35;
     }
 
     resetMsgY *= scaleY;
@@ -670,14 +785,14 @@ function main(w, h) {
     TXT.addText(canvas, TEXT_ID.SCORELABEL, 'Score', 'bold', 20, 'Montserrat', w / 2, 270 * scaleY, 70, 30, '#fff', true); 
     TXT.addText(canvas, TEXT_ID.FINALSCORE, '00', 'bold', 20, 'Montserrat', w / 2, 300 * scaleY, 35, 30, '#fff', true); 
     TXT.addText(canvas, TEXT_ID.RESETMSG, 'Tap to play again.', 'bold', 20, 'Montserrat', w / 2, h / 2, 300, 50, '#fff', true); 
-    TXT.addText(canvas, TEXT_ID.TOPTIMER, '09', (isMobile ? 'normal' : 'bold'), 20, 'Montserrat', 
-        topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2, 40 * scaleY, 20, 20, '#000', true); 
+    TXT.addText(canvas, TEXT_ID.TOPTIMER, '09', (isMobile ? 'normal' : 'bold'), topHUD.timer.fontS, 'Montserrat', 
+        topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2, 40 * scaleY, topHUD.timer.fontW, topHUD.timer.fontH, '#000', true); 
 
-    TXT.addText(canvas, TEXT_ID.SCOREX, 'x', 'normal', 20, 'Montserrat', 
-        w / 2, topHUDInfo.score.y + (scoreAdjY + 2) * scaleY, 10, 20, '#fff', true); 
+    TXT.addText(canvas, TEXT_ID.SCOREX, 'x', 'normal', topHUD.score.fontS, 'Montserrat', 
+        w / 2, topHUDInfo.score.y + (scoreAdjY + 2) * scaleY, 20, topHUD.score.fontH, '#fff', true); 
 
-    TXT.addText(canvas, TEXT_ID.SCORE, '00', (isMobile ? 'normal' : 'bold'), 25, 'Montserrat', 
-        w / 2 + 50 * scaleX, topHUDInfo.score.y + scoreAdjY * scaleY, 20, 25, '#fff', true);
+    TXT.addText(canvas, TEXT_ID.SCORE, '00', (isMobile ? 'normal' : 'bold'), topHUD.score.fontS, 'Montserrat', 
+        w / 2 + 50 * scaleX, topHUDInfo.score.y + scoreAdjY * scaleY, topHUD.score.fontW, topHUD.score.fontH, '#fff', true);
     // 
 
     shineInfo.w *= 1.5;
@@ -847,6 +962,18 @@ function main(w, h) {
     gameCycle();
 }
 
+function initStartPage() {
+    for (let k in startPageInfo) {
+        startPageInfo[k].x *= scaleX;
+        startPageInfo[k].y *= scaleY;
+        startPageInfo[k].w *= scaleX;
+        startPageInfo[k].h *= scaleY;
+    }
+
+    startPageInfo.title.x = canvas.width / 2 - startPageInfo.title.w / 2;
+    startPageInfo.beginbutton.x = canvas.width / 2 - startPageInfo.beginbutton.w / 2;
+}
+
 function drawTextInBox(txt, font, x, y, w, h, angle) {
     angle = angle || 0;
     var fontHeight = 20;
@@ -1014,26 +1141,41 @@ function init() {
 
 function initTopHUD() {
     let isMobile = detectMob();
+    let progressAdjX = 0;
+    let progressAdjW = 100;
+    let scoreAdjW = 0;
+    let scoreAdjX = 0;
 
     if (isMobile) {
         topHUD.timer.timecircle.w = 75;
         topHUD.timer.timecircle.h = 75;
         topHUD.timer.stopwatch.w = 75;
         topHUD.timer.stopwatch.h = 75;
-        topHUDInfo.timer.progress.h = 30;
+        topHUDInfo.timer.progress.h = 35;
+        // topHUDInfo.timer.progress.x = 30;
         topHUDInfo.timer.progress.max = 167;
         topHUDInfo.timer.text.fontsize = 18;
         topHUDInfo.timer.text.rectSize = 35;
         topHUDInfo.timer.text.y = 1;
 
+        progressAdjX = 50 * scaleX;
+        progressAdjW = 200;
+        scoreAdjW = 30 * scaleX;
+        
+
+        // topHUDInfo.timer.w = 300;
+        // topHUDInfo.timer.progress.h = 35;
+
         // (/iPad|iPhone|iPod/).test(navigator.userAgent);
         let sx = 844 / canvas.width;
         // let sy = 390 / canvas.height;
 
-        topHUDInfo.score.w = 130;
-        topHUDInfo.score.h = 65;
+        topHUDInfo.score.w = 130 + scoreAdjW;
+        topHUDInfo.score.h = 70;
         topHUDInfo.score.pw = 195;
         // topHUDInfo.score.y = 3;
+
+        scoreAdjX = 12;
 
         topHUD.score.turtleshine.w = 65;
         topHUD.score.turtleshine.h = 65;
@@ -1042,6 +1184,8 @@ function initTopHUD() {
         topHUDInfo.score.fontsize = 20;
         topHUDInfo.score.fontsize2 = 20;
         topHUDInfo.life.y = 5;
+    } else {
+        // topHUDInfo.timer.w = topHUD.timer.timecircle.w / 2 + 100 * scaleX;
     }
 
     rescaleSize(topHUD.timer.timecircle);
@@ -1051,10 +1195,10 @@ function initTopHUD() {
     
     rescaleSize(topHUDInfo);
 
-    topHUDInfo.timer.w = topHUD.timer.timecircle.w / 2 + 100 * scaleX;
+    topHUDInfo.timer.w = topHUD.timer.timecircle.w / 2 + progressAdjW * scaleX;
     topHUDInfo.timer.progress.h *= scaleX;
     
-    topHUDInfo.timer.progress.x = topHUDInfo.w / 2 - topHUDInfo.timer.w / 2;
+    topHUDInfo.timer.progress.x = topHUDInfo.w / 2 - topHUDInfo.timer.w / 2 + progressAdjX;
 
     topHUDInfo.timer.x = topHUDInfo.timer.progress.x - topHUD.timer.timecircle.w / 2;
     topHUDInfo.timer.y = topHUDInfo.h / 2 - topHUD.timer.timecircle.h / 2;
@@ -1070,7 +1214,7 @@ function initTopHUD() {
 
     let sx = canvas.width / 2 - topHUDInfo.w / 2;
     // topHUDInfo.score.x = sx + (topHUDInfo.w  - topHUDInfo.score.w) / 2;
-    topHUDInfo.score.x = sx + (topHUDInfo.w - topHUDInfo.score.pw) / 2;
+    topHUDInfo.score.x = sx + (topHUDInfo.w - topHUDInfo.score.pw) / 2 - scoreAdjX;
     topHUDInfo.score.y += topHUDInfo.timer.y;
 
     topHUDInfo.score.fontX += topHUDInfo.score.x + (topHUDInfo.w - topHUDInfo.score.pw) / 2 + 10 * scaleX;
@@ -1586,39 +1730,41 @@ function drawScoreHUD() {
 
 function drawProgress() {
     const { w } = topHUDInfo.timer;
+    // let w =
     const { x, y, h, max } = topHUDInfo.timer.progress;
-    let p = showTarget ? max * scaleX : (max * scaleX * (timer.timer / (9.0 * 24)));
+    // let p = showTarget ? max * scaleX : (max * scaleX * (timer.timer / (9.0 * 24)));
+    let p = showTarget ? w : (w * (timer.timer / (9.0 * 24)));
 
     // if ((h / 2) - p > 0) {
     //     p = 0;
     // }
 
     // const grd = ctx.createRadialGradient(75, 50, 5, 90, 60, 100);
-    // const grd = ctx.createLinearGradient(0, 0, 0, p);
+    const grd = ctx.createLinearGradient(0, 0, 0, p);
     // grd.addColorStop(0, "#F8E7CD");
     // grd.addColorStop(1, "#FEB466"); 
 
     let percent = p / (max * scaleX);
 
-    let pColor = '';
+    // let pColor = '';
 
-    if (percent > 0.7) {
-        pColor = '#4ED20E';
-    } else if (percent > 0.20) {
-        pColor = '#83DF56';
-    } else {
-        pColor = '#fb2121';
-    }
-    
     // if (percent > 0.7) {
-    //     grd.addColorStop(0, "#4ED20E");
-    //     grd.addColorStop(0.5, "#83DF56");
-    //     grd.addColorStop(1, "#59DC19");
+    //     pColor = '#4ED20E';
+    // } else if (percent > 0.20) {
+    //     pColor = '#83DF56';
     // } else {
-    //     grd.addColorStop(0, "#fb2121");
-    //     grd.addColorStop(0.5, "#f9a139");
-    //     grd.addColorStop(1, "#fb2121");
+    //     pColor = '#fb2121';
     // }
+    
+    if (percent > 0.7) {
+        grd.addColorStop(0, "#4ED20E");
+        grd.addColorStop(0.5, "#83DF56");
+        grd.addColorStop(1, "#59DC19");
+    } else {
+        grd.addColorStop(0, "#fb2121");
+        grd.addColorStop(0.5, "#f9a139");
+        grd.addColorStop(1, "#fb2121");
+    }
 
     /* To visalize ------------------------------------------------------*/
     ctx.beginPath();
@@ -1632,25 +1778,34 @@ function drawProgress() {
     ctx.closePath();
     /* ------------------------------------------------------------------*/
 
-    if(p <= h){
-        // ctx.beginPath();
-        // ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI - Math.acos((h - p) / h), Math.PI + Math.acos((h - p) / h));
-        // ctx.save();
-        // ctx.scale(-1, 1);
-        // ctx.arc((h / 2) - p + x, h / 2 + y, h / 2, Math.PI - Math.acos((h - p) / h), Math.PI + Math.acos((h - p) / h));
-        // ctx.restore();
-        // ctx.fillStyle = grd;
-        // ctx.fill();
-    } else {
-        ctx.beginPath();
-        ctx.arc(h / 2 + x, h / 2+ y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
-        ctx.lineTo(p - 2 * h + x, 0 + y);
-        ctx.arc(p - (h / 2) + x, h / 2 + y, h / 2, 3 / 2 *Math.PI,Math.PI / 2);
-        ctx.lineTo(h / 2 + x, h + y);
-        // ctx.fillStyle = grd;
-        ctx.fillStyle = pColor;
-        ctx.fill();
-    }
+    ctx.beginPath();
+    ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
+    ctx.lineTo(w + x, 0 + y);
+    ctx.arc((h / 2) + p + x, h / 2 + y, h / 2, 3 / 2 *Math.PI,Math.PI / 2);
+    ctx.lineTo(h / 2 + x, h + y);
+    ctx.fillStyle = grd;
+    ctx.fill();
+    ctx.closePath();
+
+    // if(p <= h){
+    //     // ctx.beginPath();
+    //     // ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI - Math.acos((h - p) / h), Math.PI + Math.acos((h - p) / h));
+    //     // ctx.save();
+    //     // ctx.scale(-1, 1);
+    //     // ctx.arc((h / 2) - p + x, h / 2 + y, h / 2, Math.PI - Math.acos((h - p) / h), Math.PI + Math.acos((h - p) / h));
+    //     // ctx.restore();
+    //     // ctx.fillStyle = grd;
+    //     // ctx.fill();
+    // } else {
+    //     ctx.beginPath();
+    //     ctx.arc(h / 2 + x, h / 2+ y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
+    //     ctx.lineTo(p - 2 * h + x, 0 + y);
+    //     ctx.arc(p - (h / 2) + x, h / 2 + y, h / 2, 3 / 2 *Math.PI,Math.PI / 2);
+    //     ctx.lineTo(h / 2 + x, h + y);
+    //     // ctx.fillStyle = grd;
+    //     ctx.fillStyle = pColor;
+    //     ctx.fill();
+    // }
 }
 
 function gameCycle() {
@@ -1680,9 +1835,46 @@ function gameCycle() {
 
                 
             } else {
-            
-                ctx.drawImage(images.splash.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+                let handx = Math.sin(startScreenHandAnimT) * 20;
+
+                // ctx.drawImage(images.splash.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(images.startbg.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(images.title.obj.img, 0, 0, startPageInfo.title.cw, startPageInfo.title.ch, startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
+                ctx.drawImage(images.hand.obj.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x + handx, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
                 
+                let t = Math.floor(startTurtleBlinkT);
+                t = t % 8;
+                let clipX = t * startPageInfo.turtle.cw;
+                
+
+                ctx.drawImage(images.turtlehappy.obj.img, clipX, 0, startPageInfo.turtle.cw, startPageInfo.turtle.ch, startPageInfo.turtle.x, startPageInfo.turtle.y, startPageInfo.turtle.w, startPageInfo.turtle.h);
+                
+
+                // Untransformed draw position
+                const position = {x: startPageInfo.shell.x, y: startPageInfo.shell.y};
+                // In degrees
+                const rotation = { x: 0, y: startScreenHandAnimT * 10, z: 0};
+                // Rotation relative to here (this is the center of the image)
+                const rotPt = { x: startPageInfo.shell.w / 2, y: startPageInfo.shell.h / 2 };
+
+                ctx.save();
+                ctx.setTransform(new DOMMatrix()
+                    .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+                    .rotateSelf(rotation.x, rotation.y, rotation.z)
+                );
+                // ctx.drawImage(AM.images.startcoin.img, 0, 0, AM.images.startcoin.cw, AM.images.startcoin.ch, -rotPt.x, -rotPt.y, startPage.startcoin.w, startPage.startcoin.h);
+                ctx.drawImage(images.shell.obj.img, 0, 0, startPageInfo.shell.cw, startPageInfo.shell.ch, -rotPt.x, -rotPt.y, startPageInfo.shell.w, startPageInfo.shell.h);
+                ctx.restore();
+
+                
+                
+
+                for (let i = 1; i < 4; ++i) {
+                    let key = 'text' + i;
+                    ctx.drawImage(images[key].obj.img, 0, 0, startPageInfo[key].cw, startPageInfo[key].ch, startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
+                }
+
+                ctx.drawImage(images.beginbutton.obj.img, 0, 0, startPageInfo.beginbutton.cw, startPageInfo.beginbutton.ch, startPageInfo.beginbutton.x, startPageInfo.beginbutton.y, startPageInfo.beginbutton.w, startPageInfo.beginbutton.h);
                 // TXT.draw(0);
                 // ctx.drawImage(images.turtleshine.obj.img, 0, 0, topHUD.score.turtleshine.cw, 
                 //     topHUD.score.turtleshine.ch, 0, 0, topHUD.score.turtleshine.w, topHUD.score.turtleshine.h);
@@ -1692,6 +1884,11 @@ function gameCycle() {
 
                 // drawTextInBox('Testing', 'Montserrat', 0, 0, 500, 100);
                 // TM.draw(tmpText);
+
+                if (delta < 1) {
+                    startTurtleBlinkT += 2 * delta;
+                    startScreenHandAnimT += 5 * delta;
+                }
             }
         } else {
             if (!fade) {

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Boilerplate Landscape - Prototype
+        </title>
+        <style>
+            @font-face {
+                font-family: 'Montserrat';
+                src: url('assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf');
+            }
+            html, body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                background: #10aad7;
+            }
+            canvas {
+                border: 1px solid #000;
+                touch-action: manipulation;
+                display: none;
+            }
+            #game-instructions {
+                padding: 10px;
+            }
+
+            .center {
+                margin: 0;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+            }
+            .directions {
+                font-family: 'Montserrat';
+                color: #fff;
+                font-size: 48px;
+            }
+            #game-surface {
+                border: 1px solid #000;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="game-surface"></canvas>
+        <div id="game-instructions" class="center">
+            <h1 id="directions-text" class="directions"></h1>
+            <!-- <p>Directions: Find the turtle by clicking on the shell after the shuffle.</p>
+            <p>Turn the phone's orientation to landscape to start the game.</p> -->
+            <!-- <button id="btnStart">Start Game</button> -->
+        </div>
+        <!-- <script type="text/javascript" src="js/helpers/globals.js"></script>
+        <script type="text/javascript" src="js/helpers/progressbar.js"></script>
+        <script type="text/javascript" src="js/helpers/assetmanager.js"></script> -->
+        <script type="text/javascript" src="js/text.js"></script>
+        <script type="text/javascript" src="js/textmanager.js"></script>
+        <script type="text/javascript" src="js/sprite.js"></script>
+        <script type="text/javascript" src="js/timer.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript">
+            // var gs = false;
+            // canvas.width = document.documentElement.clientWidth;
+            // canvas.height = document.documentElement.clientHeight;
+
+            // var AM = new AssetManager(() => {
+            //     // init sprites
+            //     // setup all scales
+
+            //     // console.log(AM.images.splash.img, AM.images.splash.cw, AM.images.splash.ch)
+            //     setTimeout(() => {
+            //         gs = true;
+            //     }, 2000);
+                
+            //     // for (let k in AM.audio) {
+            //     //     console.log(AM.audio[k]);
+            //     // }
+                
+            // });
+            // AM.initImageAssets('data/image.json');
+            // AM.initAudioAssets('data/audio.json');
+
+            // window.addEventListener('click', (e) => {
+            //     console.log('click', AM.audio.correct.img.src)
+               
+            //     AM.audio.correct.img.play();
+            // });
+
+            // var progressBar = new ProgressBar(canvas.width / 2 - 50, canvas.height / 2 + 50, 300, 30);
+            // // progressBar.draw(ctx);
+
+            // function gameCycle() {
+            //     let now = Date.now();
+            //     delta = (now - last) / 1000;
+            //     last = now;
+            //     if (gs) {
+            //         ctx.drawImage(AM.images.splash.img, 0, 0, AM.images.splash.cw, AM.images.splash.ch, 0, 0, canvas.width, canvas.height);
+            //     } else {
+            //         progressBar.draw(ctx);
+            //         progressBar.update(delta, AM.progress);
+            //     }
+                
+                
+            //     requestAnimationFrame(gameCycle);
+            // }
+
+            // gameCycle();
+
+            // function initImageLoader() {
+            //     Image.prototype.load = function(url){
+            //         var thisImg = this;
+            //         var xmlHTTP = new XMLHttpRequest();
+            //         xmlHTTP.open('GET', url, true);
+            //         xmlHTTP.responseType = 'arraybuffer';
+            //         xmlHTTP.onload = function(e) {
+            //             var blob = new Blob([this.response]);
+            //             thisImg.src = window.URL.createObjectURL(blob);
+            //         };
+            //         xmlHTTP.onprogress = function(e) {
+            //             if (e.lengthComputable) {
+            //                 thisImg.completedPercentage = parseInt((e.loaded / e.total) * 100);
+            //                 console.log(e.total);
+            //             }
+                        
+            //         };
+            //         xmlHTTP.onloadstart = function(e) {
+            //             thisImg.completedPercentage = 0;
+                        
+            //         };
+            //         xmlHTTP.onloadend = function() {
+            //             // You can also remove your progress bar here, if you like.
+            //             thisImg.completedPercentage = 100;
+            //         }
+            //         xmlHTTP.send();
+            //     };
+
+            //     Image.prototype.completedPercentage = 0;
+            // }
+            
+            // function parseAssets(callback) {
+            //     fetch('data/image.json')
+            //         .then(function (response) {
+            //             return response.json();
+            //         })
+            //         .then(function (data) {
+            //             if (callback) {
+            //                 callback(data.data);
+            //             }  
+            //         })
+            //         .catch(function (err) {
+            //             console.log('error: ' + err);
+            //         });
+            // }
+
+            // initImageLoader();
+            
+            // parseAssets((data) => {
+            //     // console.log(data[0]);
+            //     for (let i = 0; i < data.length; ++i) {
+            //         let img = new Image();
+            //         img.load('assets/' + data[i].src + '.' + data[0].ext);
+            //     }
+            // })
+
+            var e = document.getElementById('directions-text');
+
+            if (isPortrait()) {
+               e.innerHTML = "Rotate to landscape to start the game.";
+            } else {
+                e.innerHTML = "Loading...";
+                setTimeout(() => {
+                    main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+                }, 1000);
+            }
+
+            window.addEventListener("orientationchange", function() {
+                if (!isPortrait()) {
+                    canvas.style.display = 'none';
+                    startGame = false;
+                    location.href = '';
+                }
+
+                if (!startGame) {
+                    startGame = isPortrait();
+
+                    if (startGame) {
+                        e.innerHTML = "Loading...";
+                        setTimeout(() => {
+                            main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+                        }, 1000);
+                    } else if (!isPortrait()) {
+                        startGame = true;
+                        e.innerHTML = "Loading...";
+                        setTimeout(() => {
+                            main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+                        }, 1000);
+                        // main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+                    } else {
+                        alert('Rotate to landscape to start game.');
+                    }
+                }
+            }, false);
+
+            // btnStart.addEventListener('click', (e) => {
+            //     if (startGame) {
+            //         main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+            //     } else if (!isPortrait()) {
+            //         startGame = true;
+            //         main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+            //     } else {
+            //         alert('Rotate to landscape to start game.');
+            //     }
+            // });
+        </script>
+    </body>
+</html>

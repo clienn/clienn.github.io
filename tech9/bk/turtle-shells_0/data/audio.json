@@ -1,0 +1,24 @@
+{
+    "data": [
+        {
+            "id": "beach",
+            "src": "sounds/bg-beach",
+            "ext": "wav"
+        }, 
+        {
+            "id": "correct",
+            "src": "sounds/correct",
+            "ext": "wav"
+        }, 
+        {
+            "id": "wrong",
+            "src": "sounds/wrong",
+            "ext": "wav"
+        },
+        {
+            "id": "wrong2",
+            "src": "sounds/wrong2",
+            "ext": "wav"
+        }
+    ]
+}
