@@ -8,13 +8,6 @@
             "ch": 428
         },
         {
-            "id": "intro",
-            "src": "intro",
-            "ext": "png",
-            "cw": 927,
-            "ch": 429
-        },
-        {
             "id": "piggybank",
             "src": "piggybank",
             "ext": "png",
@@ -107,10 +100,10 @@
         },
         {
             "id": "hammer",
-            "src": "hammer",
+            "src": "hammer2",
             "ext": "png",
-            "cw": 181,
-            "ch": 181
+            "cw": 1887,
+            "ch": 3764
         },
         {
             "id": "kaboom",
@@ -160,6 +153,90 @@
             "ext": "png",
             "cw": 293,
             "ch": 293
+        },
+        {
+            "id": "startrect",
+            "src": "startrect",
+            "ext": "png",
+            "cw": 927,
+            "ch": 429
+        },
+        {
+            "id": "title",
+            "src": "title",
+            "ext": "png",
+            "cw": 255,
+            "ch": 89
+        },
+        {
+            "id": "text1",
+            "src": "text1",
+            "ext": "png",
+            "cw": 108,
+            "ch": 29
+        },
+        {
+            "id": "text2",
+            "src": "text2",
+            "ext": "png",
+            "cw": 124,
+            "ch": 25
+        },
+        {
+            "id": "text3",
+            "src": "text3",
+            "ext": "png",
+            "cw": 121,
+            "ch": 27
+        },
+        {
+            "id": "text4",
+            "src": "text4",
+            "ext": "png",
+            "cw": 127,
+            "ch": 40
+        },
+        {
+            "id": "hand",
+            "src": "hand",
+            "ext": "png",
+            "cw": 57,
+            "ch": 57
+        },
+        {
+            "id": "startcoin",
+            "src": "startcoin",
+            "ext": "png",
+            "cw": 57,
+            "ch": 57
+        },
+        {
+            "id": "starthammer",
+            "src": "starthammer",
+            "ext": "png",
+            "cw": 80,
+            "ch": 80
+        },
+        {
+            "id": "startball",
+            "src": "startball",
+            "ext": "png",
+            "cw": 45,
+            "ch": 45
+        },
+        {
+            "id": "startpig",
+            "src": "startpig",
+            "ext": "png",
+            "cw": 67,
+            "ch": 57
+        },
+        {
+            "id": "beginbutton",
+            "src": "beginbutton",
+            "ext": "png",
+            "cw": 213,
+            "ch": 49
         },
         {
             "id": "volume",

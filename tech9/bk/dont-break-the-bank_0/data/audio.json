@@ -1,0 +1,24 @@
+{
+    "data": [
+        {
+            "id": "bg",
+            "src": "sounds/bg",
+            "ext": "mp3"
+        }, 
+        {
+            "id": "score",
+            "src": "sounds/score",
+            "ext": "wav"
+        }, 
+        {
+            "id": "kaboom",
+            "src": "sounds/kaboom",
+            "ext": "wav"
+        },
+        {
+            "id": "glue",
+            "src": "sounds/glue",
+            "ext": "wav"
+        }
+    ]
+}

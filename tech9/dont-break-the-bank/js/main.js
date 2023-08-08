@@ -56,8 +56,8 @@ var glueInfo = {
 }
 
 var hammerInfo = {
-    w: 175,
-    h: 350,
+    w: 100,
+    h: 200,
 }
 
 var ballInfo = {
@@ -109,6 +109,88 @@ var jumpHeight = 100;
 var jump = 0;
 var score = 0;
 
+// startpage
+var startScreenTimerAnimT = 0;
+var startScreenHandAnimT = 0;
+
+var startPage = {
+    title: {
+        x: 0,
+        y: 75,
+        w: 255 * 2,
+        h: 89 * 2,
+    },
+    text1: {
+        x: 402,
+        y: 483,
+        w: 108 * 2,
+        h: 29 * 2,
+    },
+    text2: {
+        x: 680,
+        y: 483,
+        w: 124 * 2,
+        h: 25 * 2,
+    },
+    text3: {
+        x: 980,
+        y: 483,
+        w: 121 * 2,
+        h: 27 * 2,
+    },
+    text4: {
+        x: 1280,
+        y: 483,
+        w: 127 * 2,
+        h: 40 * 2,
+    },
+    hand: {
+        x: 430,
+        y: 335,
+        w: 128,
+        h: 130,
+    },
+    handcover: {
+        x: 400,
+        y: 280,
+        w: 280,
+        h: 150,
+    },
+    startcoin: {
+        x: 740,
+        y: 345,
+        w: 57 * 2,
+        h: 57 * 2,
+    },
+    startball: {
+        x: 1072,
+        y: 350,
+        w: 90,
+        h: 90,
+    },
+    starthammer: {
+        x: 1022,
+        y: 330,
+        ox: 1022,
+        oy: 330,
+        w: 80 * 2,
+        h: 80 * 2,
+    },
+    startpig: {
+        x: 1345,
+        y: 351,
+        w: 67 * 2,
+        h: 57 * 2,
+    },
+    beginbutton: {
+        x: 0,
+        y: 700,
+        w: 213 * 2,
+        h: 49 * 2,
+    }
+}
+
+// #313350
 
 /*
  * GAME INITIATLIZATIONS AND CONTROLS
@@ -122,6 +204,8 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    initStartPage();
 
     TXT = new Text(ctx, w, h); 
     TXT.setScale(scaleX, scaleY);
@@ -168,6 +252,7 @@ function main(w, h) {
 
 function controls() {
     let mid = canvas.width / 2;
+    let prevPos = 0;
 
     document.addEventListener('touchstart', (e) => {
         e.preventDefault();
@@ -180,49 +265,55 @@ function controls() {
             if (e.type == 'touchstart' || e.type == 'touchmove' || e.type == 'touchend' || e.type == 'touchcancel'){
                 var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
                 var touch = evt.touches[0] || evt.changedTouches[0];
-                x = touch.pageX;
-    
-                if (evt.touches.length > 1) {
-                    var touch2 = evt.touches[1] || evt.changedTouches[1];
-                    x1 = touch2.pageX;
-    
-                    if (x >= mid) {
-                        if (!rDown) {
-                            rDown = true;
-                            forceD = F;
-                        }
-                    } else  {
-                        if (!lDown) {
-                            lDown = true;
-                            forceD = -F;
-                        }
-                    }
-    
-                    if (x1 >= mid) {
-                        if (!rDown) {
-                            rDown = true;
-                            forceD = F;
-                        }
-                    } else {
-                        if (!lDown) {
-                            lDown = true;
-                            forceD = -F;
-                        }
-                    }
-                } else {
-                    if (x >= mid) {
-                        if (!rDown) {
-                            rDown = true;
-                            forceD = F;
-                        }
-                    } else  {
-                        if (!lDown) {
-                            lDown = true;
-                            forceD = -F;
-                        }
-                    }
-                }
+                prevPos = touch.pageX;
             }
+
+            // if (e.type == 'touchstart' || e.type == 'touchmove' || e.type == 'touchend' || e.type == 'touchcancel'){
+            //     var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+            //     var touch = evt.touches[0] || evt.changedTouches[0];
+            //     x = touch.pageX;
+    
+            //     if (evt.touches.length > 1) {
+            //         var touch2 = evt.touches[1] || evt.changedTouches[1];
+            //         x1 = touch2.pageX;
+    
+            //         if (x >= mid) {
+            //             if (!rDown) {
+            //                 rDown = true;
+            //                 forceD = F;
+            //             }
+            //         } else  {
+            //             if (!lDown) {
+            //                 lDown = true;
+            //                 forceD = -F;
+            //             }
+            //         }
+    
+            //         if (x1 >= mid) {
+            //             if (!rDown) {
+            //                 rDown = true;
+            //                 forceD = F;
+            //             }
+            //         } else {
+            //             if (!lDown) {
+            //                 lDown = true;
+            //                 forceD = -F;
+            //             }
+            //         }
+            //     } else {
+            //         if (x >= mid) {
+            //             if (!rDown) {
+            //                 rDown = true;
+            //                 forceD = F;
+            //             }
+            //         } else  {
+            //             if (!lDown) {
+            //                 lDown = true;
+            //                 forceD = -F;
+            //             }
+            //         }
+            //     }
+            // }
         }
 
         
@@ -264,9 +355,39 @@ function controls() {
     //         }
     //     }
     // });
-
+    
     canvas.addEventListener('touchmove', e => {
         // mousemoveE(e.touches[0].clientX, e.touches[0].clientY);
+        if (e.type == 'touchmove') {
+            var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+            var touch = evt.touches[0] || evt.changedTouches[0];
+            let x = touch.pageX;
+
+            if (x > prevPos) {
+                forceD = F;
+            } else  {
+                forceD = -F;
+            }
+
+            prevPos = x;
+            // if (evt.touches.length > 0) {
+            //     if (x > pig.x) {
+            //         if (!rDown) {
+            //             rDown = true;
+            //             forceD = F;
+            //         }
+            //     } else  {
+            //         if (!lDown) {
+            //             lDown = true;
+            //             forceD = -F;
+            //         }
+            //     }
+
+            //     prevPos = x;
+            // }
+
+            
+        }
         
     });
 
@@ -315,6 +436,18 @@ function controls() {
                 // music.correct.obj.volume = 0;
             }
         }
+
+        // if (mx > canvas.width / 2) {
+        //     if (!rDown) {
+        //         rDown = true;
+        //         forceD = F;
+        //     }
+        // } else {
+        //     if (!lDown) {
+        //         lDown = true;
+        //         forceD = -F;
+        //     }
+        // }
     });
 
     document.addEventListener('keydown', e => {
@@ -345,9 +478,13 @@ function controls() {
 
     canvas.addEventListener('mousemove', e => {
         // mousemoveE(e.offsetX, e.offsetY);
+        let mx = e.offsetX;
+        let my = e.offsetY;
+        console.log(mx, my);
     });
     
     canvas.addEventListener('mouseup', e => {
+        
         // mouseupE();
         if (!gameStart) {
             AM.audio.bg.img.volume = 0.2;
@@ -363,8 +500,25 @@ function controls() {
             if (gameover) {
                 reset();
             }
+
+            
         }
     });
+}
+
+function initStartPage() {
+    for (let k in startPage) {
+        startPage[k].x *= scaleX;
+        startPage[k].y *= scaleY;
+        startPage[k].w *= scaleX;
+        startPage[k].h *= scaleY;
+    }
+
+    startPage.title.x = canvas.width / 2 - startPage.title.w / 2;
+    startPage.beginbutton.x = canvas.width / 2 - startPage.beginbutton.w / 2;
+
+    startPage.starthammer.ox *= scaleX;
+    startPage.starthammer.oy *= scaleY;
 }
 // *********************************** GAME INITIATLIZATIONS AND CONTROLS END ******************************************************** //
 
@@ -467,7 +621,7 @@ function addHammer() {
     if (hammers.length < hammerLimit) {
         // let id = 'hammer_' + (Math.floor(Math.random() * 3) + 1);
 
-        let hammer = new Sprite(hammers.length * hammerInfo.w, 0, hammerInfo.w, hammerInfo.w, AM.images.hammer.cw, AM.images.hammer.ch);
+        let hammer = new Sprite(hammers.length * hammerInfo.w, 0, hammerInfo.w, hammerInfo.h, AM.images.hammer.cw, AM.images.hammer.ch);
         // hammer.id = id;
         hammer.x = Math.floor(Math.random() * (canvas.width - hammer.w));
         hammer.dropSpeed = Math.floor(Math.random() * 15) + 1;
@@ -568,6 +722,62 @@ function checkCollision2(r1, r2) {
     return r1.x + r1.w >= r2.x && r1.x <= r2.x + r2.w && r1.y + r1.h >= r2.oy + r2.dropDist && r1.y <= r2.oy + r2.dropDist + r2.h;
  }
 
+ function doPolygonsIntersect (a, b) {
+    var polygons = [a, b];
+    var minA, maxA, projected, i, i1, j, minB, maxB;
+
+    for (i = 0; i < polygons.length; i++) {
+
+        // for each polygon, look at each edge of the polygon, and determine if it separates
+        // the two shapes
+        var polygon = polygons[i];
+        for (i1 = 0; i1 < polygon.length; i1++) {
+
+            // grab 2 vertices to create an edge
+            var i2 = (i1 + 1) % polygon.length;
+            var p1 = polygon[i1];
+            var p2 = polygon[i2];
+
+            // find the line perpendicular to this edge
+            var normal = { x: p2.y - p1.y, y: p1.x - p2.x };
+
+            minA = maxA = null;
+            // for each vertex in the first shape, project it onto the line perpendicular to the edge
+            // and keep track of the min and max of these values
+            for (j = 0; j < a.length; j++) {
+                projected = normal.x * a[j].x + normal.y * a[j].y;
+                if (minA == null || projected < minA) {
+                    minA = projected;
+                }
+                if (maxA == null || projected > maxA) {
+                    maxA = projected;
+                }
+            }
+
+            // for each vertex in the second shape, project it onto the line perpendicular to the edge
+            // and keep track of the min and max of these values
+            minB = maxB = null;
+            for (j = 0; j < b.length; j++) {
+                projected = normal.x * b[j].x + normal.y * b[j].y;
+                if (minB == null || projected < minB) {
+                    minB = projected;
+                }
+                if (maxB == null || projected > maxB) {
+                    maxB = projected;
+                }
+            }
+
+            // if there is no overlap between the projects, the edge we are looking at separates the two
+            // polygons, and we know there is no overlap
+            if (maxA < minB || maxB < minA) {
+                // CONSOLE("polygons don't intersect!");
+                return false;
+            }
+        }
+    }
+    return true;
+};
+
 function collisionUpdate() {
     for (let i = 0; i < moneyList.length; ++i) {
         if (checkCollision(pig, moneyList[i])) {
@@ -632,13 +842,26 @@ function collisionUpdate() {
         }
     }
 
-    // for (let i = 0; i < hammers.length; ++i) {
-    //     if (checkCollision2(pig, hammers[i])) {
-    //         // jump = jumpHeight;
-    //         // TXT.texts['points'].str = '+1.00';
-    //         resetHammer(i);
-    //     }
-    // }
+    for (let i = 0; i < hammers.length; ++i) {
+        let y = hammers[i].oy + hammers[i].dropDist;
+        if (doPolygonsIntersect(
+            [{ x: pig.x, y: pig.y }, { x: pig.x + pig.w, y: pig.y }, { x: pig.x + pig.w, y: pig.y + pig.h }, { x: pig.x, y: pig.y + pig.h }],
+            [{ x: hammers[i].ox, y: y }, { x: hammers[i].ox + hammers[i].w, y: y }, { x: hammers[i].ox + hammers[i].w, y: y + hammers[i].h }, { x: hammers[i].ox, y: y + hammers[i].h }]
+        )) {
+            kaboomT = 2;
+            health -= 10;
+            resetHammer(i);
+
+            if (HUD.volumeOn)
+                playKaboom();
+            break;
+        }
+        // if (checkCollision2(pig, hammers[i])) {
+        //     // jump = jumpHeight;
+        //     // TXT.texts['points'].str = '+1.00';
+        //     resetHammer(i);
+        // }
+    }
 }
 
 function bounceBalls() {
@@ -836,6 +1059,75 @@ function update() {
     }
 }
 
+function startPageAnimations() {
+
+    ctx.drawImage(AM.images.title.img, 0, 0, AM.images.title.cw, AM.images.title.ch, startPage.title.x, startPage.title.y, startPage.title.w, startPage.title.h);
+    
+    for (let i = 1; i < 5; ++i) {
+        let key = 'text' + i;
+        ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, startPage[key].x, startPage[key].y, startPage[key].w, startPage[key].h);
+    }
+   
+
+    let handx = Math.sin(startScreenHandAnimT) * 20;
+
+    ctx.drawImage(AM.images.hand.img, 0, 0, AM.images.hand.cw, AM.images.hand.ch, startPage.hand.x + handx, startPage.hand.y, startPage.hand.w, startPage.hand.h);
+
+    // Untransformed draw position
+    const position = {x: startPage.startcoin.x, y: startPage.startcoin.y};
+    // In degrees
+    const rotation = { x: 0, y: startScreenHandAnimT * 10, z: 0};
+    // Rotation relative to here (this is the center of the image)
+    const rotPt = { x: startPage.startcoin.w / 2, y: startPage.startcoin.h / 2 };
+
+    ctx.save();
+    ctx.setTransform(new DOMMatrix()
+        .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+        .rotateSelf(rotation.x, rotation.y, rotation.z)
+    );
+    ctx.drawImage(AM.images.startcoin.img, 0, 0, AM.images.startcoin.cw, AM.images.startcoin.ch, -rotPt.x, -rotPt.y, startPage.startcoin.w, startPage.startcoin.h);
+    ctx.restore();
+
+    
+    
+    
+    ctx.drawImage(AM.images.startball.img, 0, 0, AM.images.startball.cw, AM.images.startball.ch, startPage.startball.x, startPage.startball.y, startPage.startball.w, startPage.startball.h);
+    
+    //
+    ctx.save();
+
+    // move to the center of the canvas
+    ctx.translate(startPage.starthammer.ox + startPage.starthammer.w / 2, startPage.starthammer.oy + startPage.starthammer.h / 2);
+    
+    let hammerDegrees = Math.sin(startScreenHandAnimT * 0.20) * 45;
+    // rotate the canvas to the specified degrees
+    ctx.rotate(hammerDegrees * Math.PI/180);
+
+    // draw the image
+    startPage.starthammer.x = -0.5 * startPage.starthammer.w;
+    startPage.starthammer.y = -0.5 * startPage.starthammer.h;
+
+    ctx.drawImage(AM.images.starthammer.img, 0, 0, AM.images.starthammer.cw, AM.images.starthammer.ch, startPage.starthammer.x, startPage.starthammer.y, startPage.starthammer.w, startPage.starthammer.h);
+    // we’re done with the rotating so restore the unrotated context
+    ctx.restore();
+    
+    //
+
+    let pigpulse = Math.sin(startScreenHandAnimT) * 5;
+    let pigw = startPage.startpig.w + pigpulse;
+    let pigh = startPage.startpig.h + pigpulse;
+    let pigx = startPage.startpig.x - pigpulse / 2;
+    let pigy = startPage.startpig.y - pigpulse / 2;
+
+    ctx.drawImage(AM.images.startpig.img, 0, 0, AM.images.startpig.cw, AM.images.startpig.ch, pigx, pigy, pigw, pigh);
+    ctx.drawImage(AM.images.beginbutton.img, 0, 0, AM.images.beginbutton.cw, AM.images.beginbutton.ch, startPage.beginbutton.x, startPage.beginbutton.y, startPage.beginbutton.w, startPage.beginbutton.h);
+
+    if (delta < 1) {
+        // startScreenTimerAnimT += 15 * delta;
+        startScreenHandAnimT += 10 * delta;
+    }
+}
+
 function gameCycle() {
     let now = Date.now();
     delta = (now - last) / 1000;
@@ -860,9 +1152,10 @@ function gameCycle() {
             drawBall();
             update();
         } else {
-        
-            ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
+            // ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(AM.images.startrect.img, 0, 0, AM.images.startrect.cw, AM.images.startrect.ch, 0, 0, canvas.width, canvas.height);
 
+            startPageAnimations();
             // ctx.beginPath();
             // ctx.rect(btnBegin.x, btnBegin.y, btnBegin.w, btnBegin.h);
             // ctx.stroke();
