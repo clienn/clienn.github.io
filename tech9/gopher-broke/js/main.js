@@ -98,8 +98,8 @@ var gopherInfo = {
 }
 
 var gopherStunInfo = {
-    w: 110,
-    h: 112,
+    w: 110 * 1.25,
+    h: 112 * 1.25,
 }
 
 var gopher = null;
@@ -117,7 +117,7 @@ var chats = [];
 var chatID = 0;
 var nextRoundT = 0;
 
-var gameDuration = 99;
+var gameDuration = 90;
 var startT = 2;
 
 var startScreenTimerAnimT = 0;
@@ -171,6 +171,9 @@ var startPage = {
         h: 39,
     }
 }
+
+var stunT = 0
+var stunAnimStars = [];
 
 /*
  * GAME INITIATLIZATIONS AND CONTROLS
@@ -288,6 +291,8 @@ function controls() {
                             chatID = 0;
                             damageGopher(50);
                             playKaboom();
+                            stunT = 0;
+                            setAnimStars(7);
                         } else {
                             let dx = mx - gopher_hide.x;
                             let dy = my - gopher_hide.y;
@@ -297,6 +302,8 @@ function controls() {
                                 chatID = 0;
                                 damageGopher(50);
                                 playKaboom();
+                                stunT = 0;
+                                setAnimStars(7);
                             } else if (dist < 120) {
                                 damageGopher(25);
                                 chatID = 1;
@@ -398,6 +405,8 @@ function drawGopher() {
                 key = 'gopher_stun';
                 gopher_hide.dynamicdraw(ctx, AM.images[key].img, gopher_hide.ox, gopher_hide.oy, gopherStunInfo.w, gopherStunInfo.h, AM.images[key].cw, AM.images[key].ch);
                 HP.y = gopher_hide.y + gopherStunInfo.h + 5;
+                animateStars(gopher_hide.x + gopher_hide.w / 2, gopher_hide.y);
+                stunT += 1 * delta;
             } else if (chatID == 2) {
                 key = 'gopher_steal';
                 gopher_hide.dynamicdraw(ctx, AM.images[key].img, gopher_hide.ox, gopher_hide.oy, gopherStunInfo.w, gopherStunInfo.h, AM.images[key].cw, AM.images[key].ch);
@@ -617,7 +626,10 @@ function update() {
         HUD.txt.texts['time'].str = zeroPad(Math.floor(timer.timer / 24), 2);
 
         HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24) / gameDuration * 100);
-        timer.tick(delta);
+
+        if (gopher_hide.goto == null && gopher_hide.moveDestinations.length == 0) {
+            timer.tick(delta);
+        }
 
         if (timer.timer <= 0) {
             gameover = true;
@@ -704,6 +716,26 @@ function startPageAnimations() {
 
         startScreenHandAnimT += 10 * delta;
     }
+}
+
+function setAnimStars(nStars) {
+    stunAnimStars = [];
+    for (let i = 0; i < nStars; ++i) {
+        let distx = Math.floor(Math.random() * 30) + 10;
+        let disty = Math.floor(Math.random() * 30) + 10;
+        let speed = Math.floor(Math.random() * 30) + 10;
+        stunAnimStars.push([distx, disty, speed]);
+    }
+}
+
+function animateStars(x, y) {
+    for (let i = 0; i < stunAnimStars.length; ++i) {
+        let space = 10;
+        let sinX = Math.sin(stunT * stunAnimStars[i][2]) * stunAnimStars[i][0];
+        let sinY = Math.cos(stunT * stunAnimStars[i][2]) * stunAnimStars[i][1];
+        ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, x + sinX + i * space, y + sinY, startPage.star.w, startPage.star.h);
+    }
+    
 }
 
 function gameCycle() {

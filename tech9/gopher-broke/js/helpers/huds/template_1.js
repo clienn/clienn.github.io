@@ -65,7 +65,7 @@ class Template_1 {
         this.timeProgressBar.progress = 100;
 
 
-        this.txt.addText('time', '99', 'normal', 20, 'Montserrat', 0, 0, 30, 30, '#000', true); 
+        this.txt.addText('time', '90', 'normal', 20, 'Montserrat', 0, 0, 30, 30, '#000', true); 
         this.txt.centerTo('time', this.timecircle.x, this.timecircle.y, this.timecircle.w, this.timecircle.h);
 
 
