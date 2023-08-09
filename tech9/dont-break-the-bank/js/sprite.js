@@ -29,12 +29,13 @@ class Sprite {
     }
 
     addForce(f, delta, thresh) {
-        this.vx += f * delta;
-        if (this.vx > thresh) {
-            this.vx = thresh;
-        } else if (this.vx < -thresh) {
-            this.vx = -thresh;
-        }
+        // this.vx += f * delta;
+        // if (this.vx > thresh) {
+        //     this.vx = thresh;
+        // } else if (this.vx < -thresh) {
+        //     this.vx = -thresh;
+        // }
+        this.vx = f;
     }
 
     update(w, delta, friction) {

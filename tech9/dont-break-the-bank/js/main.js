@@ -41,18 +41,18 @@ var pigInfo = {
 }
 
 var moneyInfo = {
-    w: 75,
-    h: 50,
+    w: 75 * 1.35,
+    h: 50 * 1.35,
 }
 
 var coinInfo = {
-    w: 45,
-    h: 45,
+    w: 45 * 1.35,
+    h: 45 * 1.35,
 }
 
 var glueInfo = {
-    w: 75,
-    h: 75,
+    w: 75 * 1.5,
+    h: 75 * 1.5,
 }
 
 var hammerInfo = {
@@ -61,13 +61,13 @@ var hammerInfo = {
 }
 
 var ballInfo = {
-    w: 30,
-    h: 30,
+    w: 30 * 1.15,
+    h: 30 * 1.15,
 }
 
 var kaboomInfo = {
-    w: 70,
-    h: 30,
+    w: 70 * 1.15,
+    h: 30 * 1.15,
 }
 
 // srpite containers
@@ -92,7 +92,7 @@ var health = 100;
 // physics
 var forceD = 0;
 var friction = 0.98;
-var F = 25;
+var F = 10;
 var T = 0;
 const G = 9.8;
 var kaboomT = 0;
@@ -204,9 +204,11 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
-
+    if (isMobile()) {
+        F = 15;
+    }
     F *= scaleX;
-    
+
     initStartPage();
 
     TXT = new Text(ctx, w, h); 
@@ -625,7 +627,7 @@ function addHammer() {
 
         let hammer = new Sprite(hammers.length * hammerInfo.w, 0, hammerInfo.w, hammerInfo.h, AM.images.hammer.cw, AM.images.hammer.ch);
         // hammer.id = id;
-        hammer.x = Math.floor(Math.random() * (canvas.width - hammer.w));
+        hammer.x = Math.floor(Math.random() * (canvas.width - hammer.w / 2));
         hammer.dropSpeed = Math.floor(Math.random() * 15) + 1;
         
         hammers.push(hammer);
@@ -659,8 +661,10 @@ function drawHammers() {
 
 function resetHammer(i) {
     hammers[i].dropSpeed = Math.floor(Math.random() * 15) + 1;
-    hammers[i].x = Math.floor(Math.random() * (canvas.width - hammers[i].w));
+    hammers[i].x = Math.floor(Math.random() * (canvas.width - hammers[i].w / 2));
+    hammers[i].ox = hammers[i].x;
     hammers[i].y = -hammers[i].h * hammers[i].dropSpeed;
+    // hammers[i].oy = hammers[i].y;
     hammers[i].vy = 0;
     hammers[i].degrees = 0;
     hammers[i].rotationT = 0;
