@@ -15,6 +15,34 @@
             "ch": 430
         },
         {
+            "id": "eel_head",
+            "src": "eel/eel_head",
+            "ext": "png",
+            "cw": 505,
+            "ch": 454
+        },
+        {
+            "id": "eel_head2",
+            "src": "eel/eel_head2",
+            "ext": "png",
+            "cw": 124,
+            "ch": 185
+        },
+        {
+            "id": "eel_neck",
+            "src": "eel/eel_neck",
+            "ext": "png",
+            "cw": 505,
+            "ch": 454
+        },
+        {
+            "id": "eel_neck2",
+            "src": "eel/eel_neck2",
+            "ext": "png",
+            "cw": 64,
+            "ch": 227
+        },
+        {
             "id": "fish_0",
             "src": "fishes/0",
             "ext": "png",

@@ -23,7 +23,7 @@ class Sprite {
         this.t2 = 0;
         this.isAnimating = false;
 
-        this.goto = null;
+        this.goto = [];
         this.moveDestinations = [];
         this.trail = [];
 
@@ -110,6 +110,73 @@ class Sprite {
     
     draw(ctx, img) {
         ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, this.x, this.y, this.w, this.h);
+    }
+
+    extend(ox, oy, px, py) {
+        let a = Math.atan2(oy - py, ox - px);
+        let angle = Math.atan2(oy - py, ox - px) * 180 / Math.PI - 90;
+        
+        // if (angle >= 105) angle -= 90;
+        // else angle -= 90;
+        
+        // if (angle > 80) angle = 80;
+        // else if (angle < -80) angle = -80;
+
+        this.degrees = angle;
+
+        // let flipAngle = a;
+        let mul = -10;
+        this.vx = Math.cos(a) * mul;
+        this.vy = Math.sin(a) * mul;
+
+        
+        
+        return a;
+    }
+
+    reset() {
+        this.x = this.ox;
+        this.y = this.oy;
+        this.vx = 0;
+        this.vy = 0;
+        this.degrees = 0;
+        
+    }
+
+    animateExtension() {
+ 
+    }
+
+    updatePos(delta, speed) {
+        this.x += this.vx * delta * speed;
+        this.y += this.vy * delta * speed;
+    }
+
+    drawWithRotation(ctx, img, rx, ry) {
+        // let angle = Math.atan2(oy - py, ox - px) * 180 / Math.PI;
+        // if (angle >= 105) angle -= 90;
+        // else angle -= 90;
+        
+        // if (angle > 80) angle = 80;
+        // else if (angle < -80) angle = -80;
+
+
+        ctx.save();
+        // Untransformed draw position
+        const position = {x: this.x, y: this.y};
+        // In degrees
+        const rotation = { x: 0, y: 0, z: this.degrees};
+        // Rotation relative to here (this is the center of the image)
+        // const rotPt = { x: this.w / 2, y: this.h / 2 };
+        const rotPt = { x: rx, y: ry };
+
+        ctx.setTransform(new DOMMatrix()
+            .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+            .rotateSelf(rotation.x, rotation.y, rotation.z)
+        );
+        
+        ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
+        ctx.restore();
     }
 
     swim(ctx, img) {

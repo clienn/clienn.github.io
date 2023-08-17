@@ -1,0 +1,151 @@
+{
+    "data": [
+        {
+            "id": "intro",
+            "src": "intro",
+            "ext": "png",
+            "cw": 932,
+            "ch": 430
+        },
+        {
+            "id": "bg",
+            "src": "bg",
+            "ext": "png",
+            "cw": 932,
+            "ch": 430
+        },
+        {
+            "id": "fish_0",
+            "src": "fishes/0",
+            "ext": "png",
+            "cw": 479,
+            "ch": 438
+        },
+        {
+            "id": "fish_1",
+            "src": "fishes/1",
+            "ext": "png",
+            "cw": 298,
+            "ch": 256
+        },
+        {
+            "id": "fish_2",
+            "src": "fishes/2",
+            "ext": "png",
+            "cw": 301,
+            "ch": 256
+        },
+        {
+            "id": "fish_3",
+            "src": "fishes/3",
+            "ext": "png",
+            "cw": 330,
+            "ch": 256
+        },
+        {
+            "id": "fish_4",
+            "src": "fishes/4",
+            "ext": "png",
+            "cw": 349,
+            "ch": 256
+        },
+        {
+            "id": "fish_5",
+            "src": "fishes/5",
+            "ext": "png",
+            "cw": 436,
+            "ch": 256
+        },
+        {
+            "id": "fish_6",
+            "src": "fishes/6",
+            "ext": "png",
+            "cw": 267,
+            "ch": 256
+        },
+        {
+            "id": "fish_7",
+            "src": "fishes/7",
+            "ext": "png",
+            "cw": 276,
+            "ch": 256
+        },
+        {
+            "id": "garbage_1",
+            "src": "garbages/1",
+            "ext": "png",
+            "cw": 261,
+            "ch": 257
+        },
+        {
+            "id": "garbage_2",
+            "src": "garbages/2",
+            "ext": "png",
+            "cw": 261,
+            "ch": 257
+        },
+        {
+            "id": "garbage_3",
+            "src": "garbages/3",
+            "ext": "png",
+            "cw": 260,
+            "ch": 257
+        },
+        {
+            "id": "garbage_4",
+            "src": "garbages/4",
+            "ext": "png",
+            "cw": 183,
+            "ch": 257
+        },
+        {
+            "id": "garbage_5",
+            "src": "garbages/5",
+            "ext": "png",
+            "cw": 183,
+            "ch": 257
+        },
+        {
+            "id": "garbage_6",
+            "src": "garbages/6",
+            "ext": "png",
+            "cw": 183,
+            "ch": 257
+        },
+        {
+            "id": "garbage_7",
+            "src": "garbages/7",
+            "ext": "png",
+            "cw": 239,
+            "ch": 257
+        },
+        {
+            "id": "garbage_8",
+            "src": "garbages/8",
+            "ext": "png",
+            "cw": 240,
+            "ch": 257
+        },
+        {
+            "id": "garbage_9",
+            "src": "garbages/9",
+            "ext": "png",
+            "cw": 239,
+            "ch": 257
+        },
+        {
+            "id": "volume",
+            "src": "hud/volume",
+            "ext": "png",
+            "cw": 50,
+            "ch": 50
+        },
+        {
+            "id": "mute",
+            "src": "hud/mute",
+            "ext": "png",
+            "cw": 50,
+            "ch": 50
+        }
+    ]
+}

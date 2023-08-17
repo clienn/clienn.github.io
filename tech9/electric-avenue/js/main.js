@@ -125,6 +125,25 @@ var startPage = {
 var fishInfo = {};
 var garbageInfo = {};
 
+var eelInfo = {
+    head: {
+        x: 0,
+        y: 0,
+        w: 124,
+        h: 185,
+        // w: 505 * 0.75,
+        // h: 454 * 0.75,
+    },
+    neck: {
+        x: 0,
+        y: 0,
+        w: 64,
+        h: 227,
+        // w: 505 * 0.75,
+        // h: 454 * 4.75,
+    }
+}
+
 var FACE = {
     LEFT: -1,
     RIGHT: 1,
@@ -139,7 +158,21 @@ var smartSwimmers = [];
 
 var garbage = [];
 
+var eelHead = null;
+var eelNeck = null;
+var eelNeck2 = null;
 
+var eelLookAt = [0, 0];
+var originCoordRotation = [];
+
+
+var eelDirectionSpeed = 160;
+var eelDirection = eelDirectionSpeed;
+var returnSpeed = -240;
+var isHunting = false;
+var isNeutral = true;
+
+var neckAdjY = 90;
 /*
  * GAME INITIATLIZATIONS AND CONTROLS
  */
@@ -156,15 +189,43 @@ function main(w, h) {
     scaleX = w / 1792;
     scaleY = h / 922;
 
+    if (isMobile()) {
+        eelDirectionSpeed = 100;
+        returnSpeed = -140;
+    }
+
+    neckAdjY *= scaleY;
+
+    TXT = new Text(ctx, w, h); 
+    TXT.setScale(scaleX, scaleY); 
+    TXT.addText('angle', '000.000000', 'normal', 20, 'Montserrat', w / 2, 0, 300, 100, '#fff', true);
+    // console.log(TXT.texts);
+    
+    
     setFishInfo(scaleX, scaleY, 0.5);
     setGarbageInfo(scaleX, scaleY, 0.5);
+    rescaleSize(eelInfo.head, scaleX, scaleY);
+    rescaleSize(eelInfo.neck, scaleX, scaleY);
+
+    eelInfo.neck.h = w;
+
+    eelLookAt[0] = w / 2;
+    originCoordRotation[0] = w / 2;
+    originCoordRotation[1] = h;
+
+    eelInfo.head.x = w / 2 - eelInfo.head.w / 2;
+    // eelInfo.head.y = h - eelInfo.head.h * 1.5;
+    eelInfo.head.y = h - eelInfo.head.h;
+
+    eelHead = new Sprite(eelInfo.head.x, eelInfo.head.y, eelInfo.head.w, eelInfo.head.h, AM.images['eel_head2'].cw, AM.images['eel_head2'].ch); 
+    eelNeck = new Sprite(w / 2 - eelInfo.neck.w / 2, eelInfo.head.y + neckAdjY, eelInfo.neck.w, eelInfo.neck.h, AM.images['eel_neck2'].cw, AM.images['eel_neck2'].ch); 
 
     initStartPage();
 
-    TXT = new Text(ctx, w, h); 
-    TXT.setScale(scaleX, scaleY);
+    // TXT = new Text(ctx, w, h); 
+    // TXT.setScale(scaleX, scaleY);
     
-    TXT.addText('points', '+1.00', 'bold', 20, 'Montserrat', 0, 0, 80, 30, '#10aad7', true); 
+    // TXT.addText('points', '+1.00', 'bold', 20, 'Montserrat', 0, 0, 80, 30, '#10aad7', true); 
     jumpHeight *= scaleY;
 
     timer = new Timer(0, 0, 0, '#fff');
@@ -237,6 +298,45 @@ function main(w, h) {
     
 
     gameCycle();
+}
+
+function drawEel() {
+    eelHead.drawWithRotation(ctx, AM.images.eel_head2.img, eelHead.w / 2, eelHead.h);
+    eelNeck.drawWithRotation(ctx, AM.images.eel_neck2.img, eelNeck.w / 2, eelHead.h - neckAdjY);
+    // eelNeck.drawWithRotation(ctx, AM.images.eel_neck2.img, eelNeck.w / 2, eelNeck.h / 2);
+
+    // if (eelHead.vx || eelHead.vy) {
+        // let max = Math.max(Math.abs(eelHead.vx), Math.abs(eelHead.vy));
+        // eelNeck.h += 10 * 30 * delta;
+    // }
+
+    eelHead.updatePos(delta, eelDirection);
+    eelNeck.updatePos(delta, eelDirection);
+    
+    if (!isNeutral) {
+        if (isHunting) {
+            let dx = eelHead.x + eelHead.w / 2 - eelLookAt[0];
+            let dy = eelHead.y - eelLookAt[1];
+    
+            let dist = Math.sqrt(dx * dx + dy * dy);
+
+            // TXT.texts['angle'].str = dist.toFixed(2) + ", " + (eelHead.h / 2).toFixed(2);
+            if (eelHead.x + eelHead.w / 2 >= canvas.width || eelHead.x <= 0 || eelHead.y <= 0) {
+                eelDirection = returnSpeed;
+                isHunting = false;
+            }
+        } else {
+            if (eelHead.y + eelHead.h > canvas.height) {
+                eelHead.reset();
+                eelNeck.reset();
+                isNeutral = true;
+            }
+        }
+    }
+    
+    
+   
+    // eelHead.t += 0.5 * delta;
 }
 
 function addGarbage() {
@@ -418,6 +518,7 @@ function controls() {
         let my = e.offsetY;
         if (!mDown) {
             mDown = true;
+            
             if (gameStart) {
                 // if (isBtnClicked(mx, my, {
                 //     x: HUD.volume.x,
@@ -436,6 +537,20 @@ function controls() {
                 //         // music.correct.obj.volume = 0;
                 //     }
                 // } 
+
+                if (isNeutral) {
+                    eelLookAt[0] = mx;
+                    eelLookAt[1] = my;
+
+                    eelHead.extend(eelHead.x + eelHead.w / 2, eelHead.y + eelHead.h, mx, my);
+                    
+                    eelNeck.extend(eelHead.x + eelHead.w / 2, eelHead.y + eelHead.h, mx, my);
+
+                    isNeutral = false;
+                    isHunting = true;
+                    eelDirection = eelDirectionSpeed;
+                }
+
             }
         }
 
@@ -445,10 +560,20 @@ function controls() {
 
     canvas.addEventListener('mousemove', e => {
         // mousemoveE(e.offsetX, e.offsetY);
+        // let mx = e.offsetX;
+        // let my = e.offsetY;
+
+        // eelLookAt[0] = mx;
+        // eelLookAt[1] = my;
+
+        // eelHead.extend(originCoordRotation[0], originCoordRotation[1], mx, my);
+        // eelNeck.extend(originCoordRotation[0], originCoordRotation[1], mx, my);
+        // eelNeck.extend(originCoordRotation[0], originCoordRotation[1], mx, my);
     });
     
     canvas.addEventListener('mouseup', e => {
         // mouseupE();
+        
         if (!gameStart) {
             // if (AM.audio.bg.img.paused) {
             //     AM.audio.bg.img.volume = 0.2;
@@ -464,6 +589,8 @@ function controls() {
 
         if (mDown) {
             mDown = false;
+            // eelLookAt[0] = canvas.width / 2;
+            // eelLookAt[1] = 0;
             if (gameover) {
                 reset();
             }
@@ -667,12 +794,15 @@ function gameCycle() {
             // drawBG(ctx, 'bg');
             // ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(AM.images.bg.img, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 0, 0, canvas.width, canvas.height);
-
+            // TXT.draw('angle');
+            // TXT.draw('angle'); 
             // HUD.draw(ctx);            
             drawFishes();
             displaySchool();
             drawSmartFishes();
             drawGarbage();
+
+            drawEel();
 
             // divingFish.dive(ctx, AM.images['fish_4'].img);
             
