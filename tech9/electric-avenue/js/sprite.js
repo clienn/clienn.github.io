@@ -37,6 +37,8 @@ class Sprite {
 
         this.tmp = 1;
         this.dest = [];
+
+        this.show = true;
     }
 
     setDirection(d) {

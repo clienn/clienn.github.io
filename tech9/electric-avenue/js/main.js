@@ -166,13 +166,15 @@ var eelLookAt = [0, 0];
 var originCoordRotation = [];
 
 
-var eelDirectionSpeed = 160;
+var eelDirectionSpeed = 160 * 0.75;
 var eelDirection = eelDirectionSpeed;
-var returnSpeed = -240;
+var returnSpeed = -240 * 0.75;
 var isHunting = false;
 var isNeutral = true;
 
 var neckAdjY = 90;
+
+// #C7FC12
 /*
  * GAME INITIATLIZATIONS AND CONTROLS
  */
@@ -190,15 +192,18 @@ function main(w, h) {
     scaleY = h / 922;
 
     if (isMobile()) {
-        eelDirectionSpeed = 100;
-        returnSpeed = -140;
+        eelDirectionSpeed = 100 * 0.75;
+        returnSpeed = -140 * 0.75;
     }
 
     neckAdjY *= scaleY;
 
     TXT = new Text(ctx, w, h); 
-    TXT.setScale(scaleX, scaleY); 
-    TXT.addText('angle', '000.000000', 'normal', 20, 'Montserrat', w / 2, 0, 300, 100, '#fff', true);
+    // TXT.setScale(scaleX, scaleY); 
+    // TXT.addText('angle', '000.000000', 'normal', 20, 'Montserrat', w / 2, 0, 300, 100, '#fff', true);
+
+    TXT.addText('points', '+1.00', 'bold', 20, 'Montserrat', 0, 0, 80, 30, '#C7FC12', true); 
+    jumpHeight *= scaleY;
     // console.log(TXT.texts);
     
     
@@ -362,12 +367,31 @@ function drawGarbage() {
         garbage[i].update(delta, 1);
 
         if (garbage[i].y > canvas.height) {
-            mutateGarbage(garbage[i]);
-            let rngY = Math.floor(Math.random() * garbage[i].h * 5) + garbage[i].h;
-            garbage[i].y = -rngY;
-            garbage[i].oy = garbage[i].y;
+            // mutateGarbage(garbage[i]);
+            // let rngY = Math.floor(Math.random() * garbage[i].h * 5) + garbage[i].h;
+            // garbage[i].y = -rngY;
+            // garbage[i].oy = garbage[i].y;
+            resetGarbage(garbage[i]);
+        } else if (isHunting) {
+            if (checkAngledCollisions(garbage[i], eelHead)) {
+                resetGarbage(garbage[i]);
+                
+                // jump = jumpHeight;
+                // TXT.texts['points'].str = '-1.00';
+                setPoints('-5.00','#fb2121');
+                
+            }
         }
+
+
     }
+}
+
+function resetGarbage(trash) {
+    mutateGarbage(trash);
+    let rngY = Math.floor(Math.random() * trash.h * 5) + trash.h;
+    trash.y = -rngY;
+    trash.oy = trash.y;
 }
 
 function addSmartFish() {
@@ -421,36 +445,48 @@ function displaySchool() {
         let flag = true;
         let flag2 = true;
         for (let j = 0; j < schools[i].length; ++j) {
-            let key = 'fish_' + schools[i][j].id;
-            schools[i][j].dive(ctx, AM.images[key].img);
-            schools[i][j].update(delta, 3);
-            schools[i][j].t += 10 * delta;
+            if (schools[i][j].show) {
+                let key = 'fish_' + schools[i][j].id;
+                schools[i][j].dive(ctx, AM.images[key].img);
+                schools[i][j].update(delta, 3);
+                schools[i][j].t += 10 * delta;
 
-            if (schools[i][j].facing == FACE.RIGHT) {
-                if (schools[i][j].x > -schools[i][j].w) {
-                    schools[i][j].sineMovement(delta);
-                    
-                    
-                } 
-                flag2 = false;
-                if (schools[i][j].x < canvas.width) {
-                    flag = false;
-                    // schools[i][j].x = school.length * -20;
-                    // mutate(schools[i][j], FACE.RIGHT,  -school.length * 20);
-                } 
-            } else if (schools[i][j].facing == FACE.LEFT) {
-                if (schools[i][j].x < canvas.width) {
-                    schools[i][j].sineMovement(delta);
-
-                    
-                }
-                
-                flag = false;
-
-                if (schools[i][j].x > -schools[i][j].w) {
+                if (schools[i][j].facing == FACE.RIGHT) {
+                    if (schools[i][j].x > -schools[i][j].w) {
+                        schools[i][j].sineMovement(delta);
+                        
+                        
+                    } 
                     flag2 = false;
-                    // schools[i][j].x = canvas.width;
-                    // mutate(schools[i][j], FACE.LEFT, canvas.width);
+                    if (schools[i][j].x < canvas.width) {
+                        flag = false;
+                        // schools[i][j].x = school.length * -20;
+                        // mutate(schools[i][j], FACE.RIGHT,  -school.length * 20);
+                    } 
+                } else if (schools[i][j].facing == FACE.LEFT) {
+                    if (schools[i][j].x < canvas.width) {
+                        schools[i][j].sineMovement(delta);
+
+                        
+                    }
+                    
+                    flag = false;
+
+                    if (schools[i][j].x > -schools[i][j].w) {
+                        flag2 = false;
+                        // schools[i][j].x = canvas.width;
+                        // mutate(schools[i][j], FACE.LEFT, canvas.width);
+                    }
+                }
+
+                if (isHunting) {
+                    if (checkAngledCollisions(schools[i][j], eelHead)) {
+                        // resetFish(i);
+                        schools[i][j].show = false;
+                        // jump = jumpHeight;
+                        // TXT.texts['points'].str = '+1.00';
+                        setPoints('+1.00','#C7FC12');
+                    }
                 }
             }
         }
@@ -506,6 +542,7 @@ function mutateSchool(idx) {
         schools[idx][i].t = 0;
         schools[idx][i].t2 = 0;
         schools[idx][i].waveHeight = waveHeight;
+        schools[idx][i].show = true;
     }
 }
 
@@ -672,7 +709,7 @@ function drawFishes() {
     }
 }
 
-function resetFish(idx) {
+function resetFish(fish) {
     let rng = Math.floor(Math.random() * 8);
     let key = 'fish_' + rng;
     let rngY = Math.floor(Math.random() * (canvas.height - fishInfo[rng].h));
@@ -680,17 +717,52 @@ function resetFish(idx) {
     let direction = Math.floor(Math.random() * 2) ? FACE.RIGHT : FACE.LEFT;
 
     if (direction < 0) {
-        fishes[idx].x = canvas.width;
+        fish.x = canvas.width;
     } else {
-        fishes[idx].x = -fishes[idx].w;
+        fish.x = -fish.w;
     }
 
-    fishes[idx].y = rngY;
+    fish.y = rngY;
     // fishes[idx].setDirection(direction);
     // fishes[idx].x = 100;
     
-    fishes[idx].mutateFish(rng, fishInfo[rng].w, fishInfo[rng].h, AM.images[key].cw, AM.images[key].ch, direction);
-    fishes[idx].setRandomSpeed(30, 15);
+    fish.mutateFish(rng, fishInfo[rng].w, fishInfo[rng].h, AM.images[key].cw, AM.images[key].ch, direction);
+    fish.setRandomSpeed(30, 15);
+}
+
+function resetSmartFish(fish) {
+    let rng = Math.floor(Math.random() * 8);
+    let key = 'fish_' + rng;
+
+    let direction = Math.floor(Math.random() * 2) ? FACE.RIGHT : FACE.LEFT;
+
+    if (direction < 0) {
+        fish.x = canvas.width;
+    } else {
+        fish.x = -fish.w;
+    }
+
+    let mulX = Math.floor(Math.random() * 2) ? 1 : -1;
+    let mulY = Math.floor(Math.random() * 2) ? 1 : -1;
+
+    let rngX = Math.floor(Math.random() * canvas.width) + canvas.width / 2 * mulX;
+    let rngY = Math.floor(Math.random() * canvas.height) + canvas.height / 2 * mulY;
+
+    fish.dest = [rngX, rngY];
+
+    if (fish.x < rngX) {
+        fish.setDirection(1);
+    } else {
+        fish.setDirection(-1);
+    }
+
+    fish.t = 0;
+    fish.t2 = 0;
+
+    fish.ox = fish.x;
+
+    fish.morph(rng, fishInfo[rng].w, fishInfo[rng].h, AM.images[key].cw, AM.images[key].ch);
+    // fish.setRandomSpeed(30, 15);
 }
 
 function mutateFish(fish) {
@@ -715,12 +787,88 @@ function mutateGarbage(trash) {
  * PHYSICS
  */
 
-// *********************************** PHYSICS END ******************************************************** //
+function checkAngledCollisions(obj1, obj2) {
+    return doPolygonsIntersect(
+        [{ x: obj1.x, y: obj1.y }, { x: obj1.x + obj1.w, y: obj1.y }, { x: obj1.x + obj1.w, y: obj1.y + obj1.h }, { x: obj1.x, y: obj1.y + obj1.h }],
+        [{ x: obj2.x, y: obj2.y }, { x: obj2.x + obj2.w, y: obj2.y }, { x: obj2.x + obj2.w, y: obj2.y + obj2.h }, { x: obj2.x, y: obj2.y + obj2.h }]
+    );
+}
 
+// *********************************** PHYSICS END ******************************************************** //
+function doPolygonsIntersect (a, b) {
+    var polygons = [a, b];
+    var minA, maxA, projected, i, i1, j, minB, maxB;
+
+    for (i = 0; i < polygons.length; i++) {
+
+        // for each polygon, look at each edge of the polygon, and determine if it separates
+        // the two shapes
+        var polygon = polygons[i];
+        for (i1 = 0; i1 < polygon.length; i1++) {
+
+            // grab 2 vertices to create an edge
+            var i2 = (i1 + 1) % polygon.length;
+            var p1 = polygon[i1];
+            var p2 = polygon[i2];
+
+            // find the line perpendicular to this edge
+            var normal = { x: p2.y - p1.y, y: p1.x - p2.x };
+
+            minA = maxA = null;
+            // for each vertex in the first shape, project it onto the line perpendicular to the edge
+            // and keep track of the min and max of these values
+            for (j = 0; j < a.length; j++) {
+                projected = normal.x * a[j].x + normal.y * a[j].y;
+                if (minA == null || projected < minA) {
+                    minA = projected;
+                }
+                if (maxA == null || projected > maxA) {
+                    maxA = projected;
+                }
+            }
+
+            // for each vertex in the second shape, project it onto the line perpendicular to the edge
+            // and keep track of the min and max of these values
+            minB = maxB = null;
+            for (j = 0; j < b.length; j++) {
+                projected = normal.x * b[j].x + normal.y * b[j].y;
+                if (minB == null || projected < minB) {
+                    minB = projected;
+                }
+                if (maxB == null || projected > maxB) {
+                    maxB = projected;
+                }
+            }
+
+            // if there is no overlap between the projects, the edge we are looking at separates the two
+            // polygons, and we know there is no overlap
+            if (maxA < minB || maxB < minA) {
+                // CONSOLE("polygons don't intersect!");
+                return false;
+            }
+        }
+    }
+    return true;
+}
 /*
  * TEXT DISPLAYS
  */
+function showPoints(pointType) {
+    // HUD.draw(ctx, AM.images.timecircle.img);
+    // jumpPointsT += 1 * delta;
+    if (jump > 0) {
+        let y = eelHead.y + jump - eelHead.h;
+        TXT.follow('points', eelHead.x, y, eelHead.w, eelHead.h);
+        TXT.draw('points');
+        jump -= G * jumpSpeed * delta;
+    }
+}
 
+function setPoints(points, color) {
+    jump = jumpHeight;
+    TXT.texts['points'].color = color;
+    TXT.texts['points'].str = points;
+}
 
 // *********************************** TEXT DISPLAYS END ******************************************************** //
 
@@ -772,8 +920,40 @@ function update() {
     for (let i = 0; i < fishes.length; ++i) {
         fishes[i].update(delta, 2);
 
+        if (isHunting) {
+            if (checkAngledCollisions(fishes[i], eelHead)) {
+                // resetFish(i);
+                resetFish(fishes[i]);
+                // jump = jumpHeight;
+                // TXT.texts['points'].str = '+1.00';
+                setPoints('+2.00','#C7FC12');
+            }
+        }
+        
+
         if ((fishes[i].facing == FACE.LEFT && fishes[i].x + fishes[i].w < 0) || (fishes[i].facing == FACE.RIGHT && fishes[i].x > canvas.width)) {
-            resetFish(i);
+            // resetFish(i);
+            resetFish(fishes[i]);
+        }
+    }
+
+    for (let i = 0; i < smartSwimmers.length; ++i) {
+        // smartSwimmers[i].update(delta, 2);
+
+        if (isHunting) {
+            if (checkAngledCollisions(smartSwimmers[i], eelHead)) {
+                // resetFish(i);
+                resetSmartFish(smartSwimmers[i]);
+                // jump = jumpHeight;
+                // TXT.texts['points'].str = '+1.00';
+                setPoints('+5.00','#C7FC12');
+            }
+        }
+        
+
+        if ((smartSwimmers[i].facing == FACE.LEFT && smartSwimmers[i].x + smartSwimmers[i].w < 0) || (smartSwimmers[i].facing == FACE.RIGHT && smartSwimmers[i].x > canvas.width)) {
+            // resetFish(i);
+            resetSmartFish(smartSwimmers[i]);
         }
     }
 
@@ -803,6 +983,8 @@ function gameCycle() {
             drawGarbage();
 
             drawEel();
+
+            showPoints(1);
 
             // divingFish.dive(ctx, AM.images['fish_4'].img);
             
