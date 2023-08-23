@@ -10,7 +10,7 @@ class ProgressBar {
 
     }
 
-    draw(ctx) {
+    draw(ctx, tmpW) {
         const { x, y, w, h } = this;
         let p = this.progress;
         var grd = null;
@@ -36,13 +36,13 @@ class ProgressBar {
                 grd.addColorStop(1, "#fb2121");
             }
         }
+        if (!tmpW) tmpW = w;
         
-
         /* To visalize ------------------------------------------------------*/
         ctx.beginPath();
         ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 * Math.PI);
         ctx.lineTo(w + x, y);
-        ctx.arc((h / 2) + w + x, h / 2 + y, h / 2, 3 / 2 * Math.PI, Math.PI / 2);
+        ctx.arc((h / 2) + tmpW + x, h / 2 + y, h / 2, 3 / 2 * Math.PI, Math.PI / 2);
         ctx.lineTo(h / 2 + x, h + y);
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 2;

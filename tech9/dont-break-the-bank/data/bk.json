@@ -7,7 +7,13 @@
             "cw": 952,
             "ch": 429
         },
-        
+        {
+            "id": "piggybank",
+            "src": "piggybank",
+            "ext": "png",
+            "cw": 513,
+            "ch": 362
+        },
         {
             "id": "pig_1",
             "src": "pig/pig_1",
@@ -42,41 +48,6 @@
             "ext": "png",
             "cw": 191,
             "ch": 142
-        },
-        {
-            "id": "pigbreak_0",
-            "src": "pig/break/0",
-            "ext": "png",
-            "cw": 454,
-            "ch": 321
-        },
-        {
-            "id": "pigbreak_1",
-            "src": "pig/break/1",
-            "ext": "png",
-            "cw": 454,
-            "ch": 321
-        },
-        {
-            "id": "pigbreak_2",
-            "src": "pig/break/2",
-            "ext": "png",
-            "cw": 454,
-            "ch": 321
-        },
-        {
-            "id": "pigbreak_3",
-            "src": "pig/break/3",
-            "ext": "png",
-            "cw": 454,
-            "ch": 321
-        },
-        {
-            "id": "pigbreak_4",
-            "src": "pig/break/4",
-            "ext": "png",
-            "cw": 513,
-            "ch": 417
         },
         {
             "id": "piggybankbroke",
@@ -175,6 +146,13 @@
             "ext": "png",
             "cw": 46,
             "ch": 46
+        },
+        {
+            "id": "glue",
+            "src": "glue",
+            "ext": "png",
+            "cw": 1103,
+            "ch": 1102
         },
         {
             "id": "glue_1",

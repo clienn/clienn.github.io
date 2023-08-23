@@ -26,6 +26,7 @@ class Sprite {
         this.t = 0;
         this.rotationT = 0;
         this.isAnimating = false;
+        this.yRotate = 0;
     }
 
     addForce(f, delta, thresh) {
@@ -53,6 +54,42 @@ class Sprite {
         }
 
         
+    }
+
+    drawRotate(ctx, img) {
+        ctx.save();
+        // Untransformed draw position
+        const position = {x: this.x, y: this.y};
+        // In degrees
+        const rotation = { x: 0, y: this.yRotate, z: 0};
+        // Rotation relative to here (this is the center of the image)
+        const rotPt = { x: this.w / 2, y: this.h / 2 };
+
+        ctx.setTransform(new DOMMatrix()
+            .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+            .rotateSelf(rotation.x, rotation.y, rotation.z)
+        );
+        
+        ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
+        ctx.restore();
+    }
+
+    dynamicDrawRotate(ctx, img, clipW, clipH) {
+        ctx.save();
+        // Untransformed draw position
+        const position = {x: this.x, y: this.y};
+        // In degrees
+        const rotation = { x: 0, y: this.yRotate, z: 0};
+        // Rotation relative to here (this is the center of the image)
+        const rotPt = { x: this.w / 2, y: this.h / 2 };
+
+        ctx.setTransform(new DOMMatrix()
+            .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+            .rotateSelf(rotation.x, rotation.y, rotation.z)
+        );
+        
+        ctx.drawImage(img, this.clipX, this.clipY, clipW, clipH, -rotPt.x, -rotPt.y, this.w, this.h);
+        ctx.restore();
     }
 
     draw(ctx, img) {

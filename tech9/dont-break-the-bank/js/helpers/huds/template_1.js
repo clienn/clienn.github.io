@@ -40,7 +40,7 @@ class Template_1 {
         this.coin0.x = this.scoreBar.x + paddingX / 2;
         this.coin0.y = this.scoreBar.y + this.scoreBar.h / 2 - this.coin0.h / 2;
 
-        this.txt.addText('score', '00.00', 'bold', 20, 'Montserrat', 0, 0, 80, 40, '#fff', true); 
+        this.txt.addText('score', '00.00', 'bold', 20, 'Montserrat', 0, 0, 80, 30, '#fff', true); 
         let adjX = isMobile() ? this.scoreBar.h : this.scoreBar.h / 2;
         this.txt.centerTo('score', this.scoreBar.x + this.scoreBar.w / 2 + adjX + paddingX, this.scoreBar.y, this.scoreBar.w + this.scoreBar.h / 2, this.scoreBar.h);
 
@@ -52,7 +52,7 @@ class Template_1 {
 
         this.life.x = this.lifebar.x - this.life.w / 2;
 
-        this.txt.addText('time', '90', 'normal', 20, 'Montserrat', 0, 0, 30, 30, '#000', true); 
+        this.txt.addText('time', '90', 'bold', 20, 'Montserrat', 0, 0, 30, 30, '#000', true); 
         this.txt.centerTo('time', this.timecircle.x, this.timecircle.y, this.timecircle.w, this.timecircle.h);
 
         // this.txt.addText('x', 'x', 'normal', 20, 'Montserrat', 
@@ -73,7 +73,7 @@ class Template_1 {
 
     draw(ctx) {
         this.timeProgressBar.draw(ctx);
-        this.scoreBar.draw(ctx);
+        this.scoreBar.draw(ctx, 100);
         this.lifebar.draw(ctx);
         this.timecircle.draw(ctx);
         this.stopwatch.draw(ctx);

@@ -12,6 +12,7 @@ var delta = 0;
 var startGame = false; // orientation prep
 var gameStart = false; // start game
 var gameover = false;
+var gameoverT = 0;
 
 // mouse 
 var mDown = false;
@@ -36,8 +37,8 @@ var btnBegin = {
 
 // sprite info
 var pigInfo = {
-    w: 100,
-    h: 70,
+    w: 100 * 2,
+    h: 70 * 2,
 }
 
 var moneyInfo = {
@@ -46,8 +47,8 @@ var moneyInfo = {
 }
 
 var coinInfo = {
-    w: 45 * 1.35,
-    h: 45 * 1.35,
+    w: 75 * 1.35,
+    h: 75 * 1.35,
 }
 
 var glueInfo = {
@@ -229,7 +230,7 @@ function main(w, h) {
     rescaleSize(glueInfo, scaleX, scaleY);
     rescaleSize(kaboomInfo, scaleX, scaleY);
 
-    pig = new Sprite(w / 2 - pigInfo.w / 2, h - pigInfo.h - 10, pigInfo.w, pigInfo.h, AM.images.piggybank.cw, AM.images.piggybank.ch);
+    pig = new Sprite(w / 2 - pigInfo.w / 2, h - pigInfo.h - 10, pigInfo.w, pigInfo.h, AM.images.pig_1.cw, AM.images.pig_1.ch);
     kaboom = new StaticSprite(0, 0, kaboomInfo.w, kaboomInfo.h, 0, 0, AM.images.kaboom.cw, AM.images.kaboom.ch, 'kaboom');
     kaboomstar = new StaticSprite(0, 0, kaboomInfo.w * 2, kaboomInfo.h * 2, 0, 0, AM.images.kaboomstar.cw, AM.images.kaboomstar.ch, 'kaboomstar');
 
@@ -263,7 +264,7 @@ function controls() {
 
         var x = 0, x1 = 0;
         
-        if (gameover) {
+        if (gameover && gameoverT <= 0) {
             reset();
         } else {
             if (e.type == 'touchstart' || e.type == 'touchmove' || e.type == 'touchend' || e.type == 'touchcancel'){
@@ -326,17 +327,19 @@ function controls() {
 
     document.addEventListener('touchend', (e) => {
         e.preventDefault();
- 
-        var x = e.changedTouches[event.changedTouches.length-1].pageX;
+        
+        if (!gameover) {
+            var x = e.changedTouches[event.changedTouches.length-1].pageX;
 
-        if (x >= mid) {
-            rDown = false;
-        } else {
-            lDown = false;
-        }
+            if (x >= mid) {
+                rDown = false;
+            } else {
+                lDown = false;
+            }
 
-        if (!rDown && !lDown) {
-            forceD = 0;
+            if (!rDown && !lDown) {
+                forceD = 0;
+            }
         }
     });
 
@@ -362,37 +365,40 @@ function controls() {
     
     canvas.addEventListener('touchmove', e => {
         // mousemoveE(e.touches[0].clientX, e.touches[0].clientY);
-        if (e.type == 'touchmove') {
-            var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
-            var touch = evt.touches[0] || evt.changedTouches[0];
-            let x = touch.pageX;
+        if (!gameover) {
+            if (e.type == 'touchmove') {
+                var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+                var touch = evt.touches[0] || evt.changedTouches[0];
+                let x = touch.pageX;
 
-            if (x > prevPos) {
-                forceD = F;
-            } else  {
-                forceD = -F;
+                if (x > prevPos) {
+                    forceD = F;
+                    pig.yRotate = 180;
+                } else  {
+                    forceD = -F;
+                    pig.yRotate = 0;
+                }
+
+                prevPos = x;
+                // if (evt.touches.length > 0) {
+                //     if (x > pig.x) {
+                //         if (!rDown) {
+                //             rDown = true;
+                //             forceD = F;
+                //         }
+                //     } else  {
+                //         if (!lDown) {
+                //             lDown = true;
+                //             forceD = -F;
+                //         }
+                //     }
+
+                //     prevPos = x;
+                // }
+
+                
             }
-
-            prevPos = x;
-            // if (evt.touches.length > 0) {
-            //     if (x > pig.x) {
-            //         if (!rDown) {
-            //             rDown = true;
-            //             forceD = F;
-            //         }
-            //     } else  {
-            //         if (!lDown) {
-            //             lDown = true;
-            //             forceD = -F;
-            //         }
-            //     }
-
-            //     prevPos = x;
-            // }
-
-            
         }
-        
     });
 
     canvas.addEventListener('touchend', e => {
@@ -455,28 +461,35 @@ function controls() {
     });
 
     document.addEventListener('keydown', e => {
-        if (e.key == 'ArrowRight') {
-            if (!rDown) {
-                rDown = true;
-                forceD = F;
-            }
-        } else if (e.key == 'ArrowLeft') {
-            if (!lDown) {
-                lDown = true;
-                forceD = -F;
+        if (!gameover) {
+            if (e.key == 'ArrowRight') {
+                if (!rDown) {
+                    rDown = true;
+                    forceD = F;
+                    pig.yRotate = 180;
+                }
+            } else if (e.key == 'ArrowLeft') {
+                if (!lDown) {
+                    lDown = true;
+                    forceD = -F;
+                    pig.yRotate = 0;
+                }
             }
         }
+        
     });
 
     document.addEventListener('keyup', e => {
-        if (e.key == 'ArrowRight') {
-            rDown = false;
-        } else if (e.key == 'ArrowLeft') {
-            lDown = false;
-        }
+        if (!gameover) {
+            if (e.key == 'ArrowRight') {
+                rDown = false;
+            } else if (e.key == 'ArrowLeft') {
+                lDown = false;
+            }
 
-        if (!rDown && !lDown) {
-            forceD = 0;
+            if (!rDown && !lDown) {
+                forceD = 0;
+            }
         }
     });
 
@@ -484,7 +497,7 @@ function controls() {
         // mousemoveE(e.offsetX, e.offsetY);
         let mx = e.offsetX;
         let my = e.offsetY;
-        console.log(mx, my);
+        // console.log(mx, my);
     });
     
     canvas.addEventListener('mouseup', e => {
@@ -501,7 +514,7 @@ function controls() {
         if (mDown) {
             mDown = false;
             
-            if (gameover) {
+            if (gameover && gameoverT <= 0) {
                 reset();
             }
 
@@ -531,7 +544,35 @@ function initStartPage() {
  * SPRITE MANAGEMENT (SETTING, ADDING, AND DRAWING)
  */
 function drawPig() {
-    pig.draw(ctx, AM.images.piggybank.img);
+    let frame = 1;
+
+    if (forceD != 0) {
+        pig.t += 20 * delta;
+        frame = Math.floor(pig.t) % 5 + 1;
+    }
+
+    // pig.t += 10 * delta;
+    // let frame = Math.floor(pig.t) % 5 + 1;
+    
+    // pig.draw(ctx, AM.images['pig_' + frame].img);
+    pig.drawRotate(ctx, AM.images['pig_' + frame].img);
+    
+}
+
+function drawPigBreak() {
+    pig.t += 5 * delta;
+    let frame = Math.floor(pig.t);
+
+    if (frame > 4) frame = 4;
+
+
+    // pig.t += 10 * delta;
+    // let frame = Math.floor(pig.t) % 5 + 1;
+    
+    // pig.draw(ctx, AM.images['pig_' + frame].img);
+    let id = 'pigbreak_' + frame;
+    pig.dynamicDrawRotate(ctx, AM.images[id].img, AM.images[id].cw, AM.images[id].ch);
+    
 }
 
 function addBall() {
@@ -595,8 +636,7 @@ function resetMoney(i) {
 
 function addCoins() {
     if (coins.length < coinLimit) {
-        let id = 'coin_' + (Math.floor(Math.random() * 3) + 1);
-
+        let id = 'coin_' + (Math.floor(Math.random() * 6) + 1);
         let coin = new Sprite(coins.length * coinInfo.w, 0, coinInfo.w, coinInfo.w, AM.images[id].cw, AM.images[id].ch);
         coin.id = id;
         
@@ -618,7 +658,9 @@ function resetCoin(i) {
     coins[i].x = Math.floor(Math.random() * (canvas.width - coins[i].w));
     coins[i].y = -coins[i].h * coins[i].dropSpeed;
     coins[i].vy = 0;
-    coins[i].id = 'coin_' + (Math.floor(Math.random() * 3) + 1);;
+    coins[i].id = 'coin_' + (Math.floor(Math.random() * 6) + 1);
+    coins[i].clipW = AM.images[coins[i].id].cw;
+    coins[i].clipH = AM.images[coins[i].id].ch;
 }
 
 function addHammer() {
@@ -674,9 +716,10 @@ function resetHammer(i) {
 function addGlue() {
     if (glues.length < glueLimit) {
         // let id = 'hammer_' + (Math.floor(Math.random() * 3) + 1);
+        let id = 'glue_' + (Math.floor(Math.random() * 2) + 1);
 
-        let glue = new Sprite(glues.length * glueInfo.w, 0, glueInfo.w, glueInfo.w, AM.images.glue.cw, AM.images.glue.ch);
-        
+        let glue = new Sprite(glues.length * glueInfo.w, 0, glueInfo.w, glueInfo.w, AM.images[id].cw, AM.images[id].ch);
+        glue.id = id;
         glue.x = Math.floor(Math.random() * (canvas.width - glue.w));
         glue.dropSpeed = Math.floor(Math.random() * 15) + 1;
         
@@ -688,7 +731,7 @@ function addGlue() {
 
 function drawGlues() {
     for (let i = 0; i < glues.length; ++i) {
-        glues[i].draw(ctx, AM.images.glue.img);
+        glues[i].draw(ctx, AM.images[glues[i].id].img);
     }
 }
 
@@ -697,6 +740,7 @@ function resetGlue(i) {
     glues[i].x = Math.floor(Math.random() * (canvas.width - glues[i].w));
     glues[i].y = -glues[i].h * glues[i].dropSpeed;
     glues[i].vy = 0;
+    glues[i].id = 'glue_' + (Math.floor(Math.random() * 2) + 1);
 }
 
 function drawKaboom() {
@@ -1013,6 +1057,16 @@ function reset() {
     timer.setTimer(90);
 }
 
+function gamoverUpdate() {
+    dropMoney();
+    dropCoins();
+    dropGlues();
+    dropHammers();
+    bounceBalls();
+
+    gameoverT -= 2 * delta;
+}
+
 function update() {
     pig.update(canvas.width, delta, friction);
     dropMoney();
@@ -1045,6 +1099,8 @@ function update() {
     if (health < 0) {
         health = 0;
         gameover = true;
+        gameoverT = 5;
+        pig.t = 0;
     }
 
     if (delta < 1) {
@@ -1057,6 +1113,8 @@ function update() {
 
         if (timer.timer <= 0) {
             gameover = true;
+            gameoverT = 5;
+            pig.t = 0;
         }
     }
 
@@ -1159,20 +1217,42 @@ function gameCycle() {
             update();
         } else {
             // ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
-            ctx.drawImage(AM.images.startrect.img, 0, 0, AM.images.startrect.cw, AM.images.startrect.ch, 0, 0, canvas.width, canvas.height);
-
-            startPageAnimations();
+            
             // ctx.beginPath();
             // ctx.rect(btnBegin.x, btnBegin.y, btnBegin.w, btnBegin.h);
             // ctx.stroke();
+            ctx.drawImage(AM.images.startrect.img, 0, 0, AM.images.startrect.cw, AM.images.startrect.ch, 0, 0, canvas.width, canvas.height);
+
+            startPageAnimations();
         }
 
         
     } else {
         drawBG(ctx, 'bg');
-        // HUD.draw(ctx);
+        if (gameoverT > 0) {
+            HUD.draw(ctx);
+
+            drawCoins();
+            drawGlues();
+            drawHammers();
+            
+            drawPigBreak();
+            drawKaboom();
+
+            showPoints();
+            
+            drawMoney();
+            drawBall();
+            gamoverUpdate();
+            
+            
+        } else {
+            
+            // HUD.draw(ctx);
+            
+            HUD.gameover(ctx);
+        }
         
-        HUD.gameover(ctx);
     }
 
     requestAnimationFrame(gameCycle);
