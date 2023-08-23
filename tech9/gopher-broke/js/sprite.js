@@ -34,6 +34,7 @@ class Sprite {
 
     update(speed, delta) {
         if (this.goto != null || this.moveDestinations.length > 0) {
+            if (delta > 1) delta = 0.1;
             this.t += speed * delta;
             if (this.goto == null) {
                 this.goto = this.moveDestinations.shift();

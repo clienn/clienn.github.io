@@ -956,6 +956,8 @@ function main(w, h) {
     addSeagull();
     addSeagull();
     addSeagull();
+    addSeagull();
+    addSeagull();
 
     init();
 
@@ -1014,8 +1016,12 @@ function addSeagull() {
     let x = Math.floor(Math.random() * canvas.width);
     let y = Math.floor(Math.random() * 300 * scaleY);
     
+    let rng = (Math.floor(Math.random() * 81) + 20) / 100;
+    let w = seagullInfo.w * rng;
+    let h = seagullInfo.h * rng;
 
-    let seagull = new Spirte(x, y, seagullInfo.w, seagullInfo.h, seagullInfo.cw, seagullInfo.ch);
+    let seagull = new Spirte(x, y, w, h, seagullInfo.cw, seagullInfo.ch);
+    // let seagull = new Spirte(x, y, seagullInfo.w, seagullInfo.h, seagullInfo.cw, seagullInfo.ch);
     seagull.activateSpriteAnimation = true;
 
     seagulls.push(seagull);
@@ -1034,7 +1040,8 @@ function setSeagullDirection(speedLimit, randomD) {
 function drawSeagulls() {
     for (let i = 0; i < seagulls.length; ++i) {
         seagulls[i].animateSprite(delta, seagullInfo, 15, 17, true);
-        seagulls[i].draw(ctx, images.seagull.obj.img, 1, seagullInfo);
+        // seagulls[i].draw(ctx, images.seagull.obj.img, 1, seagullInfo);
+        seagulls[i].dynamicDraw(ctx, images.seagull.obj.img);
     }
 }
 
@@ -1044,10 +1051,21 @@ function updateSeagulls() {
 
         if (seagullDirections[i] > 0 && seagulls[i].x > canvas.width + 10) {
             seagullDirections[i] = setSeagullDirection(30, false) * -1;
+            resetSeagullSize(seagullDirections[i]);
         } else if (seagullDirections[i] < 0 && (seagulls[i].x + seagulls[i].w) < 0) {
             seagullDirections[i] = setSeagullDirection(30, false);
+            resetSeagullSize(seagullDirections[i]);
         }
     }
+}
+
+function resetSeagullSize(seagull) {
+    let rng = (Math.floor(Math.random() * 81) + 20) / 100;
+    let w = seagullInfo.w * rng;
+    let h = seagullInfo.h * rng;
+
+    seagull.w = w;
+    seagull.h = h;
 }
 
 function drawBGs() {
@@ -1304,7 +1322,7 @@ function shellSwap(i, j) {
     let p2 = turtles[j].pos;
 
     turtles[i].goto(p2, 0);
-    turtles[j].goto(p1, turtleInfo.bucketSize / 2);
+    turtles[j].goto(p1, turtleInfo.bucketSize /2);
 }
 
 function updateTurtleInitialPos() {
@@ -1556,7 +1574,7 @@ function nextRound() {
     
     if (turtles.length < 8) {
         addTurtle();
-
+        
         // turtles[target].activateSpriteAnimation = true;
         // if (turtles.length > 7) {
         //     setBucketSizes();
@@ -1565,6 +1583,7 @@ function nextRound() {
     } else {
         
         speed += 0.5;
+        updateTurtleInitialPos();
     }
 
     turtles[target].activateSpriteAnimation = true;

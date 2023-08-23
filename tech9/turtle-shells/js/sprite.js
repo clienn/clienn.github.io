@@ -59,6 +59,15 @@ class Spirte {
         // ctx.stroke();
     }
 
+    dynamicDraw(ctx, img) {
+        ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, this.x, this.y, this.w, this.h);
+        
+
+        // ctx.beginPath();
+        // ctx.arc(this.x + this.w / 2, this.y + this.h / 2, 15.3125, 0, 2 * Math.PI);
+        // ctx.stroke();
+    }
+
     setBucketSize(n) {
         this.bucketSize = n;
         this.halfBucketSize = n / 2;
@@ -111,6 +120,8 @@ class Spirte {
 
                 this.x = this.ox + this.adjX + ax * this.rangeX;
                 this.y = this.oy + ay * this.rangeY;
+
+                if (this.y < 0) this.y = 0;
             } else {
                 // if (this.d > 0) {
                 //     this.pos++;
