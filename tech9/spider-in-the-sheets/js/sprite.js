@@ -56,6 +56,11 @@ class Sprite {
         // ctx.stroke();
     }
 
+    dynamicDraw(ctx, img, clipW, clipH) {
+        // 235 × 256
+        ctx.drawImage(img, this.clipX, this.clipY, clipW, clipH, this.x, this.y, this.w, this.h);
+    }
+
     move(dx, dy, pattern) {
         this.directionX = dx;
         this.directionY = dy;

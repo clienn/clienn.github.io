@@ -110,7 +110,19 @@ var images = {
         obj: {},
     },
     spider: {
-        src: 'spider/1',
+        src: 'spider/spider_2',
+        obj: {},
+    },
+    squish_0: {
+        src: 'bumps/squash/0',
+        obj: {},
+    },
+    squish_1: {
+        src: 'bumps/squash/1',
+        obj: {},
+    },
+    squish_2: {
+        src: 'bumps/squash/2',
         obj: {},
     },
     moving: {
@@ -278,8 +290,10 @@ var foldInfo2 = {
 var spiderInfo = {
     w: 100,
     h: 100,
-    cw: 633,
-    ch: 633,
+    cw: 256,
+    ch: 256,
+    // cw: 633,
+    // ch: 633,
 }
 
 var gameoverInfo = {
@@ -398,6 +412,8 @@ const topHUDInfo = {
 var lives = topHUDInfo.life.lives;
 var moveDestinations = [];
 var minDist = 0;
+
+var squishT = 0;
 
 function main(w, h) {
     canvas.width = w;
@@ -569,9 +585,10 @@ function main(w, h) {
                 } else if (isClickable && nextRoundTime == 0 && !isCrawl && !isTalking) {
                     isClickable = false;
                     
-                    if (checkCollission(mx, my) || minDist < 50) {
+                    if (checkCollission(mx, my) || minDist < 75) {
                         ++score;
                         music.squish.obj.audio.play();
+                        squishT = 0;
                         // music.squish.obj.audio.play();
 
                         if (nextRound()) {
@@ -810,7 +827,15 @@ function drawSpiders() {
                     
             } else {
                 if (squash[i] == 1) {
-                    spiders[i].draw(ctx, images.squash_2.obj.img, 2);
+                    // spiders[i].draw(ctx, images.squash_2.obj.img, 2);
+
+                    let frame = Math.floor(squishT);
+                    if (frame > 2) frame = 2;
+                    else squishT += 5 * delta;
+
+                    // spiders[i].draw(ctx, images['squish_' + frame].obj.img, 2);
+                    spiders[i].dynamicDraw(ctx, images['squish_' + frame].obj.img, 235, 256);
+
                     let x = spiders[i].x + spiders[i].w / 2;
                     let y = spiders[i].y - phraseInfo.h;
                     let w = phrasesWidth[5];
@@ -903,8 +928,8 @@ function checkCollission(mx, my) {
                 return true;
             } 
     
-            let dx = spiders[i].x - mx;
-            let dy = spiders[i].y - my;
+            let dx = (spiders[i].x + spiders[i].w / 2) - mx;
+            let dy = (spiders[i].y + spiders[i].h / 2) - my;
             let dist = Math.sqrt(dx * dx + dy * dy);
     
             minDist = Math.min(minDist, dist);
