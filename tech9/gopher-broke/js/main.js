@@ -293,9 +293,10 @@ function controls() {
                             playKaboom();
                             stunT = 0;
                             setAnimStars(7);
+                            gopher_hide.t = 0;
                         } else {
-                            let dx = mx - gopher_hide.x;
-                            let dy = my - gopher_hide.y;
+                            let dx = mx - (gopher_hide.x + gopher_hide.w / 2);
+                            let dy = my - (gopher_hide.y + gopher_hide.h / 2);
                             let dist = Math.sqrt(dx * dx + dy * dy);
 
                             if (dist < 50) {
@@ -318,6 +319,8 @@ function controls() {
                                 }
                                 // carrots.shift();
                             }
+
+                            gopher_hide.t = 0;
                         }
     
                         chats[chatID].x = gopher_hide.x + gopher_hide.w / 3;
@@ -494,7 +497,14 @@ function calcDestinations() {
     let rng = Math.floor(Math.random() * 7) + 3;
     for (let i = 0, c = 0; i < rng; ++i) {
         let r = Math.floor(Math.random() * rows);
-        destinations.push([r * gopherHideInfo.h + r * rowRem + padY, c * gopherHideInfo.w + c * colRem + padX]); // r, c
+
+        let currX = c * gopherHideInfo.w + c * colRem + padX;
+        let currY = r * gopherHideInfo.h + r * rowRem + padY;
+
+        if (currX > canvas.width || currX < 0) currX = canvas.width / 2; 
+        if (currY > canvas.height || currY < 0) currY = canvas.height / 2; 
+
+        destinations.push([currY, currX]); // r, c
         if (c == 0) {
             c = cols - 1;
         } else {
@@ -506,17 +516,26 @@ function calcDestinations() {
     for (let i = 0; i < rng; ++i) {
         let r = Math.floor(Math.random() * rows);
         let c = Math.floor(Math.random() * cols);
-        destinations.push([r * gopherHideInfo.h + r * rowRem + padY, c * gopherHideInfo.w + c * colRem + padX]); // r, c
+
+        let currX = c * gopherHideInfo.w + c * colRem + padX;
+        let currY = r * gopherHideInfo.h + r * rowRem + padY;
+
+        if (currX > canvas.width || currX < 0) currX = canvas.width / 2; 
+        if (currY > canvas.height || currY < 0) currY = canvas.height / 2; 
+        destinations.push([currY, currX]);
+        // destinations.push([r * gopherHideInfo.h + r * rowRem + padY, c * gopherHideInfo.w + c * colRem + padX]); // r, c
     }
 
     // let r = Math.floor(Math.random() * (rows - 4)) + 4;
     // let c = Math.floor(Math.random() * (cols - 8)) + 4;
     let c = Math.floor(Math.random() * cols);
-    
+    let currX = c * gopherHideInfo.w + c * colRem + padX;
+    if (currX > canvas.width || currX < 0) currX = canvas.width / 2; 
 
-    destinations.push([carrots[0].y - gopher_hide.h * 2, c * gopherHideInfo.w + c * colRem + padX]); // r, c
+    // destinations.push([carrots[0].y - gopher_hide.h * 2, c * gopherHideInfo.w + c * colRem + padX]); // r, c
+    destinations.push([canvas.height - gopher_hide.h * 4, currX]); // r, c
 
-    // console.log(destinations[destinations.length - 1]);
+    // console.log(destinations);
 
     return destinations;
 }
@@ -597,8 +616,13 @@ function reset() {
 
     timer.setTimer(gameDuration);
 
+    gopher_hide.x = canvas.width / 2;
+    gopher_hide.ox = canvas.width / 2;
+    gopher_hide.y = canvas.height / 2;
+    gopher_hide.oy = canvas.height / 2;
+
     moveGopher();
-    
+
     // HUD.txt.texts['time'].str = zeroPad(Math.floor(timer.timer / 24), 2);
 
     // if (health < 0) {
@@ -620,25 +644,28 @@ function reset() {
 }
 
 function update() {
-    if (startT == 0) {
-        gopher_hide.update(1, delta);
-
-        HUD.txt.texts['time'].str = zeroPad(Math.floor(timer.timer / 24), 2);
-
-        HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24) / gameDuration * 100);
-
-        if (gopher_hide.goto == null && gopher_hide.moveDestinations.length == 0) {
-            timer.tick(delta);
+    if (delta < 1) {
+        if (startT == 0) {
+            gopher_hide.update(1, delta);
+    
+            HUD.txt.texts['time'].str = zeroPad(Math.floor(timer.timer / 24), 2);
+    
+            HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24) / gameDuration * 100);
+    
+            if (gopher_hide.goto == null && gopher_hide.moveDestinations.length == 0) {
+                timer.tick(delta);
+            }
+    
+            if (timer.timer <= 0) {
+                gameover = true;
+                HUD.isWin = false;
+            }
+        } else {
+            startT -= 1 * delta;
+            if (startT <= 0) startT = 0;
         }
-
-        if (timer.timer <= 0) {
-            gameover = true;
-            HUD.isWin = false;
-        }
-    } else {
-        startT -= 1 * delta;
-        if (startT <= 0) startT = 0;
     }
+    
 }
 
 function drawStunHalo(d) {
