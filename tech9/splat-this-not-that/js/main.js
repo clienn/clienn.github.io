@@ -730,8 +730,8 @@ function main(w, h) {
 
     if (detectMob()) {
         projectileRanges = {
-            x: [50, 450],
-            y: [50, 1000]
+            x: [50, 300],
+            y: [50, 700]
         }
     }
 
