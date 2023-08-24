@@ -1739,7 +1739,8 @@ function gameCycle() {
                         let r = projectiles[i].update(delta * difficulty[i], g, projectileRanges);
                         
                         if (r) {
-                            difficulty[i] = Math.floor(Math.random() * 100) / 100 + 0.2 + difficultyAdj[i];
+                            // difficulty[i] = Math.floor(Math.random() * 100) / 100 + 0.2 + difficultyAdj[i];
+                            difficulty[i] = Math.floor(Math.random() * 100) / 100 + 0.2;
                             // difficulty[i] += 0.2;
                             updateSprite(i);
                             initAnimateCanon(i);
