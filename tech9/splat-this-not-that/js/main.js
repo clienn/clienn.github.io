@@ -286,6 +286,7 @@ var canons = {
         canons.black.right.upper.ox = canvas.width - canons.black.right.upper.w;
         canons.black.right.lower.x = canvas.width - canons.black.right.lower.w;
         canons.black.right.lower.ox = canvas.width - canons.black.right.lower.w;
+
     },
     draw: () => {
         canons.black.left.upper.draw(ctx, images.blackCanonLeft.obj.img);
@@ -1625,6 +1626,12 @@ function rescale(obj) {
     obj.y *= scaleY;
     obj.w *= scaleX;
     obj.h *= scaleY;
+
+    obj.ox = obj.x;
+    obj.oy = obj.y;
+    obj.ow = obj.w;
+    obj.oh = obj.h;
+
     console.log(obj.x, obj.y, obj.w, obj.h);
 }
 
