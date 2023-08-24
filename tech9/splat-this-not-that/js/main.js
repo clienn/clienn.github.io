@@ -301,7 +301,7 @@ var landPosY = 0;
 var scaleX = 1;
 var scaleY = 1;
 
-const g = 9.81;
+var g = 9.81;
 const friction = 2.14;
 
 var projectiles = [];
@@ -716,6 +716,8 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    g *= scaleY;
 
     // alert(scaleX + ', ' + scaleY)
 
