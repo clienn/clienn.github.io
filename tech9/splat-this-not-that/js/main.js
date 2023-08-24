@@ -400,7 +400,7 @@ const clips = [
     
 ];
 
-const projectileRanges = {
+var projectileRanges = {
     x: [50, 250],
     y: [50, 600]
 }
@@ -716,6 +716,22 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    // alert(scaleX + ', ' + scaleY)
+
+    if (scaleX > 0.6 && scaleX < 1) {
+        projectileRanges = {
+            x: [50, 350],
+            y: [50, 1000]
+        }
+    }
+
+    if (detectMob()) {
+        projectileRanges = {
+            x: [50, 450],
+            y: [50, 1000]
+        }
+    }
 
     initStartPage();
 
