@@ -6,6 +6,8 @@ class Spirte {
         this.oy = y;
         this.w = w;
         this.h = h;
+        this.ow = w;
+        this.oh = h;
         this.clipX = 0;
         this.clipY = 0;
         this.clipW = clipW;
@@ -18,8 +20,10 @@ class Spirte {
         this.fx = 0;
         this.fy = 0;
         this.t = 0;
+        this.t2 = 0;
 
         this.direction = 1;
+        this.density = this.w / 2;
     }
 
     draw(ctx, img) {
@@ -58,6 +62,11 @@ class Spirte {
         this.clipX = clipX;
         this.clipY = clipY;
         this.id = id;
+    }
+
+    floatAnim(delta) {
+        this.x += this.vx * delta;
+        this.y += this.vy * delta;
     }
 
     init(ranges) {

@@ -133,6 +133,14 @@ var images = {
         src: 'text3',
         obj: {},
     },
+    ouch: {
+        src: 'ouch',
+        obj: {},
+    },
+    explosion_star: {
+        src: 'explosion_star',
+        obj: {},
+    },
     beginbutton: {
         src: 'beginbutton',
         obj: {},
@@ -241,6 +249,24 @@ var kaboomInfo = {
     ch: 28,
 }
 
+var explosionStarInfo = {
+    x: 0,
+    y: 0,
+    w: 77 * 3,
+    h: 77 * 3,
+    cw: 77,
+    ch: 77,
+}
+
+var ouchInfo = {
+    x: 0,
+    y: 0,
+    w: 70,
+    h: 28,
+    cw: 70,
+    ch: 28,
+}
+
 var volumeOn = true;
 
 var canons = {
@@ -254,9 +280,12 @@ var canons = {
             lower: new Spirte(0, 540, 285, 225, 570, 451),
         },
     },
+    index: [],
     init: () => {
         canons.black.right.upper.x = canvas.width - canons.black.right.upper.w;
+        canons.black.right.upper.ox = canvas.width - canons.black.right.upper.w;
         canons.black.right.lower.x = canvas.width - canons.black.right.lower.w;
+        canons.black.right.lower.ox = canvas.width - canons.black.right.lower.w;
     },
     draw: () => {
         canons.black.left.upper.draw(ctx, images.blackCanonLeft.obj.img);
@@ -371,8 +400,8 @@ const clips = [
 ];
 
 const projectileRanges = {
-    x: [50, 500],
-    y: [50, 300]
+    x: [50, 250],
+    y: [50, 600]
 }
 
 var radius = 28;
@@ -385,7 +414,8 @@ const SPLAT_POINTS = 1;
 const OUCH_MINUS = -1;
 const PROJECTILE_COLLISION_MINUS = -20;
 const CANON_COLLISION_MINUS = -30;
-const LEVEL_UP_THRESHOLD = 200;
+// const LEVEL_UP_THRESHOLD = 200;
+const LEVEL_UP_THRESHOLD = 2;
 
 var textPos = {
     x: 0,
@@ -580,6 +610,7 @@ var gameStart = false;
 var level = 1;
 var levelScore = LEVEL_UP_THRESHOLD;
 var difficulty = [0, 0, 0, 0];
+var difficultyAdj = [0, 0, 0, 0];
 var mDown = false;
 
 const maxTimer = 60;
@@ -592,6 +623,8 @@ const cloudMovements = [-100, 100, 100];
 
 var scaleProj = 1.5;
 var kaboomT = 0;
+var kaboomT2 = 0;
+var ouchT = 0;
 
 var startPageInfo = {
     title: {
@@ -666,6 +699,8 @@ var startScreenTimerAnimT = 0;
 var startScreenHandAnimT = 0;
 var startPulseT = 0;
 
+var floaters = [];
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
@@ -682,6 +717,13 @@ function main(w, h) {
     scaleY = h / 922;
 
     initStartPage();
+
+    canons.index = [
+        canons.black.left.upper,
+        canons.black.left.lower,
+        canons.black.right.upper,
+        canons.black.right.lower
+    ];
 
     radius *= scaleX;
     dradius *= scaleX;
@@ -723,9 +765,9 @@ function main(w, h) {
     timer.setTimer(maxTimer);
     
     projectileRanges.x[0] *= scaleX;
-    // projectileRanges.x[1] *= scaleX;
+    projectileRanges.x[1] *= scaleX;
     projectileRanges.y[0] *= scaleY;
-    // projectileRanges.y[1] *= scaleY;
+    projectileRanges.y[1] *= scaleY;
 
     canvas.style.display = 'block';
     instrucions.style.display = 'none';
@@ -748,6 +790,8 @@ function main(w, h) {
     rescaleSize(trophyInfo);
     rescaleAll(waterInfo);
     rescaleAll(kaboomInfo);
+    rescaleAll(explosionStarInfo);
+    rescaleAll(ouchInfo);
 
     rescaleAll(volumeInfo);
 
@@ -797,13 +841,13 @@ function main(w, h) {
     bgInfo.cloud3.y = h / 2 - (150 * scaleY);
     
     let c = Math.floor(Math.random() * clips.length);
-    projectiles[0] = new Spirte(canons.black.left.upper.w - 50, canons.black.left.upper.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
+    projectiles[0] = new Spirte(canons.black.left.upper.w - 100 * scaleX, canons.black.left.upper.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
     projectiles[0].clipX = clips[c].clipX;
     projectiles[0].clipY = clips[c].clipY;
     projectiles[0].init(projectileRanges);
 
     c = Math.floor(Math.random() * clips.length);
-    projectiles[1] = new Spirte(canons.black.left.upper.w - 50, canons.black.left.lower.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
+    projectiles[1] = new Spirte(canons.black.left.upper.w - 100 * scaleX, canons.black.left.lower.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
     projectiles[1].clipX = clips[c].clipX;
     projectiles[1].clipY = clips[c].clipY;
     projectiles[1].init(projectileRanges);
@@ -822,11 +866,106 @@ function main(w, h) {
     projectiles[3].direction = -1;
     projectiles[3].init(projectileRanges);
 
+    // generateFloaters();
+
     controls();
 
     setCloudSpeed(30);
     
     gameCycle();
+}
+
+function setFloater(i) {
+    let depth = Math.floor(Math.random() * 15) + 5;
+    
+    floaters[i].x = canvas.width / 2;
+    floaters[i].y = canvas.height + clips[i].h * depth;
+    floaters[i].id = i;
+
+    floaters[i].clipW = clips[i].clipW;
+    floaters[i].clipH = clips[i].clipH;
+
+    floaters[i].clipX = clips[i].clipX;
+    floaters[i].clipY = clips[i].clipY;
+
+    let mul = Math.floor(Math.random() * 2);
+    if (mul == 0) mul = -1;
+    let moveSpeed = Math.floor(Math.random() * 80) + 20;
+    floaters[i].vx = moveSpeed * scaleX * mul;
+    floaters[i].vy = -60 * scaleY;
+    floaters[i].density = waterInfo.y - floaters[i].density;
+}
+
+function generateFloater(i) {
+    if (floaters.length < 7) {
+        let depth = Math.floor(Math.random() * 15) + 5;
+        let proj = new Spirte(canvas.width / 2, canvas.height + clips[i].h * depth, clips[i].w, clips[i].h, clips[i].clipW, clips[i].clipH, i);
+        proj.clipX = clips[i].clipX;
+        proj.clipY = clips[i].clipY;
+        let mul = Math.floor(Math.random() * 2);
+        if (mul == 0) mul = -1;
+        let moveSpeed = Math.floor(Math.random() * 80) + 20;
+        proj.vx = moveSpeed * scaleX * mul;
+        proj.vy = -60 * scaleY;
+        proj.density = waterInfo.y - proj.density;
+        floaters.push(proj);
+    }
+   
+}
+
+function generateFloaters() {
+    for (let i = 0; i < 6; ++i) {
+        let depth = Math.floor(Math.random() * 15) + 5;
+        let proj = new Spirte(canvas.width / 2, canvas.height + clips[i].h * depth, clips[i].w, clips[i].h, clips[i].clipW, clips[i].clipH, i);
+        proj.clipX = clips[i].clipX;
+        proj.clipY = clips[i].clipY;
+        let mul = Math.floor(Math.random() * 2);
+        if (mul == 0) mul = -1;
+        let moveSpeed = Math.floor(Math.random() * 80) + 20;
+        proj.vx = moveSpeed * scaleX * mul;
+        proj.vy = -60 * scaleY;
+        proj.density = waterInfo.y - proj.density;
+        floaters.push(proj);
+    }
+}
+
+function drawFloaters() {
+    for (let i = 0; i < floaters.length; ++i) {
+        floaters[i].draw(ctx, images.projectile.obj.img);
+        floaters[i].floatAnim(delta);
+
+        if (floaters[i].x < 0 || floaters[i].x > canvas.width) floaters[i].vx *= -1;
+
+        if (floaters[i].y < floaters[i].density) {
+            floaters[i].vy = 0;
+        }
+    }
+}
+
+function drawExplosionStar(x, y) {
+    ctx.drawImage(images.explosion_star.obj.img, 0, 0, explosionStarInfo.cw, explosionStarInfo.ch, x, y, explosionStarInfo.w, explosionStarInfo.h);
+}
+
+function initAnimateCanon(idx) {
+    canons.index[idx].x = canons.index[idx].ox;
+    canons.index[idx].y = canons.index[idx].oy;
+    canons.index[idx].w = canons.index[idx].ow;
+    canons.index[idx].h = canons.index[idx].oh;
+    canons.index[idx].t2 = 0;
+}
+
+function animateCanons() {
+    // if (i == 0) {
+    for (let i = 0; i < canons.index.length; ++i) {
+        if (canons.index[i].t2 > -5) {
+            canons.index[i].t2 -= 20 * delta;
+            let spring = Math.sin(canons.index[i].t2) * 5;
+            canons.index[i].y += spring;
+            canons.index[i].h += -spring;
+            canons.index[i].w += spring;
+        }
+    }
+    // }
 }
 
 function initStartPage() {
@@ -1133,13 +1272,19 @@ function controls() {
                 if (isBtnClicked(mx, my, btnBegin)) {
                     gameStart = true;
 
+                    
                     music.bg.obj.audio.volume = 0.01;
                     music.bg.obj.audio.loop = true;
-                    music.bg.obj.audio.play();
+                    // music.bg.obj.audio.play();
 
                     music.explosion.obj.audio.volume = 0.2;
                     music.explosion.obj.audio.loop = true;
-                    music.explosion.obj.audio.play();
+                    // music.explosion.obj.audio.play();
+
+                    if (volumeOn) {
+                        music.bg.obj.audio.play();
+                        music.explosion.obj.audio.play();
+                    }
                 }
             }
 
@@ -1183,12 +1328,15 @@ function controls() {
                         music.explosion.obj.audio.play();
                     } else {
                         music.bg.obj.audio.pause();
-                        music.correct.obj.volume = 0;
+                        
 
                         music.explosion.obj.audio.pause();
-                        music.explosion.obj.volume = 0;
+                        // music.explosion.obj.volume = 0;
+
+                        // music.correct.obj.volume = 0;
                     }
                 } else {
+                    // updateDifficulty();
                     splat(mx, my);
                     updateLevel();
                 }
@@ -1198,11 +1346,16 @@ function controls() {
 
                     music.bg.obj.audio.volume = 0.5;
                     music.bg.obj.audio.loop = true;
-                    music.bg.obj.audio.play();
+                    // music.bg.obj.audio.play();
 
                     music.explosion.obj.audio.volume = 0.8;
                     music.explosion.obj.audio.loop = true;
-                    music.explosion.obj.audio.play();
+                    // music.explosion.obj.audio.play();
+
+                    if (volumeOn) {
+                        music.bg.obj.audio.play();
+                        music.explosion.obj.audio.play();
+                    }
                 }
             }
 
@@ -1322,7 +1475,7 @@ function updateLevel() {
     if (score >= levelScore) {
         levelScore = ++level * LEVEL_UP_THRESHOLD;
         updateDifficulty();
-        console.log('level up');
+        // console.log('level up');
     }
 }
 
@@ -1335,8 +1488,11 @@ function updateDifficulty() {
     // }
 
     if (cols.length > 0) {
-        let rng = Math.floor(Math.random() * cols.length) + 0.3;
-        difficulty[cols[rng]] += 0.2;
+        let rng = Math.floor(Math.random() * cols.length);
+        difficulty[rng] += 0.2;
+        difficultyAdj[rng] += 0.2;
+        if (difficultyAdj[rng] > 2) difficultyAdj[rng] = 2;
+        // console.log('test', difficulty[rng])
     }
 }
 
@@ -1360,8 +1516,10 @@ function checkProjectileCollisions() {
         for (let j = 2; j < 4; ++j) {
             if (isCollided(projectiles[i], projectiles[j])) {
                 if (projectiles[i].clipY != projectiles[j].clipY) {
-                    console.log('collision detected');
+                    // console.log('collision detected');
+                    drawExplosionStar(projectiles[i].x, projectiles[i].y);
                     resetProjectile([i, j]);
+                    
                     score += PROJECTILE_COLLISION_MINUS;
                 }
             }
@@ -1425,18 +1583,27 @@ function splat(mx, my) {
                 // console.log('ouch!');
                 score += OUCH_MINUS;
                 reduceHP();
-                music.ouch.obj.audio.pause();
-                music.ouch.obj.audio.currentTime = 0;
-                music.ouch.obj.audio.play();
-                kaboomT = 0.5;
-                kaboomInfo.x = projectiles[i].x;
-                kaboomInfo.y = projectiles[i].y;
+                if (volumeOn) {
+                    music.ouch.obj.audio.pause();
+                    music.ouch.obj.audio.currentTime = 0;
+                    music.ouch.obj.audio.play();
+                }
+                
+                ouchT = 0.5;
+                ouchInfo.x = projectiles[i].x;
+                ouchInfo.y = projectiles[i].y;
             } else {
                 // console.log('splatted!');
+                kaboomT = 0.15;
+                kaboomT2 = 0;
+                kaboomInfo.x = projectiles[i].x;
+                kaboomInfo.y = projectiles[i].y;
                 score += SPLAT_POINTS;
-                music.score.obj.audio.pause();
-                music.score.obj.audio.currentTime = 0;
-                music.score.obj.audio.play();
+                if (volumeOn) {
+                    music.score.obj.audio.pause();
+                    music.score.obj.audio.currentTime = 0;
+                    music.score.obj.audio.play();
+                }
             }
             resetProjectile([i]);
             break;
@@ -1445,7 +1612,11 @@ function splat(mx, my) {
 }
 
 function isSplatted(p1, p2) {
-    return (p2.x >= p1.x && p2.x <= p1.x + p1.w && p2.y >= p1.y && p2.y <= p1.y + p1.h);
+    // let dx = (p1.x + p1.w / 2) - p2.x;
+    // let dy = (p1.y + p1.h / 2) - p2.y;
+    // let dist = Math.sqrt(dx * dx + dy * dy);
+    // return dist < 20;
+    return (p2.x >= p1.x - 10 && p2.x <= p1.x + p1.w - 10 && p2.y >= p1.y - 10 && p2.y <= p1.y + p1.h - 10);
 }
 
 function rescale(obj) {
@@ -1488,6 +1659,11 @@ function update() {
         kaboomT -= 1 * delta;
         if (kaboomT <= 0) kaboomT = 0;
     }
+
+    if (ouchT > 0) {
+        ouchT -= 1 * delta;
+        if (ouchT <= 0) ouchT = 0;
+    }
 }
 
 function gameCycle() {
@@ -1501,10 +1677,14 @@ function gameCycle() {
                 // bg
                 // ctx.drawImage(images.bg.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
                 ctx.drawImage(images.sky.obj.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
+
+                drawFloaters();
+
                 ctx.beginPath();
                 ctx.fillStyle = '#70D2ED';
                 ctx.rect(0, waterInfo.y, canvas.width, waterInfo.h);
                 ctx.fill();
+
                 drawClouds();
                 drawProgress();
                 drawTopHUD();
@@ -1519,12 +1699,14 @@ function gameCycle() {
                 ctx.drawImage(images[volumeKey].obj.img, 0, 0, volumeInfo.cw, 
                     volumeInfo.ch, volumeInfo.x, volumeInfo.y + topHUDInfo.timer.y, volumeInfo.w, volumeInfo.h);
 
+
+                
+
                 // lands
                 ctx.drawImage(images.landLeft.obj.img, 0, 0, 157, 206, images.landLeft.x, images.landLeft.y, images.landLeft.w, images.landLeft.h);
                 ctx.drawImage(images.landRight.obj.img, 0, 0, 157, 206, images.landRight.x, images.landRight.y, images.landRight.w, images.landRight.h);
 
-                // canons
-                canons.draw();
+                
 
                 for (let i = 0; i < projectiles.length; ++i) {
                     if (difficulty[i] > 0) {
@@ -1532,15 +1714,56 @@ function gameCycle() {
                         let r = projectiles[i].update(delta * difficulty[i], g, projectileRanges);
                         
                         if (r) {
-                            difficulty[i] = Math.floor(Math.random() * 100) / 100 + 0.2;
+                            difficulty[i] = Math.floor(Math.random() * 100) / 100 + 0.2 + difficultyAdj[i];
+                            // difficulty[i] += 0.2;
                             updateSprite(i);
+                            initAnimateCanon(i);
+
+                            if (i < 6) {
+                                generateFloater(i);
+                            }
+                            
+                            // if (i == 0) {
+                            //     canons.black.left.upper.x = canons.black.left.upper.ox;
+                            //     canons.black.left.upper.y = canons.black.left.upper.oy;
+                            //     canons.black.left.upper.w = canons.black.left.upper.ow;
+                            //     canons.black.left.upper.h = canons.black.left.upper.oh;
+                            //     canons.black.left.upper.t2 = 0;
+                            // }
+                            
                         }
                     }
                 }
 
                 if (kaboomT) {
-                    ctx.drawImage(images.kaboom.obj.img, 0, 0, kaboomInfo.cw, kaboomInfo.ch, kaboomInfo.x, kaboomInfo.y, kaboomInfo.w, kaboomInfo.h);
+                    kaboomT2 += 20 * delta;
+                    let adjx = Math.sin(kaboomT2) * 50;
+                    let adjx2 = adjx / 2;
+                    ctx.drawImage(images.kaboom.obj.img, 0, 0, kaboomInfo.cw, kaboomInfo.ch, kaboomInfo.x - adjx2, kaboomInfo.y - adjx2, kaboomInfo.w + adjx, kaboomInfo.h + adjx);
                 }
+
+                if (ouchT) {
+                    ctx.drawImage(images.ouch.obj.img, 0, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
+                }
+
+                // canons
+                canons.draw();
+                animateCanons();
+                // if (canons.black.left.upper.t2 > -5) {
+                //     canons.black.left.upper.t2 -= 20 * delta;
+                //     let spring = Math.sin(canons.black.left.upper.t2) * 5;
+                //     canons.black.left.upper.y += spring;
+                //     canons.black.left.upper.h += -spring;
+                //     canons.black.left.upper.w += spring;
+                // }
+                
+
+                // canons.black.left.lower.draw(ctx, images.blackCanonLeft.obj.img);
+                // canons.black.right.upper.draw(ctx, images.blackCanonRight.obj.img);
+                // canons.black.right.lower.draw(ctx, images.blackCanonRight.obj.img);
+
+                // drawExplosionStar(canvas.width / 2, canvas.height / 2);
+                // drawExplosionStar(0, 0);
 
                 checkProjectileCollisions();
                 checkCanonCollisions();
@@ -1549,6 +1772,8 @@ function gameCycle() {
             } else {
                 let handx = Math.sin(startScreenHandAnimT) * 20;
                 let handy = Math.cos(startScreenHandAnimT) * 20;
+                // let handTapX = Math.cos(startScreenHandAnimT) * 2;
+                // let handTapY = Math.sin(startScreenHandAnimT) * 2;
                 // ctx.drawImage(images.splash.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
                 ctx.drawImage(images.sky.obj.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
                 ctx.beginPath();
@@ -1565,9 +1790,26 @@ function gameCycle() {
                 canons.draw();
                 
                 ctx.drawImage(images.title.obj.img, 0, 0, startPageInfo.title.cw, startPageInfo.title.ch, startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
-                ctx.drawImage(images.hand.obj.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x + handx, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
-                ctx.drawImage(images.startballoon.obj.img, 0, 0, startPageInfo.startballoon.cw, startPageInfo.startballoon.ch, startPageInfo.startballoon.x + handx, startPageInfo.startballoon.y + handy, startPageInfo.startballoon.w, startPageInfo.startballoon.h);
                 
+                // tap
+                ctx.save();
+                // Untransformed draw position
+                const position = {x: startPageInfo.hand.x, y: startPageInfo.hand.y};
+                // In degrees
+                const rotation = { x: 0, y: Math.sin(startScreenHandAnimT) * 25, z: 0};
+                // Rotation relative to here (this is the center of the image)
+                const rotPt = { x: startPageInfo.hand.w / 2, y: startPageInfo.hand.h / 2 };
+
+                ctx.setTransform(new DOMMatrix()
+                    .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+                    .rotateSelf(rotation.x, rotation.y, rotation.z)
+                );
+                
+                ctx.drawImage(images.hand.obj.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, -rotPt.x, -rotPt.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                ctx.restore();
+                //
+                
+                ctx.drawImage(images.startballoon.obj.img, 0, 0, startPageInfo.startballoon.cw, startPageInfo.startballoon.ch, startPageInfo.startballoon.x + handx, startPageInfo.startballoon.y + handy, startPageInfo.startballoon.w, startPageInfo.startballoon.h);
                 //
                     ctx.save();
 
