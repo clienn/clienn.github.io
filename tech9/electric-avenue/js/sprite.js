@@ -248,6 +248,20 @@ class Sprite {
         this.y += this.vy * delta;
     }
 
+    moveEel(w, delta, friction) {
+        this.x += this.vx * delta;
+        // add friction
+        // this.vx *= friction;
+
+        if (this.x + this.w > w) {
+            this.x = w - this.w;
+            this.vx = 0;
+        } else if (this.x < 0) {
+            this.x = 0;
+            this.vx = 0;
+        }
+    }
+
     sineMovement(delta) {
         this.t2 += 1 * delta;
         this.prevY = this.y;

@@ -8,6 +8,48 @@
             "ch": 430
         },
         {
+            "id": "title",
+            "src": "splash/title",
+            "ext": "png",
+            "cw": 467,
+            "ch": 160
+        },
+        {
+            "id": "sub_title",
+            "src": "splash/sub_title",
+            "ext": "png",
+            "cw": 366,
+            "ch": 19
+        },
+        {
+            "id": "text1",
+            "src": "splash/text1",
+            "ext": "png",
+            "cw": 94,
+            "ch": 34
+        },
+        {
+            "id": "text2",
+            "src": "splash/text2",
+            "ext": "png",
+            "cw": 124,
+            "ch": 34
+        },
+        {
+            "id": "text3",
+            "src": "splash/text3",
+            "ext": "png",
+            "cw": 154,
+            "ch": 37
+        },
+        {
+            "id": "start",
+            "src": "splash/start",
+            "ext": "png",
+            "cw": 212,
+            "ch": 48
+        },
+        {
             "id": "bg",
             "src": "bg",
             "ext": "png",
@@ -41,6 +83,13 @@
             "ext": "png",
             "cw": 64,
             "ch": 227
+        },
+        {
+            "id": "sfish_2",
+            "src": "fishes/sprites/2",
+            "ext": "png",
+            "cw": 1029,
+            "ch": 81
         },
         {
             "id": "fish_0",
@@ -160,6 +209,55 @@
             "ext": "png",
             "cw": 239,
             "ch": 257
+        },
+        {
+            "id": "battery_rect",
+            "src": "hud/battery/rect",
+            "ext": "png",
+            "cw": 49,
+            "ch": 117
+        },
+        {
+            "id": "battery_top",
+            "src": "hud/battery/top",
+            "ext": "png",
+            "cw": 23,
+            "ch": 5
+        },
+        {
+            "id": "battery_logo",
+            "src": "hud/battery/logo",
+            "ext": "png",
+            "cw": 18,
+            "ch": 37
+        },
+        {
+            "id": "battery_charge_lime",
+            "src": "hud/battery/charge_lime",
+            "ext": "png",
+            "cw": 49,
+            "ch": 116
+        },
+        {
+            "id": "battery_charge_red",
+            "src": "hud/battery/charge_red",
+            "ext": "png",
+            "cw": 50,
+            "ch": 12
+        },
+        {
+            "id": "stopwatch",
+            "src": "hud/stopwatch",
+            "ext": "png",
+            "cw": 43,
+            "ch": 45
+        },
+        {
+            "id": "timecircle",
+            "src": "hud/timecircle",
+            "ext": "png",
+            "cw": 45,
+            "ch": 45
         },
         {
             "id": "volume",
