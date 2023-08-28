@@ -21,6 +21,7 @@ class Sprite {
 
         this.t = 0;
         this.t2 = 0;
+        this.t3 = 0;
         this.isAnimating = false;
 
         this.goto = [];
@@ -30,7 +31,7 @@ class Sprite {
         this.facing = 0; // -1 = left, 1 = right
         this.yRotate = 0;
         this.zRotate = 0;
-        this.flippingSpeed = 0;
+        this.flippingSpeed = 5;
 
         this.prevY = y;
         this.waveHeight = 150;
@@ -39,6 +40,14 @@ class Sprite {
         this.dest = [];
 
         this.show = true;
+        this.frames = 1;
+        
+    }
+
+    setFrames(frames) {
+        this.frames = frames;
+        this.clipW = this.w / frames;
+        this.w = this.clipW;
     }
 
     setDirection(d) {
@@ -57,7 +66,7 @@ class Sprite {
         // this.prevY = this.y;
         this.x = lerp(this.ox, this.dest[0], this.t);
         this.y = lerp(this.oy, this.dest[1], this.t);
-        
+        let frame = Math.floor(this.t3) % this.frames;
 
         let dx = this.x - this.dest[0];
         let dy = this.y - this.dest[1];
@@ -91,7 +100,8 @@ class Sprite {
         }
 
         let angle = Math.atan2(this.y - this.oy, this.x - this.ox) * 180 / Math.PI;
-
+        
+        
         ctx.save();
         // Untransformed draw position
         const position = {x: this.x, y: this.y};
@@ -105,7 +115,7 @@ class Sprite {
             .rotateSelf(rotation.x, rotation.y, rotation.z)
         );
         
-        ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
+        ctx.drawImage(img, this.clipW * frame, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
         ctx.restore();
     }
 
@@ -162,7 +172,6 @@ class Sprite {
         // if (angle > 80) angle = 80;
         // else if (angle < -80) angle = -80;
 
-
         ctx.save();
         // Untransformed draw position
         const position = {x: this.x, y: this.y};
@@ -182,6 +191,8 @@ class Sprite {
     }
 
     swim(ctx, img) {
+        let frame = Math.floor(this.t) % this.frames;
+        // console.log(frame * this.cw);
         ctx.save();
         // Untransformed draw position
         const position = {x: this.x, y: this.y};
@@ -195,7 +206,7 @@ class Sprite {
             .rotateSelf(rotation.x, rotation.y, rotation.z)
         );
         
-        ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
+        ctx.drawImage(img, frame * this.clipW, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
         ctx.restore();
     }
 

@@ -110,6 +110,7 @@ var startPage = {
 }
 
 var fishInfo = {};
+var schoolFishInfo = {};
 var garbageInfo = {};
 
 var eelInfo = {
@@ -200,7 +201,8 @@ function main(w, h) {
     // console.log(TXT.texts);
     
     
-    setFishInfo(scaleX, scaleY, 0.5);
+    setFishInfo(scaleX, scaleY, 2.5);
+    setSchoolFishInfo(scaleX, scaleY, 0.5);
     setGarbageInfo(scaleX, scaleY, 0.5);
     rescaleSize(eelInfo.head, scaleX, scaleY);
     rescaleSize(eelInfo.neck, scaleX, scaleY);
@@ -255,8 +257,8 @@ function main(w, h) {
 
     // divingFish.vx = 180;
 
-    let fishW = fishInfo[rng].w * 0.25;
-    let fishH = fishInfo[rng].h * 0.25;
+    let fishW = schoolFishInfo[rng].w * 0.25;
+    let fishH = schoolFishInfo[rng].h * 0.25;
 
     schools[0] = [];
     schools[1] = [];
@@ -378,6 +380,7 @@ function drawGarbage() {
             // TXT.texts['points'].str = '-1.00';
             setPoints('-5.00','#fb2121');
             HUD.updateBattery(-5);
+            playCry();
         }
 
         // else if (isHunting) {
@@ -406,8 +409,8 @@ function resetGarbage(trash) {
 }
 
 function addSmartFish() {
-    let rng = Math.floor(Math.random() * 8);
-    let key = 'fish_' + rng;
+    let rng = Math.floor(Math.random() * 6) + 1;
+    let key = 'sfish_' + rng;
     let rngY = Math.floor(Math.random() * (canvas.height - fishInfo[rng].h));
     let rngX = 0;
 
@@ -428,20 +431,23 @@ function addSmartFish() {
     fish.setDirection(direction);
     fish.vx = (Math.floor(Math.random() * 20) + 10) / 100;
     fish.id = rng;
-    fish.flippingSpeed = 25;
+    fish.flippingSpeed = 15;
     fish.dest = [canvas.width / 2, canvas.height / 2];
+    // fish.setFrames(fishInfo[rng].frames);
+    fish.frames = fishInfo[rng].frames;
     smartSwimmers.push(fish);
 }
 
 function drawSmartFishes() {
     for (let i = 0; i < smartSwimmers.length; ++i) {
-        let key = 'fish_' + smartSwimmers[i].id;
+        let key = 'sfish_' + smartSwimmers[i].id;
         // smartSwimmers[i].dive(ctx, AM.images[key].img);
         // smartSwimmers[i].swim(ctx, AM.images[key].img);
         // smartSwimmers[i].update(delta, 3);
         smartSwimmers[i].smartSwim(ctx, AM.images[key].img);
         smartSwimmers[i].t += smartSwimmers[i].vx * delta;
         smartSwimmers[i].t2 += 10 * delta;
+        smartSwimmers[i].t3 += 10 * delta;
 
         if (smartSwimmers[i].x > canvas.width || smartSwimmers[i].y > canvas.height) {
             // smartSwimmers[i].mutateFish()
@@ -516,7 +522,7 @@ function displaySchool() {
 function mutateSchool(idx) {
     let rng = Math.floor(Math.random() * 8);
     let key = 'fish_' + rng;
-    let rngY = Math.floor(Math.random() * (canvas.height - fishInfo[rng].h));
+    let rngY = Math.floor(Math.random() * (canvas.height - schoolFishInfo[rng].h));
 
     let direction = Math.floor(Math.random() * 2) ? FACE.RIGHT : FACE.LEFT;
 
@@ -525,8 +531,8 @@ function mutateSchool(idx) {
     let padding = Math.floor(Math.random() * (canvas.width)) + 100;
 
     let fishScale = (Math.floor(Math.random() * 10) + 15) / 100;
-    let fishW = fishInfo[rng].w * fishScale;
-    let fishH = fishInfo[rng].h * fishScale;
+    let fishW = schoolFishInfo[rng].w * fishScale;
+    let fishH = schoolFishInfo[rng].h * fishScale;
 
     if (direction > 0) {
         px = schools[idx].length * (fishW) + padding;
@@ -611,8 +617,6 @@ function controls() {
                 }
 
                 prevPos = x;
-                
-                
             }
         }
     });
@@ -624,9 +628,9 @@ function controls() {
         // let x = touch.pageX;
 
         if (!gameStart) {
-            // AM.audio.bg.img.volume = 0.2;
-            // AM.audio.bg.img.loop = true;
-            // AM.audio.bg.img.play();
+            AM.audio.bg.img.volume = 0.2;
+            AM.audio.bg.img.loop = true;
+            AM.audio.bg.img.play();
 
             // playScore();
             // playKaboom();
@@ -635,6 +639,10 @@ function controls() {
             gameStart = true;
             HUD.health = 100;
         } 
+
+        if (gameover) {
+            reset();
+        }
         
     });
 
@@ -646,23 +654,23 @@ function controls() {
             mDown = true;
             
             if (gameStart) {
-                // if (isBtnClicked(mx, my, {
-                //     x: HUD.volume.x,
-                //     y: HUD.volume.y,
-                //     w: HUD.volume.w,
-                //     h: HUD.volume.h
-                // })) {
+                if (isBtnClicked(mx, my, {
+                    x: HUD.volume.x,
+                    y: HUD.volume.y,
+                    w: HUD.volume.w,
+                    h: HUD.volume.h
+                })) {
                     
-                //     HUD.volumeOn = !HUD.volumeOn; 
-                //     // console.log('test', HUD.volumeOn)
-                //     if (HUD.volumeOn) {
-                //         AM.audio.bg.img.currentTime = 0;
-                //         AM.audio.bg.img.play();
-                //     } else {
-                //         AM.audio.bg.img.pause();
-                //         // music.correct.obj.volume = 0;
-                //     }
-                // } 
+                    HUD.volumeOn = !HUD.volumeOn; 
+                    // console.log('test', HUD.volumeOn)
+                    if (HUD.volumeOn) {
+                        AM.audio.bg.img.currentTime = 0;
+                        AM.audio.bg.img.play();
+                    } else {
+                        AM.audio.bg.img.pause();
+                        // music.correct.obj.volume = 0;
+                    }
+                } 
 
                 if (isNeutral) {
                     // eelLookAt[0] = mx;
@@ -702,10 +710,10 @@ function controls() {
         
         if (!gameStart) {
             // if (AM.audio.bg.img.paused) {
-            //     AM.audio.bg.img.volume = 0.2;
-            //     AM.audio.bg.img.loop = true;
-            //     AM.audio.bg.img.play();
-            //     console.log('test')
+                AM.audio.bg.img.volume = 0.2;
+                AM.audio.bg.img.loop = true;
+                AM.audio.bg.img.play();
+                // console.log('test')
             // }
             
 
@@ -719,6 +727,7 @@ function controls() {
             // eelLookAt[1] = 0;
             if (gameover) {
                 reset();
+                
             }
 
             
@@ -785,10 +794,28 @@ function initStartPage() {
 }
 
 function setFishInfo(sx, sy, sizePercentage) {
+    for (let i = 1; i < 7; ++i) {
+        let key = 'sfish_' + i;
+
+        if (AM.images[key].frames) AM.images[key].cw = AM.images[key].cw / AM.images[key].frames;
+        // console.log(AM.images[key].frames, AM.images[key].cw)
+        // let cw = (AM.images[key].frames ? (AM.images[key].cw / AM.images[key].frames) : AM.images[key].cw);
+
+        fishInfo[i] = {
+            x: 0,
+            y: 0,
+            w: AM.images[key].cw * sizePercentage * sx,
+            h: AM.images[key].ch * sizePercentage * sy,
+            frames: AM.images[key].frames
+        };
+    }
+}
+
+function setSchoolFishInfo(sx, sy, sizePercentage) {
     for (let i = 0; i < 8; ++i) {
         let key = 'fish_' + i;
 
-        fishInfo[i] = {
+        schoolFishInfo[i] = {
             x: 0,
             y: 0,
             w: AM.images[key].cw * sizePercentage * sx,
@@ -817,8 +844,8 @@ function setGarbageInfo(sx, sy, sizePercentage) {
  */
 function addFish() {
     // x, y, w, h, clipW, clipH
-    let rng = Math.floor(Math.random() * 8);
-    let key = 'fish_' + rng;
+    let rng = Math.floor(Math.random() * 6) + 1;
+    let key = 'sfish_' + rng;
     let rngY = Math.floor(Math.random() * (canvas.height - fishInfo[rng].h));
 
     let fish = new Sprite(-fishInfo[rng].w, rngY, fishInfo[rng].w, fishInfo[rng].h, AM.images[key].cw, AM.images[key].ch);
@@ -832,21 +859,22 @@ function addFish() {
     fish.setDirection(direction);
     fish.setRandomSpeed(fishMaxSpeed, fishMinSpeed);
     fish.id = rng;
-
+    // fish.setFrames(fishInfo[rng].frames);
+    fish.frames = fishInfo[rng].frames;
     fishes.push(fish);
 }
 
 function drawFishes() {
     for (let i = 0; i < fishes.length; ++i) {
-        let key = 'fish_' + fishes[i].id;
+        let key = 'sfish_' + fishes[i].id;
         fishes[i].swim(ctx, AM.images[key].img);
         fishes[i].t += 10 * delta;
     }
 }
 
 function resetFish(fish, isEaten) {
-    let rng = Math.floor(Math.random() * 8);
-    let key = 'fish_' + rng;
+    let rng = Math.floor(Math.random() * 6) + 1;
+    let key = 'sfish_' + rng;
     let rngY = Math.floor(Math.random() * (canvas.height / 2));
     // let rngY = (Math.floor(Math.random() * 2) + 1) * fish.h;
     
@@ -874,14 +902,16 @@ function resetFish(fish, isEaten) {
     
     // fishes[idx].setDirection(direction);
     // fishes[idx].x = 100;
-    
+
     fish.mutateFish(rng, fishInfo[rng].w, fishInfo[rng].h, AM.images[key].cw, AM.images[key].ch, direction);
     fish.setRandomSpeed(fishMaxSpeed, fishMinSpeed);
+    // fish.setFrames(fishInfo[rng].frames);
+    fish.frames = fishInfo[rng].frames;
 }
 
 function resetSmartFish(fish) {
-    let rng = Math.floor(Math.random() * 8);
-    let key = 'fish_' + rng;
+    let rng = Math.floor(Math.random() * 6) + 1;
+    let key = 'sfish_' + rng;
 
     let direction = Math.floor(Math.random() * 2) ? FACE.RIGHT : FACE.LEFT;
 
@@ -910,13 +940,16 @@ function resetSmartFish(fish) {
 
     fish.ox = fish.x;
 
+    
     fish.morph(rng, fishInfo[rng].w, fishInfo[rng].h, AM.images[key].cw, AM.images[key].ch);
+    // fish.setFrames(fishInfo[rng].frames);
+    fish.frames = fishInfo[rng].frames
     // fish.setRandomSpeed(30, 15);
 }
 
 function mutateFish(fish) {
-    let rng = Math.floor(Math.random() * 8);
-    let key = 'fish_' + rng;
+    let rng = Math.floor(Math.random() * 6) + 1;
+    let key = 'sfish_' + rng;
     fish.morph(rng, fishInfo[rng].w, fishInfo[rng].h, AM.images[key].cw, AM.images[key].ch);
 }
 
@@ -1025,29 +1058,29 @@ function setPoints(points, color) {
 /*
  * SOUNDS
  */
-// function playKaboom() {
-//     if (HUD.volumeOn) {
-//         AM.audio.kaboom.img.pause();
-//         AM.audio.kaboom.img.currentTime = 0;
-//         AM.audio.kaboom.img.play();
-//     }
-// }
+function playCry() {
+    if (HUD.volumeOn) {
+        AM.audio.cry.img.pause();
+        AM.audio.cry.img.currentTime = 0;
+        AM.audio.cry.img.play();
+    }
+}
 
-// function playLaugh() {
-//     if (HUD.volumeOn) {
-//         AM.audio.laugh.img.pause();
-//         AM.audio.laugh.img.currentTime = 0;
-//         AM.audio.laugh.img.play();
-//     } 
-// }
+function playEat() {
+    if (HUD.volumeOn) {
+        AM.audio.eat.img.pause();
+        AM.audio.eat.img.currentTime = 0;
+        AM.audio.eat.img.play();
+    } 
+}
 
-// function playScore() {
-//     if (HUD.volumeOn) {
-//         AM.audio.score.img.pause();
-//         AM.audio.score.img.currentTime = 0;
-//         AM.audio.score.img.play();
-//     }
-// }
+function playScore() {
+    if (HUD.volumeOn) {
+        AM.audio.score.img.pause();
+        AM.audio.score.img.currentTime = 0;
+        AM.audio.score.img.play();
+    }
+}
 
 // *********************************** SOUNDS END ******************************************************** //
 
@@ -1114,7 +1147,7 @@ function drawStartPage() {
 function reset() {
     gameover = false;
    
-    totalHP = 100;
+    HUD.health = 100;
 
     
     timer.setTimer(gameDuration);
@@ -1132,6 +1165,7 @@ function update() {
                 // TXT.texts['points'].str = '+1.00';
                 setPoints('+3.00','#C7FC12');
                 HUD.updateBattery(3);
+                playScore();
             }
         // }
         
@@ -1153,6 +1187,7 @@ function update() {
                 // TXT.texts['points'].str = '+1.00';
                 setPoints('+2.00','#C7FC12');
                 HUD.updateBattery(2);
+                playEat();
             }
         // }
         
@@ -1165,8 +1200,23 @@ function update() {
 
     // divingFish.update(delta);
     // divingFish.sineMovement(delta);
+    HUD.txt.texts['time'].str = zeroPad(Math.floor(timer.timer / 24), 2);
+
+    if (delta < 1) {
+        HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24));
+        timer.tick(delta);
+
+        if (timer.timer <= 0) {
+            gameover = true;
+            HUD.updateGameoverBattery();
+        }
+    }
 
     HUD.decay(delta);
+    if (HUD.health <= 0) {
+        gameover = true;
+        HUD.updateGameoverBattery();
+    }
 }
 
 function gameCycle() {
@@ -1206,6 +1256,7 @@ function gameCycle() {
         // HUD.draw(ctx);
         
         HUD.gameover(ctx);
+        // HUD.updateGameoverBattery(-0.01 * delta);
     }
 
     requestAnimationFrame(gameCycle);

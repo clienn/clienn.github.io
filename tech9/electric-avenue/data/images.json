@@ -85,11 +85,52 @@
             "ch": 227
         },
         {
+            "id": "sfish_1",
+            "src": "fishes/sprites/1",
+            "ext": "png",
+            "cw": 461,
+            "ch": 65,
+            "frames": 6
+        },
+        {
             "id": "sfish_2",
             "src": "fishes/sprites/2",
             "ext": "png",
             "cw": 1029,
-            "ch": 81
+            "ch": 81,
+            "frames": 10
+        },
+        {
+            "id": "sfish_3",
+            "src": "fishes/sprites/3",
+            "ext": "png",
+            "cw": 515,
+            "ch": 65,
+            "frames": 6
+        },
+        {
+            "id": "sfish_4",
+            "src": "fishes/sprites/4",
+            "ext": "png",
+            "cw": 652,
+            "ch": 65,
+            "frames": 6
+        },
+        {
+            "id": "sfish_5",
+            "src": "fishes/sprites/5",
+            "ext": "png",
+            "cw": 413,
+            "ch": 65,
+            "frames": 6
+        },
+        {
+            "id": "sfish_6",
+            "src": "fishes/sprites/6",
+            "ext": "png",
+            "cw": 400,
+            "ch": 65,
+            "frames": 6
         },
         {
             "id": "fish_0",
@@ -258,6 +299,20 @@
             "ext": "png",
             "cw": 45,
             "ch": 45
+        },
+        {
+            "id": "complete",
+            "src": "hud/complete",
+            "ext": "png",
+            "cw": 185,
+            "ch": 25
+        },
+        {
+            "id": "yourscore",
+            "src": "hud/yourscore",
+            "ext": "png",
+            "cw": 197,
+            "ch": 30
         },
         {
             "id": "volume",

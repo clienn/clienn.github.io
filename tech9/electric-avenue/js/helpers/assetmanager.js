@@ -17,7 +17,7 @@ class AssetManager {
             this.assetCount += data.length;
             for (let i = 0; i < data.length; ++i) {
                 let url = 'assets/' + data[i].src + '.' + data[i].ext;
-                this.loadImage(data[i].id, url, data[i].cw, data[i].ch, null);
+                this.loadImage(data[i].id, url, data[i].cw, data[i].ch, data[i].frames ? data[i].frames : 1, null);
             }
         })
     }
@@ -106,13 +106,14 @@ class AssetManager {
         xmlHTTP.send();
     }
 
-    loadImage(id, url, cw, ch, callback) {
+    loadImage(id, url, cw, ch, frames, callback) {
         this.images[id] = {
             img: new Image(),
             cw: cw,
             ch: ch,
             completedPercentage: 0,
-            totalsize: 0
+            totalsize: 0,
+            frames: frames
         }
 
         this.load(this.images[id], url, callback);
