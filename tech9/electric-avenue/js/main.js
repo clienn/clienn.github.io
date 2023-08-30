@@ -295,8 +295,8 @@ function main(w, h) {
     addGarbage();
     addGarbage();
     addGarbage();
-    addGarbage();
-    addGarbage();
+    // addGarbage();
+    // addGarbage();
     
 
     gameCycle();
