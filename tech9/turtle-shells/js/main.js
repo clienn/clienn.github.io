@@ -397,14 +397,14 @@ const topHUD = {
         fontW: 20,
         fontH: 20,
         timecircle: {
-            w: 45,
-            h: 45,
+            w: 45 * 2,
+            h: 45 * 2,
             cw: 45,
             ch: 45,
         },
         stopwatch: {
-            w: 45,
-            h: 45,
+            w: 45 * 2,
+            h: 45 * 2,
             cw: 43,
             ch: 45,
         },
@@ -414,8 +414,8 @@ const topHUD = {
         fontW: 20,
         fontH: 20,
         turtleshine: {
-            w: 45,
-            h: 45,
+            w: 45 * 1.5,
+            h: 45 * 1.5,
             cw: 42,
             ch: 43,
         }
@@ -523,8 +523,8 @@ const topHUDInfo = {
     life: {
         x: 0,
         y: 0,
-        w: 50,
-        h: 50,
+        w: 50 * 1.5,
+        h: 50 * 1.5,
         lives: 3,
         totalW: 0,
         sx: 0,
@@ -785,16 +785,27 @@ function main(w, h) {
     TXT.addText(canvas, TEXT_ID.SCORELABEL, 'Score', 'bold', 20, 'Montserrat', w / 2, 270 * scaleY, 70, 30, '#fff', true); 
     TXT.addText(canvas, TEXT_ID.FINALSCORE, '00', 'bold', 20, 'Montserrat', w / 2, 300 * scaleY, 35, 30, '#fff', true); 
     TXT.addText(canvas, TEXT_ID.RESETMSG, 'Tap to play again.', 'bold', 20, 'Montserrat', w / 2, h / 2, 300, 50, '#fff', true); 
-    TXT.addText(canvas, TEXT_ID.TOPTIMER, '09', (isMobile ? 'normal' : 'bold'), topHUD.timer.fontS, 'Montserrat', 
-        topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2, 40 * scaleY, topHUD.timer.fontW, topHUD.timer.fontH, '#000', true); 
+    TXT.addText(canvas, TEXT_ID.TOPTIMER, '09', (isMobile ? 'normal' : 'bold'), 20, 'Montserrat', 
+        topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2, 32 * scaleY, 40, 40, '#000', true); 
+
+    // TXT.addText(canvas, TEXT_ID.SCOREX, 'x', 'normal', topHUD.score.fontS, 'Montserrat', 
+    //     w / 2, topHUDInfo.score.y + (scoreAdjY + 2) * scaleY, 20, topHUD.score.fontH, '#fff', true); 
 
     TXT.addText(canvas, TEXT_ID.SCOREX, 'x', 'normal', topHUD.score.fontS, 'Montserrat', 
-        w / 2, topHUDInfo.score.y + (scoreAdjY + 2) * scaleY, 20, topHUD.score.fontH, '#fff', true); 
+        w / 2 + 15 * scaleX, 33 * scaleY, 20, 40, '#fff', true);
 
-    TXT.addText(canvas, TEXT_ID.SCORE, '00', (isMobile ? 'normal' : 'bold'), topHUD.score.fontS, 'Montserrat', 
-        w / 2 + 50 * scaleX, topHUDInfo.score.y + scoreAdjY * scaleY, topHUD.score.fontW, topHUD.score.fontH, '#fff', true);
+    // TXT.addText(canvas, TEXT_ID.SCORE, '00', (isMobile ? 'normal' : 'bold'), topHUD.score.fontS, 'Montserrat', 
+    //     w / 2 + 50 * scaleX, topHUDInfo.score.y + scoreAdjY * scaleY, topHUD.score.fontW, topHUD.score.fontH, '#fff', true);
+
+    let scoreW = 50;
+    let scoreH = 50;
+
+    console.log(scoreW, scaleX);
+
+    TXT.addText(canvas, TEXT_ID.SCORE, '00', 'bold', 20, 'Montserrat', 
+        w / 2 + 95 * scaleX, 33 * scaleY, scoreW, scoreH, '#fff', true);
     // 
-
+    // console.log(TXT.texts[TEXT_ID.SCORE].w);
     shineInfo.w *= 1.5;
     shineInfo.h *= 1.5;
     shineInfo.x = w / 2 - shineInfo.w / 2;
@@ -1188,19 +1199,19 @@ function initTopHUD() {
         let sx = 844 / canvas.width;
         // let sy = 390 / canvas.height;
 
-        topHUDInfo.score.w = 130 + scoreAdjW;
-        topHUDInfo.score.h = 70;
-        topHUDInfo.score.pw = 195;
+        // topHUDInfo.score.w = 130 + scoreAdjW;
+        // topHUDInfo.score.h = 70;
+        // topHUDInfo.score.pw = 195;
         // topHUDInfo.score.y = 3;
 
         scoreAdjX = 12;
 
-        topHUD.score.turtleshine.w = 65;
-        topHUD.score.turtleshine.h = 65;
+        // topHUD.score.turtleshine.w = 65;
+        // topHUD.score.turtleshine.h = 65;
 
-        topHUDInfo.score.fontX = 15;
-        topHUDInfo.score.fontsize = 20;
-        topHUDInfo.score.fontsize2 = 20;
+        // topHUDInfo.score.fontX = 15;
+        // topHUDInfo.score.fontsize = 20;
+        // topHUDInfo.score.fontsize2 = 20;
         topHUDInfo.life.y = 5;
     } else {
         // topHUDInfo.timer.w = topHUD.timer.timecircle.w / 2 + 100 * scaleX;
@@ -1208,8 +1219,8 @@ function initTopHUD() {
 
     rescaleSize(topHUD.timer.timecircle);
     rescaleSize(topHUD.timer.stopwatch);
-    // rescaleSize(topHUD.score.turtleshine);
-    rescaleAll(topHUD.score.turtleshine);
+    rescaleSize(topHUD.score.turtleshine);
+    // rescaleAll(topHUD.score.turtleshine);
     
     rescaleSize(topHUDInfo);
 
@@ -1244,7 +1255,8 @@ function initTopHUD() {
     topHUDInfo.life.pad = 20 * scaleX;
     let lifeW = topHUDInfo.life.pad * 2 + topHUDInfo.life.w * topHUDInfo.life.lives;
     sx = (canvas.width - topHUDInfo.w);
-    topHUDInfo.life.x = sx + (topHUDInfo.w - lifeW) / 2;
+    // topHUDInfo.life.x = sx + (topHUDInfo.w - lifeW) / 2;
+    topHUDInfo.life.x = canvas.width - topHUDInfo.life.w * 3 - topHUDInfo.life.pad * 3;
     topHUDInfo.life.y += topHUDInfo.timer.y;
 }
 
@@ -1700,8 +1712,15 @@ function drawScoreHUD() {
     // let x = canvas.width / 2;
     // let y = topHUD.timer.timecircle.h / 2 - h / 2 + 30;
 
-    const { x, y, w, h, pw } = topHUDInfo.score;
-    const p = pw;
+    // const { x, y, w, h, pw } = topHUDInfo.score;
+    // const { x, y } = topHUDInfo.score;
+    let w = 180 * scaleX;
+    let h = 75 * scaleY;
+    let x = canvas.width / 2 - ((h / 2) + w) / 2;
+    let y = 20 * scaleY;
+    
+    // const p = pw;
+    let p = w;
     
     /* To visalize ------------------------------------------------------*/
     ctx.beginPath();
@@ -1717,7 +1736,7 @@ function drawScoreHUD() {
     ctx.beginPath();
     ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
     ctx.lineTo(w + x, 0 + y);
-    ctx.arc((h / 2) + w + x, h / 2 + y, h / 2, 3 / 2 *Math.PI,Math.PI / 2);
+    ctx.arc((h / 2) + p + x, h / 2 + y, h / 2, 3 / 2 *Math.PI,Math.PI / 2);
     ctx.lineTo(h / 2 + x, h + y);
     ctx.fillStyle = '#569E1A';
     // ctx.lineWidth = 5;
@@ -1737,7 +1756,7 @@ function drawScoreHUD() {
     // ctx.stroke();
 
     ctx.drawImage(images.turtleshine.obj.img, 0, 0, topHUD.score.turtleshine.cw, 
-        topHUD.score.turtleshine.ch, x + 5 * scaleX, y, topHUD.score.turtleshine.w, topHUD.score.turtleshine.h);
+        topHUD.score.turtleshine.ch, x + 10 * scaleX, y, topHUD.score.turtleshine.w, topHUD.score.turtleshine.h);
 
     // TM.draw(textList.scoreX.obj);
     TXT.draw(TEXT_ID.SCOREX);
@@ -1748,9 +1767,13 @@ function drawScoreHUD() {
 }
 
 function drawProgress() {
-    const { w } = topHUDInfo.timer;
+    // const { w } = topHUDInfo.timer;
+    let w = 200 * scaleX;
     // let w =
-    const { x, y, h, max } = topHUDInfo.timer.progress;
+    // const { x, y, h, max } = topHUDInfo.timer.progress;
+    const { x, max } = topHUDInfo.timer.progress;
+    let y = 35 * scaleY;
+    let h = 35 * scaleY;
     // let p = showTarget ? max * scaleX : (max * scaleX * (timer.timer / (9.0 * 24)));
     let p = showTarget ? w : (w * (timer.timer / (9.0 * 24)));
 
