@@ -43,7 +43,7 @@ class Sprite {
             ctx.drawImage(img, 0, 0, 895, 979, this.x, this.y, this.w, this.h);
             for (let i = 0; i < this.trail.length; ++i) {
                 ctx.save();
-                ctx.globalAlpha = 0.5 - i / 10;
+                ctx.globalAlpha = 0.2 - i / 10;
                 ctx.drawImage(img, 0, 0, 895, 979, this.trail[i][0], this.trail[i][1], this.w, this.h);
                 ctx.restore();
                 // console.log(this.trail[i].x)

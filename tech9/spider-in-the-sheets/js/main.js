@@ -260,8 +260,8 @@ var music = {
 var volumeInfo = {
     x: 55,
     y: 45,
-    w: 25,
-    h: 25,
+    w: 25 * 2,
+    h: 25 * 2,
     cw: 50,
     ch: 50,
 }
@@ -364,7 +364,7 @@ var textList = {
     },
     scoreN: {
         obj: null,
-        desc: TM.addTextObj('Score: 00', 'Montserrat', 'bold', 25, 0, 0, 55, 25, '#fff'),
+        desc: TM.addTextObj('Score: 00', 'Montserrat', 'bold', 25, 0, 0, 55 * 2, 25 * 2, '#fff'),
     },
     scoreLabel: {
         obj: null,
@@ -387,8 +387,8 @@ const topHUDInfo = {
         x: 0,
         y: 50,
         w: 100,
-        h: 50,
-        pw: 150,
+        h: 100,
+        pw: 300,
         fontsize: 20,
         fontsize2: 25,
         fontX: 0,
@@ -430,6 +430,9 @@ function main(w, h) {
 
     btnBegin.x = w / 2 - btnBegin.w / 2;
     btnBegin.y = h - 235 * scaleY;
+
+    // topHUDInfo.score.h *= scaleY;
+    // topHUDInfo.score.pw *= scaleX;
 
     sheetPadding.left *= scaleX;
     sheetPadding.right *= scaleX;
@@ -473,8 +476,8 @@ function main(w, h) {
         volumeInfo.w = 35;
         volumeInfo.h = 35;
 
-        textList.scoreLabel.desc.weight = 'normal';
-        textList.scoreN.desc.weight = 'normal';
+        // textList.scoreLabel.desc.weight = 'normal';
+        // textList.scoreN.desc.weight = 'normal';
         scoreAdjY = 2;
     }
 
@@ -678,9 +681,9 @@ function initTopHUD() {
     let isMobile = detectMob();
 
     if (isMobile) {
-        topHUDInfo.score.w = 130;
-        topHUDInfo.score.h = 65;
-        topHUDInfo.score.pw = 195;
+        // topHUDInfo.score.w = 130;
+        // topHUDInfo.score.h = 65;
+        // topHUDInfo.score.pw = 195;
         // topHUDInfo.score.y = 3;
 
         topHUDInfo.score.fontX = 15;
@@ -699,7 +702,9 @@ function initTopHUD() {
 
     let sx = canvas.width / 2 - topHUDInfo.w / 2;
     // topHUDInfo.score.x = sx + (topHUDInfo.w  - topHUDInfo.score.w) / 2;
-    topHUDInfo.score.x = sx + (topHUDInfo.w - topHUDInfo.score.pw) / 2;
+    // topHUDInfo.score.x = sx + (topHUDInfo.w - topHUDInfo.score.pw) / 2;
+    let pad = isMobile ? 10 : 30;
+    topHUDInfo.score.x = canvas.width / 2 - topHUDInfo.score.pw / 2 - pad * scaleX;
     topHUDInfo.score.y *= scaleY;
 
     topHUDInfo.score.fontX += topHUDInfo.score.x + (topHUDInfo.w - topHUDInfo.score.pw) / 2 + 10 * scaleX;
@@ -728,7 +733,7 @@ function drawScoreHUD() {
     ctx.beginPath();
     ctx.arc(h / 2 + x, h / 2+ y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
     ctx.lineTo(p - 2 * h + x, 0 + y);
-    ctx.arc(p - (h / 2) + x, h / 2 + y, h / 2, 3 / 2 * Math.PI,Math.PI / 2);
+    ctx.arc(p + (h / 2) + x, h / 2 + y, h / 2, 3 / 2 * Math.PI,Math.PI / 2);
     ctx.lineTo(h / 2 + x, h + y);
     ctx.fillStyle = "#9F51FE";
     ctx.fill();

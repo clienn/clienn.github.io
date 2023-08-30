@@ -232,10 +232,10 @@ var images = {
 }
 
 var volumeInfo = {
-    x: 55,
-    y: 60,
-    w: 25,
-    h: 25,
+    x: 30,
+    y: 100,
+    w: 25 * 2,
+    h: 25 * 2,
     cw: 50,
     ch: 50,
 }
@@ -435,22 +435,22 @@ var btnBegin = {
 const topHUD = {
     timer: {
         timecircle: {
-            w: 45,
-            h: 45,
+            w: 45 * 2,
+            h: 45 * 2,
             cw: 45,
             ch: 45,
         },
         stopwatch: {
-            w: 45,
-            h: 45,
+            w: 45 * 2,
+            h: 45 * 2,
             cw: 43,
             ch: 45,
         },
     },
     score: {
         turtleshine: {
-            w: 45,
-            h: 45,
+            w: 45 * 2,
+            h: 45 * 2,
             cw: 42,
             ch: 43,
         }
@@ -485,8 +485,8 @@ const topHUDInfo = {
         x: 0,
         y: 0,
         w: 100,
-        h: 50,
-        pw: 150,
+        h: 55,
+        pw: 230,
         fontsize: 20,
         fontsize2: 25,
         fontX: 0,
@@ -496,8 +496,8 @@ const topHUDInfo = {
     life: {
         x: 0,
         y: 0,
-        w: 45,
-        h: 45,
+        w: 45 * 2,
+        h: 45 * 2,
         cw: 45,
         ch: 45,
         lives: 3,
@@ -538,15 +538,15 @@ var TM = new TextManager(ctx);
 var textList = {
     topTimer: {
         obj: null,
-        desc: TM.addTextObj('09', 'Montserrat', 'bold', 20, 0, 0, 20, 20, '#000'),
+        desc: TM.addTextObj('09', 'Montserrat', 'bold', 20, 0, 0, 40, 40, '#000'),
     },
     scoreX: {
         obj: null,
-        desc: TM.addTextObj('x', 'Montserrat', 'normal', 25, 0, 0, 10, 20, '#fff'),
+        desc: TM.addTextObj('x', 'Montserrat', 'normal', 25, 0, 0, 20, 40, '#fff'),
     },
     scoreN: {
         obj: null,
-        desc: TM.addTextObj('00', 'Montserrat', 'bold', 25, 0, 0, 20, 27, '#fff'),
+        desc: TM.addTextObj('00', 'Montserrat', 'bold', 25, 0, 0, 25, 37, '#fff'),
     },
     scoreLabel: {
         obj: null,
@@ -773,8 +773,8 @@ function main(w, h) {
         volumeInfo.w = 35;
         volumeInfo.h = 35;
 
-        textList.topTimer.desc.weight = 'normal';
-        textList.scoreN.desc.weight = 'normal';
+        // textList.topTimer.desc.weight = 'normal';
+        // textList.scoreN.desc.weight = 'normal';
 
         scoreNAdjY = 2;
         
@@ -834,12 +834,23 @@ function main(w, h) {
         }
     }
 
-    textList.scoreX.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw / 2 - 5 * scaleX;
-    textList.scoreN.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw - (textList.scoreN.desc.w + 70) / 2 * scaleX;
-    textList.scoreX.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreX.desc.h * scaleY / 2);
-    textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h * scaleY / 2) - scoreNAdjY;
+    let padY = 0;
+    let padY2 = 0;
 
-    textList.topTimer.obj.tx = topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2 - (textList.topTimer.desc.w - 5) / 2 * scaleX;
+    if (isMobile) {
+        padY =  10 * scaleY;
+        padY2 = 5 * scaleY;
+    }
+
+    // textList.scoreX.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw / 2 - 5 * scaleX;
+    // textList.scoreN.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw - (textList.scoreN.desc.w + 230 * scaleX) / 2 * scaleX;
+    textList.scoreN.obj.tx = topHUDInfo.score.x + 230 * scaleX - textList.scoreN.desc.w - 30 * scaleX;
+    textList.scoreX.obj.tx = topHUDInfo.score.x + 210 * scaleX / 2
+    textList.scoreX.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreX.desc.h * scaleY / 2) - padY;
+    textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h * scaleY / 2) - scoreNAdjY - padY2;
+
+    // textList.topTimer.obj.tx = topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2 - (textList.topTimer.desc.w - 5) / 2 * scaleX;
+    textList.topTimer.obj.tx = 40 * scaleX;
     textList.topTimer.obj.ty = topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2 - textList.topTimer.desc.h / 2 * scaleY;
 
     textList.scoreLabel.obj.tx = w / 2 - textList.scoreLabel.desc.w * scaleX / 2 - 10 * scaleX;
@@ -1019,9 +1030,9 @@ function initTopHUD() {
         let sx = 844 / canvas.width;
         // let sy = 390 / canvas.height;
 
-        topHUDInfo.score.w = 130;
-        topHUDInfo.score.h = 65;
-        topHUDInfo.score.pw = 195;
+        // topHUDInfo.score.w = 130;
+        topHUDInfo.score.h = 75;
+        // topHUDInfo.score.pw = 195;
         // topHUDInfo.score.y = 3;
 
         topHUD.score.turtleshine.w = 65;
@@ -1045,9 +1056,11 @@ function initTopHUD() {
     topHUDInfo.timer.progress.x = topHUDInfo.w / 2 - topHUDInfo.timer.w / 2;
 
     topHUDInfo.timer.x = topHUDInfo.timer.progress.x - topHUD.timer.timecircle.w / 2;
+    // topHUDInfo.timer.x = 30;
     topHUDInfo.timer.y = topHUDInfo.h / 2 - topHUD.timer.timecircle.h / 2;
 
     topHUDInfo.timer.progress.y = (topHUDInfo.h / 2 - topHUDInfo.timer.progress.h / 2);
+    // topHUDInfo.timer.text.x = topHUDInfo.timer.x + topHUDInfo.timer.text.rectSize * scaleX / 2;
     topHUDInfo.timer.text.x = topHUDInfo.timer.x + topHUDInfo.timer.text.rectSize * scaleX / 2;
     topHUDInfo.timer.text.y += topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2;
     
@@ -1058,7 +1071,8 @@ function initTopHUD() {
 
     let sx = canvas.width / 2 - topHUDInfo.w / 2;
     // topHUDInfo.score.x = sx + (topHUDInfo.w  - topHUDInfo.score.w) / 2;
-    topHUDInfo.score.x = sx + (topHUDInfo.w - topHUDInfo.score.pw) / 2;
+    // topHUDInfo.score.x = sx + (topHUDInfo.w - topHUDInfo.score.pw) / 2;
+    topHUDInfo.score.x = sx + (topHUDInfo.w - 230 * scaleX) / 2;
     topHUDInfo.score.y += topHUDInfo.timer.y;
 
     topHUDInfo.score.fontX += topHUDInfo.score.x + (topHUDInfo.w - topHUDInfo.score.pw) / 2 + 10 * scaleX;
@@ -1070,7 +1084,8 @@ function initTopHUD() {
     topHUDInfo.life.pad = 20 * scaleX;
     let lifeW = topHUDInfo.life.pad * 2 + topHUDInfo.life.w * topHUDInfo.life.lives;
     sx = (canvas.width - topHUDInfo.w);
-    topHUDInfo.life.x = sx + (topHUDInfo.w - lifeW) / 2;
+    // topHUDInfo.life.x = sx + (topHUDInfo.w - lifeW) / 2;
+    topHUDInfo.life.x = canvas.width - lifeW * 1.15;
     topHUDInfo.life.y += topHUDInfo.timer.y;
 }
 
@@ -1090,9 +1105,12 @@ function drawTopHUD() {
 }
 
 function drawProgress() {
-    const { w } = topHUDInfo.timer;
-    const { x, y, h, max } = topHUDInfo.timer.progress;
-    let p = (max * scaleX * (timer.timer / (maxTimer * 24)));
+    // const { w } = topHUDInfo.timer;
+    let w = 200 * scaleX;
+    let h = 35 * scaleY;
+    // const { x, y, h, max } = topHUDInfo.timer.progress;
+    const { x, y, max } = topHUDInfo.timer.progress;
+    let p = (w * (timer.timer / (maxTimer * 24)));
 
     const grd = ctx.createLinearGradient(0, 0, 0, p);
 
@@ -1141,9 +1159,12 @@ function drawProgress() {
 }
 
 function drawScoreHUD() {
-    const { x, y, w, h, pw } = topHUDInfo.score;
-    const p = pw;
 
+    const { x, y, w, h, pw } = topHUDInfo.score;
+    // const { x, y, w, pw } = topHUDInfo.score;
+    // let h = 55 * scaleY;
+    // const p = 230 * scaleX;
+    const p = pw;
     ctx.beginPath();
     ctx.arc(h / 2 + x, h / 2+ y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
     ctx.lineTo(p - 2 * h + x, 0 + y);
@@ -1155,7 +1176,7 @@ function drawScoreHUD() {
     ctx.stroke();
 
     ctx.drawImage(images.compass.obj.img, 0, 0, compassInfo.cw, 
-        compassInfo.ch, compassInfo.x, compassInfo.y, compassInfo.w, compassInfo.h);
+        compassInfo.ch, compassInfo.x, compassInfo.y, compassInfo.w * 1.25, compassInfo.h * 1.25);
 
     TM.draw(textList.scoreX.obj);
     score = Math.max(0, score);
@@ -1822,7 +1843,7 @@ function gameCycle() {
                 // Untransformed draw position
                 const position = {x: startPageInfo.hand.x, y: startPageInfo.hand.y};
                 // In degrees
-                const rotation = { x: 0, y: Math.sin(startScreenHandAnimT) * 25, z: 0};
+                const rotation = { x: 0, y: Math.sin(startScreenHandAnimT) * 35, z: 0};
                 // Rotation relative to here (this is the center of the image)
                 const rotPt = { x: startPageInfo.hand.w / 2, y: startPageInfo.hand.h / 2 };
 
