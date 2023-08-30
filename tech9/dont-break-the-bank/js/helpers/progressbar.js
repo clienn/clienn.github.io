@@ -10,9 +10,9 @@ class ProgressBar {
 
     }
 
-    draw(ctx, tmpW) {
+    draw(ctx) {
         const { x, y, w, h } = this;
-        let p = this.progress;
+        let p = w * (this.progress / 100);
         var grd = null;
         ctx.save();
         if (this.color) {
@@ -36,16 +36,16 @@ class ProgressBar {
                 grd.addColorStop(1, "#fb2121");
             }
         }
-        if (!tmpW) tmpW = w;
         
+
         /* To visalize ------------------------------------------------------*/
         ctx.beginPath();
         ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 * Math.PI);
         ctx.lineTo(w + x, y);
-        ctx.arc((h / 2) + tmpW + x, h / 2 + y, h / 2, 3 / 2 * Math.PI, Math.PI / 2);
+        ctx.arc((h / 2) + w + x, h / 2 + y, h / 2, 3 / 2 * Math.PI, Math.PI / 2);
         ctx.lineTo(h / 2 + x, h + y);
         ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 5;
         ctx.stroke();
         ctx.closePath();
         /* ------------------------------------------------------------------*/
@@ -53,7 +53,7 @@ class ProgressBar {
         ctx.beginPath();
         ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 * Math.PI);
         ctx.lineTo(w + x, y);
-        ctx.arc((h / 2) + this.progress + x, h / 2 + y, h / 2, 3 / 2 * Math.PI, Math.PI / 2);
+        ctx.arc((h / 2) + p + x, h / 2 + y, h / 2, 3 / 2 * Math.PI, Math.PI / 2);
         ctx.lineTo(h / 2 + x, h + y);
         ctx.fillStyle = grd;
         ctx.fill();
@@ -63,7 +63,7 @@ class ProgressBar {
     }
 
     update(delta, progress) {
-        this.progress = this.w * (progress / 100);
+        this.progress = 100 * (progress / 100);
     }
 
     // drawProgress() {

@@ -73,6 +73,7 @@ var kaboomInfo = {
 
 // srpite containers
 var pig = null;
+var smoke = null;
 var balls = [];
 const moneyList = [];
 const coins = [];
@@ -205,9 +206,9 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
-    if (isMobile()) {
-        F = 15;
-    }
+    // if (isMobile()) {
+    //     F = 15;
+    // }
     F *= scaleX;
 
     initStartPage();
@@ -231,6 +232,7 @@ function main(w, h) {
     rescaleSize(kaboomInfo, scaleX, scaleY);
 
     pig = new Sprite(w / 2 - pigInfo.w / 2, h - pigInfo.h - 10, pigInfo.w, pigInfo.h, AM.images.pig_1.cw, AM.images.pig_1.ch);
+    smoke = new Sprite(w / 2 - pigInfo.w / 2, h - pigInfo.h - 10, pigInfo.w, pigInfo.h, 192, 192);
     kaboom = new StaticSprite(0, 0, kaboomInfo.w, kaboomInfo.h, 0, 0, AM.images.kaboom.cw, AM.images.kaboom.ch, 'kaboom');
     kaboomstar = new StaticSprite(0, 0, kaboomInfo.w * 2, kaboomInfo.h * 2, 0, 0, AM.images.kaboomstar.cw, AM.images.kaboomstar.ch, 'kaboomstar');
 
@@ -560,18 +562,31 @@ function drawPig() {
 }
 
 function drawPigBreak() {
-    pig.t += 5 * delta;
+    pig.t += 15 * delta;
     let frame = Math.floor(pig.t);
 
-    if (frame > 4) frame = 4;
+    // if (frame > 4) frame = 4;
+    
 
 
     // pig.t += 10 * delta;
     // let frame = Math.floor(pig.t) % 5 + 1;
     
     // pig.draw(ctx, AM.images['pig_' + frame].img);
-    let id = 'pigbreak_' + frame;
-    pig.dynamicDrawRotate(ctx, AM.images[id].img, AM.images[id].cw, AM.images[id].ch);
+    // let id = 'pigbreak_' + frame;
+    // pig.dynamicDrawRotate(ctx, AM.images[id].img, AM.images[id].cw, AM.images[id].ch);
+    if (frame < 9) {
+        smoke.x = pig.x;
+        smoke.y = pig.y;
+
+        let clipX = frame % 3;
+        let clipY = Math.floor(frame / 3);
+
+        smoke.clipX = clipX * 192;
+        smoke.clipY = clipY * 192;
+        
+        smoke.draw(ctx, AM.images.smoke.img);
+    }
     
 }
 
@@ -716,9 +731,11 @@ function resetHammer(i) {
 function addGlue() {
     if (glues.length < glueLimit) {
         // let id = 'hammer_' + (Math.floor(Math.random() * 3) + 1);
-        let id = 'glue_' + (Math.floor(Math.random() * 2) + 1);
+        // let id = 'glue_' + (Math.floor(Math.random() * 2) + 1);
+        let id = 'glue_0';
 
-        let glue = new Sprite(glues.length * glueInfo.w, 0, glueInfo.w, glueInfo.w, AM.images[id].cw, AM.images[id].ch);
+        // let glue = new Sprite(glues.length * glueInfo.w, 0, glueInfo.w, glueInfo.w, AM.images[id].cw, AM.images[id].ch);
+        let glue = new Sprite(glues.length * glueInfo.w, 0, glueInfo.w, glueInfo.w, 80.25, 83);
         glue.id = id;
         glue.x = Math.floor(Math.random() * (canvas.width - glue.w));
         glue.dropSpeed = Math.floor(Math.random() * 15) + 1;
@@ -731,6 +748,10 @@ function addGlue() {
 
 function drawGlues() {
     for (let i = 0; i < glues.length; ++i) {
+        glues[i].t += 10 * delta;
+        let frame = Math.floor(glues[i].t) % 4;
+        let clipX = frame * 80.25;
+        glues[i].clipX = clipX;
         glues[i].draw(ctx, AM.images[glues[i].id].img);
     }
 }
@@ -740,7 +761,8 @@ function resetGlue(i) {
     glues[i].x = Math.floor(Math.random() * (canvas.width - glues[i].w));
     glues[i].y = -glues[i].h * glues[i].dropSpeed;
     glues[i].vy = 0;
-    glues[i].id = 'glue_' + (Math.floor(Math.random() * 2) + 1);
+    // glues[i].id = 'glue_' + (Math.floor(Math.random() * 2) + 1);
+    // glues[i].id = 'glue_0';
 }
 
 function drawKaboom() {

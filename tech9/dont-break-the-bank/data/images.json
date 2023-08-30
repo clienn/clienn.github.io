@@ -79,6 +79,13 @@
             "ch": 417
         },
         {
+            "id": "smoke",
+            "src": "pig/break/smoke",
+            "ext": "png",
+            "cw": 576,
+            "ch": 577
+        },
+        {
             "id": "piggybankbroke",
             "src": "piggybankbroke",
             "ext": "png",
@@ -175,6 +182,13 @@
             "ext": "png",
             "cw": 46,
             "ch": 46
+        },
+        {
+            "id": "glue_0",
+            "src": "glue_0",
+            "ext": "png",
+            "cw": 80,
+            "ch": 83
         },
         {
             "id": "glue_1",
