@@ -381,12 +381,12 @@ var shineInfo = {
     cw: 352,
     ch: 290,
 }
-
+// 35 * scaleX, volumeInfo.y + 50 * scaleY, volumeInfo.w * 2, volumeInfo.h * 2
 var volumeInfo = {
-    x: 55,
-    y: 60,
-    w: 25,
-    h: 25,
+    x: 35,
+    y: 100,
+    w: 25 * 2,
+    h: 25 * 2,
     cw: 50,
     ch: 50,
 }
@@ -726,10 +726,10 @@ function main(w, h) {
 
         scoreAdjY = 20;
 
-        volumeInfo.x = 45;
-        volumeInfo.y = 85;
-        volumeInfo.w = 35;
-        volumeInfo.h = 35;
+        // volumeInfo.x = 45;
+        // volumeInfo.y = 85;
+        // volumeInfo.w = 35;
+        // volumeInfo.h = 35;
 
         topHUD.timer.fontS = 30;
         topHUD.timer.fontW = 30;
@@ -781,18 +781,19 @@ function main(w, h) {
     TXT.addText(canvas, TEXT_ID.CORRECT, 'Correct!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
     TXT.addText(canvas, TEXT_ID.WRONG, 'Wrong!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
     TXT.addText(canvas, TEXT_ID.TOOSLOW, 'Too Slow!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
-    TXT.addText(canvas, TEXT_ID.COMPLETE, 'Complete!', 'bold', 20, 'Montserrat', w / 2, 75 * scaleY, 200, 40, '#fff', true); 
-    TXT.addText(canvas, TEXT_ID.SCORELABEL, 'Score', 'bold', 20, 'Montserrat', w / 2, 270 * scaleY, 70, 30, '#fff', true); 
-    TXT.addText(canvas, TEXT_ID.FINALSCORE, '00', 'bold', 20, 'Montserrat', w / 2, 300 * scaleY, 35, 30, '#fff', true); 
-    TXT.addText(canvas, TEXT_ID.RESETMSG, 'Tap to play again.', 'bold', 20, 'Montserrat', w / 2, h / 2, 300, 50, '#fff', true); 
+    TXT.addText(canvas, TEXT_ID.COMPLETE, 'Complete!', 'bold', 20, 'Montserrat', w / 2, 55 * scaleY, 300, 70, '#fff', true); 
+    TXT.addText(canvas, TEXT_ID.SCORELABEL, 'Score', 'bold', 20, 'Montserrat', w / 2, 270 * scaleY, 100, 50, '#fff', true); 
+    TXT.addText(canvas, TEXT_ID.FINALSCORE, '00', 'bold', 20, 'Montserrat', w / 2, 320 * scaleY, 65, 60, '#fff', true); 
+    TXT.addText(canvas, TEXT_ID.RESETMSG, 'Tap to play again.', 'bold', 20, 'Montserrat', w / 2, h / 2, 600, 100, '#fff', true); 
     TXT.addText(canvas, TEXT_ID.TOPTIMER, '09', (isMobile ? 'normal' : 'bold'), 20, 'Montserrat', 
-        topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2, 32 * scaleY, 40, 40, '#000', true); 
+        topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2, 29 * scaleY, 40, 40, '#000', true); 
 
     // TXT.addText(canvas, TEXT_ID.SCOREX, 'x', 'normal', topHUD.score.fontS, 'Montserrat', 
     //     w / 2, topHUDInfo.score.y + (scoreAdjY + 2) * scaleY, 20, topHUD.score.fontH, '#fff', true); 
 
+    let scoreLabelY = isMobile ? 30 * scaleY : 37 * scaleY;
     TXT.addText(canvas, TEXT_ID.SCOREX, 'x', 'normal', topHUD.score.fontS, 'Montserrat', 
-        w / 2 + 15 * scaleX, 33 * scaleY, 20, 40, '#fff', true);
+        w / 2 + 15 * scaleX, scoreLabelY, 20, 40, '#fff', true);
 
     // TXT.addText(canvas, TEXT_ID.SCORE, '00', (isMobile ? 'normal' : 'bold'), topHUD.score.fontS, 'Montserrat', 
     //     w / 2 + 50 * scaleX, topHUDInfo.score.y + scoreAdjY * scaleY, topHUD.score.fontW, topHUD.score.fontH, '#fff', true);
@@ -800,10 +801,10 @@ function main(w, h) {
     let scoreW = 50;
     let scoreH = 50;
 
-    console.log(scoreW, scaleX);
+    let scoreY = isMobile ? 23 * scaleY : 33 * scaleY;
 
     TXT.addText(canvas, TEXT_ID.SCORE, '00', 'bold', 20, 'Montserrat', 
-        w / 2 + 95 * scaleX, 33 * scaleY, scoreW, scoreH, '#fff', true);
+        w / 2 + 95 * scaleX, scoreY, scoreW, scoreH, '#fff', true);
     // 
     // console.log(TXT.texts[TEXT_ID.SCORE].w);
     shineInfo.w *= 1.5;
@@ -858,7 +859,7 @@ function main(w, h) {
                 // turtles[2].goto(-2);
                 if (isBtnClicked(mx, my, {
                     x: volumeInfo.x,
-                    y: volumeInfo.y + topHUDInfo.timer.y,
+                    y: volumeInfo.y,
                     w: volumeInfo.w,
                     h: volumeInfo.h
                 })) {
@@ -1663,7 +1664,7 @@ function drawTopHUD() {
     }
 
     ctx.drawImage(images[volumeKey].obj.img, 0, 0, volumeInfo.cw, 
-        volumeInfo.ch, volumeInfo.x, volumeInfo.y + y, volumeInfo.w, volumeInfo.h);
+        volumeInfo.ch, volumeInfo.x, volumeInfo.y, volumeInfo.w, volumeInfo.h);
     
     // ctx.font = 'bold ' + topHUDInfo.timer.text.fontsize + 'px Montserrat';
     // ctx.fillStyle = 'black';
