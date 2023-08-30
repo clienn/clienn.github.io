@@ -50,7 +50,7 @@ var garbageDropSpeed = 500;
 // physics
 var forceD = 0;
 var friction = 0.98;
-var F = 750;
+var F = 550;
 var T = 0;
 var G = 9.8;
 var kaboomT = 0;
@@ -458,6 +458,8 @@ function drawSmartFishes() {
 }
 
 function displaySchool() {
+    ctx.save();
+    ctx.globalAlpha = 0.4;
     for (let i = 0; i < schools.length; ++i) {
         let flag = true;
         let flag2 = true;
@@ -517,6 +519,7 @@ function displaySchool() {
         }
         
     }
+    ctx.restore();
 }
 
 function mutateSchool(idx) {
