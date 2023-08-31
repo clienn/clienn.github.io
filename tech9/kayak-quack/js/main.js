@@ -186,6 +186,13 @@ var kayakBounds = {
     right: 0,
 }
 
+var bunnies = [];
+var bunnyInfo = {
+    w: 40.125 * 1.5,
+    h: 46.71 * 1.5,
+    clipX: [18.55, 53.55, 87.55, 127.55, 172.55, 205.55, 237.55, 271.55]
+}
+
 // pool - 606px
 // rect - 12px, 6px
 // total width - 926px
@@ -237,7 +244,9 @@ function main(w, h) {
         parallaxInfo.tile.yPos[i] = parallaxInfo.tile.startY + i * parallaxInfo.tile.h;
     }
 
+    rescaleSize(bunnyInfo, scaleX, scaleY);
     rescaleSize(kayakInfo, scaleX, scaleY);
+    
     kayak = new Sprite(w / 2 - kayakInfo.w / 2, h - kayakInfo.h * 1.25, kayakInfo.w, kayakInfo.h, AM.images.kayak.cw, AM.images.kayak.ch);
 
     setFishInfo(scaleX, scaleY, 2.5);
@@ -284,11 +293,78 @@ function main(w, h) {
     addPlank(1, 1, 1);
     addPlank(2, 0, 2);
     
+    addBunny(1, 0);
+    addBunny(1, 0);
+    addBunny(5, 0);
+
+    addBunny(6, 1);
+    addBunny(7, 1);
+
+
     gameCycle();
 }
 
-function updateWaterObject(idx) {
+function addBunny(posY, id) {
+    let cw = 37;
+    let ch = 41;
+    // let id = Math.floor(Math.random() * 2);
 
+    let x = 0;
+    if (id) {
+        x = canvas.width + bunnyInfo.w;
+    }
+
+    let bunny = new Sprite(x, posY * parallaxInfo.tile.h, bunnyInfo.w, bunnyInfo.h, cw, ch);
+    bunny.clipX = bunnyInfo.clipX[0];
+    bunny.clipY = (5 * ch) + 5;
+    let direction = Math.floor(Math.random() * 2) ? 1 : -1;
+    bunny.vy = parallaxInfo.tile.moveSpeed;
+    bunny.setDirection(direction);
+    bunny.setRandomSpeed(100, 50);
+
+    bunny.id = id;
+
+    bunnies.push(bunny);
+}
+
+function drawBunnies() {
+    for (let i = 0; i < bunnies.length; ++i) {
+        bunnies[i].swim(ctx, AM.images.bunny.img);
+        bunnies[i].updatePos(delta, 1);
+
+        bunnies[i].t += 10 * delta;
+        let frame = Math.floor(bunnies[i].t) % 8;
+        bunnies[i].clipX = bunnyInfo.clipX[frame];
+
+        if (bunnies[i].id == 0) {
+            if (
+                (bunnies[i].facing == 1 && bunnies[i].x >= parallaxInfo.water.x - bunnies[i].w) || 
+                (bunnies[i].facing == -1 && bunnies[i].x <= -bunnies[i].w * 2)
+            ) {
+                bunnies[i].setDirection(bunnies[i].facing * -1);
+                bunnies[i].setRandomSpeed(100, 50);
+    
+                if (bunnies[i].x < 0) {
+                    let rngY = Math.floor(Math.random() * parallaxInfo.tile.rows);
+                    bunnies[i].y = rngY * parallaxInfo.tile.h;
+                }
+            }
+        } else {
+            if (
+                (bunnies[i].facing == 1 && bunnies[i].x >= canvas.width + bunnies[i].w * 2) || 
+                (bunnies[i].facing == -1 && bunnies[i].x <= parallaxInfo.water.x + parallaxInfo.water.w)
+            ) {
+                bunnies[i].setDirection(bunnies[i].facing * -1);
+                bunnies[i].setRandomSpeed(100, 50);
+    
+                if (bunnies[i].x > canvas.width) {
+                    let rngY = Math.floor(Math.random() * parallaxInfo.tile.rows);
+                    bunnies[i].y = rngY * parallaxInfo.tile.h;
+                }
+            }
+        }
+        
+    }
 }
 
 function addPlank(id, direction, rngY) {
@@ -507,6 +583,7 @@ function parallaxBG() {
     ctx.fillRect(parallaxInfo.borders[2].x, parallaxInfo.borders[2].y, parallaxInfo.borders[2].w, parallaxInfo.borders[2].h);
     ctx.fillRect(parallaxInfo.borders[2].x + parallaxInfo.borders[2].gap, parallaxInfo.borders[2].y, parallaxInfo.borders[2].w, parallaxInfo.borders[2].h);
    
+    
     // land tiles
     for (let i = 0; i < parallaxInfo.tile.rows; ++i) {
         for (let j = 0; j < parallaxInfo.tile.cols; ++j) {
@@ -950,6 +1027,7 @@ function gameCycle() {
             
             // HUD.draw(ctx);  
             parallaxBG();
+            drawBunnies();
             // drawTerrain();
             // drawWaterObject(plankInfo, 1, 0);
             drawWaterObjects();

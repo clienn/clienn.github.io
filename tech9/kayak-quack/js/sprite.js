@@ -81,16 +81,14 @@ class Sprite {
 
     drawWithRotation(ctx, img, left, right) {
         // let angle = Math.atan2(this.y - this.oy, this.x - this.ox) * 180 / Math.PI;
-        let mul = 1;
-        if (this.vx < 0) {
-            mul = -1;
-        }
 
         let w = right - left;
         let hw = w / 2;
         let percentage = Math.abs(this.ox - this.x) / hw;
 
-        let angle = 45 * mul * percentage;
+        let angle = 45 * percentage;
+
+        if (this.x < this.ox) angle *= -1;
         // let angle = Math.atan2(oy - py, ox - px) * 180 / Math.PI;
         // if (angle >= 105) angle -= 90;
         // else angle -= 90;
@@ -117,7 +115,7 @@ class Sprite {
     }
 
     swim(ctx, img) {
-        let frame = Math.floor(this.t) % this.frames;
+        // let frame = Math.floor(this.t) % this.frames;
         // console.log(frame * this.cw);
         ctx.save();
         // Untransformed draw position
@@ -132,7 +130,7 @@ class Sprite {
             .rotateSelf(rotation.x, rotation.y, rotation.z)
         );
         
-        ctx.drawImage(img, frame * this.clipW, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
+        ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
         ctx.restore();
     }
 
