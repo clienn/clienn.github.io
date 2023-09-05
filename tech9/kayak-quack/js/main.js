@@ -65,38 +65,58 @@ var score = 0;
 var gameDuration = 90;
 
 
-// var startPage = {
-//     title: {
-//         x: 0,
-//         y: 10,
-//         w: 467 * 2,
-//         h: 160 * 2,
-//     },
-//     sub_title: {
-//         x: 0,
-//         y: 25,
-//         w: 366 * 2,
-//         h: 19 * 2,
-//     },
-//     text1: {
-//         x: 400,
-//         y: 0,
-//         w: 94 * 2,
-//         h: 34 * 2,
-//     },
-//     text2: {
-//         x: 780,
-//         y: 0,
-//         w: 124 * 2,
-//         h: 34 * 2,
-//     },
-//     text3: {
-//         x: 1200,
-//         y: 0,
-//         w: 154 * 2,
-//         h: 37 * 2,
-//     },
-// }
+var startPage = {
+    title: {
+        x: 0,
+        y: 10,
+        w: 467 * 2,
+        h: 160 * 2,
+    },
+    sub_title: {
+        x: 0,
+        y: 25,
+        w: 366 * 2,
+        h: 19 * 2,
+    },
+    duck: {
+        x: 440,
+        y: 320,
+        w: 76 * 2,
+        h: 65 * 2,
+        t: 0,
+        dist: 50,
+    },
+    hourglass: {
+        x: 820,
+        y: 320,
+        w: 65 * 2,
+        h: 65 * 2,
+    },
+    rock: {
+        x: 1210,
+        y: 320,
+        w: 65 * 2,
+        h: 65 * 2,
+    },
+    text1: {
+        x: 360,
+        y: 470,
+        w: 157 * 2,
+        h: 27 * 2,
+    },
+    text2: {
+        x: 740,
+        y: 470,
+        w: 159 * 2,
+        h: 25 * 2,
+    },
+    text3: {
+        x: 1130,
+        y: 470,
+        w: 153 * 2,
+        h: 27 * 2,
+    },
+}
 
 var fishInfo = {};
 
@@ -193,6 +213,8 @@ var bunnyInfo = {
     clipX: [18.55, 53.55, 87.55, 127.55, 172.55, 205.55, 237.55, 271.55]
 }
 
+var currentTop = 0;
+
 // pool - 606px
 // rect - 12px, 6px
 // total width - 926px
@@ -213,7 +235,7 @@ function main(w, h) {
     scaleX = w / 1792;
     scaleY = h / 922;
 
-    console.log(12 / scaleX)
+    // console.log(12 / scaleX)
 
     G *= scaleY;
     F *= scaleX;
@@ -250,7 +272,7 @@ function main(w, h) {
     kayak = new Sprite(w / 2 - kayakInfo.w / 2, h - kayakInfo.h * 1.25, kayakInfo.w, kayakInfo.h, AM.images.kayak.cw, AM.images.kayak.ch);
 
     setFishInfo(scaleX, scaleY, 2.5);
-    // initStartPage();
+    initStartPage();
 
     // rescaleSize(eelInfo.head, scaleX, scaleY);
 
@@ -415,8 +437,15 @@ function addDuck() {
 function drawWaterObjects() {
     for (let i = 0; i < waterObjectRows.length; ++i) {
         let idx = waterObjectRows[i];
+
         if (idx > -1) {
             waterObjects[idx].swim(ctx, AM.images[waterObjects[idx].key].img);
+
+            if (checkAngledCollisions(kayak, waterObjects[idx])) {
+                waterObjects[idx].y = parallaxInfo.tile.yPos[currentTop];
+                waterObjectRows[i] = -1;
+            }
+            
         }
         
     }
@@ -435,6 +464,8 @@ function drawWaterObjects() {
                 waterObjects[i].setRandomSpeed(100, 50);
             }
         }
+
+        
     }
 }
 
@@ -447,40 +478,41 @@ function updateWaterObject(rngY) {
 
     let idx = -1;
     for (let i = 0; i < waterObjects.length; ++i) {
-        if (waterObjects[i].id == rngY) {
+       if (waterObjects[i].id == rngY) {
             idx = i;
-            break;
-        }
-    }
-
-    if (rng) {
-        let count = 0;
-        for (let i = 0; i < waterObjectRows.length; ++i) {
-            if (waterObjectRows[i] > -1) {
-                ++count;
+            if (rng) {
+                let count = 0;
+                for (let j = 0; j < waterObjectRows.length; ++j) {
+                    if (waterObjectRows[j] > -1) {
+                        ++count;
+                    }
+                }
+        
+                if (count < waterObjects.length) {
+                    // if (waterObjects[count].key == 'duck') {
+                    //     let rngX = Math.floor(Math.random() * parallaxInfo.water.w);
+                    //     waterObjects[count].x = parallaxInfo.water.x + rngX;
+                    // }
+                    if (idx < 0) idx = 0;
+        
+                    // waterObjects[idx].y = parallaxInfo.tile.yPos[rngY];
+                    
+                    // waterObjects[idx].id = rngY;
+                    waterObjectRows[rngY] = idx;
+                    
+                }
+            } else {
+                waterObjectRows[rngY] = -1;
+        
+                // if (idx > -1) {
+                //     waterObjects[idx].id = Math.floor(Math.random() * parallaxInfo.tile.rows);
+                // }
             }
+            // break;
         }
-
-        if (count < waterObjects.length) {
-            // if (waterObjects[count].key == 'duck') {
-            //     let rngX = Math.floor(Math.random() * parallaxInfo.water.w);
-            //     waterObjects[count].x = parallaxInfo.water.x + rngX;
-            // }
-            if (idx < 0) idx = 0;
-
-            // waterObjects[idx].y = parallaxInfo.tile.yPos[rngY];
-            
-            // waterObjects[idx].id = rngY;
-            waterObjectRows[rngY] = idx;
-            
-        }
-    } else {
-        waterObjectRows[rngY] = -1;
-
-        // if (idx > -1) {
-        //     waterObjects[idx].id = Math.floor(Math.random() * parallaxInfo.tile.rows);
-        // }
     }
+
+    
     
 }
 
@@ -614,6 +646,7 @@ function updateParallax() {
             parallaxInfo.tile.yPos[i] = (parallaxInfo.tile.yPos[(i + 1) % parallaxInfo.tile.rows] + v) - parallaxInfo.tile.h;
             generateTerrain(i);
             updateWaterObject(i);
+            currentTop = i;
         }
     }
 }
@@ -813,16 +846,18 @@ function initStartPage() {
         startPage[k].h *= scaleY;
     }
 
-    startPage.title.x = canvas.width / 2 - startPage.title.w / 2;
-    startPage.sub_title.x = canvas.width / 2 - startPage.sub_title.w / 2;
-    // startPage.sub_title.x = 0;
-    startPage.sub_title.y += startPage.title.y + startPage.title.h ;
+    startPage.duck.dist *= scaleX;
+
+    // startPage.title.x = canvas.width / 2 - startPage.title.w / 2;
+    // startPage.sub_title.x = canvas.width / 2 - startPage.sub_title.w / 2;
+    // // startPage.sub_title.x = 0;
+    // startPage.sub_title.y += startPage.title.y + startPage.title.h ;
     // startPage.sub_title.y = 0;
 
-    for (let i = 1; i < 4; ++i) {
-        let key = 'text' + i;
-        startPage[key].y = startPage.sub_title.y + 140 * scaleY;
-    }
+    // for (let i = 1; i < 4; ++i) {
+    //     let key = 'text' + i;
+    //     startPage[key].y = startPage.sub_title.y + 140 * scaleY;
+    // }
 
     
 }
@@ -980,9 +1015,103 @@ function playScore() {
 /*
  * GAME UPDATES AND CYCLES
  */
+// function drawStartPage() {
+//     // ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
+//     ctx.drawImage(AM.images.bg.img, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 0, 0, canvas.width, canvas.height);
+//     ctx.drawImage(AM.images.title.img, 0, 0, AM.images.title.cw, AM.images.title.ch, startPage.title.x, startPage.title.y, startPage.title.w, startPage.title.h);
+//     ctx.drawImage(AM.images.sub_title.img, 0, 0, AM.images.sub_title.cw, AM.images.sub_title.ch, startPage.sub_title.x, startPage.sub_title.y, startPage.sub_title.w, startPage.sub_title.h);
+    
+//     for (let i = 1; i < 4; ++i) {
+//         let key = 'text' + i;
+//         ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, startPage[key].x, startPage[key].y, startPage[key].w, startPage[key].h);
+//     }
+
+//     let id = 2;
+//     let key = 'sfish_' + id;
+//     let fw = 102.9 * scaleX;
+//     let fh = 81 * scaleY;
+//     let frame = Math.floor(T) % 10;
+//     ctx.drawImage(AM.images[key].img, 102.9 * frame, 0, 102.9, AM.images[key].ch, startPage['text1'].x - fw * 1.1, startPage['text1'].y - fh * 0.15, fw, fh);
+    
+//     id = 9;
+//     key = 'garbage_' + id;
+//     let x = startPage['text2'].x - garbageInfo[id].w;
+//     let y = startPage['text1'].y - garbageInfo[id].h * 0.25;
+//     ctx.save();
+//     // Untransformed draw position
+//     const position = {x: x, y: y};
+//     // In degrees
+//     const rotation = { x: 0, y: 0, z: Math.sin(T) * 15};
+//     // Rotation relative to here (this is the center of the image)
+//     const rotPt = { x: garbageInfo[id].w / 2, y: garbageInfo[id].h / 2 };
+
+//     ctx.setTransform(new DOMMatrix()
+//         .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+//         .rotateSelf(rotation.x, rotation.y, rotation.z)
+//     );
+    
+//     // ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
+//     ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, -rotPt.x, -rotPt.y, garbageInfo[id].w, garbageInfo[id].h);
+//     ctx.restore();
+    
+    
+//     HUD.drawMiniBattery(ctx);
+
+//     let startBtnW = AM.images.start.cw * 2 * scaleX;
+//     let startBtnH = AM.images.start.ch * 2 * scaleY;
+
+//     ctx.drawImage(AM.images.start.img, 0, 0, AM.images.start.cw, AM.images.start.ch, canvas.width / 2 - startBtnW / 2, canvas.height - startBtnH * 2, startBtnW, startBtnH);
+
+//     if (delta < 1) {
+//         T += 10 * delta;
+//         HUD.decayMiniBattery(delta);
+//     }
+    
+// }
+
+function drawRotate(obj, key, ax, ay, yRot, zRot) {
+    ctx.save();
+    // Untransformed draw position
+    const position = {x: obj.x + ax, y: obj.y + ay};
+    // In degrees
+    const rotation = { x: 0, y: yRot, z: zRot};
+    // Rotation relative to here (this is the center of the image)
+    const rotPt = { x: obj.w / 2, y: obj.h / 2 };
+
+    ctx.setTransform(new DOMMatrix()
+        .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+        .rotateSelf(rotation.x, rotation.y, rotation.z)
+    );
+    
+    // ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
+    // ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, -rotPt.x, -rotPt.y, garbageInfo[id].w, garbageInfo[id].h);
+    ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, -rotPt.x, -rotPt.y, startPage.duck.w, startPage.duck.h);
+    ctx.restore();
+}
 
 function drawStartPage() {
+    startPage.duck.t += 3 * delta;
+    let sine = Math.sin(startPage.duck.t);
+    let a = sine * startPage.duck.dist;
+    let duckRot = 0;
+    if (a < 0) duckRot = 180;
+
     ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
+
+    for (let i = 1; i < 4; ++i) {
+        let key = 'text' + i;
+        ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, startPage[key].x, startPage[key].y, startPage[key].w, startPage[key].h);
+    }
+
+    drawRotate(startPage.duck, 'splash_duck', a, 0, 0, 0);
+    drawRotate(startPage.hourglass, 'splash_hourglass', 0, 0, 0, sine * 180);
+    drawRotate(startPage.rock, 'splash_rock', 0, a, 0, 0);
+    
+    
+    // ctx.drawImage(AM.images.splash_hourglass.img, 0, 0, AM.images.splash_hourglass.cw, AM.images.splash_hourglass.ch, startPage.hourglass.x, startPage.hourglass.y, startPage.hourglass.w, startPage.hourglass.h);
+    // ctx.drawImage(AM.images.splash_rock.img, 0, 0, AM.images.splash_rock.cw, AM.images.splash_rock.ch, startPage.rock.x, startPage.rock.y, startPage.rock.w, startPage.rock.h);
+
+    
 }
 
 function reset() {

@@ -95,7 +95,7 @@ class Sprite {
         
         // if (angle > 80) angle = 80;
         // else if (angle < -80) angle = -80;
-        console.log(angle)
+        // console.log(angle)
         ctx.save();
         // Untransformed draw position
         const position = {x: this.x, y: this.y};

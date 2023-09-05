@@ -8,6 +8,48 @@
             "ch": 429
         },
         {
+            "id": "splash_duck",
+            "src": "splash/duck",
+            "ext": "png",
+            "cw": 76,
+            "ch": 65
+        },
+        {
+            "id": "splash_hourglass",
+            "src": "splash/hourglass",
+            "ext": "png",
+            "cw": 65,
+            "ch": 65
+        },
+        {
+            "id": "splash_rock",
+            "src": "splash/rock",
+            "ext": "png",
+            "cw": 65,
+            "ch": 65
+        },
+        {
+            "id": "text1",
+            "src": "splash/text1",
+            "ext": "png",
+            "cw": 157,
+            "ch": 27
+        },
+        {
+            "id": "text2",
+            "src": "splash/text2",
+            "ext": "png",
+            "cw": 159,
+            "ch": 25
+        },
+        {
+            "id": "text3",
+            "src": "splash/text3",
+            "ext": "png",
+            "cw": 153,
+            "ch": 27
+        },
+        {
             "id": "kayak",
             "src": "kayak",
             "ext": "png",
