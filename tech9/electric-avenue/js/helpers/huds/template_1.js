@@ -86,9 +86,11 @@ class Template_1 {
         this.mini_battery_top.x = this.mini_battery_rect.x + this.mini_battery_rect.w / 2 - this.mini_battery_top.w / 2;
         this.mini_battery_logo.x = this.mini_battery_rect.x + this.mini_battery_rect.w / 2 - this.mini_battery_logo.w / 2;
         this.mini_battery_charge_lime.x = this.mini_battery_rect.x + 2.5 * sx;
+        this.mini_battery_charge_red.x = this.mini_battery_charge_lime.x;
 
         this.mini_battery_rect.y = 480 * sy;
         this.mini_battery_charge_lime.y = this.mini_battery_rect.y + 4 * sy;
+        this.mini_battery_charge_red.y = this.mini_battery_charge_lime.y;
         this.mini_battery_top.y = this.mini_battery_rect.y - this.mini_battery_top.h;
         this.mini_battery_logo.y = this.mini_battery_rect.y + this.mini_battery_rect.h / 2 - this.mini_battery_logo.h / 2;
         // this.mini_chargeY = this.mini_battery_charge_lime.y;
@@ -136,13 +138,20 @@ class Template_1 {
         this.mini_battery_top = new StaticSprite(0, 0, AM.images.battery_top.cw * mul, AM.images.battery_top.ch * mul, 0, 0, AM.images.battery_top.cw, AM.images.battery_top.ch, 'battery_top');
         this.mini_battery_logo = new StaticSprite(0, 0, AM.images.battery_logo.cw * mul, AM.images.battery_logo.ch * mul, 0, 0, AM.images.battery_logo.cw, AM.images.battery_logo.ch, 'battery_logo');
         this.mini_battery_charge_lime = new StaticSprite(0, 0, AM.images.battery_charge_lime.cw * mul - 3, AM.images.battery_charge_lime.ch * mul - 4, 0, 0, AM.images.battery_charge_lime.cw, AM.images.battery_charge_lime.ch, 'battery_charge_lime');
+        this.mini_battery_charge_red = new StaticSprite(0, 0, AM.images.battery_charge_red.cw * mul - 3, AM.images.battery_charge_red.ch * mul - 4, 0, 0, AM.images.battery_charge_red.cw, AM.images.battery_charge_red.ch, 'battery_charge_red');
         // this.battery_logo = new StaticSprite(0, 0, AM.images.battery_logo.cw, AM.images.battery_logo.ch, 0, 0, AM.images.battery_logo.cw, AM.images.battery_logo.ch, 'battery_logo');
     }
 
     drawMiniBattery(ctx) {
         this.mini_battery_rect.draw(ctx);
         this.mini_battery_top.draw(ctx);
-        this.mini_battery_charge_lime.draw(ctx);
+        // this.mini_battery_charge_lime.draw(ctx);
+        if (this.health > 20) {
+            this.mini_battery_charge_lime.draw(ctx);
+        } else {
+            this.mini_battery_charge_red.draw(ctx);
+        }
+
         this.mini_battery_logo.draw(ctx);
     }
 
@@ -152,7 +161,11 @@ class Template_1 {
         else if (this.health < 0) this.health = 100;
 
         this.mini_battery_charge_lime.h = this.miniChargeHeight * (this.health / 100);
+        
         this.mini_battery_charge_lime.y = this.miniChargeY + (this.miniChargeHeight - this.mini_battery_charge_lime.h);
+
+        this.mini_battery_charge_red.h = this.mini_battery_charge_lime.h;
+        this.mini_battery_charge_red.y = this.mini_battery_charge_lime.y;
     }
 
     decayMiniBattery(delta) {

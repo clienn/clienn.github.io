@@ -295,8 +295,8 @@ function main(w, h) {
     addGarbage();
     addGarbage();
     addGarbage();
-    // addGarbage();
-    // addGarbage();
+    addGarbage();
+    addGarbage();
     
 
     gameCycle();
@@ -1093,6 +1093,26 @@ function playScore() {
  * GAME UPDATES AND CYCLES
  */
 
+function drawRotate(obj, key, ax, ay, yRot, zRot) {
+    ctx.save();
+    // Untransformed draw position
+    const position = {x: obj.x + ax, y: obj.y + ay};
+    // In degrees
+    const rotation = { x: 0, y: yRot, z: zRot};
+    // Rotation relative to here (this is the center of the image)
+    const rotPt = { x: obj.w / 2, y: obj.h / 2 };
+
+    ctx.setTransform(new DOMMatrix()
+        .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+        .rotateSelf(rotation.x, rotation.y, rotation.z)
+    );
+    
+    // ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
+    // ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, -rotPt.x, -rotPt.y, garbageInfo[id].w, garbageInfo[id].h);
+    ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, -rotPt.x, -rotPt.y, startPage.duck.w, startPage.duck.h);
+    ctx.restore();
+}
+
 function drawStartPage() {
     // ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
     ctx.drawImage(AM.images.bg.img, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 0, 0, canvas.width, canvas.height);
@@ -1109,7 +1129,27 @@ function drawStartPage() {
     let fw = 102.9 * scaleX;
     let fh = 81 * scaleY;
     let frame = Math.floor(T) % 10;
-    ctx.drawImage(AM.images[key].img, 102.9 * frame, 0, 102.9, AM.images[key].ch, startPage['text1'].x - fw * 1.1, startPage['text1'].y - fh * 0.15, fw, fh);
+
+    ctx.save();
+    // Untransformed draw position
+    const position2 = {x: startPage['text1'].x - fw * 1.1, y: startPage['text1'].y - fh * 0.15};
+    // In degrees
+    const rotation2= { x: 0, y: Math.sin(T * 1.5) * 15, z: 0};
+    // Rotation relative to here (this is the center of the image)
+    const rotPt2 = { x: fw / 2, y: fh / 2 };
+
+    ctx.setTransform(new DOMMatrix()
+        .translateSelf(position2.x + rotPt2.x, position2.y + rotPt2.y)
+        .rotateSelf(rotation2.x, rotation2.y, rotation2.z)
+    );
+    
+    // ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
+    // ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, -rotPt.x, -rotPt.y, garbageInfo[id].w, garbageInfo[id].h);
+    ctx.drawImage(AM.images[key].img, 102.9 * frame, 0, 102.9, AM.images[key].ch,  -rotPt2.x, -rotPt2.y, fw, fh);
+    ctx.restore();
+    
+
+    
     
     id = 9;
     key = 'garbage_' + id;
