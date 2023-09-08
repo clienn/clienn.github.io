@@ -298,7 +298,7 @@ function main(w, h) {
     timer = new Timer(0, 0, 0, '#fff');
     timer.setTimer(gameDuration);
 
-    // HUD = new Template_1(ctx, w, h, scaleX, scaleY);
+    HUD = new Template_1(ctx, w, h, scaleX, scaleY);
     
     controls();
 
@@ -444,6 +444,16 @@ function drawWaterObjects() {
             if (checkAngledCollisions(kayak, waterObjects[idx])) {
                 waterObjects[idx].y = parallaxInfo.tile.yPos[currentTop];
                 waterObjectRows[i] = -1;
+
+                if (waterObjects[idx].key == 'duck') {
+                    score++;
+                    if (score > 99) score = 99;
+                } else {
+                    score--;
+                    if (score < 0) score = 0;
+                }
+
+                updateScore();
             }
             
         }
@@ -978,6 +988,14 @@ function setPoints(points, color) {
     TXT.texts['points'].str = points;
 }
 
+function updateScore() {
+    HUD.txt.texts['score'].str = 'x ' + zeroPad(score, 2);
+}
+
+function updateFinalScore() {
+    HUD.txt.texts['score2'].str = zeroPad(score, 2);
+}
+
 // *********************************** TEXT DISPLAYS END ******************************************************** //
 
 
@@ -1116,10 +1134,11 @@ function drawStartPage() {
 
 function reset() {
     gameover = false;
-   
-    // HUD.health = 100;
+    score = 0;
 
-    
+    updateScore();
+    updateFinalScore();
+
     timer.setTimer(gameDuration);
 }
 
@@ -1128,17 +1147,16 @@ function update() {
 
     // divingFish.update(delta);
     // divingFish.sineMovement(delta);
-    // HUD.txt.texts['time'].str = zeroPad(Math.floor(timer.timer / 24), 2);
+    HUD.txt.texts['time'].str = 'TIME: ' + zeroPad(Math.floor(timer.timer / 24), 2);
 
-    // if (delta < 1) {
-    //     HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24));
-    //     timer.tick(delta);
+    if (delta < 1) {
+        timer.tick(delta);
 
-    //     if (timer.timer <= 0) {
-    //         gameover = true;
-    //         HUD.updateGameoverBattery();
-    //     }
-    // }
+        if (timer.timer <= 0) {
+            gameover = true;
+            updateFinalScore();
+        }
+    }
     updateParallax();
     kayak.update(delta, 1);
 }
@@ -1154,7 +1172,7 @@ function gameCycle() {
             // ctx.clearRect(0, 0, canvas.width, canvas.height);
             // ctx.drawImage(AM.images.bg.img, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 0, 0, canvas.width, canvas.height);
             
-            // HUD.draw(ctx);  
+              
             parallaxBG();
             drawBunnies();
             // drawTerrain();
@@ -1164,7 +1182,7 @@ function gameCycle() {
 
             drawKayak();
             
-            
+            HUD.draw(ctx);
             update();
 
             
@@ -1176,7 +1194,7 @@ function gameCycle() {
         
     } else {
 
-        // HUD.gameover(ctx);
+        HUD.gameover(ctx);
         // HUD.updateGameoverBattery(-0.01 * delta);
     }
 

@@ -113,6 +113,20 @@
             "ch": 212
         },
         {
+            "id": "stopwatch",
+            "src": "hud/stopwatch",
+            "ext": "png",
+            "cw": 43,
+            "ch": 45
+        },
+        {
+            "id": "timecircle",
+            "src": "hud/timecircle",
+            "ext": "png",
+            "cw": 45,
+            "ch": 45
+        },
+        {
             "id": "volume",
             "src": "hud/volume",
             "ext": "png",
@@ -125,6 +139,20 @@
             "ext": "png",
             "cw": 50,
             "ch": 50
+        },
+        {
+            "id": "complete",
+            "src": "hud/complete2",
+            "ext": "png",
+            "cw": 185,
+            "ch": 25
+        },
+        {
+            "id": "yourscore",
+            "src": "hud/yourscore2",
+            "ext": "png",
+            "cw": 209,
+            "ch": 210
         }
     ]
 }
