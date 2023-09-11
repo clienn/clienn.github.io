@@ -19,8 +19,8 @@ class Template_1 {
         // this.stopwatch = new StaticSprite(50, 20, 60 * multiplier, 60 * multiplier, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
         this.duck = new StaticSprite(duckX, 20, duckW, AM.images.duck.ch * 0.25 * sy, 0, 0, AM.images.duck.cw, AM.images.duck.ch, 'duck');
 
-        this.volume = new StaticSprite(65, 10 * sy, 35, 35, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
-        this.mute = new StaticSprite(65, 10 * sy, 35, 35, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
+        this.volume = new StaticSprite(20, 10 * sy, 35, 35, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
+        this.mute = new StaticSprite(20, 10 * sy, 35, 35, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
 
         this.complete = new StaticSprite(0, 50, AM.images.complete.cw * multiplier2, AM.images.complete.ch * multiplier2, 0, 0, AM.images.complete.cw, AM.images.complete.ch, 'complete');
         this.yourscore = new StaticSprite(0, 80, AM.images.yourscore.cw * multiplier2, AM.images.yourscore.ch * multiplier2, 0, 0, AM.images.yourscore.cw, AM.images.yourscore.ch, 'yourscore');
@@ -32,7 +32,6 @@ class Template_1 {
         rescaleAll(this.mute, sx, sy);
         rescaleAll(this.complete, sx, sy);
         rescaleAll(this.yourscore, sx, sy);
-
 
         let paddingX = 50 * sx;
         let paddingY = 22 * sy;

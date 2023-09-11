@@ -6,18 +6,13 @@
             "ext": "mp3"
         }, 
         {
-            "id": "eat",
-            "src": "sounds/eat",
-            "ext": "wav"
-        }, 
-        {
             "id": "cry",
-            "src": "sounds/cry",
+            "src": "sounds/hit",
             "ext": "wav"
         },
         {
             "id": "score",
-            "src": "sounds/score",
+            "src": "sounds/score2",
             "ext": "wav"
         }
     ]

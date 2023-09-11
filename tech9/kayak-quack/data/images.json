@@ -99,6 +99,27 @@
             "ch": 21
         },
         {
+            "id": "wstone1",
+            "src": "environment/stones/water/1",
+            "ext": "png",
+            "cw": 420,
+            "ch": 257
+        },
+        {
+            "id": "wstone2",
+            "src": "environment/stones/water/2",
+            "ext": "png",
+            "cw": 506,
+            "ch": 257
+        },
+        {
+            "id": "wstone3",
+            "src": "environment/stones/water/3",
+            "ext": "png",
+            "cw": 88,
+            "ch": 77
+        },
+        {
             "id": "plank1",
             "src": "environment/planks/1",
             "ext": "png",
@@ -111,6 +132,41 @@
             "ext": "png",
             "cw": 797,
             "ch": 212
+        },
+        {
+            "id": "lily1",
+            "src": "environment/lilies/1",
+            "ext": "png",
+            "cw": 100,
+            "ch": 99
+        },
+        {
+            "id": "lily2",
+            "src": "environment/lilies/2",
+            "ext": "png",
+            "cw": 99,
+            "ch": 99
+        },
+        {
+            "id": "lily3",
+            "src": "environment/lilies/3",
+            "ext": "png",
+            "cw": 257,
+            "ch": 257
+        },
+        {
+            "id": "log1",
+            "src": "environment/logs/1",
+            "ext": "png",
+            "cw": 468,
+            "ch": 257
+        },
+        {
+            "id": "log2",
+            "src": "environment/logs/2",
+            "ext": "png",
+            "cw": 468,
+            "ch": 257
         },
         {
             "id": "stopwatch",

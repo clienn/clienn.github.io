@@ -197,6 +197,21 @@ const duckInfo = {
     1: { id: 'duck' },
 }
 
+const lilyInfo = {
+    w: 100,
+    h: 100
+}
+
+const wstoneInfo = {
+    w: 160,
+    h: 140
+}
+
+const logInfo = {
+    w: 234 * 0.5,
+    h: 125 * 0.5
+}
+
 var waterObjects = [];
 var waterObjectRows = [new Array(parallaxInfo.tile.rows).fill(-1)];
 
@@ -268,6 +283,9 @@ function main(w, h) {
 
     rescaleSize(bunnyInfo, scaleX, scaleY);
     rescaleSize(kayakInfo, scaleX, scaleY);
+    rescaleSize(lilyInfo, scaleX, scaleY);
+    rescaleSize(wstoneInfo, scaleX, scaleY);
+    rescaleSize(logInfo, scaleX, scaleY);
     
     kayak = new Sprite(w / 2 - kayakInfo.w / 2, h - kayakInfo.h * 1.25, kayakInfo.w, kayakInfo.h, AM.images.kayak.cw, AM.images.kayak.ch);
 
@@ -308,8 +326,19 @@ function main(w, h) {
     addDuck();
     addDuck();
     addDuck();
-    addDuck();
-    addDuck();
+    // addDuck();
+    // addDuck();
+
+    addLily(1);
+    addLily(2);
+    addLily(3);
+
+    addWaterStone(1);
+    addWaterStone(2);
+    addWaterStone(3);
+
+    addLog(1);
+    addLog(2);
 
     addPlank(1, 0, 0);
     addPlank(1, 1, 1);
@@ -324,6 +353,66 @@ function main(w, h) {
 
 
     gameCycle();
+}
+
+function addLog(rng) {
+    let rngX = Math.floor(Math.random() * (parallaxInfo.water.w - logInfo.w));
+    let rngY = parallaxInfo.tile.rows - waterObjects.length - 1; //Math.floor(Math.random() * parallaxInfo.tile.rows);
+    // let direction = Math.floor(Math.random() * 2) ? 1 : -1;
+
+    // let rng = Math.floor(Math.random() * 3) + 1;
+
+    let key = 'log' + rng;
+    let log = new Sprite(parallaxInfo.water.x + rngX, parallaxInfo.tile.yPos[rngY], logInfo.w, logInfo.h, AM.images[key].cw, AM.images[key].ch);
+    log.id = rngY;
+    log.key = key;
+    // duck.vy = parallaxInfo.tile.moveSpeed;
+
+    // duck.setDirection(direction);
+    // duck.setRandomSpeed(100, 50);
+
+    waterObjects.push(log);
+    // waterObjectRows[rngY] = waterObjects.length - 1;
+}
+
+function addWaterStone(rng) {
+    let rngX = Math.floor(Math.random() * (parallaxInfo.water.w - wstoneInfo.w));
+    let rngY = parallaxInfo.tile.rows - waterObjects.length - 1; //Math.floor(Math.random() * parallaxInfo.tile.rows);
+    // let direction = Math.floor(Math.random() * 2) ? 1 : -1;
+
+    // let rng = Math.floor(Math.random() * 3) + 1;
+
+    let key = 'wstone' + rng;
+    let wstone = new Sprite(parallaxInfo.water.x + rngX, parallaxInfo.tile.yPos[rngY], wstoneInfo.w, wstoneInfo.h, AM.images[key].cw, AM.images[key].ch);
+    wstone.id = rngY;
+    wstone.key = key;
+    // duck.vy = parallaxInfo.tile.moveSpeed;
+
+    // duck.setDirection(direction);
+    // duck.setRandomSpeed(100, 50);
+
+    waterObjects.push(wstone);
+    // waterObjectRows[rngY] = waterObjects.length - 1;
+}
+
+function addLily(rng) {
+    let rngX = Math.floor(Math.random() * (parallaxInfo.water.w - lilyInfo.w));
+    let rngY = parallaxInfo.tile.rows - waterObjects.length - 1; //Math.floor(Math.random() * parallaxInfo.tile.rows);
+    let direction = Math.floor(Math.random() * 2) ? 1 : -1;
+
+    // let rng = Math.floor(Math.random() * 3) + 1;
+
+    let key = 'lily' + rng;
+    let lily = new Sprite(parallaxInfo.water.x + rngX, parallaxInfo.tile.yPos[rngY], lilyInfo.w, lilyInfo.h, AM.images[key].cw, AM.images[key].ch);
+    lily.id = rngY;
+    lily.key = key;
+    // duck.vy = parallaxInfo.tile.moveSpeed;
+
+    // duck.setDirection(direction);
+    // duck.setRandomSpeed(100, 50);
+
+    waterObjects.push(lily);
+    // waterObjectRows[rngY] = waterObjects.length - 1;
 }
 
 function addBunny(posY, id) {
@@ -442,18 +531,24 @@ function drawWaterObjects() {
             waterObjects[idx].swim(ctx, AM.images[waterObjects[idx].key].img);
 
             if (checkAngledCollisions(kayak, waterObjects[idx])) {
-                waterObjects[idx].y = parallaxInfo.tile.yPos[currentTop];
-                waterObjectRows[i] = -1;
+                if (!waterObjects[idx].key.match(/lily\d/g)) {
+                    waterObjects[idx].y = parallaxInfo.tile.yPos[currentTop];
+                    waterObjectRows[i] = -1;
 
-                if (waterObjects[idx].key == 'duck') {
-                    score++;
-                    if (score > 99) score = 99;
-                } else {
-                    score--;
-                    if (score < 0) score = 0;
+                    if (waterObjects[idx].key == 'duck') {
+                        score++;
+                        if (score > 99) score = 99;
+                        setPoints('+1', '#C7FC12');
+                        playScore();
+                    } else {
+                        score--;
+                        if (score < 0) score = 0;
+                        setPoints('-1', '#fb2121'); // red
+                        playCry();
+                    }
+
+                    updateScore();
                 }
-
-                updateScore();
             }
             
         }
@@ -727,9 +822,9 @@ function controls() {
         // let x = touch.pageX;
 
         if (!gameStart) {
-            // AM.audio.bg.img.volume = 0.2;
-            // AM.audio.bg.img.loop = true;
-            // AM.audio.bg.img.play();
+            AM.audio.bg.img.volume = 0.2;
+            AM.audio.bg.img.loop = true;
+            AM.audio.bg.img.play();
 
 
             gameStart = true;
@@ -759,13 +854,13 @@ function controls() {
                     
                     HUD.volumeOn = !HUD.volumeOn; 
                     // console.log('test', HUD.volumeOn)
-                    // if (HUD.volumeOn) {
-                    //     AM.audio.bg.img.currentTime = 0;
-                    //     AM.audio.bg.img.play();
-                    // } else {
-                    //     AM.audio.bg.img.pause();
-                    //     // music.correct.obj.volume = 0;
-                    // }
+                    if (HUD.volumeOn) {
+                        AM.audio.bg.img.currentTime = 0;
+                        AM.audio.bg.img.play();
+                    } else {
+                        AM.audio.bg.img.pause();
+                        // music.correct.obj.volume = 0;
+                    }
                 } 
 
             }
@@ -787,9 +882,9 @@ function controls() {
         
         if (!gameStart) {
             // if (AM.audio.bg.img.paused) {
-                // AM.audio.bg.img.volume = 0.2;
-                // AM.audio.bg.img.loop = true;
-                // AM.audio.bg.img.play();
+                AM.audio.bg.img.volume = 0.2;
+                AM.audio.bg.img.loop = true;
+                AM.audio.bg.img.play();
                 // console.log('test')
             // }
             
@@ -971,12 +1066,12 @@ function doPolygonsIntersect (a, b) {
 /*
  * TEXT DISPLAYS
  */
-function showPoints(pointType) {
+function showPoints() {
     // HUD.draw(ctx, AM.images.timecircle.img);
     // jumpPointsT += 1 * delta;
     if (jump > 0) {
-        let y = eelHead.y + jump - eelHead.h;
-        TXT.follow('points', eelHead.x, y, eelHead.w, eelHead.h);
+        let y = kayak.y + jump - kayak.h;
+        TXT.follow('points', kayak.x, y, kayak.w, kayak.h);
         TXT.draw('points');
         jump -= G * jumpSpeed * delta;
     }
@@ -1010,13 +1105,13 @@ function playCry() {
     }
 }
 
-function playEat() {
-    if (HUD.volumeOn) {
-        AM.audio.eat.img.pause();
-        AM.audio.eat.img.currentTime = 0;
-        AM.audio.eat.img.play();
-    } 
-}
+// function playEat() {
+//     if (HUD.volumeOn) {
+//         AM.audio.eat.img.pause();
+//         AM.audio.eat.img.currentTime = 0;
+//         AM.audio.eat.img.play();
+//     } 
+// }
 
 function playScore() {
     if (HUD.volumeOn) {
@@ -1181,6 +1276,8 @@ function gameCycle() {
             // drawWaterObject(duckInfo, 1, 3);
 
             drawKayak();
+
+            showPoints();
             
             HUD.draw(ctx);
             update();
