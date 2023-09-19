@@ -24,6 +24,8 @@ class TextManager {
             font: font,
             weight: weight,
             fontHeight: fontHeight,
+            ow: w,
+            oh: h,
             width: txtWidth,
             x: -txtWidth / 2,
             y: 0,

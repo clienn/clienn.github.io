@@ -364,7 +364,7 @@ var textList = {
     },
     scoreN: {
         obj: null,
-        desc: TM.addTextObj('Score: 00', 'Montserrat', 'bold', 25, 0, 0, 55 * 2, 25 * 2, '#fff'),
+        desc: TM.addTextObj('Score: 00', 'Montserrat', 'bold', 25, 0, 0, 55 * 1.5, 25 * 1.5, '#fff'),
     },
     scoreLabel: {
         obj: null,
@@ -415,6 +415,9 @@ var minDist = 0;
 
 var squishT = 0;
 
+var scoreProgressBar = null;
+var TXT = null;
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
@@ -424,6 +427,11 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    TXT = new Text(ctx, w, h); 
+    TXT.setScale(scaleX, scaleY);
+    
+     
 
     btnBegin.w *= scaleX;
     btnBegin.h *= scaleY;
@@ -517,8 +525,18 @@ function main(w, h) {
         }
     }
 
-    textList.scoreN.obj.tx = w / 2 - (textList.scoreN.desc.w + 30) / 2 * scaleX;
-    textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h * scaleY / 2) - scoreAdjY;
+    let pbW = 200 * scaleX;
+    let pbH = 75 * scaleY;
+
+    scoreProgressBar = new ProgressBar(w / 2 - pbW / 2, 30 * scaleY, pbW, pbH, '#9F51FE');
+    scoreProgressBar.progress = 100;
+
+    let pbWidth = (scoreProgressBar.w + scoreProgressBar.h);
+
+    TXT.addText('score', 'Score: 00', 'bold', 20, 'Montserrat', scoreProgressBar.x + pbWidth / 2, scoreProgressBar.y + 15 * scaleY, 220, 50, '#fff', true);
+
+    textList.scoreN.obj.tx = scoreProgressBar.x + scoreProgressBar.w / 2 - textList.scoreN.desc.w / 2;
+    textList.scoreN.obj.ty = scoreProgressBar.y + 15 * scaleY;
 
     // textList.complete.obj.tx = w / 2 - textList.complete.desc.w / 2 * scaleX - 10 * scaleX;
     // textList.complete.obj.ty = 75 * scaleY;
@@ -727,22 +745,38 @@ function drawScoreHUD() {
     // let x = canvas.width / 2;
     // let y = topHUD.timer.timecircle.h / 2 - h / 2 + 30;
 
-    const { x, y, w, h, pw } = topHUDInfo.score;
-    const p = pw;
+    // const { x, y, w, h, pw } = topHUDInfo.score;
+    // const p = pw;
     
-    ctx.beginPath();
-    ctx.arc(h / 2 + x, h / 2+ y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
-    ctx.lineTo(p - 2 * h + x, 0 + y);
-    ctx.arc(p + (h / 2) + x, h / 2 + y, h / 2, 3 / 2 * Math.PI,Math.PI / 2);
-    ctx.lineTo(h / 2 + x, h + y);
-    ctx.fillStyle = "#9F51FE";
-    ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = '2';
-    ctx.stroke();
+    // ctx.beginPath();
+    // ctx.arc(h / 2 + x, h / 2+ y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
+    // ctx.lineTo(p - 2 * h + x, 0 + y);
+    // ctx.arc(p + (h / 2) + x, h / 2 + y, h / 2, 3 / 2 * Math.PI,Math.PI / 2);
+    // ctx.lineTo(h / 2 + x, h + y);
+    // ctx.fillStyle = "#9F51FE";
+    // ctx.fill();
+    // ctx.strokeStyle = '#fff';
+    // ctx.lineWidth = '2';
+    // ctx.stroke();
 
-    textList.scoreN.obj.str = 'Score: ' + zeroPad(score, 2);
-    TM.draw(textList.scoreN.obj);
+    scoreProgressBar.draw(ctx);
+
+    // textList.scoreN.obj.str = 'Score: ' + zeroPad(score, 2);
+    // TM.draw(textList.scoreN.obj);
+
+    TXT.texts['score'].str = 'Score: ' + zeroPad(score, 2);
+    TXT.draw('score');
+
+    // ctx.lineWidth = 3;
+
+    // ctx.beginPath();
+    // ctx.rect(TXT.texts['score'].x, TXT.texts['score'].y, TXT.texts['score'].w, TXT.texts['score'].h);
+    // ctx.stroke();
+
+    // let pbWidth = (scoreProgressBar.w + scoreProgressBar.h);
+    // ctx.beginPath();
+    // ctx.rect(scoreProgressBar.x, scoreProgressBar.y, pbWidth, scoreProgressBar.h);
+    // ctx.stroke();
 }
 
 function drawLives() {

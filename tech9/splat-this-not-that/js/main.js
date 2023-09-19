@@ -538,7 +538,7 @@ var TM = new TextManager(ctx);
 var textList = {
     topTimer: {
         obj: null,
-        desc: TM.addTextObj('09', 'Montserrat', 'bold', 20, 0, 0, 40, 40, '#000'),
+        desc: TM.addTextObj('09', 'Montserrat', 'bold', 20, 0, 0, 35, 35, '#000'),
     },
     scoreX: {
         obj: null,
@@ -702,6 +702,8 @@ var startPulseT = 0;
 
 var floaters = [];
 
+var timeProgressBar = null;
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
@@ -842,15 +844,30 @@ function main(w, h) {
         padY2 = 5 * scaleY;
     }
 
+    let pbW = 150 * scaleX;
+    let pbH = 45 * scaleY;
+
+    timeProgressBar = new ProgressBar(topHUDInfo.timer.progress.x * scaleX, 30 * scaleY, pbW, pbH);
+    timeProgressBar.progress = 100;
+
+    pbW = 150 * scaleX;
+    pbH = 55 * scaleY;
+
+    scoreProgressBar = new ProgressBar(w / 2 - pbW / 2, 20 * scaleY, pbW, pbH, '#2D3E58');
+    scoreProgressBar.progress = 100;
+
     // textList.scoreX.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw / 2 - 5 * scaleX;
     // textList.scoreN.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw - (textList.scoreN.desc.w + 230 * scaleX) / 2 * scaleX;
-    textList.scoreN.obj.tx = topHUDInfo.score.x + 230 * scaleX - textList.scoreN.desc.w - 30 * scaleX;
-    textList.scoreX.obj.tx = topHUDInfo.score.x + 210 * scaleX / 2
-    textList.scoreX.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreX.desc.h * scaleY / 2) - padY;
-    textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h * scaleY / 2) - scoreNAdjY - padY2;
+    textList.scoreN.obj.tx = scoreProgressBar.x + scoreProgressBar.w - 5 * scaleX;
+    textList.scoreX.obj.tx = scoreProgressBar.x + scoreProgressBar.w / 2 + 15 * scaleX;
+    // textList.scoreX.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreX.desc.h * scaleY / 2) - padY;
+    // textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h * scaleY / 2) - scoreNAdjY - padY2;
+    
+    textList.scoreX.obj.ty = 25 * scaleY;
+    textList.scoreN.obj.ty = 28 * scaleY;
 
     // textList.topTimer.obj.tx = topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2 - (textList.topTimer.desc.w - 5) / 2 * scaleX;
-    textList.topTimer.obj.tx = 40 * scaleX;
+    textList.topTimer.obj.tx = 43 * scaleX;
     textList.topTimer.obj.ty = topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2 - textList.topTimer.desc.h / 2 * scaleY;
 
     textList.scoreLabel.obj.tx = w / 2 - textList.scoreLabel.desc.w * scaleX / 2 - 10 * scaleX;
@@ -895,6 +912,8 @@ function main(w, h) {
     projectiles[3].clipY = clips[c].clipY;
     projectiles[3].direction = -1;
     projectiles[3].init(projectileRanges);
+
+    
 
     // generateFloaters();
 
@@ -1159,29 +1178,33 @@ function drawProgress() {
 }
 
 function drawScoreHUD() {
+    // const { x, y, w, h, pw } = topHUDInfo.score;
+    // // const { x, y, w, pw } = topHUDInfo.score;
+    // // let h = 55 * scaleY;
+    // // const p = 230 * scaleX;
+    // const p = pw;
+    // ctx.beginPath();
+    // ctx.arc(h / 2 + x, h / 2+ y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
+    // ctx.lineTo(p - 2 * h + x, 0 + y);
+    // ctx.arc(p - (h / 2) + x, h / 2 + y, h / 2, 3 / 2 * Math.PI,Math.PI / 2);
+    // ctx.lineTo(h / 2 + x, h + y);
+    // ctx.fillStyle = "#2D3E58";
+    // ctx.fill();
+    // ctx.strokeStyle = '#fff';
+    // ctx.stroke();
 
-    const { x, y, w, h, pw } = topHUDInfo.score;
-    // const { x, y, w, pw } = topHUDInfo.score;
-    // let h = 55 * scaleY;
-    // const p = 230 * scaleX;
-    const p = pw;
-    ctx.beginPath();
-    ctx.arc(h / 2 + x, h / 2+ y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
-    ctx.lineTo(p - 2 * h + x, 0 + y);
-    ctx.arc(p - (h / 2) + x, h / 2 + y, h / 2, 3 / 2 * Math.PI,Math.PI / 2);
-    ctx.lineTo(h / 2 + x, h + y);
-    ctx.fillStyle = "#2D3E58";
-    ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.stroke();
+    scoreProgressBar.draw(ctx);
 
     ctx.drawImage(images.compass.obj.img, 0, 0, compassInfo.cw, 
-        compassInfo.ch, compassInfo.x, compassInfo.y, compassInfo.w * 1.25, compassInfo.h * 1.25);
+        compassInfo.ch, scoreProgressBar.x + 10 * scaleX, 25 * scaleY, compassInfo.w * 1.25, compassInfo.h * 1.25);
 
+    
     TM.draw(textList.scoreX.obj);
     score = Math.max(0, score);
     textList.scoreN.obj.str = zeroPad(score, 2);
     TM.draw(textList.scoreN.obj);
+
+    
 }
 
 function drawLives() {
@@ -1693,6 +1716,8 @@ function update() {
     // placeholder
     // projectiles[0].vy += g * 50 * delta;
     timer.tick(delta);
+    let percent = timer.timer / (maxTimer * 24) * 100;
+    timeProgressBar.update(delta, percent);
 
     if (timer.timer <= 0) {
         canReset = true;
@@ -1732,8 +1757,10 @@ function gameCycle() {
                 ctx.fill();
 
                 drawClouds();
-                drawProgress();
+                // drawProgress();
+                timeProgressBar.draw(ctx);
                 drawTopHUD();
+                
                 drawScoreHUD();
                 drawLives();
 
@@ -1905,7 +1932,8 @@ function gameCycle() {
                 ctx.rect(0, waterInfo.y, canvas.width, waterInfo.h);
                 ctx.fill();
                 drawClouds();
-                drawProgress();
+                // drawProgress();
+                timeProgressBar.draw(ctx);
                 drawTopHUD();
                 drawScoreHUD();
                 drawLives();

@@ -9,7 +9,7 @@ class Text {
         this.ch = h;
     }
 
-    addText(id, str, weight, fontH, font, x, y, w, h, color, isCentered) {
+    addText(canvas, id, str, weight, fontH, font, x, y, w, h, color, isCentered) {
         let text = { id, str, weight, fontH, font, x, y, w, h, color };
 
         this.calculateScaledPosition(text);
@@ -19,16 +19,6 @@ class Text {
         }
 
         this.texts[id] = text;
-    }
-
-    centerTo(id, x, y, w, h) {
-        this.texts[id].x += x + w / 2;
-        this.texts[id].y = y + h / 2 - this.texts[id].h / 2;
-    }
-
-    follow(id, x, y, w, h) {
-        this.texts[id].x = x + w / 2;
-        this.texts[id].y = y + h / 2 - this.texts[id].h / 2;
     }
 
     setScale(sx, sy) {

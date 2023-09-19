@@ -1,22 +1,42 @@
 class ProgressBar {
-    constructor(x, y, w, h) {
+    constructor(x, y, w, h, color) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
+        this.color = color;
 
         this.progress = 0;
+
     }
 
     draw(ctx) {
         const { x, y, w, h } = this;
-        let p = this.progress;
-    
-        const grd = ctx.createLinearGradient(0, 0, 0, p);
+        let p = w * (this.progress / 100);
+        var grd = null;
+        ctx.save();
+        if (this.color) {
+            grd = this.color;
+        } else {
+            grd = ctx.createLinearGradient(0, 0, 0, p);
         
-        grd.addColorStop(0, "#4ED20E");
-        grd.addColorStop(0.5, "#83DF56");
-        grd.addColorStop(1, "#59DC19");
+            // grd.addColorStop(0, "#fb2121");
+            // grd.addColorStop(0.5, "#f9a139");
+            // grd.addColorStop(1, "#59DC19");
+            // console.log(p, w);
+            let percent = p / w * 100;
+            // console.log(percent)
+            if (percent > 50) {
+                grd.addColorStop(0, "#4ED20E");
+                grd.addColorStop(0.5, "#83DF56");
+                grd.addColorStop(1, "#59DC19");
+            } else {
+                grd.addColorStop(0, "#fb2121");
+                grd.addColorStop(0.5, "#f9a139");
+                grd.addColorStop(1, "#fb2121");
+            }
+        }
+        
 
         /* To visalize ------------------------------------------------------*/
         ctx.beginPath();
@@ -25,7 +45,7 @@ class ProgressBar {
         ctx.arc((h / 2) + w + x, h / 2 + y, h / 2, 3 / 2 * Math.PI, Math.PI / 2);
         ctx.lineTo(h / 2 + x, h + y);
         ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 5;
         ctx.stroke();
         ctx.closePath();
         /* ------------------------------------------------------------------*/
@@ -33,23 +53,17 @@ class ProgressBar {
         ctx.beginPath();
         ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 * Math.PI);
         ctx.lineTo(w + x, y);
-        ctx.arc((h / 2) + this.progress + x, h / 2 + y, h / 2, 3 / 2 * Math.PI, Math.PI / 2);
+        ctx.arc((h / 2) + p + x, h / 2 + y, h / 2, 3 / 2 * Math.PI, Math.PI / 2);
         ctx.lineTo(h / 2 + x, h + y);
         ctx.fillStyle = grd;
         ctx.fill();
         ctx.closePath();
-    
-        // ctx.beginPath();
-        // ctx.arc(h / 2 + x, h / 2+ y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
-        // ctx.lineTo(p - 2 * w + x, y);
-        // ctx.arc(p - (w / 2) + x, h / 2 + y, h / 2, 3 / 2 *Math.PI,Math.PI / 2);
-        // ctx.lineTo(h / 2 + x, h + y);
-        // ctx.fillStyle = grd;
-        // ctx.fill();
+
+        ctx.restore();
     }
 
     update(delta, progress) {
-        this.progress = this.w * (progress / 100);
+        this.progress = 100 * (progress / 100);
     }
 
     // drawProgress() {

@@ -690,6 +690,9 @@ var startScreenTimerAnimT = 0;
 var startScreenHandAnimT = 0;
 var startTurtleBlinkT = 0;
 
+var timeProgressBar = null;
+var scoreProgressBar = null;
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
@@ -778,33 +781,33 @@ function main(w, h) {
     rescaleAll(shineInfo);
 
     // Texts
-    TXT.addText(canvas, TEXT_ID.CORRECT, 'Correct!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
-    TXT.addText(canvas, TEXT_ID.WRONG, 'Wrong!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
-    TXT.addText(canvas, TEXT_ID.TOOSLOW, 'Too Slow!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
-    TXT.addText(canvas, TEXT_ID.COMPLETE, 'Complete!', 'bold', 20, 'Montserrat', w / 2, 55 * scaleY, 300, 70, '#fff', true); 
-    TXT.addText(canvas, TEXT_ID.SCORELABEL, 'Score', 'bold', 20, 'Montserrat', w / 2, 270 * scaleY, 100, 50, '#fff', true); 
-    TXT.addText(canvas, TEXT_ID.FINALSCORE, '00', 'bold', 20, 'Montserrat', w / 2, 320 * scaleY, 65, 60, '#fff', true); 
-    TXT.addText(canvas, TEXT_ID.RESETMSG, 'Tap to play again.', 'bold', 20, 'Montserrat', w / 2, h / 2, 600, 100, '#fff', true); 
-    TXT.addText(canvas, TEXT_ID.TOPTIMER, '09', (isMobile ? 'normal' : 'bold'), 20, 'Montserrat', 
+    TXT.addText(TEXT_ID.CORRECT, 'Correct!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
+    TXT.addText(TEXT_ID.WRONG, 'Wrong!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
+    TXT.addText(TEXT_ID.TOOSLOW, 'Too Slow!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
+    TXT.addText(TEXT_ID.COMPLETE, 'Complete!', 'bold', 20, 'Montserrat', w / 2, 55 * scaleY, 300, 70, '#fff', true); 
+    TXT.addText(TEXT_ID.SCORELABEL, 'Score', 'bold', 20, 'Montserrat', w / 2, 270 * scaleY, 100, 50, '#fff', true); 
+    TXT.addText(TEXT_ID.FINALSCORE, '00', 'bold', 20, 'Montserrat', w / 2, 320 * scaleY, 65, 60, '#fff', true); 
+    TXT.addText(TEXT_ID.RESETMSG, 'Tap to play again.', 'bold', 20, 'Montserrat', w / 2, h / 2, 600, 100, '#fff', true); 
+    TXT.addText(TEXT_ID.TOPTIMER, '09', (isMobile ? 'normal' : 'bold'), 20, 'Montserrat', 
         topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2, 29 * scaleY, 40, 40, '#000', true); 
 
     // TXT.addText(canvas, TEXT_ID.SCOREX, 'x', 'normal', topHUD.score.fontS, 'Montserrat', 
     //     w / 2, topHUDInfo.score.y + (scoreAdjY + 2) * scaleY, 20, topHUD.score.fontH, '#fff', true); 
 
     let scoreLabelY = isMobile ? 30 * scaleY : 37 * scaleY;
-    TXT.addText(canvas, TEXT_ID.SCOREX, 'x', 'normal', topHUD.score.fontS, 'Montserrat', 
-        w / 2 + 15 * scaleX, scoreLabelY, 20, 40, '#fff', true);
+    TXT.addText(TEXT_ID.SCOREX, 'x', 'normal', topHUD.score.fontS, 'Montserrat', 
+        w / 2 + 30 * scaleX, 45 * scaleY, 20, 40, '#fff', true);
 
     // TXT.addText(canvas, TEXT_ID.SCORE, '00', (isMobile ? 'normal' : 'bold'), topHUD.score.fontS, 'Montserrat', 
     //     w / 2 + 50 * scaleX, topHUDInfo.score.y + scoreAdjY * scaleY, topHUD.score.fontW, topHUD.score.fontH, '#fff', true);
-
+    
     let scoreW = 50;
     let scoreH = 50;
 
     let scoreY = isMobile ? 23 * scaleY : 33 * scaleY;
 
-    TXT.addText(canvas, TEXT_ID.SCORE, '00', 'bold', 20, 'Montserrat', 
-        w / 2 + 95 * scaleX, scoreY, scoreW, scoreH, '#fff', true);
+    TXT.addText(TEXT_ID.SCORE, '00', 'bold', 20, 'Montserrat', 
+        w / 2 + 120 * scaleX, 43 * scaleY, scoreW, scoreH, '#fff', true);
     // 
     // console.log(TXT.texts[TEXT_ID.SCORE].w);
     shineInfo.w *= 1.5;
@@ -830,6 +833,18 @@ function main(w, h) {
     bgInfo.water.y = h / 2 + bgInfo.water.y * scaleY;
     bgInfo.sand.y = h - 376 * scaleY;
     bgInfo.sand2.y = h - 336 * scaleY;
+
+    let pbW = 150 * scaleX;
+    let pbH = 45 * scaleY;
+
+    timeProgressBar = new ProgressBar(topHUDInfo.timer.progress.x * scaleX, 30 * scaleY, pbW, pbH);
+    timeProgressBar.progress = 100;
+    
+    pbW = 200 * scaleX;
+    pbH = 75 * scaleY;
+
+    scoreProgressBar = new ProgressBar(w / 2 - pbW / 2, 30 * scaleY, pbW, pbH, '#569E1A');
+    scoreProgressBar.progress = 100;
 
     loadAssets();
 
@@ -1150,6 +1165,7 @@ function init() {
 
     updateTurtleInitialPos();
     timer.setTimer(showTurtleDuration);
+    timeProgressBar.update(delta, 100);
 
     showTarget = true;
 
@@ -1536,6 +1552,9 @@ function update() {
             // turtles[answerIdx].jump = jumpHeight;
         }
 
+        let percent = timer.timer / (9.0 * 24) * 100;
+        timeProgressBar.update(delta, percent);
+
     } else if (showAnswerT > 0) {
         if (msg) {
             // TM.draw(textList[msg].obj);
@@ -1583,7 +1602,7 @@ function nextRound() {
     answerIdx = -1;
     showAnswerT = 0;
     target = Math.floor(Math.random() * turtles.length);
-
+    timeProgressBar.update(delta, 100);
     
     if (turtles.length < 8) {
         addTurtle();
@@ -1714,35 +1733,35 @@ function drawScoreHUD() {
     // let y = topHUD.timer.timecircle.h / 2 - h / 2 + 30;
 
     // const { x, y, w, h, pw } = topHUDInfo.score;
-    // const { x, y } = topHUDInfo.score;
-    let w = 180 * scaleX;
-    let h = 75 * scaleY;
-    let x = canvas.width / 2 - ((h / 2) + w) / 2;
-    let y = 20 * scaleY;
+    const { x, y } = topHUDInfo.score;
+    // let w = 180 * scaleX;
+    // let h = 75 * scaleY;
+    // let x = canvas.width / 2 - ((h / 2) + w) / 2;
+    // let y = 20 * scaleY;
     
-    // const p = pw;
-    let p = w;
+    // // const p = pw;
+    // let p = w;
     
-    /* To visalize ------------------------------------------------------*/
-    ctx.beginPath();
-    ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
-    ctx.lineTo(w + x, 0 + y);
-    ctx.arc((h / 2) + w + x, h / 2 + y, h / 2, 3 / 2 *Math.PI,Math.PI / 2);
-    ctx.lineTo(h / 2 + x, h + y);
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 5;
-    ctx.stroke();
-    ctx.closePath();
-
-    ctx.beginPath();
-    ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
-    ctx.lineTo(w + x, 0 + y);
-    ctx.arc((h / 2) + p + x, h / 2 + y, h / 2, 3 / 2 *Math.PI,Math.PI / 2);
-    ctx.lineTo(h / 2 + x, h + y);
-    ctx.fillStyle = '#569E1A';
+    // /* To visalize ------------------------------------------------------*/
+    // ctx.beginPath();
+    // ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
+    // ctx.lineTo(w + x, 0 + y);
+    // ctx.arc((h / 2) + w + x, h / 2 + y, h / 2, 3 / 2 *Math.PI,Math.PI / 2);
+    // ctx.lineTo(h / 2 + x, h + y);
+    // ctx.strokeStyle = '#fff';
     // ctx.lineWidth = 5;
-    ctx.fill();
-    ctx.closePath();
+    // ctx.stroke();
+    // ctx.closePath();
+
+    // ctx.beginPath();
+    // ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
+    // ctx.lineTo(w + x, 0 + y);
+    // ctx.arc((h / 2) + p + x, h / 2 + y, h / 2, 3 / 2 *Math.PI,Math.PI / 2);
+    // ctx.lineTo(h / 2 + x, h + y);
+    // ctx.fillStyle = '#569E1A';
+    // // ctx.lineWidth = 5;
+    // ctx.fill();
+    // ctx.closePath();
     /* ------------------------------------------------------------------*/
 
 
@@ -1757,7 +1776,7 @@ function drawScoreHUD() {
     // ctx.stroke();
 
     ctx.drawImage(images.turtleshine.obj.img, 0, 0, topHUD.score.turtleshine.cw, 
-        topHUD.score.turtleshine.ch, x + 10 * scaleX, y, topHUD.score.turtleshine.w, topHUD.score.turtleshine.h);
+        topHUD.score.turtleshine.ch, scoreProgressBar.x + 10 * scaleX, 30 * scaleY, topHUD.score.turtleshine.w, topHUD.score.turtleshine.h);
 
     // TM.draw(textList.scoreX.obj);
     TXT.draw(TEXT_ID.SCOREX);
@@ -1865,8 +1884,11 @@ function gameCycle() {
                 drawBGs();
                 drawSeagulls();
                 // hud
-                drawProgress();
+                // drawProgress();
+                timeProgressBar.draw(ctx);
                 drawTopHUD();
+
+                scoreProgressBar.draw(ctx);
                 drawScoreHUD();
                 drawLives();
 
@@ -1939,8 +1961,12 @@ function gameCycle() {
                 drawBGs();
                 drawSeagulls();
                 // hud
-                drawProgress();
+                // drawProgress();
+                timeProgressBar.draw(ctx);
+
                 drawTopHUD();
+                scoreProgressBar.draw(ctx);
+                
                 drawScoreHUD();
                 drawLives();
 

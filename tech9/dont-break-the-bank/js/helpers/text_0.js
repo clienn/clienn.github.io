@@ -23,7 +23,7 @@ class Text {
 
     centerTo(id, x, y, w, h) {
         this.texts[id].x += x + w / 2;
-        this.texts[id].y = y + h / 2 - this.texts[id].h / 2;
+        // this.texts[id].y = y + h / 2 - this.texts[id].h / 2;
     }
 
     follow(id, x, y, w, h) {

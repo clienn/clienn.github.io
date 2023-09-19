@@ -12,7 +12,7 @@ class ProgressBar {
 
     draw(ctx) {
         const { x, y, w, h } = this;
-        let p = w * (this.progress / 100);
+        let p = this.progress;
         var grd = null;
         ctx.save();
         if (this.color) {
@@ -42,7 +42,7 @@ class ProgressBar {
         ctx.beginPath();
         ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 * Math.PI);
         ctx.lineTo(w + x, y);
-        ctx.arc((h / 2) + w + x, h / 2 + y, h / 2, 3 / 2 * Math.PI, Math.PI / 2);
+        ctx.arc((h / 2) + 100 + x, h / 2 + y, h / 2, 3 / 2 * Math.PI, Math.PI / 2);
         ctx.lineTo(h / 2 + x, h + y);
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 5;
@@ -53,7 +53,7 @@ class ProgressBar {
         ctx.beginPath();
         ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 * Math.PI);
         ctx.lineTo(w + x, y);
-        ctx.arc((h / 2) + p + x, h / 2 + y, h / 2, 3 / 2 * Math.PI, Math.PI / 2);
+        ctx.arc((h / 2) + this.progress + x, h / 2 + y, h / 2, 3 / 2 * Math.PI, Math.PI / 2);
         ctx.lineTo(h / 2 + x, h + y);
         ctx.fillStyle = grd;
         ctx.fill();
