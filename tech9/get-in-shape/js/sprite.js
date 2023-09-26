@@ -16,6 +16,7 @@ class Sprite {
         this.vy = 0;
 
         this.id = 0;
+        this.key = 0;
 
         this.dropSpeed = 1;
         this.dropSine = 0;

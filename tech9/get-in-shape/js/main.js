@@ -206,6 +206,63 @@ var mDown = false;
 var mouseX = 0;
 var mouseY = 0;
 
+var startPageInfo = {
+    title: {
+        x: 0,
+        y: 105,
+        w: 0,
+        h: 0
+    },
+    start: {
+        x: 0,
+        y: 705,
+        w: 0,
+        h: 0
+    },
+    img1: {
+        x: 450,
+        y: 310,
+        w: 0,
+        h: 0
+    },
+    img2: {
+        x: 835,
+        y: 310,
+        w: 0,
+        h: 0,
+        tw: 50,
+        th: 50,
+    },
+    img3: {
+        x: 1200,
+        y: 310,
+        w: 0,
+        h: 0
+    },
+
+    text1: {
+        x: 363,
+        y: 460,
+        w: 0,
+        h: 0
+    },
+    text2: {
+        x: 750,
+        y: 460,
+        w: 0,
+        h: 0
+    },
+    text3: {
+        x: 1150,
+        y: 460,
+        w: 0,
+        h: 0
+    },
+    
+}
+
+
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
@@ -215,6 +272,8 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    initStartPage(2);
 
     TXT = new Text(ctx, w, h); 
     TXT.setScale(scaleX, scaleY);
@@ -290,12 +349,22 @@ function main(w, h) {
     shapeDimX *= scaleX;
     shapeDimY *= scaleY;
 
+    // for (let i = 0; i < 8; ++i) {
+    //     // let rng = Math.floor(Math.random() * 5);
+    //     let pos = portal.getPos(i);
+    //     let id = 'shape_' + (i + 1);
+    //     let shape = new Sprite(pos.x, pos.y, shapeDimX, shapeDimY, AM.images[id].cw, AM.images[id].ch);
+    //     shape.id = id;
+    //     shapes.push(shape);
+    // }
+
     for (let i = 0; i < 8; ++i) {
         // let rng = Math.floor(Math.random() * 5);
         let pos = portal.getPos(i);
-        let id = 'shape_' + (i + 1);
-        let shape = new Sprite(pos.x, pos.y, shapeDimX, shapeDimY, AM.images[id].cw, AM.images[id].ch);
+        let id = 'shapes';
+        let shape = new Sprite(pos.x, pos.y, AM.images[id].cw * scaleX, AM.images[id].ch * scaleY, AM.images[id].cw, AM.images[id].ch);
         shape.id = id;
+        shape.key = i;
         shapes.push(shape);
     }
 
@@ -331,13 +400,33 @@ function main(w, h) {
     gameCycle();
 }
 
+function initStartPage(scale) {
+    for (let k in startPageInfo) {
+        startPageInfo[k].x *= scaleX;
+        startPageInfo[k].y *= scaleY
+        startPageInfo[k].w = AM.images[k].cw * scale * scaleX;
+        startPageInfo[k].h = AM.images[k].ch * scale * scaleY;
+    }
+
+    startPageInfo.title.x = canvas.width / 2 - startPageInfo.title.w / 2;
+    startPageInfo.start.x = canvas.width / 2 - startPageInfo.start.w / 2;
+    startPageInfo.t = 0;
+    startPageInfo.t2 = 0;
+
+    startPageInfo.img2.tx = 900 * scaleX;
+    startPageInfo.img2.ty = 380 * scaleY;
+    startPageInfo.img2.tw = AM.images.img2.cw * 0.60 * scaleX;
+    startPageInfo.img2.th = AM.images.img2.ch * 0.60 * scaleY;
+}
+
 function initShapesContainer() {
     shapesContainer = [...Array(nContainers).keys()];
     rngShapes();
 
     for (let i = 0; i < shapesContainer.length; ++i) {
         // shapesContainer[i] = ;
-        shapesContainerKeys[i] = parseInt(shapes[shapesContainer[i]].id.replace(/shape_/, ''));
+        // shapesContainerKeys[i] = parseInt(shapes[shapesContainer[i]].id.replace(/shape_/, ''));
+        shapesContainerKeys[i] = shapes[shapesContainer[i]].key;
     }
 
     shuffleArr(shapesContainer);
@@ -452,7 +541,7 @@ function mouseupE() {
                 AM.audio.bg.img.pause();
                 // music.correct.obj.volume = 0;
             }
-            console.log('test')
+            // console.log('test')
         }
         mDown = false;
     }
@@ -480,7 +569,8 @@ function mouseupE() {
             
             let id = shapesContainer[hoveredContainerID];
             // console.log(hoveredContainerID, dragID, shapes[id].id, shapes[dragID].id)
-            if (correctAnswers[hoveredContainerID] < 0 && shapes[id].id == shapes[dragID].id) {
+            // if (correctAnswers[hoveredContainerID] < 0 && shapes[id].id == shapes[dragID].id) {
+            if (correctAnswers[hoveredContainerID] < 0 && shapes[id].key == shapes[dragID].key) {
                 // correctAnswers[hoveredContainerID] = dragID;
                 correctAnswers[hoveredContainerID] = dragID;
                 // score += 10 * portal.duration + portal.bonus;
@@ -518,6 +608,7 @@ function mouseupE() {
 
                     if (HUD.volumeOn) {
                         AM.audio.kaboom.img.pause();
+                        AM.audio.kaboom.img.volume = 0.05;
                         AM.audio.kaboom.img.currentTime = 0;
                         AM.audio.kaboom.img.play();
                     }
@@ -554,14 +645,19 @@ function drawShapesContainer() {
 
         let id = shapesContainer[i];
         // let key = 'container_' + (id + 1);
-        let key = 'container_' + (shapesContainerKeys[id]);
+        // let key = 'container_' + (shapesContainerKeys[id]);
+        let key = 'shapes';
+        let clipX = shapesContainerKeys[id] * AM.images[key].cw;
+        let clipY = AM.images[key].ch;
         
         if (correctAnswers[i] > -1) {
             // let idx = correctAnswers[i];
             ctx.strokeStyle = '#b3d23b';
             ctx.globalAlpha = 1;
             // key = 'shape_' + (id + 1);
-            key = 'shape_' + (shapesContainerKeys[id]);
+            // key = 'shape_' + (shapesContainerKeys[id]);
+            key = 'shapes';
+            clipY = 0;
         } else if (i == hoveredContainerID) {
             ctx.strokeStyle = '#10aad7';
             ctx.globalAlpha = 1;
@@ -575,8 +671,8 @@ function drawShapesContainer() {
         // ctx.drawImage(shapeImages[key], 0, 0, shapes[id].w, shapes[id].h, i * containerRectDimX + cc_x, cc_y, containerRectDimX, containerRectDimY);
         // ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, 
         //     x * portal.gridDimX + containerGridAdjX, y * portal.gridDimY + containerGridAdjY, portal.gridDimX, portal.gridDimY);
-            
-        ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, 
+        // console.log(key)
+        ctx.drawImage(AM.images[key].img, clipX, clipY, AM.images[key].cw, AM.images[key].ch, 
             x * containerShapeW + containerGridAdjX, y * containerShapeH + containerGridAdjY, containerShapeW, containerShapeH);
         ctx.globalAlpha = 1;
 
@@ -589,6 +685,10 @@ function drawShapesContainer() {
     }
 }
 
+function checkCollision(r1, r2) {
+    return r1.x + r1.w >= r2.x && r1.x <= r2.x + r2.w && r1.y + r1.h >= r2.y && r1.y <= r2.y + r2.h;
+ }
+
 function checkContainerCollision() {
     let x = shapes[dragID].x;
     let y = shapes[dragID].y;
@@ -599,7 +699,7 @@ function checkContainerCollision() {
         let row = Math.floor(shapesContainerPos[i] / totalContainerGridCols);
         let col = shapesContainerPos[i] % totalContainerGridCols;
 
-        if (isBtnClicked(x, y, {
+        if (checkCollision(shapes[dragID], {
             x: col * containerShapeW + containerGridAdjX,
             y: row * containerShapeH + containerGridAdjY,
             w: containerShapeW,
@@ -609,6 +709,16 @@ function checkContainerCollision() {
             break;
 
         }
+        // if (isBtnClicked(x, y, {
+        //     x: col * containerShapeW + containerGridAdjX,
+        //     y: row * containerShapeH + containerGridAdjY,
+        //     w: containerShapeW,
+        //     h: containerShapeH,
+        // })) {
+        //     hoveredContainerID = i;
+        //     break;
+
+        // }
     }
 
     return hoveredContainerID > -1;
@@ -638,13 +748,18 @@ function checkAnswers() {
 
 function rngShapes() {
     for (let i = 0; i < nContainers; ++i) {
-        let rng = Math.floor(Math.random() * nContainers);
+        let rng = Math.floor(Math.random() * 11);
         
-        let pos = portal.getPos(rng);
-        let id = 'shape_' + (rng + 1);
-        shapes[i].id = id;
-        shapes[i].clipW = AM.images[id].cw;
-        shapes[i].clipH = AM.images[id].ch;
+        // let pos = portal.getPos(rng);
+        // let id = 'shape_' + (rng + 1);
+        // shapes[i].id = id;
+        
+        // shapes[i].clipW = AM.images[id].cw;
+        // shapes[i].clipH = AM.images[id].ch;
+
+        shapes[i].clipX = rng * AM.images.shapes.cw;
+        shapes[i].key = rng;
+        // shapes[i].clipH = AM.images[id].ch;
 
         // let shape = new Sprite(pos.x, pos.y, shapeDimX, shapeDimY, AM.images[id].cw, AM.images[id].ch);
         // shapes[i].w = sizes[rng][0];
@@ -685,6 +800,75 @@ function update() {
     }
 }
 
+function drawStartPage() {
+    ctx.drawImage(AM.images.bg.img, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 0, 0, canvas.width, canvas.height);
+    // ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(AM.images.title.img, 0, 0, AM.images.title.cw, AM.images.title.ch, 
+        startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
+    
+    
+    let a = Math.sin(startPageInfo.t2) * 20 * scaleX;
+    let b = a / 2;
+
+    ctx.drawImage(AM.images.img1.img, 0, 0, AM.images.img1.cw, AM.images.img1.ch, 
+        startPageInfo.img1.x - b, startPageInfo.img1.y - b, startPageInfo.img1.w + a, startPageInfo.img1.h + a);
+
+    ctx.drawImage(AM.images.img2.img, 0, 0, AM.images.img2.cw, AM.images.img2.ch, 
+        startPageInfo.img2.x, startPageInfo.img2.y, startPageInfo.img2.w, startPageInfo.img2.h);
+
+    ctx.save();
+    // Untransformed draw position
+    const position = {x: startPageInfo.img3.x, y: startPageInfo.img3.y};
+    // In degrees
+    const rotation = { x: 0, y: 0, z: Math.sin(startPageInfo.t2) * 180};
+    // Rotation relative to here (this is the center of the image)
+    const rotPt = { x: startPageInfo.img3.w / 2, y: startPageInfo.img3.h / 2 };
+
+    ctx.setTransform(new DOMMatrix()
+        .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+        .rotateSelf(rotation.x, rotation.y, rotation.z)
+    );
+    
+    // ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
+    // ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, -rotPt.x, -rotPt.y, garbageInfo[id].w, garbageInfo[id].h);
+    ctx.drawImage(AM.images.img3.img, 0, 0, AM.images.img3.cw, AM.images.img3.ch, 
+        -rotPt.x, -rotPt.y, startPageInfo.img3.w, startPageInfo.img3.h);
+    ctx.restore();
+
+    for (let i = 1; i < 4; ++i) {
+        let key = 'text' + i;
+        ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, 
+            startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
+    }
+
+    ctx.beginPath();
+    ctx.fillStyle = '#11A5CC';
+    ctx.ellipse(startPageInfo.img2.tx, startPageInfo.img2.ty, startPageInfo.img2.tw, startPageInfo.img2.th, 0, 0, 2 * Math.PI);
+    
+    ctx.fill();
+    if (delta < 1) {
+        startPageInfo.t += 15 * delta;
+        var radians = Math.PI / 180 * startPageInfo.t;
+
+        ctx.save();
+        ctx.globalAlpha = 0.95;
+        ctx.beginPath();
+        ctx.moveTo(startPageInfo.img2.tx, startPageInfo.img2.ty);
+        ctx.fillStyle = '#fff';
+        ctx.ellipse(startPageInfo.img2.tx, startPageInfo.img2.ty, startPageInfo.img2.tw, startPageInfo.img2.th, 0, radians, Math.PI + Math.PI / 2);
+        ctx.closePath();
+        
+        ctx.fill();
+        ctx.restore();
+
+        startPageInfo.t += 10 * delta;
+        startPageInfo.t2 += 1 * delta;
+    }
+
+    ctx.drawImage(AM.images.start.img, 0, 0, AM.images.start.cw, AM.images.start.ch, 
+        startPageInfo.start.x, startPageInfo.start.y, startPageInfo.start.w, startPageInfo.start.h);
+}
+
 function gameCycle() {
     let now = Date.now();
     delta = (now - last) / 1000;
@@ -704,7 +888,8 @@ function gameCycle() {
 
             ctx.drawImage(AM.images.portal.img, 0, 0, AM.images.portal.cw, AM.images.portal.ch, (portal.x + tmp), (portal.y + tmpH), pw, ph);
             // console.log(portal.shapesOpacity)
-            
+            drawShapesContainer();
+
             if (!portal.isRefreshing) {
                 for (let i = 0; i < nContainers; ++i) {
                     if (dragID == i) {
@@ -724,7 +909,7 @@ function gameCycle() {
 
             // drawGrid(portal.x, portal.y, portal.gridDim)
 
-            drawShapesContainer();
+            
             // drawContainerGrid();
 
             portal.animate();
@@ -735,7 +920,7 @@ function gameCycle() {
 
             update();
         } else {
-            ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
+            drawStartPage();
         }
     } else {
         // HUD.draw(ctx);

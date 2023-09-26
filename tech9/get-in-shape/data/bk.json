@@ -2,6 +2,13 @@
     "data": [
         {
             "id": "bg",
+            "src": "startpage/bg",
+            "ext": "png",
+            "cw": 926,
+            "ch": 428
+        },
+        {
+            "id": "bg",
             "src": "bg",
             "ext": "png",
             "cw": 926,
@@ -13,62 +20,6 @@
             "ext": "png",
             "cw": 926,
             "ch": 428
-        },
-        {
-            "id": "title",
-            "src": "huds/startpage/title",
-            "ext": "png",
-            "cw": 410,
-            "ch": 30
-        },
-        {
-            "id": "start",
-            "src": "huds/startpage/start",
-            "ext": "png",
-            "cw": 212,
-            "ch": 48
-        },
-        {
-            "id": "img1",
-            "src": "huds/startpage/img1",
-            "ext": "png",
-            "cw": 66,
-            "ch": 64
-        },
-        {
-            "id": "img2",
-            "src": "huds/startpage/img2",
-            "ext": "png",
-            "cw": 64,
-            "ch": 64
-        },
-        {
-            "id": "img3",
-            "src": "huds/startpage/img3",
-            "ext": "png",
-            "cw": 64,
-            "ch": 64
-        },
-        {
-            "id": "text1",
-            "src": "huds/startpage/text1",
-            "ext": "png",
-            "cw": 152,
-            "ch": 28
-        },
-        {
-            "id": "text2",
-            "src": "huds/startpage/text2",
-            "ext": "png",
-            "cw": 146,
-            "ch": 25
-        },
-        {
-            "id": "text3",
-            "src": "huds/startpage/text3",
-            "ext": "png",
-            "cw": 122,
-            "ch": 28
         },
         {
             "id": "portal",

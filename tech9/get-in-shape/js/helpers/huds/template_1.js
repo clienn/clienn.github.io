@@ -5,10 +5,11 @@ class Template_1 {
         this.txt.setScale(sx, sy); 
 
         this.volumeOn = true;
-
+        this.volume = new StaticSprite(15, 30, 25, 25, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
+        this.mute = new StaticSprite(15, 30, 25, 25, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
         // this.timecircle = new StaticSprite(10, 10, 60, 60, 0, 0, AM.images.timecircle.cw, AM.images.timecircle.ch, 'timecircle');
         // this.stopwatch = new StaticSprite(10, 10, 60, 60, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
-        this.hourglass = new StaticSprite(10, 10, 40, 60, 0, 0, AM.images.hourglass.cw, AM.images.hourglass.ch, 'hourglass');
+        this.hourglass = new StaticSprite(this.volume.x + this.volume.w + 10, 10, 40, 60, 0, 0, AM.images.hourglass.cw, AM.images.hourglass.ch, 'hourglass');
 
         // this.life = new StaticSprite(0, 10, 60, 60, 0, 0, AM.images.life.cw, AM.images.life.ch, 'life');
         this.star = new StaticSprite(0, 0, 60, 60, 0, 0, AM.images.star.cw, AM.images.star.ch, 'star');
@@ -20,8 +21,7 @@ class Template_1 {
         // this.pigscore = new StaticSprite(0, 80, 120, 90, 0, 0, AM.images.pigscore.cw, AM.images.pigscore.ch, 'pigscore');
 
 
-        this.volume = new StaticSprite(30, this.hourglass.h + 20, 25, 25, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
-        this.mute = new StaticSprite(30, this.hourglass.h + 20, 25, 25, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
+        
 
         rescaleAll(this.hourglass, sx, sy);
         rescaleAll(this.complete, sx, sy);
@@ -43,7 +43,7 @@ class Template_1 {
 
         
         
-        this.timeProgressBar = new ProgressBar(this.hourglass.w / 2 + paddingX, this.hourglass.h / 2 - 30 * sx / 2 + paddingY, 100 * sx, 30 * sy);
+        this.timeProgressBar = new ProgressBar(this.hourglass.x + paddingX * 2, this.hourglass.h / 2 - 30 * sx / 2 + paddingY, 100 * sx, 30 * sy);
         this.timeProgressBar.progress = 100;
 
         this.scoreBar = new ProgressBar(w / 2 - 50 * sx / 2 - 70 * sy, paddingY, 50 * sx, 70 * sy, '#00ABC8');
