@@ -50,7 +50,7 @@ var garbageDropSpeed = 500;
 // physics
 var forceD = 0;
 var friction = 0.98;
-var F = 550;
+var F = 600;
 var T = 0;
 var G = 9.8;
 var kaboomT = 0;
@@ -117,18 +117,18 @@ var eelInfo = {
     head: {
         x: 0,
         y: 0,
-        w: 124,
-        h: 185,
-        // w: 505 * 0.75,
-        // h: 454 * 0.75,
+        // w: 124,
+        // h: 185,
+        w: 505 * 1,
+        h: 454 * 1,
     },
     neck: {
         x: 0,
         y: 0,
         w: 64,
-        h: 227 * 1.25,
-        // w: 505 * 0.75,
-        // h: 454 * 4.75,
+        // h: 227 * 1.25,
+        w: 505 * 1,
+        h: 454 * 1,
     }
 }
 
@@ -161,8 +161,31 @@ var isHunting = false;
 var isNeutral = true;
 
 var neckAdjY = 90;
-
+// 183.92px height eel head
 // #C7FC12
+
+var eel_hitbox = {
+    x: 0,
+    y: 0,
+    w: 124,
+    h: 185
+};
+
+var eelStatusEnum = {
+    NORMAL: 0,
+    EAT: 1,
+    DIZZY: 2,
+    CHARGED: 3,
+};
+
+var eelExpressionKeys = [
+    'eel_head_normal', 'eel_head_eat', 'eel_head_dizzy', 'eel_head_charged', 
+];
+
+var eelStatus = eelStatusEnum.NORMAL;
+var eelExpressionT = 0;
+var expressionDuration = 3;
+
 /*
  * GAME INITIATLIZATIONS AND CONTROLS
  */
@@ -206,6 +229,7 @@ function main(w, h) {
     setGarbageInfo(scaleX, scaleY, 0.5);
     rescaleSize(eelInfo.head, scaleX, scaleY);
     rescaleSize(eelInfo.neck, scaleX, scaleY);
+    rescaleSize(eel_hitbox, scaleX, scaleY);
 
     // eelInfo.neck.h = w;
 
@@ -216,11 +240,14 @@ function main(w, h) {
     eelInfo.head.x = w / 2 - eelInfo.head.w / 2;
     // eelInfo.head.y = h - eelInfo.head.h * 1.5;
     // eelInfo.head.y = h - eelInfo.head.h ;
-    eelInfo.head.y = h - eelInfo.neck.h ;
+    eelInfo.head.y = h - eelInfo.neck.h;
 
-    eelHead = new Sprite(eelInfo.head.x, eelInfo.head.y, eelInfo.head.w, eelInfo.head.h, AM.images['eel_head2'].cw, AM.images['eel_head2'].ch); 
-    eelNeck = new Sprite(w / 2 - eelInfo.neck.w / 2, eelInfo.head.y + neckAdjY, eelInfo.neck.w, eelInfo.neck.h, AM.images['eel_neck2'].cw, AM.images['eel_neck2'].ch); 
-
+    // eelHead = new Sprite(eelInfo.head.x, eelInfo.head.y, eelInfo.head.w, eelInfo.head.h, AM.images['eel_head2'].cw, AM.images['eel_head2'].ch); 
+    eelHead = new Sprite(eelInfo.head.x, eelInfo.head.y + 100 * scaleY, eelInfo.head.w, eelInfo.head.h, AM.images['eel_head_charged'].cw, AM.images['eel_head_charged'].ch); 
+    // eelNeck = new Sprite(w / 2 - eelInfo.neck.w / 2, eelInfo.head.y + neckAdjY, eelInfo.neck.w, eelInfo.neck.h, AM.images['eel_neck2'].cw, AM.images['eel_neck2'].ch); 
+    eelNeck = new Sprite(w / 2 - eelInfo.neck.w / 2, eelInfo.head.y + neckAdjY, eelInfo.neck.w, eelInfo.neck.h, AM.images.eel_neck.cw, AM.images.eel_neck.ch); 
+    eel_hitbox.y = eelHead.y + 50 * scaleY;
+    updateHitBox();
     initStartPage();
 
     // TXT = new Text(ctx, w, h); 
@@ -298,13 +325,26 @@ function main(w, h) {
     addGarbage();
     addGarbage();
     
-
+    
+    
     gameCycle();
 }
 
+function updateHitBox() {
+    eel_hitbox.x = eelHead.x + eelHead.w / 2 - eel_hitbox.w / 2;
+    
+    // ctx.beginPath();
+    // ctx.rect(eel_hitbox.x, eel_hitbox.y, eel_hitbox.w, eel_hitbox.h);
+    // ctx.stroke();
+}
+
 function drawEel() {
-    eelHead.drawWithRotation(ctx, AM.images.eel_head2.img, eelHead.w / 2, eelHead.h);
-    eelNeck.drawWithRotation(ctx, AM.images.eel_neck2.img, eelNeck.w / 2, eelHead.h - neckAdjY);
+    
+    // eelNeck.drawWithRotation(ctx, AM.images.eel_neck2.img, eelNeck.w / 2, eelHead.h - neckAdjY);
+    let key = eelExpressionKeys[eelStatus];
+    eelNeck.drawWithRotation(ctx, AM.images.eel_neck.img, eelNeck.w / 2, eelHead.h - neckAdjY);
+    eelHead.drawWithRotation(ctx, AM.images[key].img, eelHead.w / 2, eelHead.h);
+    
     // eelNeck.drawWithRotation(ctx, AM.images.eel_neck2.img, eelNeck.w / 2, eelNeck.h / 2);
 
     // if (eelHead.vx || eelHead.vy) {
@@ -314,29 +354,34 @@ function drawEel() {
 
     // eelHead.updatePos(delta, eelDirection);
     // eelNeck.updatePos(delta, eelDirection);
-    eelHead.moveEel(canvas.width, delta, friction);
+    
+    eelHead.moveEel(canvas.width, delta, eel_hitbox, updateHitBox);
     eelNeck.x = eelHead.x + eelHead.w / 2 - eelNeck.w / 2;
+    updateHitBox();
+    // if (!isNeutral) {
+    //     if (isHunting) {
+    //         let dx = eelHead.x + eelHead.w / 2 - eelLookAt[0];
+    //         let dy = eelHead.y - eelLookAt[1];
     
-    if (!isNeutral) {
-        if (isHunting) {
-            let dx = eelHead.x + eelHead.w / 2 - eelLookAt[0];
-            let dy = eelHead.y - eelLookAt[1];
-    
-            let dist = Math.sqrt(dx * dx + dy * dy);
+    //         let dist = Math.sqrt(dx * dx + dy * dy);
 
-            // TXT.texts['angle'].str = dist.toFixed(2) + ", " + (eelHead.h / 2).toFixed(2);
-            if (eelHead.x + eelHead.w / 2 >= canvas.width || eelHead.x <= 0 || eelHead.y <= 0) {
-                eelDirection = returnSpeed;
-                isHunting = false;
-            }
-        } else {
-            if (eelHead.y + eelHead.h > canvas.height) {
-                eelHead.reset();
-                eelNeck.reset();
-                isNeutral = true;
-            }
-        }
-    }
+    //         // TXT.texts['angle'].str = dist.toFixed(2) + ", " + (eelHead.h / 2).toFixed(2);
+    //         if (eelHead.x + eelHead.w / 2 >= canvas.width || eelHead.x <= 0 || eelHead.y <= 0) {
+    //             eelDirection = returnSpeed;
+    //             isHunting = false;
+    //         }
+    //         // if (eel_hitbox.x + eel_hitbox.w / 2 >= canvas.width || eel_hitbox.x <= 0 || eel_hitbox.y <= 0) {
+    //         //     eelDirection = returnSpeed;
+    //         //     isHunting = false;
+    //         // }
+    //     } else {
+    //         if (eel_hitbox.y + eel_hitbox.h > canvas.height) {
+    //             eelHead.reset();
+    //             eelNeck.reset();
+    //             isNeutral = true;
+    //         }
+    //     }
+    // }
     
     
    
@@ -373,14 +418,16 @@ function drawGarbage() {
             resetGarbage(garbage[i]);
         } 
         
-        if (checkAngledCollisions(garbage[i], eelHead)) {
-            resetGarbage(garbage[i]);
-            
+        // if (checkAngledCollisions(garbage[i], eelHead)) {
+        if (checkAngledCollisions(garbage[i], eel_hitbox)) {
             // jump = jumpHeight;
             // TXT.texts['points'].str = '-1.00';
             setPoints('-5.00','#fb2121');
             HUD.updateBattery(-5);
             playCry();
+
+            updateEelStatus(eelStatusEnum.DIZZY, expressionDuration);
+            resetGarbage(garbage[i]);
         }
 
         // else if (isHunting) {
@@ -409,7 +456,7 @@ function resetGarbage(trash) {
 }
 
 function addSmartFish() {
-    let rng = Math.floor(Math.random() * 6) + 1;
+    let rng = Math.floor(Math.random() * 7);
     let key = 'sfish_' + rng;
     let rngY = Math.floor(Math.random() * (canvas.height - fishInfo[rng].h));
     let rngX = 0;
@@ -580,6 +627,24 @@ function controls() {
                 var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
                 var touch = evt.touches[0] || evt.changedTouches[0];
                 prevPos = touch.pageX;
+
+                if (isBtnClicked(touch.pageX, touch.pageY, {
+                    x: HUD.volume.x,
+                    y: HUD.volume.y,
+                    w: HUD.volume.w,
+                    h: HUD.volume.h
+                })) {
+                    
+                    HUD.volumeOn = !HUD.volumeOn; 
+                    // console.log('test', HUD.volumeOn)
+                    if (HUD.volumeOn) {
+                        AM.audio.bg.img.currentTime = 0;
+                        AM.audio.bg.img.play();
+                    } else {
+                        AM.audio.bg.img.pause();
+                        // music.correct.obj.volume = 0;
+                    }
+                } 
             }
         }
     });
@@ -631,7 +696,7 @@ function controls() {
         // let x = touch.pageX;
 
         if (!gameStart) {
-            AM.audio.bg.img.volume = 0.2;
+            AM.audio.bg.img.volume = 0.5;
             AM.audio.bg.img.loop = true;
             AM.audio.bg.img.play();
 
@@ -640,7 +705,7 @@ function controls() {
             // playGlue();
 
             gameStart = true;
-            HUD.health = 100;
+            HUD.health = 50;
         } 
 
         if (gameover) {
@@ -713,7 +778,7 @@ function controls() {
         
         if (!gameStart) {
             // if (AM.audio.bg.img.paused) {
-                AM.audio.bg.img.volume = 0.2;
+                AM.audio.bg.img.volume = 0.5;
                 AM.audio.bg.img.loop = true;
                 AM.audio.bg.img.play();
                 // console.log('test')
@@ -721,7 +786,7 @@ function controls() {
             
 
             gameStart = true;
-            HUD.health = 100;
+            HUD.health = 50;
         }
 
         if (mDown) {
@@ -812,6 +877,14 @@ function setFishInfo(sx, sy, sizePercentage) {
             frames: AM.images[key].frames
         };
     }
+
+    fishInfo[0] = {
+        x: 0,
+        y: 0,
+        w: AM.images.sfish_0.cw * 1.5 * sx,
+        h: AM.images.sfish_0.ch * 1.5 * sy,
+        frames: AM.images.sfish_0.frames
+    };
 }
 
 function setSchoolFishInfo(sx, sy, sizePercentage) {
@@ -847,7 +920,8 @@ function setGarbageInfo(sx, sy, sizePercentage) {
  */
 function addFish() {
     // x, y, w, h, clipW, clipH
-    let rng = Math.floor(Math.random() * 6) + 1;
+    let rng = Math.floor(Math.random() * 7);
+    // let rng = 0;
     let key = 'sfish_' + rng;
     let rngY = Math.floor(Math.random() * (canvas.height - fishInfo[rng].h));
 
@@ -876,8 +950,9 @@ function drawFishes() {
 }
 
 function resetFish(fish, isEaten) {
-    let rng = Math.floor(Math.random() * 6) + 1;
+    let rng = Math.floor(Math.random() * 7);
     let key = 'sfish_' + rng;
+    // let key = 'sfish_';
     let rngY = Math.floor(Math.random() * (canvas.height / 2));
     // let rngY = (Math.floor(Math.random() * 2) + 1) * fish.h;
     
@@ -913,7 +988,7 @@ function resetFish(fish, isEaten) {
 }
 
 function resetSmartFish(fish) {
-    let rng = Math.floor(Math.random() * 6) + 1;
+    let rng = Math.floor(Math.random() * 7);
     let key = 'sfish_' + rng;
 
     let direction = Math.floor(Math.random() * 2) ? FACE.RIGHT : FACE.LEFT;
@@ -951,7 +1026,7 @@ function resetSmartFish(fish) {
 }
 
 function mutateFish(fish) {
-    let rng = Math.floor(Math.random() * 6) + 1;
+    let rng = Math.floor(Math.random() * 7);
     let key = 'sfish_' + rng;
     fish.morph(rng, fishInfo[rng].w, fishInfo[rng].h, AM.images[key].cw, AM.images[key].ch);
 }
@@ -1085,6 +1160,14 @@ function playScore() {
     }
 }
 
+function playBonus() {
+    if (HUD.volumeOn) {
+        AM.audio.bonus.img.pause();
+        AM.audio.bonus.img.currentTime = 0;
+        AM.audio.bonus.img.play();
+    }
+}
+
 // *********************************** SOUNDS END ******************************************************** //
 
 // #11A5CC
@@ -1190,10 +1273,15 @@ function drawStartPage() {
 function reset() {
     gameover = false;
    
-    HUD.health = 100;
-
+    HUD.health = 50;
+    eelStatus = eelStatusEnum.NORMAL;
     
     timer.setTimer(gameDuration);
+}
+
+function updateEelStatus(status, duration) {
+    eelStatus = status;
+    eelExpressionT = duration;
 }
 
 function update() {
@@ -1201,14 +1289,32 @@ function update() {
         fishes[i].update(delta, 2);
 
         // if (isHunting) {
-            if (checkAngledCollisions(fishes[i], eelHead)) {
+            // if (checkAngledCollisions(fishes[i], eelHead)) {
+            if (checkAngledCollisions(fishes[i], eel_hitbox)) {
                 // resetFish(i);
-                resetFish(fishes[i], true);
+                
                 // jump = jumpHeight;
                 // TXT.texts['points'].str = '+1.00';
-                setPoints('+3.00','#C7FC12');
-                HUD.updateBattery(3);
-                playScore();
+                
+                // console.log(fishes[i].id);
+                if (fishes[i].id == 0 || eelStatus == eelStatusEnum.CHARGED) {
+                    updateEelStatus(eelStatusEnum.CHARGED, expressionDuration * 7);
+                    playBonus();
+                } else {
+                    updateEelStatus(eelStatusEnum.EAT, expressionDuration);
+                    playScore();
+                }
+
+                let points = 3;
+                if (eelStatus == eelStatusEnum.CHARGED) {
+                    points = 9;
+                }
+
+                setPoints('+' + points + '.00','#C7FC12');
+                HUD.updateBattery(points);
+                
+
+                resetFish(fishes[i], true);
             }
         // }
         
@@ -1223,14 +1329,36 @@ function update() {
         // smartSwimmers[i].update(delta, 2);
 
         // if (isHunting) {
-            if (checkAngledCollisions(smartSwimmers[i], eelHead)) {
+            // if (checkAngledCollisions(smartSwimmers[i], eelHead)) {
+            if (checkAngledCollisions(smartSwimmers[i], eel_hitbox)) {
                 // resetFish(i);
-                resetSmartFish(smartSwimmers[i]);
+                
                 // jump = jumpHeight;
                 // TXT.texts['points'].str = '+1.00';
-                setPoints('+2.00','#C7FC12');
-                HUD.updateBattery(2);
-                playEat();
+                // setPoints('+2.00','#C7FC12');
+                // HUD.updateBattery(2);
+                // playEat();
+                // console.log(fishes[i].id);
+
+                if (smartSwimmers[i].id == 0 || eelStatus == eelStatusEnum.CHARGED) {
+                    updateEelStatus(eelStatusEnum.CHARGED, expressionDuration * 7);
+                    playBonus();
+                } else {
+                    updateEelStatus(eelStatusEnum.EAT, expressionDuration);
+                    playEat();
+                }
+
+                let points = 2;
+                if (eelStatus == eelStatusEnum.CHARGED) {
+                    points = 6;
+                }
+
+                setPoints('+' + points + '.00','#C7FC12');
+                HUD.updateBattery(points);
+                // playEat();
+
+                resetSmartFish(smartSwimmers[i]);
+                // updateEelStatus(eelStatusEnum.EAT, expressionDuration);
             }
         // }
         
@@ -1255,11 +1383,20 @@ function update() {
         }
     }
 
-    HUD.decay(delta);
-    if (HUD.health <= 0) {
+    if (HUD.health <= 0 || HUD.health == 100) {
         gameover = true;
         HUD.updateGameoverBattery();
     }
+
+    if (eelExpressionT > 0) {
+        eelExpressionT -= 5 * delta;
+        if (eelExpressionT <= 0) {
+            eelExpressionT = 0;
+            eelStatus = eelStatusEnum.NORMAL;
+        }
+    }
+
+    HUD.decay(delta);
 }
 
 function gameCycle() {

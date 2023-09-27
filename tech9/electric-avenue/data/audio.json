@@ -19,6 +19,11 @@
             "id": "score",
             "src": "sounds/score",
             "ext": "wav"
+        },
+        {
+            "id": "bonus",
+            "src": "sounds/bonus",
+            "ext": "wav"
         }
     ]
 }

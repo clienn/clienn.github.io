@@ -41,7 +41,6 @@ class Sprite {
 
         this.show = true;
         this.frames = 1;
-        
     }
 
     setFrames(frames) {
@@ -259,16 +258,30 @@ class Sprite {
         this.y += this.vy * delta;
     }
 
-    moveEel(w, delta, friction) {
+    moveEel(w, delta, hitbox, callback) {
         this.x += this.vx * delta;
         // add friction
         // this.vx *= friction;
 
-        if (this.x + this.w > w) {
-            this.x = w - this.w;
+        // if (this.x + this.w > w) {
+        //     this.x = w - this.w;
+        //     this.vx = 0;
+        // } else if (this.x < 0) {
+        //     this.x = 0;
+        //     this.vx = 0;
+        // }
+
+        if (callback) {
+            callback();
+        }
+
+        if (hitbox.x + hitbox.w > w) {
+            this.x = w - (this.w / 2 + hitbox.w / 2);
             this.vx = 0;
-        } else if (this.x < 0) {
-            this.x = 0;
+            // console.log(this.x)
+        } else if (hitbox.x < 0) {
+            this.x = -(this.w / 2 - hitbox.w / 2);
+            
             this.vx = 0;
         }
     }

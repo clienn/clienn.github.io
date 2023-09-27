@@ -57,6 +57,34 @@
             "ch": 430
         },
         {
+            "id": "eel_head_normal",
+            "src": "eel/expressions/normal",
+            "ext": "png",
+            "cw": 505,
+            "ch": 454
+        },
+        {
+            "id": "eel_head_eat",
+            "src": "eel/expressions/eat",
+            "ext": "png",
+            "cw": 505,
+            "ch": 454
+        },
+        {
+            "id": "eel_head_charged",
+            "src": "eel/expressions/charged",
+            "ext": "png",
+            "cw": 505,
+            "ch": 454
+        },
+        {
+            "id": "eel_head_dizzy",
+            "src": "eel/expressions/dizzy",
+            "ext": "png",
+            "cw": 505,
+            "ch": 454
+        },
+        {
             "id": "eel_head",
             "src": "eel/eel_head",
             "ext": "png",
@@ -72,7 +100,7 @@
         },
         {
             "id": "eel_neck",
-            "src": "eel/eel_neck",
+            "src": "eel/neck",
             "ext": "png",
             "cw": 505,
             "ch": 454
@@ -83,6 +111,14 @@
             "ext": "png",
             "cw": 64,
             "ch": 227
+        },
+        {
+            "id": "sfish_0",
+            "src": "fishes/sprites/0",
+            "ext": "png",
+            "cw": 187,
+            "ch": 180,
+            "frames": 1
         },
         {
             "id": "sfish_1",
