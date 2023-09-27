@@ -161,6 +161,10 @@ var images = {
         w: 314,
         h: 412
     },
+    blackcannon: {
+        src: 'cannon_sprite',
+        obj: {}
+    },
     blackCanonLeft: {
         src: 'black-canon',
         obj: {}
@@ -171,6 +175,18 @@ var images = {
     },
     blackCanonRight: {
         src: 'black-canon-2',
+        obj: {}
+    },
+    softobjects: {
+        src: 'shapes/soft',
+        obj: {}
+    },
+    hardobjects: {
+        src: 'shapes/hard',
+        obj: {}
+    },
+    bombs: {
+        src: 'shapes/bombs',
         obj: {}
     },
     mine: {
@@ -232,8 +248,8 @@ var images = {
 }
 
 var volumeInfo = {
-    x: 30,
-    y: 100,
+    x: 15,
+    y: 20,
     w: 25 * 2,
     h: 25 * 2,
     cw: 50,
@@ -272,12 +288,16 @@ var volumeOn = true;
 var canons = {
     black: {
         left: {
-            upper: new Spirte(0, 310, 285, 225, 636, 504),
-            lower: new Spirte(0, 540, 285, 225, 636, 504),
+            upper: new Spirte(0, 310, 280, 235, 192.11, 145),
+            lower: new Spirte(0, 540, 280, 235, 192.11, 145),
+            // upper: new Spirte(0, 310, 285, 225, 636, 504),
+            // lower: new Spirte(0, 540, 285, 225, 636, 504),
         },
         right: {
-            upper: new Spirte(0, 320, 285, 225, 570, 451),
-            lower: new Spirte(0, 540, 285, 225, 570, 451),
+            upper: new Spirte(0, 320, 280, 235, 192.11, 145),
+            lower: new Spirte(0, 540, 280, 235, 192.11, 145),
+            // upper: new Spirte(0, 320, 285, 225, 570, 451),
+            // lower: new Spirte(0, 540, 285, 225, 570, 451),
         },
     },
     index: [],
@@ -287,12 +307,28 @@ var canons = {
         canons.black.right.lower.x = canvas.width - canons.black.right.lower.w;
         canons.black.right.lower.ox = canvas.width - canons.black.right.lower.w;
 
+        canons.black.right.upper.yRotate = 180;
+        canons.black.right.lower.yRotate = 180;
+
+        canons.black.left.upper.frames = 9;
+        canons.black.left.lower.frames = 9;
+        canons.black.right.upper.frames = 9;
+        canons.black.right.lower.frames = 9;
+
     },
     draw: () => {
-        canons.black.left.upper.draw(ctx, images.blackCanonLeft.obj.img);
-        canons.black.left.lower.draw(ctx, images.blackCanonLeft.obj.img);
-        canons.black.right.upper.draw(ctx, images.blackCanonRight.obj.img);
-        canons.black.right.lower.draw(ctx, images.blackCanonRight.obj.img);
+        let expSpeed = 15;
+        canons.black.left.upper.animateSprite(expSpeed, delta);
+        canons.black.left.lower.animateSprite(expSpeed, delta);
+        canons.black.right.upper.animateSprite(expSpeed, delta);
+        canons.black.right.lower.animateSprite(expSpeed, delta);
+
+        canons.black.left.upper.draw(ctx, images.blackcannon.obj.img);
+        canons.black.left.lower.draw(ctx, images.blackcannon.obj.img);
+        canons.black.right.upper.drawRotate(ctx, images.blackcannon.obj.img);
+        canons.black.right.lower.drawRotate(ctx, images.blackcannon.obj.img);
+
+        // canons.black.right.lower.draw(ctx, images.blackCanonRight.obj.img);
     }
 }
 
@@ -704,6 +740,30 @@ var floaters = [];
 
 var timeProgressBar = null;
 
+var projSpriteInfo = {
+    0: {
+        frames: 18,
+        cw: 48.056,
+        ch: 48,
+        key: "softobjects"
+    },
+    1: {
+        frames: 13,
+        cw: 48.077,
+        ch: 49,
+        key: "hardobjects"
+    },
+    2: {
+        frames: 5,
+        cw: 48,
+        ch: 48,
+        key: "bombs"
+    },
+};
+
+var projDimX = 85;
+var projDimY = 85;
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
@@ -718,6 +778,9 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    projDimX *= scaleX;
+    projDimY *= scaleY;
 
     g *= scaleY;
 
@@ -770,8 +833,8 @@ function main(w, h) {
         trophyInfo.y = 70;
         scaleProj = 1.7;
 
-        volumeInfo.x = 45;
-        volumeInfo.y = 85;
+        // volumeInfo.x = 45;
+        // volumeInfo.y = 85;
         volumeInfo.w = 35;
         volumeInfo.h = 35;
 
@@ -803,7 +866,7 @@ function main(w, h) {
 
     init();
 
-    initTopHUD();
+    
 
     rescaleSize(compassInfo);
     rescaleSize(shineInfo);
@@ -815,6 +878,8 @@ function main(w, h) {
     rescaleAll(ouchInfo);
 
     rescaleAll(volumeInfo);
+
+    initTopHUD();
 
     waterInfo.y = h - waterInfo.h;
 
@@ -867,7 +932,7 @@ function main(w, h) {
     textList.scoreN.obj.ty = 28 * scaleY;
 
     // textList.topTimer.obj.tx = topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2 - (textList.topTimer.desc.w - 5) / 2 * scaleX;
-    textList.topTimer.obj.tx = 43 * scaleX;
+    textList.topTimer.obj.tx = 45 * scaleX + volumeInfo.x + volumeInfo.w;
     textList.topTimer.obj.ty = topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2 - textList.topTimer.desc.h / 2 * scaleY;
 
     textList.scoreLabel.obj.tx = w / 2 - textList.scoreLabel.desc.w * scaleX / 2 - 10 * scaleX;
@@ -889,30 +954,34 @@ function main(w, h) {
     
     let c = Math.floor(Math.random() * clips.length);
     projectiles[0] = new Spirte(canons.black.left.upper.w - 100 * scaleX, canons.black.left.upper.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
-    projectiles[0].clipX = clips[c].clipX;
-    projectiles[0].clipY = clips[c].clipY;
+    // projectiles[0].clipX = clips[c].clipX;
+    // projectiles[0].clipY = clips[c].clipY;
     projectiles[0].init(projectileRanges);
 
     c = Math.floor(Math.random() * clips.length);
     projectiles[1] = new Spirte(canons.black.left.upper.w - 100 * scaleX, canons.black.left.lower.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
-    projectiles[1].clipX = clips[c].clipX;
-    projectiles[1].clipY = clips[c].clipY;
+    // projectiles[1].clipX = clips[c].clipX;
+    // projectiles[1].clipY = clips[c].clipY;
     projectiles[1].init(projectileRanges);
 
     c = Math.floor(Math.random() * clips.length);
     projectiles[2] = new Spirte(canons.black.right.upper.x, canons.black.left.upper.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
-    projectiles[2].clipX = clips[c].clipX;
-    projectiles[2].clipY = clips[c].clipY;
+    // projectiles[2].clipX = clips[c].clipX;
+    // projectiles[2].clipY = clips[c].clipY;
     projectiles[2].direction = -1;
     projectiles[2].init(projectileRanges);
 
     c = Math.floor(Math.random() * clips.length);
     projectiles[3] = new Spirte(canons.black.right.upper.x, canons.black.left.lower.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
-    projectiles[3].clipX = clips[c].clipX;
-    projectiles[3].clipY = clips[c].clipY;
+    // projectiles[3].clipX = clips[c].clipX;
+    // projectiles[3].clipY = clips[c].clipY;
     projectiles[3].direction = -1;
     projectiles[3].init(projectileRanges);
 
+    updateSprite(0);
+    updateSprite(1);
+    updateSprite(2);
+    updateSprite(3);
     
 
     // generateFloaters();
@@ -948,9 +1017,19 @@ function setFloater(i) {
 function generateFloater(i) {
     if (floaters.length < 7) {
         let depth = Math.floor(Math.random() * 15) + 5;
-        let proj = new Spirte(canvas.width / 2, canvas.height + clips[i].h * depth, clips[i].w, clips[i].h, clips[i].clipW, clips[i].clipH, i);
-        proj.clipX = clips[i].clipX;
-        proj.clipY = clips[i].clipY;
+
+        let rng = Math.floor(Math.random() * 2);
+        let frames = projSpriteInfo[rng].frames;
+
+        let frame = Math.floor(Math.random() * frames);
+        let key = projSpriteInfo[rng].key;
+
+        let proj = new Spirte(canvas.width / 2, canvas.height + projDimY * depth, projDimX, projDimY, projSpriteInfo[rng].cw, projSpriteInfo[rng].ch, key);
+        proj.clipX = frame * projSpriteInfo[rng].cw;
+
+        // let proj = new Spirte(canvas.width / 2, canvas.height + clips[i].h * depth, clips[i].w, clips[i].h, clips[i].clipW, clips[i].clipH, i);
+        // proj.clipX = clips[i].clipX;
+        // proj.clipY = clips[i].clipY;
         let mul = Math.floor(Math.random() * 2);
         if (mul == 0) mul = -1;
         let moveSpeed = Math.floor(Math.random() * 80) + 20;
@@ -980,7 +1059,7 @@ function generateFloaters() {
 
 function drawFloaters() {
     for (let i = 0; i < floaters.length; ++i) {
-        floaters[i].draw(ctx, images.projectile.obj.img);
+        floaters[i].draw(ctx, images[floaters[i].id].obj.img);
         floaters[i].floatAnim(delta);
 
         if (floaters[i].x < 0 || floaters[i].x > canvas.width) floaters[i].vx *= -1;
@@ -1001,6 +1080,7 @@ function initAnimateCanon(idx) {
     canons.index[idx].w = canons.index[idx].ow;
     canons.index[idx].h = canons.index[idx].oh;
     canons.index[idx].t2 = 0;
+    canons.index[idx].startAnimation = true;
 }
 
 function animateCanons() {
@@ -1035,15 +1115,15 @@ function initTopHUD() {
     let isMobile = detectMob();
 
     if (isMobile) {
-        topHUD.timer.timecircle.w = 75;
-        topHUD.timer.timecircle.h = 75;
-        topHUD.timer.stopwatch.w = 75;
-        topHUD.timer.stopwatch.h = 75;
-        topHUDInfo.timer.progress.h = 30;
-        topHUDInfo.timer.progress.max = 167;
-        topHUDInfo.timer.text.fontsize = 18;
-        topHUDInfo.timer.text.rectSize = 35;
-        topHUDInfo.timer.text.y = 1;
+        // topHUD.timer.timecircle.w = 75;
+        // topHUD.timer.timecircle.h = 75;
+        // topHUD.timer.stopwatch.w = 75;
+        // topHUD.timer.stopwatch.h = 75;
+        // topHUDInfo.timer.progress.h = 30;
+        // topHUDInfo.timer.progress.max = 167;
+        // topHUDInfo.timer.text.fontsize = 18;
+        // topHUDInfo.timer.text.rectSize = 35;
+        // topHUDInfo.timer.text.y = 1;
 
         // (/iPad|iPhone|iPod/).test(navigator.userAgent);
         let sx = 844 / canvas.width;
@@ -1069,12 +1149,15 @@ function initTopHUD() {
     rescaleAll(topHUD.score.turtleshine);
     rescaleSize(topHUDInfo);
 
+    let volumeAdjX = volumeInfo.x + volumeInfo.w + 10 * scaleX;
+
     topHUDInfo.timer.w = topHUD.timer.timecircle.w / 2 + 100 * scaleX;
     topHUDInfo.timer.progress.h *= scaleX;
     
-    topHUDInfo.timer.progress.x = topHUDInfo.w / 2 - topHUDInfo.timer.w / 2;
+    topHUDInfo.timer.progress.x = topHUDInfo.w / 2 - topHUDInfo.timer.w / 2 + volumeAdjX + 10 * scaleX;
 
-    topHUDInfo.timer.x = topHUDInfo.timer.progress.x - topHUD.timer.timecircle.w / 2;
+    // topHUDInfo.timer.x = topHUDInfo.timer.progress.x - topHUD.timer.timecircle.w / 2;
+    topHUDInfo.timer.x = volumeAdjX;
     // topHUDInfo.timer.x = 30;
     topHUDInfo.timer.y = topHUDInfo.h / 2 - topHUD.timer.timecircle.h / 2;
 
@@ -1501,21 +1584,25 @@ function init() {
     cannonCollisionBubble[0] = {
         x: canons.black.left.upper.x + canons.black.left.upper.w - dradius,
         y: canons.black.left.upper.y + dradius,
+        id: 'bombs'
     }
 
     cannonCollisionBubble[1] = {
         x: canons.black.left.lower.x + canons.black.left.lower.w - dradius,
         y: canons.black.left.lower.y + dradius,
+        id: 'bombs'
     }
 
     cannonCollisionBubble[2] = {
         x: canons.black.right.upper.x + dradius,
         y: canons.black.right.upper.y + dradius,
+        id: 'bombs'
     }
 
     cannonCollisionBubble[3] = {
         x: canons.black.right.lower.x + dradius,
         y: canons.black.right.lower.y + dradius,
+        id: 'bombs'
     }
 }
 
@@ -1578,7 +1665,8 @@ function checkProjectileCollisions() {
     for (let i = 0; i < 2; ++i) {
         for (let j = 2; j < 4; ++j) {
             if (isCollided(projectiles[i], projectiles[j])) {
-                if (projectiles[i].clipY != projectiles[j].clipY) {
+                // if (projectiles[i].clipY != projectiles[j].clipY) {
+                if ((projectiles[i].id != 'bombs' && projectiles[j].id == 'bombs') || (projectiles[i].id == 'bombs' && projectiles[j].id != 'bombs')) {
                     // console.log('collision detected');
                     drawExplosionStar(projectiles[i].x, projectiles[i].y);
                     resetProjectile([i, j]);
@@ -1614,8 +1702,16 @@ function checkCanonCollisions() {
 }
 
 function updateSprite(idx) {
-    let c = Math.floor(Math.random() * clips.length);
-    projectiles[idx].updateSprite(clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, clips[c].clipX, clips[c].clipY, c);
+//     let c = Math.floor(Math.random() * clips.length);
+//     projectiles[idx].updateSprite(clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, clips[c].clipX, clips[c].clipY, c);
+    let rng = Math.floor(Math.random() * 3);
+    let frames = projSpriteInfo[rng].frames;
+
+    let frame = Math.floor(Math.random() * frames);
+    let key = projSpriteInfo[rng].key;
+
+    projectiles[idx].updateSprite(projDimX, projDimY, 
+        projSpriteInfo[rng].cw, projSpriteInfo[rng].ch, frame * projSpriteInfo[rng].cw, 0, key);
 }
 
 function resetProjectile(range) {
@@ -1642,7 +1738,8 @@ function reduceHP() {
 function splat(mx, my) {
     for (let i = 0; i < projectiles.length; ++i) {
         if (isSplatted(projectiles[i], { x: mx, y: my })) {
-            if (projectiles[i].clipY > 0) {
+            // if (projectiles[i].clipY > 0) {
+            if (projectiles[i].id == 'bombs') {
                 // console.log('ouch!');
                 score += OUCH_MINUS;
                 reduceHP();
@@ -1669,6 +1766,7 @@ function splat(mx, my) {
                 }
             }
             resetProjectile([i]);
+            initAnimateCanon(i);
             break;
         }
     }
@@ -1783,7 +1881,8 @@ function gameCycle() {
 
                 for (let i = 0; i < projectiles.length; ++i) {
                     if (difficulty[i] > 0) {
-                        projectiles[i].draw(ctx, images.projectile.obj.img);
+                        // projectiles[i].draw(ctx, images.projectile.obj.img);
+                        projectiles[i].draw(ctx, images[projectiles[i].id].obj.img);
                         let r = projectiles[i].update(delta * difficulty[i], g, projectileRanges);
                         
                         if (r) {
@@ -1822,7 +1921,7 @@ function gameCycle() {
 
                 // canons
                 canons.draw();
-                animateCanons();
+                // animateCanons();
                 // if (canons.black.left.upper.t2 > -5) {
                 //     canons.black.left.upper.t2 -= 20 * delta;
                 //     let spring = Math.sin(canons.black.left.upper.t2) * 5;

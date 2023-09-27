@@ -21,9 +21,31 @@ class Spirte {
         this.fy = 0;
         this.t = 0;
         this.t2 = 0;
+        this.t3 = 0;
 
         this.direction = 1;
         this.density = this.w / 2;
+        this.yRotate = 0;
+        this.frames = 1;
+        this.currFrame = 0;
+        this.startAnimation = false;
+    }
+
+    animateSprite(speed, delta) {
+        if (this.startAnimation) {
+            if (this.currFrame == this.frames - 1) {
+                this.startAnimation = false;
+                this.clipX = 0;
+                this.t3 = 0;
+                this.currFrame = 0;
+            } else {
+                this.t3 += speed * delta;
+                this.currFrame = Math.floor(this.t3) % this.frames;
+                
+                this.clipX = this.currFrame * this.clipW;
+            }
+        }
+        
     }
 
     draw(ctx, img) {
@@ -32,6 +54,24 @@ class Spirte {
         // ctx.beginPath();
         // ctx.arc(this.x + this.w / 2, this.y + this.h / 2, 15.3125, 0, 2 * Math.PI);
         // ctx.stroke();
+    }
+
+    drawRotate(ctx, img) {
+        ctx.save();
+        // Untransformed draw position
+        const position = {x: this.x, y: this.y};
+        // In degrees
+        const rotation = { x: 0, y: this.yRotate, z: 0};
+        // Rotation relative to here (this is the center of the image)
+        const rotPt = { x: this.w / 2, y: this.h / 2 };
+
+        ctx.setTransform(new DOMMatrix()
+            .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+            .rotateSelf(rotation.x, rotation.y, rotation.z)
+        );
+        
+        ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
+        ctx.restore();
     }
 
     update(delta, g, projectileRanges) {
