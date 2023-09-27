@@ -171,8 +171,8 @@ var kayak = null;
 var kayakInfo = {
     x: 0,
     y: 0,
-    w: 412 * 0.5,
-    h: 512 * 0.5
+    w: 129.125 * 2,
+    h: 187 * 2
 }
 
 const terrain = [];
@@ -287,16 +287,18 @@ function main(w, h) {
     rescaleSize(wstoneInfo, scaleX, scaleY);
     rescaleSize(logInfo, scaleX, scaleY);
     
-    kayak = new Sprite(w / 2 - kayakInfo.w / 2, h - kayakInfo.h * 1.25, kayakInfo.w, kayakInfo.h, AM.images.kayak.cw, AM.images.kayak.ch);
+    // kayak = new Sprite(w / 2 - kayakInfo.w / 2, h - kayakInfo.h * 1, kayakInfo.w, kayakInfo.h, 129.125, AM.images.kayak.ch);
+    console.log(AM.images.kayak.cw)
+    kayak = new Sprite(w / 2 - kayakInfo.w / 2, h - kayakInfo.h * 0.85, kayakInfo.w, kayakInfo.h, AM.images.kayak.cw, AM.images.kayak.ch);
 
-    setFishInfo(scaleX, scaleY, 2.5);
+    // setFishInfo(scaleX, scaleY, 2.5);
     initStartPage();
 
     // rescaleSize(eelInfo.head, scaleX, scaleY);
 
     initTerrain(1.5, 1.5);
     initWaterObjects(1, 1);
-    initDuck(0.25, 0.25);
+    initDuck(1.5, 1.5);
 
     terrainSprite = new StaticSprite(0, 0, 0, 0, 0, 0, 0, 0, ''); // blank sprite
     waterObjectSprite = new StaticSprite(0, 0, 0, 0, 0, 0, 0, 0, ''); // blank sprite
@@ -511,6 +513,7 @@ function addDuck() {
     let direction = Math.floor(Math.random() * 2) ? 1 : -1;
 
     let key = 'duck';
+    // let duck = new Sprite(parallaxInfo.water.x + rngX, parallaxInfo.tile.yPos[rngY], duckInfo[1].w, duckInfo[1].h, 46.83, AM.images[key].ch);
     let duck = new Sprite(parallaxInfo.water.x + rngX, parallaxInfo.tile.yPos[rngY], duckInfo[1].w, duckInfo[1].h, AM.images[key].cw, AM.images[key].ch);
     duck.id = rngY;
     duck.key = key;
@@ -544,7 +547,7 @@ function drawWaterObjects() {
                         score--;
                         if (score < 0) score = 0;
                         setPoints('-1', '#fb2121'); // red
-                        playCry();
+                        // playCry();
                     }
 
                     updateScore();
@@ -561,6 +564,7 @@ function drawWaterObjects() {
         waterObjects[i].y = parallaxInfo.tile.yPos[waterObjects[i].id];
 
         if (waterObjects[i].key == 'duck') {
+            waterObjects[i].updateFrameAnimation(6, 15, delta); // frames, speed, delta
             if (
                 (waterObjects[i].facing == 1 && waterObjects[i].x >= parallaxInfo.water.edgeX - waterObjects[i].w) || 
                 (waterObjects[i].facing == -1 && waterObjects[i].x <= parallaxInfo.water.x)
@@ -598,9 +602,9 @@ function updateWaterObject(rngY) {
                     //     let rngX = Math.floor(Math.random() * parallaxInfo.water.w);
                     //     waterObjects[count].x = parallaxInfo.water.x + rngX;
                     // }
-                    if (idx < 0) idx = 0;
+                    // if (idx < 0) idx = 0;
         
-                    // waterObjects[idx].y = parallaxInfo.tile.yPos[rngY];
+                    waterObjects[idx].y = parallaxInfo.tile.yPos[rngY];
                     
                     // waterObjects[idx].id = rngY;
                     waterObjectRows[rngY] = idx;
@@ -625,6 +629,7 @@ function initDuck(widthPercent, heightPercent) {
     let i = 1;
     let id = duckInfo[i].id;
     duckInfo[i].w = AM.images[id].cw * widthPercent * scaleX;
+    // duckInfo[i].w = 46.83 * widthPercent * scaleX;
     duckInfo[i].h = AM.images[id].ch * heightPercent * scaleY;
 }
 
@@ -701,7 +706,12 @@ function drawTerrain(r, c) {
 
 function drawKayak() {
     // kayak.draw(ctx, AM.images.kayak.img);
+    // kayak.t2 += 10 * delta;
+    // let frame = Math.floor(kayak.t2) % 8
+    // kayak.clipX = frame * 129.125;
+    kayak.updateFrameAnimation(8, 10, delta); // frames, speed, delta
     kayak.drawWithRotation(ctx, AM.images.kayak.img, kayakBounds.left, kayakBounds.right);
+
     if (kayak.x > kayakBounds.right - kayak.w) kayak.x = kayakBounds.right - kayak.w;
     if (kayak.x < kayakBounds.left) kayak.x = kayakBounds.left;
 }

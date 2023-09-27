@@ -51,16 +51,30 @@
         },
         {
             "id": "kayak",
+            "src": "kayak",
+            "ext": "png",
+            "cw": 412,
+            "ch": 512
+        },
+        {
+            "id": "kayak2",
             "src": "kayak_sprite",
             "ext": "png",
-            "cw": "129.125",
+            "cw": 1033,
             "ch": 187
         },
         {
             "id": "duck",
+            "src": "environment/duck",
+            "ext": "png",
+            "cw": 318,
+            "ch": 266
+        },
+        {
+            "id": "duck2",
             "src": "duck_sprite",
             "ext": "png",
-            "cw": "46.83",
+            "cw": 281,
             "ch": 40
         },
         {

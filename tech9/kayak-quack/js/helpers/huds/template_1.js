@@ -13,14 +13,17 @@ class Template_1 {
 
         this.volumeOn = true;
         let waterW = 1108 * sx;
-        let duckW = AM.images.duck.cw * 0.25 * sx;
+        let duckW = 46.83 * 2 * sx;
         let duckX = w / 2 - waterW / 2 + waterW - duckW * 3.5;
         // this.timecircle = new StaticSprite(50, 20, 60 * multiplier, 60 * multiplier, 0, 0, AM.images.timecircle.cw, AM.images.timecircle.ch, 'timecircle');
         // this.stopwatch = new StaticSprite(50, 20, 60 * multiplier, 60 * multiplier, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
-        this.duck = new StaticSprite(duckX, 20, duckW, AM.images.duck.ch * 0.25 * sy, 0, 0, AM.images.duck.cw, AM.images.duck.ch, 'duck');
+        this.duck = new StaticSprite(duckX, 20, duckW, AM.images.duck.ch * 2 * sy, 0, 0, 46.83, AM.images.duck.ch, 'duck');
 
-        this.volume = new StaticSprite(20, 10 * sy, 35, 35, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
-        this.mute = new StaticSprite(20, 10 * sy, 35, 35, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
+        let volumePosX = 10;
+        let volumePosY = 10;
+
+        this.volume = new StaticSprite(volumePosX, volumePosY, 35, 35, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
+        this.mute = new StaticSprite(volumePosX, volumePosY, 35, 35, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
 
         this.complete = new StaticSprite(0, 50, AM.images.complete.cw * multiplier2, AM.images.complete.ch * multiplier2, 0, 0, AM.images.complete.cw, AM.images.complete.ch, 'complete');
         this.yourscore = new StaticSprite(0, 80, AM.images.yourscore.cw * multiplier2, AM.images.yourscore.ch * multiplier2, 0, 0, AM.images.yourscore.cw, AM.images.yourscore.ch, 'yourscore');
@@ -53,7 +56,7 @@ class Template_1 {
         this.txt.addText('time', 'TIME: 90', 'bold', 25, 'Montserrat', this.timeProgressBar.x + diff, 35 * sy, txtW, txtH, '#fff', false); 
         this.txt.texts['time'].x = this.timeProgressBar.x + (this.timeProgressBar.w + this.timeProgressBar.h) / 2 - this.txt.texts['time'].w / 2;
         // this.txt.centerTo('time', this.timeProgressBar.x, this.timeProgressBar.y, this.timeProgressBar.w, this.timeProgressBar.h);
-        console.log(this.timeProgressBar.w, this.timeProgressBar.w + this.timeProgressBar.h / 2, this.txt.texts['time'].w);
+        // console.log(this.timeProgressBar.w, this.timeProgressBar.w + this.timeProgressBar.h / 2, this.txt.texts['time'].w);
 
         // gameover
         this.txt.addText('score', 'x 00', 'bold', 30, 'Montserrat', this.duck.x + this.duck.w * 2, this.duck.y + 10 * sy, 120, 50, '#fff', true);

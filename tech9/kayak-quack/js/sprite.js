@@ -51,6 +51,12 @@ class Sprite {
         this.w = this.clipW;
     }
 
+    updateFrameAnimation(frames, speed, delta) {
+        this.t3 += speed * delta;
+        let frame = Math.floor(this.t3) % frames;
+        this.clipX = frame * this.clipW;
+    }
+
     setDirection(d) {
         this.facing = d;
 
