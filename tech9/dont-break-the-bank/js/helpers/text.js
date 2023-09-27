@@ -82,6 +82,7 @@ class Text {
         this.ctx.translate(x, y);
         
         this.ctx.scale(sx, sy);
+        // this.ctx.scale(this.sx, this.sy);
 
         // ctx.translate(hMargin, 0);
 

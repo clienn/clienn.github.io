@@ -1,13 +1,23 @@
 class Template_1 {
     constructor(ctx, w, h, sx, sy) {
+        
         this.isMuted = false;
         this.txt = new Text(ctx, w, h); 
         this.txt.setScale(sx, sy); 
 
         this.volumeOn = true;
 
-        this.timecircle = new StaticSprite(10, 10, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.timecircle.cw, AM.images.timecircle.ch, 'timecircle');
-        this.stopwatch = new StaticSprite(10, 10, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
+        let volumePosX = 20;
+        let volumePosY = 35;
+
+        this.volume = new StaticSprite(volumePosX, volumePosY, 25 * 2, 25 * 2, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
+        this.mute = new StaticSprite(volumePosX, volumePosY, 25 * 2, 25 * 2, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
+
+        let paddingX = 20 * sx + this.volume.w;
+        let paddingY = 10 * sy;
+
+        this.timecircle = new StaticSprite(10 + paddingX, 10, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.timecircle.cw, AM.images.timecircle.ch, 'timecircle');
+        this.stopwatch = new StaticSprite(10 + paddingX, 10, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
 
         this.life = new StaticSprite(0, 10, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.life.cw, AM.images.life.ch, 'life');
         this.coin0 = new StaticSprite(0, 0, 60, 60, 0, 0, AM.images.coin_0.cw, AM.images.coin_0.ch, 'coin_0');
@@ -15,9 +25,10 @@ class Template_1 {
         this.shine = new StaticSprite(0, 80, 352, 290, 0, 0, AM.images.shine.cw, AM.images.shine.ch, 'shine');
         this.pigscore = new StaticSprite(0, 140, 120 * 2, 90 * 2, 0, 0, AM.images.pigscore.cw, AM.images.pigscore.ch, 'pigscore');
 
+        
 
-        this.volume = new StaticSprite(30, this.timecircle.h + 20, 25 * 2, 25 * 2, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
-        this.mute = new StaticSprite(30, this.timecircle.h + 20, 25 * 2, 25 * 2, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
+        // this.volume = new StaticSprite(30, this.timecircle.h + 20, 25 * 2, 25 * 2, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
+        // this.mute = new StaticSprite(30, this.timecircle.h + 20, 25 * 2, 25 * 2, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
 
         rescaleAll(this.timecircle, sx, sy);
         rescaleAll(this.stopwatch, sx, sy);
@@ -28,28 +39,32 @@ class Template_1 {
         rescaleAll(this.volume, sx, sy);
         rescaleAll(this.mute, sx, sy);
         
-        let paddingX = 10 * sx;
-        let paddingY = 10 * sy;
+        
 
-        this.timeProgressBar = new ProgressBar(this.timecircle.w / 2 + paddingX, this.timecircle.h / 2 - 30 * sx / 2 + paddingY, 200 * sx, 45 * sy);
+        this.timeProgressBar = new ProgressBar(this.timecircle.w / 2 + paddingX / 2, this.timecircle.h / 2 - 30 * sx / 2 + paddingY, 200 * sx, 45 * sy);
         this.timeProgressBar.progress = 100;
 
-        this.scoreBar = new ProgressBar(w / 2 - 50 * sx / 2 - 70 * sy, 20 * sy, 150 * sx, 70 * sy, '#15441D');
+        let scorebarWidth = 200 * sx + 70 * sy;
+
+        this.scoreBar = new ProgressBar(w / 2 - scorebarWidth / 2, 20 * sy, 200 * sx, 70 * sy, '#15441D');
         this.scoreBar.progress = 100;
 
-        this.coin0.x = this.scoreBar.x + paddingX / 2;
+        this.coin0.x = this.scoreBar.x + 10 * scaleX;
         this.coin0.y = this.scoreBar.y + this.scoreBar.h / 2 - this.coin0.h / 2;
 
         let txtY = 32 * sy;
-        if (isMobile()) txtY = 22 * sy;
+        // if (isMobile()) txtY = 12 * sy;
+        let scoreTxtW = 80 * 1.5;
+        // let scorebarWidth = this.scoreBar.w + this.scoreBar.h;
 
-        this.txt.addText('score', '00.00', 'bold', 20, 'Montserrat', 0, txtY, 80 * 1.5, 30 * 1.5, '#fff', true); 
-        let adjX = isMobile() ? this.scoreBar.h : this.scoreBar.h / 2;
+
+        this.txt.addText('score', '00.00', 'bold', 20, 'Montserrat', this.scoreBar.x + scorebarWidth / 2 + 20 * sx, this.scoreBar.y + 10 * sy, scoreTxtW, 30 * 1.5, '#fff', true); 
+        // let adjX = isMobile() ? this.scoreBar.h : this.scoreBar.h / 2;
         // this.txt.centerTo('score', this.scoreBar.x + this.scoreBar.w - this.txt.texts['score'].w + 20 * scaleX, this.scoreBar.y, this.scoreBar.w + this.scoreBar.h / 2, this.scoreBar.h);
-        this.txt.centerTo('score', this.scoreBar.x + this.scoreBar.w - this.txt.texts['score'].w + 20 * sx, this.scoreBar.y, this.scoreBar.w + this.scoreBar.h / 2, this.scoreBar.h);
+        // this.txt.centerTo('score', this.scoreBar.x + this.scoreBar.w - this.txt.texts['score'].w + 20 * sx, this.scoreBar.y, this.scoreBar.w + this.scoreBar.h / 2, this.scoreBar.h);
 
-        adjX = isMobile() ? 50 : 0;
-        console.log(adjX);
+        // adjX = isMobile() ? 50 : 0;
+        // console.log(adjX);
 
         // this.lifebar = new ProgressBar(w - this.life.w - 100 * sx / 2 - 25 * sy - adjX, this.life.h / 2 - 25 * sx / 2 + paddingY, 160 * sx, 35 * sy);
         this.lifebar = new ProgressBar(w - 260 * sx, this.life.h / 2 - 25 * sx / 2 + paddingY, 160 * sx, 35 * sy);
@@ -57,7 +72,7 @@ class Template_1 {
 
         this.life.x = this.lifebar.x - this.life.w / 2;
 
-        this.txt.addText('time', '90', 'bold', 20, 'Montserrat', 0, txtY, 30 * 1.5, 30 * 1.5, '#000', true); 
+        this.txt.addText('time', '90', 'bold', 20, 'Montserrat', 0, this.timecircle.y, 30 * 1.5, 30 * 1.5, '#000', true); 
         this.txt.centerTo('time', this.timecircle.x, this.timecircle.y, this.timecircle.w, this.timecircle.h);
 
         // this.txt.addText('x', 'x', 'normal', 20, 'Montserrat', 
@@ -67,6 +82,7 @@ class Template_1 {
         // w / 2 + 50 * scaleX, topHUDInfo.score.y + scoreAdjY * scaleY, topHUD.score.fontW, topHUD.score.fontH, '#fff', true);
 
         //#15441D
+        // alert(h + ' ' + this.txt.texts['score'].h + ' ' + this.txt.texts['score'].y);
 
         // gameover
         this.txt.addText('complete', 'Complete!', 'bold', 30, 'Montserrat', w / 2, 35 * 1.5 * sy, 180 * 2, 35 * 2, '#fff', true);
@@ -92,6 +108,16 @@ class Template_1 {
         
         this.txt.draw('time');
         this.txt.draw('score');
+
+        // ctx.beginPath();
+        // ctx.rect(this.txt.texts['score'].x, this.txt.texts['score'].y, this.txt.texts['score'].w, this.txt.texts['score'].h);
+        // ctx.stroke();
+
+        // ctx.font = 'bold 20px Montserrat';
+        // ctx.textAlign = 'left';
+        // ctx.textBaseline = 'top';
+        // ctx.fillStyle = '#f00';
+        // ctx.fillText('text', 0, 0);
     }
 
     gameover(ctx) {

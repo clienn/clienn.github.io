@@ -6,6 +6,8 @@ class Sprite {
         this.oy = y;
         this.w = w;
         this.h = h;
+        this.ow = w;
+        this.oh = h;
 
         this.clipX = 0;
         this.clipY = 0;
@@ -24,6 +26,7 @@ class Sprite {
         this.dropDist = 0;
 
         this.t = 0;
+        this.t2 = 0;
         this.rotationT = 0;
         this.isAnimating = false;
         this.yRotate = 0;
@@ -40,7 +43,7 @@ class Sprite {
     }
 
     update(w, delta, friction) {
-        this.x += this.vx;
+        this.x += this.vx * delta;
         // add friction
         this.vx *= friction;
 

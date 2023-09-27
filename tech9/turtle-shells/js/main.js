@@ -383,8 +383,8 @@ var shineInfo = {
 }
 // 35 * scaleX, volumeInfo.y + 50 * scaleY, volumeInfo.w * 2, volumeInfo.h * 2
 var volumeInfo = {
-    x: 35,
-    y: 100,
+    x: 15,
+    y: 25,
     w: 25 * 2,
     h: 25 * 2,
     cw: 50,
@@ -608,7 +608,22 @@ const TEXT_ID = {
     'TOPTIMER': 8,
     'SCOREX': 9,
     'SCORE': 10,
+    'YOU_GOT_IT': 11,
+    'YAY_YOU_FOUND_HIM': 12,
+    'NICE_WORK': 13,
+    'GOOD_JOB': 14,
+    'MASTERFUL': 15,
+    'YOUR_MOTHER_SHOULD_BE_PROUD': 16,
+    'SHOWING_PROMISE': 17,
+    'WRONG_TURTLE': 18,
+    'NOPE_NOT_THAT_ONE': 19,
+    'THEY_DO_LOOK_ALIKE': 20,
+    'UMMM_NOPE': 21,
+    'YOU_CAN_DO_BETTER': 22,
+    'NO_THATS_NOT_IT': 23,
+    'TRY_AGAIN': 24,
 }
+
 
 var answerIdx = -1;
 var showAnswerT = 0;
@@ -781,8 +796,25 @@ function main(w, h) {
     rescaleAll(shineInfo);
 
     // Texts
+    
     TXT.addText(TEXT_ID.CORRECT, 'Correct!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
+    TXT.addText(TEXT_ID.YOU_GOT_IT, 'You got it!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
+    TXT.addText(TEXT_ID.YAY_YOU_FOUND_HIM, 'Yay, you found him!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 350, 50, '#fff', true); 
+    TXT.addText(TEXT_ID.NICE_WORK, 'Nice work!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
+    TXT.addText(TEXT_ID.GOOD_JOB, 'Good job!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
+    TXT.addText(TEXT_ID.MASTERFUL, 'Masterful!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
+    TXT.addText(TEXT_ID.YOUR_MOTHER_SHOULD_BE_PROUD, 'Your mother should be proud!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 500, 50, '#fff', true); 
+    TXT.addText(TEXT_ID.SHOWING_PROMISE, 'Showing promise!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 300, 50, '#fff', true); 
+
     TXT.addText(TEXT_ID.WRONG, 'Wrong!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
+    TXT.addText(TEXT_ID.WRONG_TURTLE, 'Wrong turtle!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
+    TXT.addText(TEXT_ID.NOPE_NOT_THAT_ONE, 'Nope, not that one!', 'bold', 20, 'Montserrat', w / 2, 250 * scaleY, 350, 50, '#fb2121', true); 
+    TXT.addText(TEXT_ID.THEY_DO_LOOK_ALIKE, 'They do look alike!', 'bold', 20, 'Montserrat', w / 2, 250 * scaleY, 350, 50, '#fb2121', true); 
+    TXT.addText(TEXT_ID.UMMM_NOPE, 'Ummm, nope!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
+    TXT.addText(TEXT_ID.YOU_CAN_DO_BETTER, 'You can do better!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 350, 50, '#fb2121', true); 
+    TXT.addText(TEXT_ID.NO_THATS_NOT_IT, 'No, that\'s not it!', 'bold', 20, 'Montserrat', w / 2, 250 * scaleY, 300, 50, '#fb2121', true); 
+    TXT.addText(TEXT_ID.TRY_AGAIN, 'Try again!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
+
     TXT.addText(TEXT_ID.TOOSLOW, 'Too Slow!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
     TXT.addText(TEXT_ID.COMPLETE, 'Complete!', 'bold', 20, 'Montserrat', w / 2, 55 * scaleY, 300, 70, '#fff', true); 
     TXT.addText(TEXT_ID.SCORELABEL, 'Score', 'bold', 20, 'Montserrat', w / 2, 270 * scaleY, 100, 50, '#fff', true); 
@@ -837,7 +869,7 @@ function main(w, h) {
     let pbW = 150 * scaleX;
     let pbH = 45 * scaleY;
 
-    timeProgressBar = new ProgressBar(topHUDInfo.timer.progress.x * scaleX, 30 * scaleY, pbW, pbH);
+    timeProgressBar = new ProgressBar(topHUDInfo.timer.progress.x, 30 * scaleY, pbW, pbH);
     timeProgressBar.progress = 100;
     
     pbW = 200 * scaleX;
@@ -892,7 +924,13 @@ function main(w, h) {
                         // alert('you win');
                         // msg = 'Correct!';
                         // msg = 'correct';
-                        msg = TEXT_ID.CORRECT;
+
+                        // let msgs = [1, 11, 12, 13, 14, 15, 16, 17];
+                        let rng = Math.floor(Math.random() * 8) + 1;
+                        if (rng > 1) rng += 9;
+
+                        // msg = TEXT_ID.CORRECT;
+                        msg = rng;
                         score++;
                         // if (!music.correct.obj.audio.paused) {
                         //     music.correct.obj.audio.currentTime = 0;
@@ -910,7 +948,12 @@ function main(w, h) {
                     } else {
                         // alert('you lose');
                         // msg = 'wrong';
-                        msg = TEXT_ID.WRONG;
+                        let rng = Math.floor(Math.random() * 8) + 1;
+                        if (rng > 1) rng += 16;
+                        else rng = TEXT_ID.WRONG;
+
+                        msg = rng;
+                        // msg = TEXT_ID.WRONG;
                         // msg = 'Wrong!';
                         reduceHP();
 
@@ -1193,16 +1236,16 @@ function initTopHUD() {
     let scoreAdjX = 0;
 
     if (isMobile) {
-        topHUD.timer.timecircle.w = 75;
-        topHUD.timer.timecircle.h = 75;
-        topHUD.timer.stopwatch.w = 75;
-        topHUD.timer.stopwatch.h = 75;
-        topHUDInfo.timer.progress.h = 35;
-        // topHUDInfo.timer.progress.x = 30;
-        topHUDInfo.timer.progress.max = 167;
-        topHUDInfo.timer.text.fontsize = 18;
-        topHUDInfo.timer.text.rectSize = 35;
-        topHUDInfo.timer.text.y = 1;
+        // topHUD.timer.timecircle.w = 75;
+        // topHUD.timer.timecircle.h = 75;
+        // topHUD.timer.stopwatch.w = 75;
+        // topHUD.timer.stopwatch.h = 75;
+        // topHUDInfo.timer.progress.h = 35;
+        // // topHUDInfo.timer.progress.x = 30;
+        // topHUDInfo.timer.progress.max = 167;
+        // topHUDInfo.timer.text.fontsize = 18;
+        // topHUDInfo.timer.text.rectSize = 35;
+        // topHUDInfo.timer.text.y = 1;
 
         progressAdjX = 50 * scaleX;
         progressAdjW = 200;
@@ -1240,11 +1283,15 @@ function initTopHUD() {
     // rescaleAll(topHUD.score.turtleshine);
     
     rescaleSize(topHUDInfo);
+    let volumeAdjX = volumeInfo.x + volumeInfo.w;
+
+    console.log(volumeAdjX);
 
     topHUDInfo.timer.w = topHUD.timer.timecircle.w / 2 + progressAdjW * scaleX;
     topHUDInfo.timer.progress.h *= scaleX;
     
-    topHUDInfo.timer.progress.x = topHUDInfo.w / 2 - topHUDInfo.timer.w / 2 + progressAdjX;
+    // topHUDInfo.timer.progress.x = topHUDInfo.w / 2 - topHUDInfo.timer.w / 2 + volumeAdjX * 2;
+    topHUDInfo.timer.progress.x = volumeAdjX * 1.75;
 
     topHUDInfo.timer.x = topHUDInfo.timer.progress.x - topHUD.timer.timecircle.w / 2;
     topHUDInfo.timer.y = topHUDInfo.h / 2 - topHUD.timer.timecircle.h / 2;
@@ -1296,7 +1343,7 @@ function drawTurtle() {
     for (let i = 0; i < turtles.length; ++i) {
         if ((showTarget && i == target && showAnswerT == 0) || answerIdx == i) {
             if (answerIdx > -1) {
-                if (msg == TEXT_ID.WRONG || msg == TEXT_ID.TOOSLOW) {
+                if (msg == TEXT_ID.WRONG || msg == TEXT_ID.TOOSLOW || msg > 17) {
                     ctx.save();
 
                     // move to the center of the canvas
@@ -1905,7 +1952,25 @@ function gameCycle() {
                 // ctx.drawImage(images.splash.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
                 ctx.drawImage(images.startbg.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
                 ctx.drawImage(images.title.obj.img, 0, 0, startPageInfo.title.cw, startPageInfo.title.ch, startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
-                ctx.drawImage(images.hand.obj.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x + handx, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                
+                // tap
+                ctx.save();
+                // Untransformed draw position
+                var position = {x: startPageInfo.hand.x, y: startPageInfo.hand.y};
+                // In degrees
+                var rotation = { x: 0, y: Math.sin(startScreenHandAnimT) * 35, z: 0};
+                // Rotation relative to here (this is the center of the image)
+                var rotPt = { x: startPageInfo.hand.w / 2, y: startPageInfo.hand.h / 2 };
+
+                ctx.setTransform(new DOMMatrix()
+                    .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+                    .rotateSelf(rotation.x, rotation.y, rotation.z)
+                );
+                
+                ctx.drawImage(images.hand.obj.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, -rotPt.x, -rotPt.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                ctx.restore();
+                //
+                // ctx.drawImage(images.hand.obj.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x + handx, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
                 
                 let t = Math.floor(startTurtleBlinkT);
                 t = t % 8;
@@ -1916,11 +1981,11 @@ function gameCycle() {
                 
 
                 // Untransformed draw position
-                const position = {x: startPageInfo.shell.x, y: startPageInfo.shell.y};
+                position = {x: startPageInfo.shell.x, y: startPageInfo.shell.y};
                 // In degrees
-                const rotation = { x: 0, y: startScreenHandAnimT * 10, z: 0};
+                rotation = { x: 0, y: startScreenHandAnimT * 10, z: 0};
                 // Rotation relative to here (this is the center of the image)
-                const rotPt = { x: startPageInfo.shell.w / 2, y: startPageInfo.shell.h / 2 };
+                rotPt = { x: startPageInfo.shell.w / 2, y: startPageInfo.shell.h / 2 };
 
                 ctx.save();
                 ctx.setTransform(new DOMMatrix()

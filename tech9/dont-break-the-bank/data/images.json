@@ -86,6 +86,13 @@
             "ch": 577
         },
         {
+            "id": "break",
+            "src": "pig/break/break",
+            "ext": "png",
+            "cw": 192,
+            "ch": 145
+        },
+        {
             "id": "piggybankbroke",
             "src": "piggybankbroke",
             "ext": "png",

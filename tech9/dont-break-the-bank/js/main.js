@@ -94,7 +94,7 @@ var health = 100;
 // physics
 var forceD = 0;
 var friction = 0.98;
-var F = 10;
+var F = 600;
 var T = 0;
 const G = 9.8;
 var kaboomT = 0;
@@ -192,6 +192,7 @@ var startPage = {
     }
 }
 
+var pigbreakFlag = true;
 // #313350
 
 /*
@@ -233,6 +234,11 @@ function main(w, h) {
 
     pig = new Sprite(w / 2 - pigInfo.w / 2, h - pigInfo.h - 10, pigInfo.w, pigInfo.h, AM.images.pig_1.cw, AM.images.pig_1.ch);
     smoke = new Sprite(w / 2 - pigInfo.w / 2, h - pigInfo.h - 10, pigInfo.w, pigInfo.h, 192, 192);
+    pigbreak = new Sprite(w / 2 - pigInfo.w / 2, h - pigInfo.h - 10, pigInfo.w, pigInfo.h, 192, 145);
+    
+    gluebonus = new Sprite(0, pig.y - glueInfo.h, glueInfo.w, glueInfo.h, AM.images.glue_0.cw, AM.images.glue_0.ch);
+    gluebonus.t = 5;
+
     kaboom = new StaticSprite(0, 0, kaboomInfo.w, kaboomInfo.h, 0, 0, AM.images.kaboom.cw, AM.images.kaboom.ch, 'kaboom');
     kaboomstar = new StaticSprite(0, 0, kaboomInfo.w * 2, kaboomInfo.h * 2, 0, 0, AM.images.kaboomstar.cw, AM.images.kaboomstar.ch, 'kaboomstar');
 
@@ -273,6 +279,22 @@ function controls() {
                 var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
                 var touch = evt.touches[0] || evt.changedTouches[0];
                 prevPos = touch.pageX;
+
+                if (isBtnClicked(touch.pageX, touch.pageY, {
+                    x: HUD.volume.x,
+                    y: HUD.volume.y,
+                    w: HUD.volume.w,
+                    h: HUD.volume.h
+                })) {
+                    HUD.volumeOn = !HUD.volumeOn; 
+                    if (HUD.volumeOn) {
+                        AM.audio.bg.img.currentTime = 0;
+                        AM.audio.bg.img.play();
+                    } else {
+                        AM.audio.bg.img.pause();
+                        // music.correct.obj.volume = 0;
+                    }
+                }
             }
 
             // if (e.type == 'touchstart' || e.type == 'touchmove' || e.type == 'touchend' || e.type == 'touchcancel'){
@@ -545,6 +567,34 @@ function initStartPage() {
 /*
  * SPRITE MANAGEMENT (SETTING, ADDING, AND DRAWING)
  */
+
+function drawGlueBonus() {
+    if (gluebonus.t < 5) {
+        gluebonus.t += 10 * delta;
+        let a = Math.sin(gluebonus.t) * 15 * scaleX;
+        let frame = Math.floor(gluebonus.t) % 4;
+        let clipX = frame * 80.25;
+        gluebonus.clipX = clipX;
+
+        gluebonus.w += a;
+        gluebonus.h += a;
+
+        gluebonus.x = pig.x + pig.w / 2 - gluebonus.w / 2;
+        gluebonus.y = gluebonus.oy - a;
+        // let alpha = a;
+        // ctx.save();
+        // ctx.globalAlpha = Math.max(0, alpha - 1);
+        gluebonus.draw(ctx, AM.images.glue_0.img)
+        // ctx.restore();
+        if (gluebonus.t >= 5) {
+            gluebonus.t = 5;
+            gluebonus.w = gluebonus.ow;
+            gluebonus.h = gluebonus.oh;
+        }
+    }
+    
+}
+
 function drawPig() {
     let frame = 1;
 
@@ -558,13 +608,41 @@ function drawPig() {
     
     // pig.draw(ctx, AM.images['pig_' + frame].img);
     pig.drawRotate(ctx, AM.images['pig_' + frame].img);
-    
+    drawGlueBonus();
 }
 
 function drawPigBreak() {
-    pig.t += 15 * delta;
+    pig.t += 5 * delta;
     let frame = Math.floor(pig.t);
 
+    if (pigbreakFlag) {
+        pigbreak.x = pig.x;
+        pigbreak.y = pig.y;
+
+        pigbreak.clipX = frame * 192;
+        pigbreak.draw(ctx, AM.images.break.img);
+        if (frame == 4) {
+            pigbreakFlag = false;
+            pig.t = 0;
+        }
+    } else {
+        pigbreak.draw(ctx, AM.images.break.img);
+
+        if (frame < 9) {
+            smoke.x = pig.x;
+            smoke.y = pig.y;
+    
+            let clipX = frame % 3;
+            let clipY = Math.floor(frame / 3);
+    
+            smoke.clipX = clipX * 192;
+            smoke.clipY = clipY * 192;
+            
+            smoke.draw(ctx, AM.images.smoke.img);
+        }
+    }
+
+    
     // if (frame > 4) frame = 4;
     
 
@@ -575,18 +653,7 @@ function drawPigBreak() {
     // pig.draw(ctx, AM.images['pig_' + frame].img);
     // let id = 'pigbreak_' + frame;
     // pig.dynamicDrawRotate(ctx, AM.images[id].img, AM.images[id].cw, AM.images[id].ch);
-    if (frame < 9) {
-        smoke.x = pig.x;
-        smoke.y = pig.y;
-
-        let clipX = frame % 3;
-        let clipY = Math.floor(frame / 3);
-
-        smoke.clipX = clipX * 192;
-        smoke.clipY = clipY * 192;
-        
-        smoke.draw(ctx, AM.images.smoke.img);
-    }
+    
     
 }
 
@@ -907,7 +974,7 @@ function collisionUpdate() {
         if (checkCollision(pig, glues[i])) {
             health += 5;
             resetGlue(i);
-
+            gluebonus.t = 0;
             if (HUD.volumeOn)
                 playGlue();
             break;
@@ -1121,7 +1188,7 @@ function update() {
     if (health < 0) {
         health = 0;
         gameover = true;
-        gameoverT = 5;
+        gameoverT = 10;
         pig.t = 0;
     }
 
@@ -1135,7 +1202,7 @@ function update() {
 
         if (timer.timer <= 0) {
             gameover = true;
-            gameoverT = 5;
+            gameoverT = 10;
             pig.t = 0;
         }
     }
