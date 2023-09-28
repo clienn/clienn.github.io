@@ -43,6 +43,20 @@ class Sprite {
         this.frames = 1;
     }
 
+    updateBounds(w, hitbox) {
+        let left = -this.w / 2 + hitbox.w / 2;
+        if (this.x < left) {
+            this.x = left;
+        } else if (this.x + this.w / 2 + hitbox.w / 2 > w) {
+            this.x = w - (this.w / 2 + hitbox.w / 2);
+        }
+    }
+
+    updateOriginalPos() {
+        this.ox = this.x;
+        this.oy = this.y;
+    }
+
     setFrames(frames) {
         this.frames = frames;
         this.clipW = this.w / frames;
@@ -152,10 +166,6 @@ class Sprite {
         this.vy = 0;
         this.degrees = 0;
         
-    }
-
-    animateExtension() {
- 
     }
 
     updatePos(delta, speed) {

@@ -193,6 +193,12 @@ var startPage = {
 }
 
 var pigbreakFlag = true;
+var mouseMoveOrigin = {
+    x: 0,
+    y: 0
+};
+
+
 // #313350
 
 /*
@@ -295,6 +301,14 @@ function controls() {
                         // music.correct.obj.volume = 0;
                     }
                 }
+
+                if (!mDown) {
+                    mDown = true;
+                    
+                    mouseMoveOrigin.x = prevPos;
+                    console.log(prevPos)
+                }
+                
             }
 
             // if (e.type == 'touchstart' || e.type == 'touchmove' || e.type == 'touchend' || e.type == 'touchcancel'){
@@ -355,14 +369,21 @@ function controls() {
         if (!gameover) {
             var x = e.changedTouches[event.changedTouches.length-1].pageX;
 
-            if (x >= mid) {
-                rDown = false;
-            } else {
-                lDown = false;
-            }
+            // if (x >= mid) {
+            //     rDown = false;
+            // } else {
+            //     lDown = false;
+            // }
 
-            if (!rDown && !lDown) {
-                forceD = 0;
+            // if (!rDown && !lDown) {
+            //     forceD = 0;
+            // }
+
+            if (mDown) {
+                mDown = false;
+                pig.updateOriginalPos();
+                // mouseMoveOrigin.x = pig.x;
+                // console.log(x)
             }
         }
     });
@@ -395,31 +416,39 @@ function controls() {
                 var touch = evt.touches[0] || evt.changedTouches[0];
                 let x = touch.pageX;
 
-                if (x > prevPos) {
-                    forceD = F;
-                    pig.yRotate = 180;
-                } else  {
-                    forceD = -F;
-                    pig.yRotate = 0;
+                if (mDown) {
+                    let dist = x - mouseMoveOrigin.x;
+                    pig.x = pig.ox + dist;
+                    pig.updateBounds(canvas.width);
+
+                    if (x >= prevPos) {
+                        // forceD = F;
+                        pig.yRotate = 180;
+                    } else  {
+                        // forceD = -F;
+                        pig.yRotate = 0;
+                    }
+
+                    prevPos = x;
+                    // if (evt.touches.length > 0) {
+                    //     if (x > pig.x) {
+                    //         if (!rDown) {
+                    //             rDown = true;
+                    //             forceD = F;
+                    //         }
+                    //     } else  {
+                    //         if (!lDown) {
+                    //             lDown = true;
+                    //             forceD = -F;
+                    //         }
+                    //     }
+
+                    //     prevPos = x;
+                    // }
+
+                
+                    
                 }
-
-                prevPos = x;
-                // if (evt.touches.length > 0) {
-                //     if (x > pig.x) {
-                //         if (!rDown) {
-                //             rDown = true;
-                //             forceD = F;
-                //         }
-                //     } else  {
-                //         if (!lDown) {
-                //             lDown = true;
-                //             forceD = -F;
-                //         }
-                //     }
-
-                //     prevPos = x;
-                // }
-
                 
             }
         }
@@ -441,6 +470,8 @@ function controls() {
             playGlue();
 
             gameStart = true;
+
+            
         } 
         
     });
@@ -449,10 +480,10 @@ function controls() {
         // mousedownE(e.offsetX, e.offsetY);
         let mx = e.offsetX;
         let my = e.offsetY;
-        if (!mDown) {
-            
 
+        if (!mDown) {
             mDown = true;
+            mouseMoveOrigin.x = mx;
         }
 
         if (isBtnClicked(mx, my, {
@@ -522,10 +553,29 @@ function controls() {
         let mx = e.offsetX;
         let my = e.offsetY;
         // console.log(mx, my);
+        if (gameover) mDown = false;
+
+        if (mDown) {
+            let dist = mx - mouseMoveOrigin.x;
+            pig.x = pig.ox + dist;
+            pig.updateBounds(canvas.width);
+
+            
+
+            if (mx >= prevPos) {
+                // forceD = F;
+                pig.yRotate = 180;
+            } else {
+                // forceD = -F;
+                pig.yRotate = 0;
+            }
+
+            prevPos = mx;
+        }
     });
     
     canvas.addEventListener('mouseup', e => {
-        
+        let mx = e.offsetX;
         // mouseupE();
         if (!gameStart) {
             AM.audio.bg.img.volume = 0.2;
@@ -537,9 +587,19 @@ function controls() {
 
         if (mDown) {
             mDown = false;
+            pig.updateOriginalPos();
+            
+            // prevPos = 0;
+            // if (rDown) 
+
+            // if (mx >= mid) {
+            //     rDown = false;
+            // } else {
+            //     lDown = false;
+            // }
             
             if (gameover && gameoverT <= 0) {
-                reset();
+                // reset();
             }
 
             
@@ -598,7 +658,7 @@ function drawGlueBonus() {
 function drawPig() {
     let frame = 1;
 
-    if (forceD != 0) {
+    if (forceD != 0 || mDown) {
         pig.t += 20 * delta;
         frame = Math.floor(pig.t) % 5 + 1;
     }
@@ -1157,7 +1217,10 @@ function gamoverUpdate() {
 }
 
 function update() {
-    pig.update(canvas.width, delta, friction);
+    if (!mDown) {
+        pig.update(canvas.width, delta, friction);
+    }
+    // pig.update(canvas.width, delta, friction);
     dropMoney();
     dropCoins();
     dropGlues();

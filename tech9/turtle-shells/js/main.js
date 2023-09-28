@@ -1007,7 +1007,7 @@ function main(w, h) {
 
             if (gameover) {
                 if (canReset) {
-                    init();
+                    // init();
                     // location.href = '';
                 } else {
                     canReset = true;
@@ -2088,7 +2088,7 @@ function gameCycle() {
                 TXT.draw(TEXT_ID.SCORELABEL);
                 TXT.texts[TEXT_ID.FINALSCORE].str = zeroPad(score, 2);
                 TXT.draw(TEXT_ID.FINALSCORE);
-                TXT.draw(TEXT_ID.RESETMSG);
+                // TXT.draw(TEXT_ID.RESETMSG);
             }
             
         }

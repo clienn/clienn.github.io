@@ -186,6 +186,11 @@ var eelStatus = eelStatusEnum.NORMAL;
 var eelExpressionT = 0;
 var expressionDuration = 3;
 
+var mouseMoveOrigin = {
+    x: 0,
+    y: 0
+};
+
 /*
  * GAME INITIATLIZATIONS AND CONTROLS
  */
@@ -355,8 +360,11 @@ function drawEel() {
     // eelHead.updatePos(delta, eelDirection);
     // eelNeck.updatePos(delta, eelDirection);
     
-    eelHead.moveEel(canvas.width, delta, eel_hitbox, updateHitBox);
-    eelNeck.x = eelHead.x + eelHead.w / 2 - eelNeck.w / 2;
+    if (!mDown) {
+        eelHead.moveEel(canvas.width, delta, eel_hitbox, updateHitBox);
+        eelNeck.x = eelHead.x + eelHead.w / 2 - eelNeck.w / 2;
+    }
+    
     updateHitBox();
     // if (!isNeutral) {
     //     if (isHunting) {
@@ -644,7 +652,12 @@ function controls() {
                         AM.audio.bg.img.pause();
                         // music.correct.obj.volume = 0;
                     }
-                } 
+                }
+                
+                if (!mDown) {
+                    mDown = true;
+                    mouseMoveOrigin.x = prevPos;
+                }
             }
         }
     });
@@ -655,15 +668,20 @@ function controls() {
         if (!gameover) {
             var x = e.changedTouches[event.changedTouches.length-1].pageX;
 
-            if (x >= mid) {
-                rDown = false;
-            } else {
-                lDown = false;
-            }
+            // if (x >= mid) {
+            //     rDown = false;
+            // } else {
+            //     lDown = false;
+            // }
 
-            if (!rDown && !lDown) {
-                // forceD = 0;
-                eelHead.vx = 0;
+            // if (!rDown && !lDown) {
+            //     // forceD = 0;
+            //     eelHead.vx = 0;
+            // }
+
+            if (mDown) {
+                mDown = false;
+                eelHead.updateOriginalPos();
             }
         }
     });
@@ -676,12 +694,23 @@ function controls() {
                 var touch = evt.touches[0] || evt.changedTouches[0];
                 let x = touch.pageX;
 
-                if (x > prevPos) {
-                    // forceD = F;
-                    eelHead.vx = F;
-                } else  {
-                    // forceD = -F;
-                    eelHead.vx = -F;
+                // if (x > prevPos) {
+                //     // forceD = F;
+                //     eelHead.vx = F;
+                // } else  {
+                //     // forceD = -F;
+                //     eelHead.vx = -F;
+                // }
+                if (gameover) mDown = false;
+
+                if (mDown) {
+                    let dist = x - mouseMoveOrigin.x;
+                    eelHead.x = eelHead.ox + dist;
+                    eelHead.updateBounds(canvas.width, eel_hitbox);
+
+                    eelNeck.x = eelHead.x + eelHead.w / 2 - eelNeck.w / 2;
+
+                    prevPos = mx;
                 }
 
                 prevPos = x;
@@ -709,7 +738,7 @@ function controls() {
         } 
 
         if (gameover) {
-            reset();
+            // reset();
         }
         
     });
@@ -719,8 +748,6 @@ function controls() {
         let mx = e.offsetX;
         let my = e.offsetY;
         if (!mDown) {
-            mDown = true;
-            
             if (gameStart) {
                 if (isBtnClicked(mx, my, {
                     x: HUD.volume.x,
@@ -753,6 +780,8 @@ function controls() {
                     // eelDirection = eelDirectionSpeed;
                 }
 
+                mDown = true;
+                mouseMoveOrigin.x = mx;
             }
         }
 
@@ -762,7 +791,7 @@ function controls() {
 
     canvas.addEventListener('mousemove', e => {
         // mousemoveE(e.offsetX, e.offsetY);
-        // let mx = e.offsetX;
+        let mx = e.offsetX;
         // let my = e.offsetY;
 
         // eelLookAt[0] = mx;
@@ -771,6 +800,17 @@ function controls() {
         // eelHead.extend(originCoordRotation[0], originCoordRotation[1], mx, my);
         // eelNeck.extend(originCoordRotation[0], originCoordRotation[1], mx, my);
         // eelNeck.extend(originCoordRotation[0], originCoordRotation[1], mx, my);
+        if (gameover) mDown = false;
+
+        if (mDown) {
+            let dist = mx - mouseMoveOrigin.x;
+            eelHead.x = eelHead.ox + dist;
+            eelHead.updateBounds(canvas.width, eel_hitbox);
+
+            eelNeck.x = eelHead.x + eelHead.w / 2 - eelNeck.w / 2;
+
+            prevPos = mx;
+        }
     });
     
     canvas.addEventListener('mouseup', e => {
@@ -791,14 +831,12 @@ function controls() {
 
         if (mDown) {
             mDown = false;
+            eelHead.updateOriginalPos();
             // eelLookAt[0] = canvas.width / 2;
             // eelLookAt[1] = 0;
             if (gameover) {
-                reset();
-                
+                // reset();
             }
-
-            
         }
     });
 
@@ -839,7 +877,6 @@ function controls() {
 }
 
 function initStartPage() {
-    
     for (let k in startPage) {
         startPage[k].x *= scaleX;
         startPage[k].y *= scaleY;

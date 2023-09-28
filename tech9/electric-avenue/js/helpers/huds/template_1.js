@@ -289,7 +289,7 @@ class Template_1 {
         this.drawBatteryRotate(ctx, -90);
         
         this.txt.draw('score');
-        this.txt.draw('reset');
+        // this.txt.draw('reset');
     }
 }
 

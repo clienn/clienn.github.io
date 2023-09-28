@@ -42,6 +42,19 @@ class Sprite {
         this.vx = f;
     }
 
+    updateBounds(w) {
+        if (this.x < 0) {
+            this.x = 0;
+        } else if (this.x + this.w > w) {
+            this.x = w - this.w;
+        }
+    }
+
+    updateOriginalPos() {
+        this.ox = this.x;
+        this.oy = this.y;
+    }
+
     update(w, delta, friction) {
         this.x += this.vx * delta;
         // add friction

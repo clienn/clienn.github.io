@@ -131,7 +131,7 @@ class Template_1 {
         this.pigscore.draw(ctx);
         this.txt.draw('complete');
         this.txt.draw('total');
-        this.txt.draw('reset');
+        // this.txt.draw('reset');
     }
 
     // draw(ctx) {
