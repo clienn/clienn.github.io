@@ -29,6 +29,10 @@ class Spirte {
         this.frames = 1;
         this.currFrame = 0;
         this.startAnimation = false;
+
+        this.prevY = y;
+        this.prevX = x;
+        this.zRotate = 0;
     }
 
     animateSprite(speed, delta) {
@@ -46,6 +50,26 @@ class Spirte {
             }
         }
         
+    }
+
+    dive(ctx, img) {
+        let angle = Math.atan2(this.y - this.oy, this.x - this.ox) * 180 / Math.PI;
+
+        ctx.save();
+        // Untransformed draw position
+        const position = {x: this.x, y: this.y};
+        // In degrees
+        const rotation = { x: 0, y: 0, z: angle + this.zRotate};
+        // Rotation relative to here (this is the center of the image)
+        const rotPt = { x: this.w / 2, y: this.h / 2 };
+
+        ctx.setTransform(new DOMMatrix()
+            .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+            .rotateSelf(rotation.x, rotation.y, rotation.z)
+        );
+        
+        ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
+        ctx.restore();
     }
 
     draw(ctx, img) {
@@ -82,6 +106,8 @@ class Spirte {
 
         this.x += this.fx * delta;
         this.y += this.fy * delta;
+        this.prevX = this.x;
+        this.prevY = this.y;
 
         this.fy += g;
 
@@ -90,6 +116,8 @@ class Spirte {
             this.init(projectileRanges);
             return 1;
         }
+
+        
 
         return 0;
     }
@@ -112,6 +140,7 @@ class Spirte {
     init(ranges) {
         this.x = this.ox;
         this.y = this.oy;
+        this.prevY = this.oy;
         this.fx = (Math.random() * ranges.x[0] + ranges.x[1]) * this.direction;
         this.fy = -(Math.random() * ranges.y[0] + ranges.y[1]);
         this.vx = 0;

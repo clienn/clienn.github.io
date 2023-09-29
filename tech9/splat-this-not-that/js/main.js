@@ -177,18 +177,22 @@ var images = {
         src: 'black-canon-2',
         obj: {}
     },
-    softobjects: {
-        src: 'shapes/soft',
+    projectiles: {
+        src: 'shapes/projectiles',
         obj: {}
     },
-    hardobjects: {
-        src: 'shapes/hard',
-        obj: {}
-    },
-    bombs: {
-        src: 'shapes/bombs',
-        obj: {}
-    },
+    // softobjects: {
+    //     src: 'shapes/soft',
+    //     obj: {}
+    // },
+    // hardobjects: {
+    //     src: 'shapes/hard',
+    //     obj: {}
+    // },
+    // bombs: {
+    //     src: 'shapes/bombs',
+    //     obj: {}
+    // },
     mine: {
         src: 'mine',
         obj: {},
@@ -277,8 +281,8 @@ var explosionStarInfo = {
 var ouchInfo = {
     x: 0,
     y: 0,
-    w: 70,
-    h: 28,
+    w: 70 * 2,
+    h: 28 * 2,
     cw: 70,
     ch: 28,
 }
@@ -759,8 +763,14 @@ var projSpriteInfo = {
         ch: 48,
         key: "bombs"
     },
+    3: {
+        frames: 43,
+        cw: 48.023,
+        ch: 49,
+        key: "projectiles"
+    },
 };
-
+// 2065 × 49, 43, 48.023
 var projDimX = 85;
 var projDimY = 85;
 
@@ -978,6 +988,11 @@ function main(w, h) {
     projectiles[3].direction = -1;
     projectiles[3].init(projectileRanges);
 
+    projectiles[0].zRotate = 0;
+    projectiles[1].zRotate = 0;
+    projectiles[2].zRotate = 180;
+    projectiles[3].zRotate = 180;
+
     updateSprite(0);
     updateSprite(1);
     updateSprite(2);
@@ -1018,8 +1033,10 @@ function generateFloater(i) {
     if (floaters.length < 7) {
         let depth = Math.floor(Math.random() * 15) + 5;
 
-        let rng = Math.floor(Math.random() * 2);
-        let frames = projSpriteInfo[rng].frames;
+        // let rng = Math.floor(Math.random() * 2);
+        let rng = 3;
+        // let frames = projSpriteInfo[rng].frames;
+        let frames = 31;
 
         let frame = Math.floor(Math.random() * frames);
         let key = projSpriteInfo[rng].key;
@@ -1527,7 +1544,7 @@ function controls() {
 
             if (gameover) {
                 if (canReset) {
-                    resetGame();
+                    // resetGame();
                 } else {
                     canReset = true;
                 }
@@ -1666,10 +1683,13 @@ function checkProjectileCollisions() {
         for (let j = 2; j < 4; ++j) {
             if (isCollided(projectiles[i], projectiles[j])) {
                 // if (projectiles[i].clipY != projectiles[j].clipY) {
-                if ((projectiles[i].id != 'bombs' && projectiles[j].id == 'bombs') || (projectiles[i].id == 'bombs' && projectiles[j].id != 'bombs')) {
+                // if ((projectiles[i].id != 'bombs' && projectiles[j].id == 'bombs') || (projectiles[i].id == 'bombs' && projectiles[j].id != 'bombs')) {
+                if ((projectiles[i].currFrame < 31 && projectiles[j].currFrame > 30) || (projectiles[i].currFrame > 30 && projectiles[j].currFrame < 31)) {
                     // console.log('collision detected');
                     drawExplosionStar(projectiles[i].x, projectiles[i].y);
                     resetProjectile([i, j]);
+                    initAnimateCanon(i);
+                    initAnimateCanon(j);
                     
                     score += PROJECTILE_COLLISION_MINUS;
                 }
@@ -1683,28 +1703,33 @@ function checkCanonCollisions() {
     if (isCollided(projectiles[0], cannonCollisionBubble[2]) || isCollided(projectiles[0], cannonCollisionBubble[3])) {
         resetProjectile([0]);
         score += CANON_COLLISION_MINUS;
+        initAnimateCanon(0);
     }
 
     if (isCollided(projectiles[1], cannonCollisionBubble[2]) || isCollided(projectiles[1], cannonCollisionBubble[3])) {
         resetProjectile([1]);
         score += CANON_COLLISION_MINUS;
+        initAnimateCanon(1);
     }
 
     if (isCollided(projectiles[2], cannonCollisionBubble[0]) || isCollided(projectiles[2], cannonCollisionBubble[1])) {
         resetProjectile([2]);
         score += CANON_COLLISION_MINUS;
+        initAnimateCanon(2);
     }
 
     if (isCollided(projectiles[3], cannonCollisionBubble[0]) || isCollided(projectiles[3], cannonCollisionBubble[1])) {
         resetProjectile([3]);
         score += CANON_COLLISION_MINUS;
+        initAnimateCanon(3);
     }
 }
 
 function updateSprite(idx) {
 //     let c = Math.floor(Math.random() * clips.length);
 //     projectiles[idx].updateSprite(clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, clips[c].clipX, clips[c].clipY, c);
-    let rng = Math.floor(Math.random() * 3);
+    // let rng = Math.floor(Math.random() * 3);
+    let rng = 3;
     let frames = projSpriteInfo[rng].frames;
 
     let frame = Math.floor(Math.random() * frames);
@@ -1712,6 +1737,8 @@ function updateSprite(idx) {
 
     projectiles[idx].updateSprite(projDimX, projDimY, 
         projSpriteInfo[rng].cw, projSpriteInfo[rng].ch, frame * projSpriteInfo[rng].cw, 0, key);
+
+    projectiles[idx].currFrame = frame;
 }
 
 function resetProjectile(range) {
@@ -1739,7 +1766,8 @@ function splat(mx, my) {
     for (let i = 0; i < projectiles.length; ++i) {
         if (isSplatted(projectiles[i], { x: mx, y: my })) {
             // if (projectiles[i].clipY > 0) {
-            if (projectiles[i].id == 'bombs') {
+            // if (projectiles[i].id == 'bombs') {
+            if (projectiles[i].currFrame > 30) {
                 // console.log('ouch!');
                 score += OUCH_MINUS;
                 reduceHP();
@@ -1777,8 +1805,29 @@ function isSplatted(p1, p2) {
     // let dy = (p1.y + p1.h / 2) - p2.y;
     // let dist = Math.sqrt(dx * dx + dy * dy);
     // return dist < 20;
-    return (p2.x >= p1.x - 10 && p2.x <= p1.x + p1.w - 10 && p2.y >= p1.y - 10 && p2.y <= p1.y + p1.h - 10);
+
+    let w = p1.w * 1.5;
+    
+    if (p1.currFrame > 30) w = p1.w;
+
+    // return (p2.x >= p1.x - 10 && p2.x <= p1.x + p1.w - 10 && p2.y >= p1.y - 10 && p2.y <= p1.y + p1.h - 10);
+    // return (p2.x + w >= p1.x && p2.x <= p1.x + p1.w);
+    return circleCollision(p1.x, p1.y, w, p2.x, p2.y, w);
+
+    // circleCollision
 }
+
+function circleCollision(p1x, p1y, r1, p2x, p2y, r2) {
+    var a = r1 + r2;
+    var x = p1x - p2x;
+    var y = p1y - p2y;
+  
+    if (a > Math.sqrt((x * x) + (y * y))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
 function rescale(obj) {
     console.log(obj.x, obj.y, obj.w, obj.h);
@@ -1882,7 +1931,7 @@ function gameCycle() {
                 for (let i = 0; i < projectiles.length; ++i) {
                     if (difficulty[i] > 0) {
                         // projectiles[i].draw(ctx, images.projectile.obj.img);
-                        projectiles[i].draw(ctx, images[projectiles[i].id].obj.img);
+                        projectiles[i].dive(ctx, images[projectiles[i].id].obj.img);
                         let r = projectiles[i].update(delta * difficulty[i], g, projectileRanges);
                         
                         if (r) {
@@ -2092,7 +2141,7 @@ function gameCycle() {
                 TM.draw(textList.scoreLabel.obj);
                 textList.finalScore.obj.str = zeroPad(score, 2);
                 TM.draw(textList.finalScore.obj);
-                TM.draw(textList.resetMsg.obj);
+                // TM.draw(textList.resetMsg.obj);
             }
         }
     }
