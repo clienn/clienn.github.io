@@ -489,7 +489,7 @@ function mousedownE(mx, my) {
     }
     
     if (gameover) {
-        canReset = true;
+        // canReset = true;
     } else if (!portal.isAnimating)  {
         for (let i = 0; i < nContainers; ++i) {
             if (!correctAnswers.includes(i)) {
@@ -551,7 +551,7 @@ function mouseupE() {
             gameover = false;
             canReset = false;
 
-            restart();
+            // restart();
         }
     } else {
 

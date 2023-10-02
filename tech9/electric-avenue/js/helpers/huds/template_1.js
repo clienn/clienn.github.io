@@ -19,9 +19,9 @@ class Template_1 {
         let multiplier2 = 2.5;
         this.timecircle = new StaticSprite(50, 20, 60 * multiplier, 60 * multiplier, 0, 0, AM.images.timecircle.cw, AM.images.timecircle.ch, 'timecircle');
         this.stopwatch = new StaticSprite(50, 20, 60 * multiplier, 60 * multiplier, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
-
-        this.complete = new StaticSprite(0, 50, AM.images.complete.cw * multiplier2, AM.images.complete.ch * multiplier2, 0, 0, AM.images.complete.cw, AM.images.complete.ch, 'complete');
-        this.yourscore = new StaticSprite(0, 200, AM.images.yourscore.cw * multiplier2, AM.images.yourscore.ch * multiplier2, 0, 0, AM.images.yourscore.cw, AM.images.yourscore.ch, 'yourscore');
+        let adjY = 120;
+        this.complete = new StaticSprite(0, 50 + adjY, AM.images.complete.cw * multiplier2, AM.images.complete.ch * multiplier2, 0, 0, AM.images.complete.cw, AM.images.complete.ch, 'complete');
+        this.yourscore = new StaticSprite(0, 200 + adjY, AM.images.yourscore.cw * multiplier2, AM.images.yourscore.ch * multiplier2, 0, 0, AM.images.yourscore.cw, AM.images.yourscore.ch, 'yourscore');
 
         this.volume = new StaticSprite(25, 25, 55, 55, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
         this.mute = new StaticSprite(25, 25, 55, 55, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
@@ -66,9 +66,9 @@ class Template_1 {
         this.chargeHeight2 = this.battery_charge_lime2.h;
         
 
-        this.battery_rect2.y = 320 * sy;
+        this.battery_rect2.y = 440 * sy;
         this.battery_charge_lime2.y = this.battery_rect2.y + 4.5 * sy;
-        this.battery_top2.y = 460 * sy;
+        this.battery_top2.y = 580 * sy;
         this.battery_logo2.y = this.battery_rect2.y + this.battery_rect2.h / 2 - this.battery_logo2.h / 2;
         this.chargeY2 = this.battery_charge_lime2.y - this.battery_charge_lime2.w + 30 * sy;
         
@@ -122,7 +122,7 @@ class Template_1 {
 
 
         // gameover
-        this.txt.addText('score', this.health + '%', 'bold', 30, 'Montserrat', w / 2, 300 * sy, 150, 55, '#fff', true);
+        this.txt.addText('score', this.health + '%', 'bold', 30, 'Montserrat', w / 2, 420 * sy, 150, 55, '#fff', true);
         this.txt.addText('reset', 'Tap to play again.', 'bold', 30, 'Montserrat', w / 2, h * 0.65, 500, 40, '#fff', true);
 
         this.complete.x = w / 2 - this.complete.w / 2;

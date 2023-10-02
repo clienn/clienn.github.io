@@ -375,7 +375,7 @@ var seagullInfo = {
 
 var shineInfo = {
     x: 0,
-    y: 0,
+    y: 150,
     w: 352,
     h: 290,
     cw: 352,
@@ -816,9 +816,9 @@ function main(w, h) {
     TXT.addText(TEXT_ID.TRY_AGAIN, 'Try again!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
 
     TXT.addText(TEXT_ID.TOOSLOW, 'Too Slow!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
-    TXT.addText(TEXT_ID.COMPLETE, 'Complete!', 'bold', 20, 'Montserrat', w / 2, 55 * scaleY, 300, 70, '#fff', true); 
-    TXT.addText(TEXT_ID.SCORELABEL, 'Score', 'bold', 20, 'Montserrat', w / 2, 270 * scaleY, 100, 50, '#fff', true); 
-    TXT.addText(TEXT_ID.FINALSCORE, '00', 'bold', 20, 'Montserrat', w / 2, 320 * scaleY, 65, 60, '#fff', true); 
+    TXT.addText(TEXT_ID.COMPLETE, 'Complete!', 'bold', 20, 'Montserrat', w / 2, (55 + 145) * scaleY, 300, 70, '#fff', true); 
+    TXT.addText(TEXT_ID.SCORELABEL, 'Score', 'bold', 20, 'Montserrat', w / 2, (270 + 145) * scaleY, 100, 50, '#fff', true); 
+    TXT.addText(TEXT_ID.FINALSCORE, '00', 'bold', 20, 'Montserrat', w / 2, (320 + 145) * scaleY, 65, 60, '#fff', true); 
     TXT.addText(TEXT_ID.RESETMSG, 'Tap to play again.', 'bold', 20, 'Montserrat', w / 2, h / 2, 600, 100, '#fff', true); 
     TXT.addText(TEXT_ID.TOPTIMER, '09', (isMobile ? 'normal' : 'bold'), 20, 'Montserrat', 
         topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2, 29 * scaleY, 40, 40, '#000', true); 

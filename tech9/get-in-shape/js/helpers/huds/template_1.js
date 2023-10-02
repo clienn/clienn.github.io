@@ -14,10 +14,10 @@ class Template_1 {
         // this.life = new StaticSprite(0, 10, 60, 60, 0, 0, AM.images.life.cw, AM.images.life.ch, 'life');
         this.star = new StaticSprite(0, 0, 60, 60, 0, 0, AM.images.star.cw, AM.images.star.ch, 'star');
         // this.emptystar = new StaticSprite(0, 0, 60, 60, 0, 0, AM.images.emptystar.cw, AM.images.emptystar.ch, 'emptystar');
-        
-        this.shine = new StaticSprite(0, 0, 309, 309, 0, 0, AM.images.shine.cw, AM.images.shine.ch, 'shine');
-        this.rays = new StaticSprite(0, 0, 309, 309, 0, 0, AM.images.rays.cw, AM.images.rays.ch, 'rays');
-        this.complete = new StaticSprite(0, 50, 370, 50, 0, 0, AM.images.complete.cw, AM.images.complete.ch, 'complete');
+        let adjY = 130;
+        this.shine = new StaticSprite(0, adjY, 309, 309, 0, 0, AM.images.shine.cw, AM.images.shine.ch, 'shine');
+        this.rays = new StaticSprite(0, adjY, 309, 309, 0, 0, AM.images.rays.cw, AM.images.rays.ch, 'rays');
+        this.complete = new StaticSprite(0, 50 + adjY, 370, 50, 0, 0, AM.images.complete.cw, AM.images.complete.ch, 'complete');
         // this.pigscore = new StaticSprite(0, 80, 120, 90, 0, 0, AM.images.pigscore.cw, AM.images.pigscore.ch, 'pigscore');
 
 
@@ -143,6 +143,6 @@ class Template_1 {
         if (totalScore == 0)
             this.txt.draw('betterluck');
 
-        this.txt.draw('reset');
+        // this.txt.draw('reset');
     }
 }

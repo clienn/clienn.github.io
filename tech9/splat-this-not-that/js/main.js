@@ -622,7 +622,7 @@ const completeInfo = {
 
 const trophyInfo = {
     x: 0,
-    y: 120,
+    y: 270,
     w: 122,
     h: 162,
     cw: 61,
@@ -840,7 +840,7 @@ function main(w, h) {
     if (isMobile) {
         compassAdjX = 17;
         compassAdjY = 13;
-        trophyInfo.y = 70;
+        // trophyInfo.y = 70;
         scaleProj = 1.7;
 
         // volumeInfo.x = 45;
@@ -881,7 +881,7 @@ function main(w, h) {
     rescaleSize(compassInfo);
     rescaleSize(shineInfo);
     rescaleSize(completeInfo);
-    rescaleSize(trophyInfo);
+    rescaleAll(trophyInfo);
     rescaleAll(waterInfo);
     rescaleAll(kaboomInfo);
     rescaleAll(explosionStarInfo);
@@ -896,14 +896,14 @@ function main(w, h) {
     shineInfo.w *= 2;
     shineInfo.h *= 2;
     shineInfo.x = w / 2 - shineInfo.w / 2;
-    shineInfo.y = 0;
+    shineInfo.y = 150 * scaleY;
 
     compassInfo.x = topHUDInfo.score.x + compassAdjX * scaleX;
     compassInfo.y = topHUDInfo.score.y + compassAdjY * scaleY;
 
     completeInfo.x = w / 2 - completeInfo.w / 2;
     trophyInfo.x = w / 2 - trophyInfo.w / 2;
-    // completeInfo.y = 15 * scaleY;
+    completeInfo.y = shineInfo.y + 15 * scaleY;
 
     for (let k in textList) {
         if (textList[k].desc != null) {
@@ -946,9 +946,9 @@ function main(w, h) {
     textList.topTimer.obj.ty = topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2 - textList.topTimer.desc.h / 2 * scaleY;
 
     textList.scoreLabel.obj.tx = w / 2 - textList.scoreLabel.desc.w * scaleX / 2 - 10 * scaleX;
-    textList.scoreLabel.obj.ty = 320 * scaleY;
+    textList.scoreLabel.obj.ty = 450 * scaleY;
     textList.finalScore.obj.tx = w / 2 - textList.finalScore.desc.w * scaleX / 2 - 8 * scaleX;
-    textList.finalScore.obj.ty = 360 * scaleY;
+    textList.finalScore.obj.ty = 490 * scaleY;
     textList.resetMsg.obj.tx = w / 2 - textList.resetMsg.desc.w / 2 * scaleX - 20 * scaleX;
     textList.resetMsg.obj.ty = h / 2 - textList.resetMsg.desc.h / 2 * scaleY + 20 * scaleX;
 
