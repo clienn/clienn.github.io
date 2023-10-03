@@ -129,7 +129,7 @@ var portal = {
         if (!portal.isAnimating) {
             portal.duration -= 1 * delta;
             if (portal.duration < 2 && portal.et == 1.5) {
-                let a = Math.sin(portal.warningT) * 25;
+                let a = Math.sin(portal.warningT) * 20;
 
                 ctx.strokeStyle = '#FF0000';
                 ctx.lineWidth = 3;
