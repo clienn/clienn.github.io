@@ -33,6 +33,7 @@ var portal = {
     gridDimY: 65,
     sx: 0,
     sy: 0,
+    warningT: 0,
     rng: [...Array(9).keys()],
     init: () => {
         portal.w *= scaleX;
@@ -127,10 +128,23 @@ var portal = {
     trigger: () => {
         if (!portal.isAnimating) {
             portal.duration -= 1 * delta;
+            if (portal.duration < 2 && portal.et == 1.5) {
+                let a = Math.sin(portal.warningT) * 25;
+
+                ctx.strokeStyle = '#FF0000';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(portal.x + portal.w / 2, portal.y + portal.h / 2, portal.w / 2 + a, 0, 2 * Math.PI);
+                ctx.stroke();
+
+                portal.warningT += 10 * delta;
+            }
+
             if (portal.duration <= 0) {
                 portal.toggle();
                 
-                portal.duration = portal.et == 1.5 ? (Math.floor(Math.random() * 7) + 1) : 1;
+                portal.duration = portal.et == 1.5 ? Math.max((Math.floor(Math.random() * 7) + 1), 4) : 1;
+                portal.warningT = 0;
             }
         }
     }
@@ -499,7 +513,7 @@ function mousedownE(mx, my) {
                     // center to mouse
                     let adj = portal.gridDim / 2;
                     shapes[i].x = mx - adj;
-                    shapes[i].y = my - adj;
+                    shapes[i].y = my - adj - shapes[i].h / 2;
 
                     dragID = i;
                     isDraggable = true;
@@ -514,7 +528,7 @@ function mousemoveE(mx, my) {
     if (isDraggable) {
         let adj = portal.gridDim / 2;
         shapes[dragID].x = mx - adj;
-        shapes[dragID].y = my - adj;
+        shapes[dragID].y = my - adj - shapes[dragID].h / 2;
 
         if (checkContainerCollision()) {
             // console.log('test', hoveredContainerID)
