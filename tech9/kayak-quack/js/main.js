@@ -230,6 +230,34 @@ var bunnyInfo = {
 
 var currentTop = 0;
 
+var mouseMoveOrigin = {
+    x: 0,
+    y: 0
+};
+
+var kayakHitBox = {
+    x: 0,
+    y: 0,
+    w: 80,
+    h: 187 * 1.35
+}
+
+var testRect = {
+    x: 0,
+    y: 0,
+    w: 0,
+    h: 0
+}
+
+var testRect2 = [
+    { x: 0, y: 0},
+    { x: 0, y: 0},
+    { x: 0, y: 0},
+    { x: 0, y: 0}
+];
+
+var testT = 0;
+
 // pool - 606px
 // rect - 12px, 6px
 // total width - 926px
@@ -286,10 +314,32 @@ function main(w, h) {
     rescaleSize(lilyInfo, scaleX, scaleY);
     rescaleSize(wstoneInfo, scaleX, scaleY);
     rescaleSize(logInfo, scaleX, scaleY);
+    rescaleSize(kayakHitBox, scaleX, scaleY);
     
     // kayak = new Sprite(w / 2 - kayakInfo.w / 2, h - kayakInfo.h * 1, kayakInfo.w, kayakInfo.h, 129.125, AM.images.kayak.ch);
     console.log(AM.images.kayak.cw)
     kayak = new Sprite(w / 2 - kayakInfo.w / 2, h - kayakInfo.h * 0.85, kayakInfo.w, kayakInfo.h, AM.images.kayak.cw, AM.images.kayak.ch);
+    kayak.screenW = w;
+    kayakHitBox.y = kayak.y;
+    updateHitBox();
+
+    testRect.x = canvas.width / 2 - kayakHitBox.w / 2;
+    // testRect.y = canvas.height / 2 - kayakHitBox.h / 2;
+    testRect.y = kayakHitBox.y;
+    testRect.w = kayakHitBox.w;
+    testRect.h = kayakHitBox.h;
+
+    testRect2[0].x = testRect.x;
+    testRect2[0].y = testRect.y;
+
+    testRect2[1].x = testRect.x + testRect.w;
+    testRect2[1].y = testRect.y;
+
+    testRect2[2].x = testRect.x + testRect.w;
+    testRect2[2].y = testRect.y + testRect.h;
+
+    testRect2[3].x = testRect.x;
+    testRect2[3].y = testRect.y + testRect.h;
 
     // setFishInfo(scaleX, scaleY, 2.5);
     initStartPage();
@@ -533,7 +583,7 @@ function drawWaterObjects() {
         if (idx > -1) {
             waterObjects[idx].swim(ctx, AM.images[waterObjects[idx].key].img);
 
-            if (checkAngledCollisions(kayak, waterObjects[idx])) {
+            if (checkAngledCollisions(kayakHitBox, waterObjects[idx])) {
                 if (!waterObjects[idx].key.match(/lily\d/g)) {
                     waterObjects[idx].y = parallaxInfo.tile.yPos[currentTop];
                     waterObjectRows[i] = -1;
@@ -704,6 +754,84 @@ function drawTerrain(r, c) {
     
 }
 
+// function transformPoint(pointX, pointY, centerX, centerY, rotationDegrees){
+//     var radians = rotationDegrees * (Math.PI/180);
+//     var cos = Math.cos(radians);
+//     var sin = Math.sin(radians);
+//     var x = centerX + (pointX * cos) - (pointY * sin);
+//     var y = centerY + (pointX * sin) + (pointY * cos);
+//     return {x, y};
+// }
+function transformPoint(rect, cx, cy, rotationDegrees) {
+    var radians = rotationDegrees * (Math.PI / 180);
+    
+    // Translate rotation
+    var cos = Math.cos(radians);
+    var sin = Math.sin(radians);
+
+    let px = rect.x - cx;
+    let py = rect.y - cy;
+
+
+    var x = (px * cos) - (py * sin);
+    var y = (px * sin) + (py * cos);
+
+    x += cx;
+    y += cy;
+
+    return { x, y };
+}
+
+function getRotatedRect(rect, degrees) {
+    // const radiant = degrees * Math.PI / 180;
+    // cos = Math.cos(0);
+    // sin = Math.sin(0);
+
+    let cx = (rect.x + rect.w / 2); 
+    let cy = (rect.y + rect.h / 2); 
+
+    // ctx.beginPath();
+    // ctx.rect(cx, cy, 5, 5);
+    // ctx.stroke();
+
+    return [
+        // {x: rect.x, y: rect.y},
+        // transformPoint(testRect2[0], cx, cy, degrees),
+        // transformPoint(testRect2[1], cx, cy, degrees),
+        // transformPoint(testRect2[2], cx, cy, degrees),
+        // transformPoint(testRect2[3], cx, cy, degrees),
+        transformPoint({ x: rect.x, y: rect.y }, cx, cy, degrees),
+        transformPoint({ x: rect.x + rect.w, y: rect.y }, cx, cy, degrees),
+        transformPoint({ x: rect.x + rect.w, y: rect.y + rect.h }, cx, cy, degrees),
+        transformPoint({ x: rect.x, y: rect.y + rect.h }, cx, cy, degrees)
+    ];
+
+    // return [
+    //     { x: rect.x * cos2 - rect.y * sin2, y: rect.x * sin2 + rect.y * cos2 }, 
+    //     { x: (rect.x + rect.w) * cos - rect.y * sin, y: (rect.x + rect.w) * sin + rect.y * cos }, 
+    //     { x: (rect.x + rect.w) * cos - (rect.y + rect.h) * sin, y: (rect.x + rect.w) * sin + (rect.y + rect.h) * cos }, 
+    //     { x: rect.x * cos - (rect.y + rect.h) * sin, y: rect.x * sin + (rect.y + rect.h) * cos }
+    // ];
+
+    // return {
+    //     x: x * cos - y * sin,
+    //     y: x * sin + y * cos,
+    // }
+}
+
+function drawTestRect() {
+    let p = getRotatedRect(kayakHitBox, kayak.degrees);
+    let d = 5;
+    ctx.beginPath();
+    ctx.rect(p[0].x, p[0].y, d, d);
+    ctx.rect(p[1].x, p[1].y, d, d);
+    ctx.rect(p[2].x, p[2].y, d, d);
+    ctx.rect(p[3].x, p[3].y, d, d);
+    ctx.stroke();
+
+    // testT += 100 * delta;
+}
+
 function drawKayak() {
     // kayak.draw(ctx, AM.images.kayak.img);
     // kayak.t2 += 10 * delta;
@@ -712,9 +840,32 @@ function drawKayak() {
     kayak.updateFrameAnimation(8, 10, delta); // frames, speed, delta
     kayak.drawWithRotation(ctx, AM.images.kayak.img, kayakBounds.left, kayakBounds.right);
 
-    if (kayak.x > kayakBounds.right - kayak.w) kayak.x = kayakBounds.right - kayak.w;
-    if (kayak.x < kayakBounds.left) kayak.x = kayakBounds.left;
+    // if (kayak.x > kayakBounds.right - kayak.w) kayak.x = kayakBounds.right - kayak.w;
+    // if (kayak.x < kayakBounds.left) kayak.x = kayakBounds.left;
+
+    updateHitBox();
+
+    // ctx.beginPath();
+    // ctx.rect(kayakHitBox.x, kayakHitBox.y, kayakHitBox.w, kayakHitBox.h);
+    // ctx.stroke();
+    
+    // ctx.beginPath();
+    // ctx.rect(canvas.width / 2 - kayakHitBox.w / 2, canvas.height / 2 - kayakHitBox.h / 2, 1, 1);
+    // ctx.rect(canvas.width / 2 + kayakHitBox.w / 2, canvas.height / 2 - kayakHitBox.h / 2, 1, 1);
+    // ctx.rect(canvas.width / 2 - kayakHitBox.w / 2, canvas.height / 2 + kayakHitBox.h / 2, 1, 1);
+    // ctx.rect(canvas.width / 2 + kayakHitBox.w / 2, canvas.height / 2 + kayakHitBox.h / 2, 1, 1);
+    // ctx.stroke();
+    // drawTestRect();
 }
+
+function updateHitBox() {
+    kayakHitBox.x = kayak.x + kayak.w / 2 - kayakHitBox.w / 2;
+    
+    // ctx.beginPath();
+    // ctx.rect(eel_hitbox.x, eel_hitbox.y, eel_hitbox.w, eel_hitbox.h);
+    // ctx.stroke();
+}
+
 
 function parallaxBG() {
     ctx.save();
@@ -781,6 +932,29 @@ function controls() {
                 var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
                 var touch = evt.touches[0] || evt.changedTouches[0];
                 prevPos = touch.pageX;
+
+                if (!mDown) {
+                    if (isBtnClicked(touch.pageX, touch.pageY, {
+                        x: HUD.volume.x,
+                        y: HUD.volume.y,
+                        w: HUD.volume.w,
+                        h: HUD.volume.h
+                    })) {
+                        
+                        HUD.volumeOn = !HUD.volumeOn; 
+                        // console.log('test', HUD.volumeOn)
+                        if (HUD.volumeOn) {
+                            AM.audio.bg.img.currentTime = 0;
+                            AM.audio.bg.img.play();
+                        } else {
+                            AM.audio.bg.img.pause();
+                            // music.correct.obj.volume = 0;
+                        }
+                    }
+                    
+                    mDown = true;
+                    mouseMoveOrigin.x = prevPos;
+                }
             }
         }
     });
@@ -791,15 +965,20 @@ function controls() {
         if (!gameover) {
             var x = e.changedTouches[event.changedTouches.length-1].pageX;
 
-            if (x >= mid) {
-                rDown = false;
-            } else {
-                lDown = false;
-            }
+            // if (x >= mid) {
+            //     rDown = false;
+            // } else {
+            //     lDown = false;
+            // }
 
-            if (!rDown && !lDown) {
-                // forceD = 0;
-                kayak.vx = 0;
+            // if (!rDown && !lDown) {
+            //     // forceD = 0;
+            //     kayak.vx = 0;
+            // }
+
+            if (mDown) {
+                mDown = false;
+                kayak.updateOriginalPos();
             }
         }
     });
@@ -812,12 +991,20 @@ function controls() {
                 var touch = evt.touches[0] || evt.changedTouches[0];
                 let x = touch.pageX;
 
-                if (x > prevPos) {
-                    // forceD = F;
-                    kayak.vx = F;
-                } else  {
-                    // forceD = -F;
-                    kayak.vx = -F;
+                // if (x > prevPos) {
+                //     // forceD = F;
+                //     kayak.vx = F;
+                // } else  {
+                //     // forceD = -F;
+                //     kayak.vx = -F;
+                // }
+
+                if (gameover) mDown = false;
+
+                if (mDown) {
+                    let dist = x - mouseMoveOrigin.x;
+                    kayak.x = kayak.ox + dist;
+                    kayak.updateBounds(kayakBounds, kayakHitBox);
                 }
 
                 prevPos = x;
@@ -836,13 +1023,12 @@ function controls() {
             AM.audio.bg.img.loop = true;
             AM.audio.bg.img.play();
 
-
             gameStart = true;
             // HUD.health = 100;
         } 
 
         if (gameover) {
-            reset();
+            // reset();
         }
         
     });
@@ -852,7 +1038,7 @@ function controls() {
         let mx = e.offsetX;
         let my = e.offsetY;
         if (!mDown) {
-            mDown = true;
+            
             
             if (gameStart) {
                 if (isBtnClicked(mx, my, {
@@ -873,6 +1059,11 @@ function controls() {
                     }
                 } 
 
+                // if (!mDown) {
+                    mDown = true;
+                    mouseMoveOrigin.x = mx;
+                // }
+
             }
         }
 
@@ -882,8 +1073,17 @@ function controls() {
 
     canvas.addEventListener('mousemove', e => {
         // mousemoveE(e.offsetX, e.offsetY);
-        // let mx = e.offsetX;
+        let mx = e.offsetX;
         // let my = e.offsetY;
+
+        if (gameover) mDown = false;
+
+        if (mDown) {
+            let dist = mx - mouseMoveOrigin.x;
+            kayak.x = kayak.ox + dist;
+            kayak.updateBounds(kayakBounds, kayakHitBox);
+            prevPos = mx;
+        }
 
     });
     
@@ -905,13 +1105,13 @@ function controls() {
 
         if (mDown) {
             mDown = false;
+            kayak.updateOriginalPos();
             // eelLookAt[0] = canvas.width / 2;
             // eelLookAt[1] = 0;
             if (gameover) {
-                reset();
+                // reset();
                 
             }
-
             
         }
     });
@@ -1010,10 +1210,33 @@ function setFishInfo(sx, sy, sizePercentage) {
  * PHYSICS
  */
 
+// function getRotatedRect(rect, degrees) {
+//     const radiant = degrees * Math.PI / 180;
+//     cos = Math.cos(radiant);
+//     sin = Math.sin(radiant);
+
+//     return [
+//         { x: rect.x * cos - rect.y * sin, y: rect.x * sin + rect.y * cos }, 
+//         { x: (rect.x + rect.w) * cos - rect.y * sin, y: (rect.x + rect.w) * sin + rect.y * cos }, 
+//         { x: (rect.x + rect.w) * cos - (rect.y + rect.h) * sin, y: (rect.x + rect.w) * sin + (rect.y + rect.h) * cos }, 
+//         { x: rect.x * cos - (rect.y + rect.h) * sin, y: rect.x * sin + (rect.y + rect.h) * cos }
+//     ];
+
+//     // return {
+//     //     x: x * cos - y * sin,
+//     //     y: x * sin + y * cos,
+//     // }
+// }
+
 function checkAngledCollisions(obj1, obj2) {
+    // return doPolygonsIntersect(
+    //     [{ x: obj1.x, y: obj1.y }, { x: obj1.x + obj1.w, y: obj1.y }, { x: obj1.x + obj1.w, y: obj1.y + obj1.h }, { x: obj1.x, y: obj1.y + obj1.h }],
+    //     [{ x: obj2.x, y: obj2.y }, { x: obj2.x + obj2.w, y: obj2.y }, { x: obj2.x + obj2.w, y: obj2.y + obj2.h }, { x: obj2.x, y: obj2.y + obj2.h }]
+    // );
+    
     return doPolygonsIntersect(
-        [{ x: obj1.x, y: obj1.y }, { x: obj1.x + obj1.w, y: obj1.y }, { x: obj1.x + obj1.w, y: obj1.y + obj1.h }, { x: obj1.x, y: obj1.y + obj1.h }],
-        [{ x: obj2.x, y: obj2.y }, { x: obj2.x + obj2.w, y: obj2.y }, { x: obj2.x + obj2.w, y: obj2.y + obj2.h }, { x: obj2.x, y: obj2.y + obj2.h }]
+        getRotatedRect(obj1, kayak.degrees),
+        getRotatedRect(obj2, obj2.degrees)
     );
 }
 
@@ -1263,7 +1486,12 @@ function update() {
         }
     }
     updateParallax();
-    kayak.update(delta, 1);
+
+    if (!mDown) {
+        kayak.update(delta, 1);
+        kayak.updateBounds(kayakBounds, kayakHitBox);
+    }
+    
 }
 
 function gameCycle() {

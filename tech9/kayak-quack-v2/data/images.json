@@ -1,0 +1,221 @@
+{
+    "data": [
+        {
+            "id": "intro",
+            "src": "intro",
+            "ext": "png",
+            "cw": 927,
+            "ch": 429
+        },
+        {
+            "id": "bg",
+            "src": "environment/bg",
+            "ext": "png",
+            "cw": 927,
+            "ch": 428
+        },
+        {
+            "id": "splash_duck",
+            "src": "splash/duck",
+            "ext": "png",
+            "cw": 76,
+            "ch": 65
+        },
+        {
+            "id": "splash_hourglass",
+            "src": "splash/hourglass",
+            "ext": "png",
+            "cw": 65,
+            "ch": 65
+        },
+        {
+            "id": "splash_rock",
+            "src": "splash/rock",
+            "ext": "png",
+            "cw": 65,
+            "ch": 65
+        },
+        {
+            "id": "text1",
+            "src": "splash/text1",
+            "ext": "png",
+            "cw": 157,
+            "ch": 27
+        },
+        {
+            "id": "text2",
+            "src": "splash/text2",
+            "ext": "png",
+            "cw": 159,
+            "ch": 25
+        },
+        {
+            "id": "text3",
+            "src": "splash/text3",
+            "ext": "png",
+            "cw": 153,
+            "ch": 27
+        },
+        {
+            "id": "kayak",
+            "src": "kayak_sprite",
+            "ext": "png",
+            "cw": "129.125",
+            "ch": 187
+        },
+        {
+            "id": "duck",
+            "src": "duck_sprite",
+            "ext": "png",
+            "cw": "46.83",
+            "ch": 40
+        },
+        {
+            "id": "bunny",
+            "src": "environment/bunny",
+            "ext": "png",
+            "cw": 321,
+            "ch": 327
+        },
+        {
+            "id": "tree1",
+            "src": "environment/trees/1",
+            "ext": "png",
+            "cw": 63,
+            "ch": 74
+        },
+        {
+            "id": "tree2",
+            "src": "environment/trees/2",
+            "ext": "png",
+            "cw": 32,
+            "ch": 32
+        },
+        {
+            "id": "stone1",
+            "src": "environment/stones/land/1",
+            "ext": "png",
+            "cw": 36,
+            "ch": 25
+        },
+        {
+            "id": "stone2",
+            "src": "environment/stones/land/2",
+            "ext": "png",
+            "cw": 22,
+            "ch": 21
+        },
+        {
+            "id": "wstone1",
+            "src": "environment/stones/water/1",
+            "ext": "png",
+            "cw": 420,
+            "ch": 257
+        },
+        {
+            "id": "wstone2",
+            "src": "environment/stones/water/2",
+            "ext": "png",
+            "cw": 506,
+            "ch": 257
+        },
+        {
+            "id": "wstone3",
+            "src": "environment/stones/water/3",
+            "ext": "png",
+            "cw": 88,
+            "ch": 77
+        },
+        {
+            "id": "plank1",
+            "src": "environment/planks/1",
+            "ext": "png",
+            "cw": 242,
+            "ch": 83
+        },
+        {
+            "id": "plank2",
+            "src": "environment/planks/2",
+            "ext": "png",
+            "cw": 797,
+            "ch": 212
+        },
+        {
+            "id": "lily1",
+            "src": "environment/lilies/1",
+            "ext": "png",
+            "cw": 100,
+            "ch": 99
+        },
+        {
+            "id": "lily2",
+            "src": "environment/lilies/2",
+            "ext": "png",
+            "cw": 99,
+            "ch": 99
+        },
+        {
+            "id": "lily3",
+            "src": "environment/lilies/3",
+            "ext": "png",
+            "cw": 257,
+            "ch": 257
+        },
+        {
+            "id": "log1",
+            "src": "environment/logs/1",
+            "ext": "png",
+            "cw": 468,
+            "ch": 257
+        },
+        {
+            "id": "log2",
+            "src": "environment/logs/2",
+            "ext": "png",
+            "cw": 468,
+            "ch": 257
+        },
+        {
+            "id": "stopwatch",
+            "src": "hud/stopwatch",
+            "ext": "png",
+            "cw": 43,
+            "ch": 45
+        },
+        {
+            "id": "timecircle",
+            "src": "hud/timecircle",
+            "ext": "png",
+            "cw": 45,
+            "ch": 45
+        },
+        {
+            "id": "volume",
+            "src": "hud/volume",
+            "ext": "png",
+            "cw": 50,
+            "ch": 50
+        },
+        {
+            "id": "mute",
+            "src": "hud/mute",
+            "ext": "png",
+            "cw": 50,
+            "ch": 50
+        },
+        {
+            "id": "complete",
+            "src": "hud/complete2",
+            "ext": "png",
+            "cw": 185,
+            "ch": 25
+        },
+        {
+            "id": "yourscore",
+            "src": "hud/yourscore2",
+            "ext": "png",
+            "cw": 209,
+            "ch": 210
+        }
+    ]
+}

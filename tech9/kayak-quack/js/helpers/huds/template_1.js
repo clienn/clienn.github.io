@@ -14,7 +14,8 @@ class Template_1 {
         this.volumeOn = true;
         let waterW = 1108 * sx;
         let duckW = 46.83 * 2 * sx;
-        let duckX = w / 2 - waterW / 2 + waterW - duckW * 3.5;
+        // let duckX = w / 2 - waterW / 2 + waterW - duckW * 3.5;
+        let duckX = w - duckW * 3;
         // this.timecircle = new StaticSprite(50, 20, 60 * multiplier, 60 * multiplier, 0, 0, AM.images.timecircle.cw, AM.images.timecircle.ch, 'timecircle');
         // this.stopwatch = new StaticSprite(50, 20, 60 * multiplier, 60 * multiplier, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
         this.duck = new StaticSprite(duckX, 20, duckW, AM.images.duck.ch * 2 * sy, 0, 0, 46.83, AM.images.duck.ch, 'duck');
@@ -25,8 +26,10 @@ class Template_1 {
         this.volume = new StaticSprite(volumePosX, volumePosY, 35, 35, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
         this.mute = new StaticSprite(volumePosX, volumePosY, 35, 35, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
 
-        this.complete = new StaticSprite(0, 50, AM.images.complete.cw * multiplier2, AM.images.complete.ch * multiplier2, 0, 0, AM.images.complete.cw, AM.images.complete.ch, 'complete');
-        this.yourscore = new StaticSprite(0, 80, AM.images.yourscore.cw * multiplier2, AM.images.yourscore.ch * multiplier2, 0, 0, AM.images.yourscore.cw, AM.images.yourscore.ch, 'yourscore');
+        let adjY = 120;
+
+        this.complete = new StaticSprite(0, 50 + adjY, AM.images.complete.cw * multiplier2, AM.images.complete.ch * multiplier2, 0, 0, AM.images.complete.cw, AM.images.complete.ch, 'complete');
+        this.yourscore = new StaticSprite(0, 80 + adjY, AM.images.yourscore.cw * multiplier2, AM.images.yourscore.ch * multiplier2, 0, 0, AM.images.yourscore.cw, AM.images.yourscore.ch, 'yourscore');
 
         // rescaleAll(this.timecircle, sx, sy);
         // rescaleAll(this.stopwatch, sx, sy);
@@ -46,20 +49,20 @@ class Template_1 {
         // this.stopwatch.x = this.timecircle.x;
 
         // this.timeProgressBar = new ProgressBar(this.timecircle.x + paddingX, this.timecircle.h / 2 - 35 * sx / 2 + paddingY, pbW, 40 * sy);
-        this.timeProgressBar = new ProgressBar(w / 2 - pbW / 2, 20 * sy, pbW, pbH, '#9F51FE');
+        this.timeProgressBar = new ProgressBar(w / 2 - pbW / 2, 30 * sy, pbW, pbH, '#9F51FE');
         this.timeProgressBar.progress = 100;
 
         let txtW = 170;
         let txtH = 40;
         let diff = Math.abs((this.timeProgressBar.w + this.timeProgressBar.h));
         
-        this.txt.addText('time', 'TIME: 90', 'bold', 25, 'Montserrat', this.timeProgressBar.x + diff, 35 * sy, txtW, txtH, '#fff', false); 
+        this.txt.addText('time', 'TIME: 90', 'bold', 25, 'Montserrat', this.timeProgressBar.x + diff, 50 * sy, txtW, txtH, '#fff', false); 
         this.txt.texts['time'].x = this.timeProgressBar.x + (this.timeProgressBar.w + this.timeProgressBar.h) / 2 - this.txt.texts['time'].w / 2;
         // this.txt.centerTo('time', this.timeProgressBar.x, this.timeProgressBar.y, this.timeProgressBar.w, this.timeProgressBar.h);
         // console.log(this.timeProgressBar.w, this.timeProgressBar.w + this.timeProgressBar.h / 2, this.txt.texts['time'].w);
 
         // gameover
-        this.txt.addText('score', 'x 00', 'bold', 30, 'Montserrat', this.duck.x + this.duck.w * 2, this.duck.y + 10 * sy, 120, 50, '#fff', true);
+        this.txt.addText('score', 'x 00', 'bold', 30, 'Montserrat', this.duck.x + this.duck.w * 2, this.duck.y + (10) * sy, 120, 50, '#fff', true);
         this.txt.addText('reset', 'Tap to play again.', 'bold', 30, 'Montserrat', w / 2, h * 0.65, 500, 40, '#fff', true);
 
         this.txt.addText('score2', '00', 'bold', 30, 'Montserrat', w / 2 - 10 * sx, this.yourscore.y + this.yourscore.h - 40 * sy, 130, 85, '#fff', true);
@@ -107,7 +110,7 @@ class Template_1 {
         this.yourscore.draw(ctx);
         
         this.txt.draw('score2');
-        this.txt.draw('reset');
+        // this.txt.draw('reset');
     }
 }
 

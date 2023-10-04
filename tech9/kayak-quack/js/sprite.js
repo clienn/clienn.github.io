@@ -42,7 +42,24 @@ class Sprite {
 
         this.show = true;
         this.frames = 1;
+
+        this.screenW = 0;
         
+    }
+
+    updateBounds(bounds, hitbox) {
+        // kayakBounds.left, kayakBounds.right
+        let left = bounds.left - (this.w / 2 - hitbox.w / 2);
+        if (this.x < left) {
+            this.x = left;
+        } else if (this.x + this.w / 2 + hitbox.w / 2 > bounds.right) {
+            this.x = bounds.right - (this.w / 2 + hitbox.w / 2);
+        }
+    }
+
+    updateOriginalPos() {
+        this.ox = this.x;
+        this.oy = this.y;
     }
 
     setFrames(frames) {
@@ -88,13 +105,14 @@ class Sprite {
     drawWithRotation(ctx, img, left, right) {
         // let angle = Math.atan2(this.y - this.oy, this.x - this.ox) * 180 / Math.PI;
 
-        let w = right - left;
-        let hw = w / 2;
-        let percentage = Math.abs(this.ox - this.x) / hw;
+        // let w = right - left;
+        // let hw = w / 2;
+        let percentage = Math.abs(this.screenW / 2 - this.x) / this.screenW;
 
         let angle = 45 * percentage;
 
-        if (this.x < this.ox) angle *= -1;
+        if (this.x < this.screenW / 2) angle *= -1;
+        this.degrees = angle;
         // let angle = Math.atan2(oy - py, ox - px) * 180 / Math.PI;
         // if (angle >= 105) angle -= 90;
         // else angle -= 90;
