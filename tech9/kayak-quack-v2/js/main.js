@@ -484,6 +484,7 @@ function drawWaterObj(idx) {
                 waterObjHolder[i].swim(ctx, AM.images[waterObjHolder[i].key].img);
 
                 if (waterObjHolder[i].id == 3) {
+                    waterObjHolder[i].updateFrameAnimation(6, 15, delta);
                     waterObjHolder[i].updatePos(delta, 1);
                     
                     let edgeX = waterObjContainer[idx][col].x + waterObjContainer[idx][col].w - waterObjHolder[i].w;
