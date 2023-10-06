@@ -213,7 +213,8 @@ const logInfo = {
 }
 
 var waterObjects = [];
-var waterObjectRows = [new Array(parallaxInfo.tile.rows).fill(-1)];
+// var waterObjectRows = [new Array(parallaxInfo.tile.rows).fill(-1)];
+var waterObjectRows = [new Array(24).fill(-1)];
 
 var totalWaterObjects = 5;
 var kayakBounds = {
@@ -270,7 +271,13 @@ var bgWalls = [
 
 var bgWallData = [];
 
+var waterObjContainer = [];
+
 var testT = 0;
+var containerH = 140;
+
+var waterObjHolder = [];
+var bgTileGroup = [];
 
 // pool - 606px
 // rect - 12px, 6px
@@ -297,6 +304,7 @@ function main(w, h) {
 
     initBGTiles();
     initBGWalls();
+    initWaterObjContainer();
 
     // console.log(12 / scaleX)
 
@@ -325,9 +333,21 @@ function main(w, h) {
     parallaxInfo.tile.tileGap = parallaxInfo.water.x + parallaxInfo.water.w;
     parallaxInfo.tile.moveSpeed *= scaleY;
 
-    for (let i = 0; i < parallaxInfo.tile.rows; ++i) {
-        parallaxInfo.tile.yPos[i] = parallaxInfo.tile.startY + i * parallaxInfo.tile.h;
+    // for (let i = 0; i < parallaxInfo.tile.rows; ++i) {
+    //     parallaxInfo.tile.yPos[i] = parallaxInfo.tile.startY + i * parallaxInfo.tile.h;
+    // }
+    containerH *= scaleY;
+    
+    for (let i = 0; i < 24; ++i) {
+        parallaxInfo.tile.yPos[i] = bgTilesPosY[0] + i * containerH;
     }
+
+    for (let i = 0; i < 9; ++i) {
+        waterObjHolder[i] = new Sprite(0, 0, 0, 0, 0, 0);
+        waterObjHolder[i].id = -1;
+    }
+
+    
 
     rescaleSize(bunnyInfo, scaleX, scaleY);
     rescaleSize(kayakInfo, scaleX, scaleY);
@@ -383,29 +403,34 @@ function main(w, h) {
     
     controls();
 
+    initTileGroup();
+
     // AM.audio.bg.img.volume = 0.2;
     // AM.audio.bg.img.loop = true;
     // AM.audio.bg.img.play();
-    addDuck();
-    addDuck();
-    addDuck();
+
     // addDuck();
     // addDuck();
+    // addDuck();
+    // addDuck();
+    // addDuck();
 
-    addLily(1);
-    addLily(2);
-    addLily(3);
+    // addLily(1);
+    // addLily(2);
+    // addLily(2);
+    // addLily(3);
 
-    addWaterStone(1);
-    addWaterStone(2);
-    addWaterStone(3);
 
-    addLog(1);
-    addLog(2);
+    // addWaterStone(1);
+    // addWaterStone(2);
+    // addWaterStone(3);
 
-    addPlank(1, 0, 0);
-    addPlank(1, 1, 1);
-    addPlank(2, 0, 2);
+    // addLog(1);
+    // addLog(2);
+
+    // addPlank(1, 0, 0);
+    // addPlank(1, 1, 1);
+    // addPlank(2, 0, 2);
     
     // addBunny(1, 0);
     // addBunny(1, 0);
@@ -416,6 +441,251 @@ function main(w, h) {
 
 
     gameCycle();
+}
+
+function initTileGroup() {
+    let arr = [1, 2, 3, 0, 0, 0];
+    shuffleArr(arr);
+    arr.push(0, 0);
+    bgTileGroup = arr;
+
+    for (let i = 0; i < 9; ++i) {
+        morphWaterObj(i);
+    }
+
+    for (let i = 0; i < 8; ++i) {
+        let group = bgTileGroup[i];
+        if (group > 0) {
+            let start = (group - 1) * 3;
+            let end = group * 3;
+
+            for (let j = start; j < end; ++j) {
+                let col = i % 3;
+                let rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w - waterObjHolder[j].w)) + waterObjContainer[i][col].x;
+                waterObjHolder[j].x = rngX;
+                // waterObjHolder[j].y = bgTilesPosY[idx] + containerH / 2 - waterObjHolder[i].h / 2 + col * containerH;
+                // waterObjHolder[j].swim(ctx, AM.images[waterObjHolder[i].key].img);
+            }
+        }
+    }
+}
+
+function drawWaterObj(idx) {
+    let group = bgTileGroup[idx];
+    if (group > 0) {
+        let start = (group - 1) * 3;
+        let end = group * 3;
+
+        for (let i = start; i < end; ++i) {
+            if (waterObjHolder[i].id > -1) {
+                let col = i % 3;
+
+                waterObjHolder[i].y = bgTilesPosY[idx] + containerH / 2 - waterObjHolder[i].h / 2 + col * containerH;
+                waterObjHolder[i].swim(ctx, AM.images[waterObjHolder[i].key].img);
+
+                if (waterObjHolder[i].id == 3) {
+                    waterObjHolder[i].updatePos(delta, 1);
+                    
+                    let edgeX = waterObjContainer[idx][col].x + waterObjContainer[idx][col].w - waterObjHolder[i].w;
+
+                    if (
+                        (waterObjHolder[i].facing == 1 && waterObjHolder[i].x >= edgeX) || 
+                        (waterObjHolder[i].facing == -1 && waterObjHolder[i].x <= waterObjContainer[idx][col].x)
+                    ) {
+                        waterObjHolder[i].setDirection(waterObjHolder[i].facing * -1);
+                        waterObjHolder[i].setRandomSpeed(100, 50);
+                    }
+                }
+
+                if (checkAngledCollisions(kayakHitBox, waterObjHolder[i])) {
+                    if (waterObjHolder[i].id > 2) {
+                        if (waterObjHolder[i].id == 3) {
+                            score++;
+                            if (score > 99) score = 99;
+                            setPoints('+1', '#C7FC12');
+                            playScore();
+                        } else {
+                            score--;
+                            if (score < 0) score = 0;
+                            setPoints('-1', '#fb2121'); // red
+                            // playCry();
+                        }
+    
+                        updateScore();
+
+                        waterObjHolder[i].id = -1;
+                    }
+                }
+            }
+            
+        }
+    }
+}
+
+function moveTileGroup(idx) {
+    let next = (idx + 13) % 8;
+    let group = bgTileGroup[idx];
+
+    bgTileGroup[next] = group;
+    bgTileGroup[idx] = 0;
+
+    let start = (group - 1) * 3;
+    let end = group * 3;
+
+    for (let j = start; j < end; ++j) {
+        morphWaterObj(j);
+
+        let col = j % 3;
+        let rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w - waterObjHolder[j].w)) + waterObjContainer[next][col].x;
+        waterObjHolder[j].x = rngX;
+    }
+}
+
+function morphWaterObj(i) {
+    let rng = Math.floor(Math.random() * 12) - 1;
+    
+    if (rng > -1) {
+        let w, h, cw, ch, key;
+
+        let duckChances = Math.floor(Math.random() * 100);
+        if (duckChances > 65) rng = 3;
+
+        if (rng < 3) {
+            key = 'lily' + (rng + 1);
+            w = lilyInfo.w;
+            h = lilyInfo.h;
+            cw = AM.images[key].cw;
+            ch = AM.images[key].ch;
+        } else if (rng == 3) {
+            key = 'duck';
+            w = duckInfo[1].w;
+            h = duckInfo[1].h;
+            cw = AM.images.duck.cw;
+            ch = AM.images.duck.ch;
+
+            let direction = Math.floor(Math.random() * 2) ? 1 : -1;
+            waterObjHolder[i].setDirection(direction);
+            waterObjHolder[i].setRandomSpeed(100, 50);
+    
+        } else if (rng < 7) {
+            key = 'wstone' + (rng - 3);
+            w = wstoneInfo.w;
+            h = wstoneInfo.h;
+            cw = AM.images[key].cw;
+            ch = AM.images[key].ch;
+        } else if (rng < 9) {
+            key = 'log' + (rng - 6);
+            w = logInfo.w;
+            h = logInfo.h;
+            cw = AM.images[key].cw;
+            ch = AM.images[key].ch;
+        } else {
+            let id = rng - 8;
+            key = 'plank' + id;
+            w = plankInfo[id].w;
+            h = plankInfo[id].h;
+            cw = AM.images[key].cw;
+            ch = AM.images[key].ch;
+        }
+        
+        waterObjHolder[i].morph(rng, w, h, cw, ch);
+        waterObjHolder[i].key = key;
+
+        if (!AM.images[waterObjHolder[i].key]) console.log(key)
+    } else {
+        waterObjHolder[i].id = rng;
+    }
+       
+}
+
+function updateWaterObjContainer(idx) {
+    let adjH = 140 * scaleY;
+    let h = 140;
+
+    if (idx == 0) {
+        waterObjContainer[idx] = [
+            { x: 300, y: bgTilesPosY[0], w: 1170, h: h },
+            { x: 0, y: bgTilesPosY[0] + adjH, w: 1700, h: h },
+            { x: 230, y: bgTilesPosY[0] + adjH * 2, w: 1270, h: h }
+        ];
+    } else if (idx == 1) {
+        waterObjContainer[idx] = [
+            { x: 750, y: bgTilesPosY[1], w: 920, h: h },
+            { x: 200, y: bgTilesPosY[1] + adjH, w: 1270, h: h },
+            { x: 200, y: bgTilesPosY[1] + adjH * 2, w: 910, h: h }
+        ];
+    } else if (idx == 2) {
+        waterObjContainer[idx] = [
+            { x: 300, y: bgTilesPosY[2], w: 970, h: h },
+            { x: 300, y: bgTilesPosY[2] + adjH, w: 1470, h: h },
+            { x: 700, y: bgTilesPosY[2] + adjH * 2, w: 1000, h: h }
+        ];
+    } else if (idx == 3) {
+        waterObjContainer[idx] = [
+            { x: 800, y: bgTilesPosY[3], w: 980, h: h },
+            { x: 800, y: bgTilesPosY[3] + adjH, w: 980, h: h },
+            { x: 0, y: bgTilesPosY[3] + adjH * 2, w: 1620, h: h }
+        ];
+    } else if (idx == 4) {
+        waterObjContainer[idx] = [
+            { x: 0, y: bgTilesPosY[4], w: 1020, h: h },
+            { x: 0, y: bgTilesPosY[4] + adjH, w: 1020, h: h },
+            { x: 0, y: bgTilesPosY[4] + adjH * 2, w: 1780, h: h }
+        ];
+    } else if (idx == 5) {
+        waterObjContainer[idx] = [
+            { x: 350, y: bgTilesPosY[5], w: 1435, h: h },
+            { x: 1000, y: bgTilesPosY[5] + adjH, w: 780, h: h },
+            { x: 1000, y: bgTilesPosY[5] + adjH * 2, w: 780, h: h }
+        ];
+    } else if (idx == 6) {
+        waterObjContainer[idx] = [
+            { x: 50, y: bgTilesPosY[6], w: 1600, h: h },
+            { x: 50, y: bgTilesPosY[6] + adjH, w: 1020, h: h },
+            { x: 180, y: bgTilesPosY[6] + adjH * 2, w: 1400, h: h }
+        ];
+    } else if (idx == 7) {
+        waterObjContainer[idx] = [
+            { x: 300, y: bgTilesPosY[7], w: 1270, h: h },
+            { x: 300, y: bgTilesPosY[7] + adjH, w: 1270, h: h },
+            { x: 280, y: bgTilesPosY[7] + adjH * 2, w: 1070, h: h }
+        ];
+    }
+
+    for (let i = 0; i < waterObjContainer[idx].length; ++i) {
+        waterObjContainer[idx][i].x *= scaleX;
+        waterObjContainer[idx][i].w *= scaleX;
+        waterObjContainer[idx][i].h *= scaleY;
+    }
+}
+
+function initWaterObjContainer() {
+    for (let i = 0; i < bgInfo.rows; ++i) {
+        updateWaterObjContainer(i);
+    }
+}
+
+function updateWaterObjContainerPos(speed) {
+    for (let i = 0; i < bgInfo.rows; ++i) {
+        for (let j = 0; j < waterObjContainer[i].length; ++j) {
+            waterObjContainer[i][j].y += speed * delta;
+        }
+    }
+}
+
+function drawWaterObjContainer() {
+
+    for (let i = 0; i < waterObjContainer.length; ++i) {
+        // if (waterObjContainer[i]) {
+            for (let j = 0; j < waterObjContainer[i].length; ++j) {
+                const { x, y, w, h } = waterObjContainer[i][j];
+                // ctx.beginPath();
+                // ctx.rect(x, y, w, h);
+                // ctx.stroke();
+            }
+        // }
+    }
+    
 }
 
 function updateBGWall(idx) {
@@ -687,6 +957,8 @@ function drawBGTiles() {
             // ctx.beginPath();
             // ctx.rect(0, bgTilesPosY[i], canvas.width, bgInfo.h);
             // ctx.stroke();
+
+            drawWaterObj(i);
         }
         // ctx.drawImage(AM.images.bg.img, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 0, 0, canvas.width, 428);
     }
@@ -699,19 +971,31 @@ function updateBGTiles(speed) {
             let idx = (i + 1) % bgInfo.rows;
             bgTilesPosY[i] = bgTilesPosY[idx] - bgInfo.h;
             updateBGWall(i);
+            updateWaterObjContainer(i);
+            // bgTileGroup
+            if (bgTileGroup[i] > 0) {
+                moveTileGroup(i);
+            }
         }
     }
 }
 
 function addLog(rng) {
-    let rngX = Math.floor(Math.random() * (parallaxInfo.water.w - logInfo.w));
-    let rngY = parallaxInfo.tile.rows - waterObjects.length - 1; //Math.floor(Math.random() * parallaxInfo.tile.rows);
+    // let rngX = Math.floor(Math.random() * (parallaxInfo.water.w - logInfo.w));
+    let rngY = 24 - waterObjects.length - 1; //Math.floor(Math.random() * parallaxInfo.tile.rows);
+    // let rngY = parallaxInfo.tile.rows - waterObjects.length - 1; //Math.floor(Math.random() * parallaxInfo.tile.rows);
+
+    let rowIdx = Math.floor(rngY / 3)
+    let colIdx = rngY % 3; 
+    let w = waterObjContainer[rowIdx][colIdx].w - logInfo.w;
+    let rngX = Math.floor(Math.random() * w) + waterObjContainer[rowIdx][colIdx].x;
     // let direction = Math.floor(Math.random() * 2) ? 1 : -1;
 
     // let rng = Math.floor(Math.random() * 3) + 1;
 
     let key = 'log' + rng;
-    let log = new Sprite(parallaxInfo.water.x + rngX, parallaxInfo.tile.yPos[rngY], logInfo.w, logInfo.h, AM.images[key].cw, AM.images[key].ch);
+    // let log = new Sprite(parallaxInfo.water.x + rngX, parallaxInfo.tile.yPos[rngY], logInfo.w, logInfo.h, AM.images[key].cw, AM.images[key].ch);
+    let log = new Sprite(rngX, parallaxInfo.tile.yPos[rngY] + containerH / 2 - logInfo.h / 2, logInfo.w, logInfo.h, AM.images[key].cw, AM.images[key].ch);
     log.id = rngY;
     log.key = key;
     // duck.vy = parallaxInfo.tile.moveSpeed;
@@ -724,14 +1008,21 @@ function addLog(rng) {
 }
 
 function addWaterStone(rng) {
-    let rngX = Math.floor(Math.random() * (parallaxInfo.water.w - wstoneInfo.w));
-    let rngY = parallaxInfo.tile.rows - waterObjects.length - 1; //Math.floor(Math.random() * parallaxInfo.tile.rows);
+    // let rngX = Math.floor(Math.random() * (parallaxInfo.water.w - wstoneInfo.w));
+    let rngY = 24 - waterObjects.length - 1; //Math.floor(Math.random() * parallaxInfo.tile.rows);
+    // let rngY = parallaxInfo.tile.rows - waterObjects.length - 1; //Math.floor(Math.random() * parallaxInfo.tile.rows);
+
+    let rowIdx = Math.floor(rngY / 3)
+    let colIdx = rngY % 3; 
+    let w = waterObjContainer[rowIdx][colIdx].w - wstoneInfo.w;
+    let rngX = Math.floor(Math.random() * w) + waterObjContainer[rowIdx][colIdx].x;
     // let direction = Math.floor(Math.random() * 2) ? 1 : -1;
 
     // let rng = Math.floor(Math.random() * 3) + 1;
 
     let key = 'wstone' + rng;
-    let wstone = new Sprite(parallaxInfo.water.x + rngX, parallaxInfo.tile.yPos[rngY], wstoneInfo.w, wstoneInfo.h, AM.images[key].cw, AM.images[key].ch);
+    // let wstone = new Sprite(parallaxInfo.water.x + rngX, parallaxInfo.tile.yPos[rngY], wstoneInfo.w, wstoneInfo.h, AM.images[key].cw, AM.images[key].ch);
+    let wstone = new Sprite(rngX, parallaxInfo.tile.yPos[rngY] + containerH / 2 - wstoneInfo.h / 2, wstoneInfo.w, wstoneInfo.h, AM.images[key].cw, AM.images[key].ch);
     wstone.id = rngY;
     wstone.key = key;
     // duck.vy = parallaxInfo.tile.moveSpeed;
@@ -744,14 +1035,23 @@ function addWaterStone(rng) {
 }
 
 function addLily(rng) {
-    let rngX = Math.floor(Math.random() * (parallaxInfo.water.w - lilyInfo.w));
-    let rngY = parallaxInfo.tile.rows - waterObjects.length - 1; //Math.floor(Math.random() * parallaxInfo.tile.rows);
-    let direction = Math.floor(Math.random() * 2) ? 1 : -1;
+    // let rngX = Math.floor(Math.random() * (parallaxInfo.water.w - lilyInfo.w));
+    let rngY = 24 - waterObjects.length - 1; //Math.floor(Math.random() * parallaxInfo.tile.rows);
+    // let rngY = parallaxInfo.tile.rows - waterObjects.length - 1; //Math.floor(Math.random() * parallaxInfo.tile.rows);
+
+    
+    let rowIdx = Math.floor(rngY / 3)
+    let colIdx = rngY % 3; 
+    let w = waterObjContainer[rowIdx][colIdx].w - lilyInfo.w;
+    let rngX = Math.floor(Math.random() * w) + waterObjContainer[rowIdx][colIdx].x;
+
+    // let direction = Math.floor(Math.random() * 2) ? 1 : -1;
 
     // let rng = Math.floor(Math.random() * 3) + 1;
 
     let key = 'lily' + rng;
-    let lily = new Sprite(parallaxInfo.water.x + rngX, parallaxInfo.tile.yPos[rngY], lilyInfo.w, lilyInfo.h, AM.images[key].cw, AM.images[key].ch);
+    // let lily = new Sprite(parallaxInfo.water.x + rngX, parallaxInfo.tile.yPos[rngY], lilyInfo.w, lilyInfo.h, AM.images[key].cw, AM.images[key].ch);
+    let lily = new Sprite(rngX, parallaxInfo.tile.yPos[rngY] + containerH / 2 - lilyInfo.h / 2, lilyInfo.w, lilyInfo.h, AM.images[key].cw, AM.images[key].ch);
     lily.id = rngY;
     lily.key = key;
     // duck.vy = parallaxInfo.tile.moveSpeed;
@@ -830,20 +1130,26 @@ function addPlank(id, direction, rngY) {
     // let id = Math.floor(Math.random() * 2) + 1;
     // let rngY = id; //Math.floor(Math.random() * parallaxInfo.tile.rows);
     // let direction = Math.floor(Math.random() * 2);
+    // let rngY = parallaxInfo.tile.rows - waterObjects.length - 1; //Math.floor(Math.random() * parallaxInfo.tile.rows);
+    let rowIdx = Math.floor(rngY / 3)
+    let colIdx = rngY % 3; 
+    let w = waterObjContainer[rowIdx][colIdx].w - plankInfo[id].w;
+    let x = Math.floor(Math.random() * w) + waterObjContainer[rowIdx][colIdx].x;
 
-    let x = parallaxInfo.water.x;
+    // let x = parallaxInfo.water.x;
 
-    if (id == 1) {
-        if (direction) {
-            x += parallaxInfo.water.w - plankInfo[id].w;
-        }
-    } else {
-        let rngX = Math.floor(Math.random() * (parallaxInfo.water.w - plankInfo[id].w));
-        x += rngX;
-    }
+    // if (id == 1) {
+    //     if (direction) {
+    //         x += parallaxInfo.water.w - plankInfo[id].w;
+    //     }
+    // } else {
+    //     let rngX = Math.floor(Math.random() * (parallaxInfo.water.w - plankInfo[id].w));
+    //     x += rngX;
+    // }
 
     let key = 'plank' + id;
-    let plank = new Sprite(x, parallaxInfo.tile.yPos[rngY], plankInfo[id].w, plankInfo[id].h, AM.images[key].cw, AM.images[key].ch);
+    // let plank = new Sprite(x, parallaxInfo.tile.yPos[rngY], plankInfo[id].w, plankInfo[id].h, AM.images[key].cw, AM.images[key].ch);
+    let plank = new Sprite(x, parallaxInfo.tile.yPos[rngY] + containerH / 2 - plankInfo[id].h / 2, plankInfo[id].w, plankInfo[id].h, AM.images[key].cw, AM.images[key].ch);
     plank.id = rngY;
     plank.key = key;
 
@@ -854,16 +1160,22 @@ function addPlank(id, direction, rngY) {
 }
 
 function addDuck() {
-    let rngX = Math.floor(Math.random() * parallaxInfo.water.w);
-    let rngY = parallaxInfo.tile.rows - waterObjects.length - 1; //Math.floor(Math.random() * parallaxInfo.tile.rows);
+    // let rngX = Math.floor(Math.random() * parallaxInfo.water.w);
+    let rngY = 24 - waterObjects.length - 1; //Math.floor(Math.random() * parallaxInfo.tile.rows);
+    // let rngY = parallaxInfo.tile.rows - waterObjects.length - 1; //Math.floor(Math.random() * parallaxInfo.tile.rows);
+    let rowIdx = Math.floor(rngY / 3)
+    let colIdx = rngY % 3; 
+    let w = waterObjContainer[rowIdx][colIdx].w - duckInfo[1].w;
+    let rngX = Math.floor(Math.random() * w) + waterObjContainer[rowIdx][colIdx].x;
     let direction = Math.floor(Math.random() * 2) ? 1 : -1;
 
     let key = 'duck';
     // let duck = new Sprite(parallaxInfo.water.x + rngX, parallaxInfo.tile.yPos[rngY], duckInfo[1].w, duckInfo[1].h, 46.83, AM.images[key].ch);
-    let duck = new Sprite(parallaxInfo.water.x + rngX, parallaxInfo.tile.yPos[rngY], duckInfo[1].w, duckInfo[1].h, AM.images[key].cw, AM.images[key].ch);
+    // let duck = new Sprite(parallaxInfo.water.x + rngX, parallaxInfo.tile.yPos[rngY], duckInfo[1].w, duckInfo[1].h, AM.images[key].cw, AM.images[key].ch);
+    let duck = new Sprite(rngX, parallaxInfo.tile.yPos[rngY] + containerH / 2 - duckInfo[1].h / 2, duckInfo[1].w, duckInfo[1].h, AM.images[key].cw, AM.images[key].ch);
     duck.id = rngY;
     duck.key = key;
-    // duck.vy = parallaxInfo.tile.moveSpeed;
+    duck.vy = parallaxInfo.tile.moveSpeed;
 
     duck.setDirection(direction);
     duck.setRandomSpeed(100, 50);
@@ -881,7 +1193,13 @@ function drawWaterObjects() {
 
             if (checkAngledCollisions(kayakHitBox, waterObjects[idx])) {
                 if (!waterObjects[idx].key.match(/lily\d/g)) {
-                    waterObjects[idx].y = parallaxInfo.tile.yPos[currentTop];
+                    waterObjects[idx].y = parallaxInfo.tile.yPos[currentTop] + containerH / 2 - waterObjects[idx].h / 2;
+                    let rowIdx = Math.floor(currentTop / 3)
+                    let colIdx = currentTop % 3; 
+                    let w = waterObjContainer[rowIdx][colIdx].w - waterObjects[idx].w;
+                    let rngX = Math.floor(Math.random() * w) + waterObjContainer[rowIdx][colIdx].x;
+                    waterObjects[idx].x = rngX;
+
                     waterObjectRows[i] = -1;
 
                     if (waterObjects[idx].key == 'duck') {
@@ -907,17 +1225,32 @@ function drawWaterObjects() {
 
     for (let i = 0; i < waterObjects.length; ++i) {
         waterObjects[i].updatePos(delta, 1);
-        waterObjects[i].y = parallaxInfo.tile.yPos[waterObjects[i].id];
+        // waterObjects[i].y = parallaxInfo.tile.yPos[waterObjects[i].id];
+        // waterObjects[i].x += waterObjects[i].vx * delta;
+        waterObjects[i].y = parallaxInfo.tile.yPos[waterObjects[i].id] + containerH / 2 - waterObjects[i].h / 2;
+        // waterObjects[i].y = parallaxInfo.tile.yPos[waterObjects[i].id];
 
         if (waterObjects[i].key == 'duck') {
             waterObjects[i].updateFrameAnimation(6, 15, delta); // frames, speed, delta
+            let rngY = waterObjects[i].id;
+            let rowIdx = Math.floor(rngY / 3)
+            let colIdx = rngY % 3; 
+            let edgeX = waterObjContainer[rowIdx][colIdx].x + waterObjContainer[rowIdx][colIdx].w - waterObjects[i].w;
+
             if (
-                (waterObjects[i].facing == 1 && waterObjects[i].x >= parallaxInfo.water.edgeX - waterObjects[i].w) || 
-                (waterObjects[i].facing == -1 && waterObjects[i].x <= parallaxInfo.water.x)
+                (waterObjects[i].facing == 1 && waterObjects[i].x >= edgeX) || 
+                (waterObjects[i].facing == -1 && waterObjects[i].x <= waterObjContainer[rowIdx][colIdx].x)
             ) {
                 waterObjects[i].setDirection(waterObjects[i].facing * -1);
                 waterObjects[i].setRandomSpeed(100, 50);
             }
+            // if (
+            //     (waterObjects[i].facing == 1 && waterObjects[i].x >= parallaxInfo.water.edgeX - waterObjects[i].w) || 
+            //     (waterObjects[i].facing == -1 && waterObjects[i].x <= parallaxInfo.water.x)
+            // ) {
+            //     waterObjects[i].setDirection(waterObjects[i].facing * -1);
+            //     waterObjects[i].setRandomSpeed(100, 50);
+            // }
         }
 
         
@@ -950,7 +1283,14 @@ function updateWaterObject(rngY) {
                     // }
                     // if (idx < 0) idx = 0;
         
-                    waterObjects[idx].y = parallaxInfo.tile.yPos[rngY];
+                    waterObjects[idx].y = parallaxInfo.tile.yPos[rngY] + containerH / 2 - waterObjects[idx].h / 2;
+
+                    let rowIdx = Math.floor(rngY / 3)
+                    let colIdx = rngY % 3; 
+                    let w = waterObjContainer[rowIdx][colIdx].w - waterObjects[idx].w;
+                    let rngX = Math.floor(Math.random() * w) + waterObjContainer[rowIdx][colIdx].x;
+                    waterObjects[idx].x = rngX;
+                    // waterObjects[idx].id = rngY;
                     
                     // waterObjects[idx].id = rngY;
                     waterObjectRows[rngY] = idx;
@@ -1169,14 +1509,18 @@ function parallaxBG() {
 
 function updateParallax() {
     let v = parallaxInfo.tile.moveSpeed * delta;
-    for (let i = 0; i < parallaxInfo.tile.rows; ++i) {
-        parallaxInfo.tile.yPos[i] += v;
+    // for (let i = 0; i < parallaxInfo.tile.rows; ++i) {
+    for (let i = 0; i < 24; ++i) {
+        
         if (parallaxInfo.tile.yPos[i] >= canvas.height) {
-            parallaxInfo.tile.yPos[i] = (parallaxInfo.tile.yPos[(i + 1) % parallaxInfo.tile.rows] + v) - parallaxInfo.tile.h;
+            // parallaxInfo.tile.yPos[i] = (parallaxInfo.tile.yPos[(i + 1) % parallaxInfo.tile.rows] + v) - parallaxInfo.tile.h;
+            parallaxInfo.tile.yPos[i] = (parallaxInfo.tile.yPos[(i + 1) % 24]) - containerH;
             // generateTerrain(i);
             updateWaterObject(i);
             currentTop = i;
         }
+
+        parallaxInfo.tile.yPos[i] += v;
     }
 }
 
@@ -1743,13 +2087,15 @@ function update() {
         timer.tick(delta);
         updateBGTiles(parallaxInfo.tile.moveSpeed);
         updateBGWallsPos(parallaxInfo.tile.moveSpeed);
-
+        updateWaterObjContainerPos(parallaxInfo.tile.moveSpeed);
+        // updateParallax();
+        
         if (timer.timer <= 0) {
             gameover = true;
             updateFinalScore();
         }
     }
-    updateParallax();
+    
 
     if (!mDown) {
         kayak.update(delta, 1);
@@ -1770,12 +2116,13 @@ function gameCycle() {
             // ctx.drawImage(AM.images.bg.img, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 0, 0, canvas.width, 428);
             drawBGTiles();
             // drawBGWalls();
+            drawWaterObjContainer();
               
             // parallaxBG();
             // drawBunnies();
             // drawTerrain();
             // drawWaterObject(plankInfo, 1, 0);
-            drawWaterObjects();
+            // drawWaterObjects();
             // drawWaterObject(duckInfo, 1, 3);
 
             drawKayak();
