@@ -12,8 +12,8 @@
         },
         {
             "id": "score",
-            "src": "sounds/score2",
-            "ext": "wav"
+            "src": "sounds/score",
+            "ext": "mp3"
         }
     ]
 }

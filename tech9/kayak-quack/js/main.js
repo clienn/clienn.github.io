@@ -257,6 +257,7 @@ var testRect2 = [
 ];
 
 var testT = 0;
+var doSpeedInc = false;
 
 // pool - 606px
 // rect - 12px, 6px
@@ -1500,6 +1501,9 @@ function update() {
 
     if (delta < 1) {
         timer.tick(delta);
+
+        // let tmpT = Math.floor(timer.timer / 24 / 10);
+        // parallaxInfo.tile.moveSpeed = 100 * scaleY + (tmpT * 20 * scaleY);
 
         if (timer.timer <= 0) {
             gameover = true;
