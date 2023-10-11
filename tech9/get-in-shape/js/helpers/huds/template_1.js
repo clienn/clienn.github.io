@@ -5,8 +5,8 @@ class Template_1 {
         this.txt.setScale(sx, sy); 
 
         this.volumeOn = true;
-        this.volume = new StaticSprite(15, 30, 25, 25, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
-        this.mute = new StaticSprite(15, 30, 25, 25, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
+        this.volume = new StaticSprite(15, 15, 55, 55, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
+        this.mute = new StaticSprite(15, 15, 55, 55, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
         // this.timecircle = new StaticSprite(10, 10, 60, 60, 0, 0, AM.images.timecircle.cw, AM.images.timecircle.ch, 'timecircle');
         // this.stopwatch = new StaticSprite(10, 10, 60, 60, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
         this.hourglass = new StaticSprite(this.volume.x + this.volume.w + 10, 10, 40, 60, 0, 0, AM.images.hourglass.cw, AM.images.hourglass.ch, 'hourglass');

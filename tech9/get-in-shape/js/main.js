@@ -410,8 +410,31 @@ function main(w, h) {
         });
     }
     
+    window.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    window.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+
+    document.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    document.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+    
     initShapesContainer();
     gameCycle();
+}
+
+function muteAllAudio(flag) {
+    for (let k in AM.audio) {
+        AM.audio[k].img.muted = flag;
+    }
+    
 }
 
 function initStartPage(scale) {

@@ -173,6 +173,14 @@ var images = {
         src: 'kaboom',
         obj: {}
     },
+    boom: {
+        src: 'boom_sprite',
+        obj: {}
+    },
+    scoreboom: {
+        src: 'score_sprite',
+        obj: {}
+    },
     blackCanonRight: {
         src: 'black-canon-2',
         obj: {}
@@ -256,35 +264,52 @@ var volumeInfo = {
     y: 20,
     w: 25 * 2,
     h: 25 * 2,
-    cw: 50,
-    ch: 50,
+    cw: 46,
+    ch: 46,
 }
 
+// 481 × 49
 var kaboomInfo = {
     x: 0,
     y: 0,
-    w: 108,
-    h: 28,
-    cw: 108,
-    ch: 28,
+    // w: 108,
+    // h: 28,
+    w: 48.1 * 3,
+    h: 49 * 3,
+    cw: 48.1,
+    ch: 49,
+    // cw: 108,
+    // ch: 28,
 }
+
+// var explosionStarInfo = {
+//     x: 0,
+//     y: 0,
+//     w: 77 * 3,
+//     h: 77 * 3,
+//     cw: 77,
+//     ch: 77,
+// }
 
 var explosionStarInfo = {
     x: 0,
     y: 0,
-    w: 77 * 3,
-    h: 77 * 3,
-    cw: 77,
-    ch: 77,
+    w: 48.125 * 3,
+    h: 49 * 3,
+    cw: 48.125,
+    ch: 49,
 }
 
+// 385 × 49
 var ouchInfo = {
     x: 0,
     y: 0,
-    w: 70 * 2,
-    h: 28 * 2,
-    cw: 70,
-    ch: 28,
+    w: 48.125 * 3,
+    h: 49 * 3,
+    cw: 48.125,
+    ch: 49,
+    // cw: 70,
+    // ch: 28,
 }
 
 var volumeOn = true;
@@ -666,7 +691,9 @@ var scaleProj = 1.5;
 var kaboomT = 0;
 var kaboomT2 = 0;
 var ouchT = 0;
+var ouchT2 = 0;
 
+// 448 × 57
 var startPageInfo = {
     title: {
         x: 0,
@@ -681,8 +708,10 @@ var startPageInfo = {
         y: 333,
         w: 64 * 2,
         h: 65 * 2,
-        cw: 64,
-        ch: 65,
+        cw: 56,
+        ch: 57,
+        // cw: 64,
+        // ch: 65,
     },
     startballoon: {
         x: 837,
@@ -790,7 +819,7 @@ function main(w, h) {
     scaleY = h / 922;
 
     projDimX *= scaleX;
-    projDimY *= scaleY;
+    projDimY *= scaleX;
 
     g *= scaleY;
 
@@ -1088,7 +1117,12 @@ function drawFloaters() {
 }
 
 function drawExplosionStar(x, y) {
-    ctx.drawImage(images.explosion_star.obj.img, 0, 0, explosionStarInfo.cw, explosionStarInfo.ch, x, y, explosionStarInfo.w, explosionStarInfo.h);
+    // ctx.drawImage(images.explosion_star.obj.img, 0, 0, explosionStarInfo.cw, explosionStarInfo.ch, x, y, explosionStarInfo.w, explosionStarInfo.h);
+    // ctx.drawImage(images.boom.obj.img, 0, 0, explosionStarInfo.cw, explosionStarInfo.ch, x, y, explosionStarInfo.w, explosionStarInfo.h);
+    ouchT = 1;
+    ouchT2 = 0;
+    ouchInfo.x = x;
+    ouchInfo.y = y;
 }
 
 function initAnimateCanon(idx) {
@@ -1391,7 +1425,30 @@ function rescaleAll(obj) {
     obj.h *= scaleY;
 }
 
+function muteAllAudio(flag) {
+    for (let k in music) {
+        music[k].obj.audio.muted = flag;
+    }
+    
+}
+
 function controls() {
+    window.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    window.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+
+    document.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    document.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+
     canvas.addEventListener('touchstart', e => {
         // mousedownE(e.touches[0].clientX, e.touches[0].clientY);
         if (!mDown) {
@@ -1687,6 +1744,12 @@ function checkProjectileCollisions() {
                 if ((projectiles[i].currFrame < 31 && projectiles[j].currFrame > 30) || (projectiles[i].currFrame > 30 && projectiles[j].currFrame < 31)) {
                     // console.log('collision detected');
                     drawExplosionStar(projectiles[i].x, projectiles[i].y);
+                    if (volumeOn) {
+                        music.ouch.obj.audio.pause();
+                        music.ouch.obj.audio.currentTime = 0;
+                        music.ouch.obj.audio.play();
+                    }
+                    
                     resetProjectile([i, j]);
                     initAnimateCanon(i);
                     initAnimateCanon(j);
@@ -1777,12 +1840,14 @@ function splat(mx, my) {
                     music.ouch.obj.audio.play();
                 }
                 
-                ouchT = 0.5;
+                ouchT = 1;
+                ouchT2 = 0;
                 ouchInfo.x = projectiles[i].x;
                 ouchInfo.y = projectiles[i].y;
             } else {
                 // console.log('splatted!');
-                kaboomT = 0.15;
+                // kaboomT = 0.15;
+                kaboomT = 1;
                 kaboomT2 = 0;
                 kaboomInfo.x = projectiles[i].x;
                 kaboomInfo.y = projectiles[i].y;
@@ -1958,14 +2023,21 @@ function gameCycle() {
                 }
 
                 if (kaboomT) {
-                    kaboomT2 += 20 * delta;
+                    kaboomT2 += 10 * delta;
                     let adjx = Math.sin(kaboomT2) * 50;
                     let adjx2 = adjx / 2;
-                    ctx.drawImage(images.kaboom.obj.img, 0, 0, kaboomInfo.cw, kaboomInfo.ch, kaboomInfo.x - adjx2, kaboomInfo.y - adjx2, kaboomInfo.w + adjx, kaboomInfo.h + adjx);
+                    let frame = Math.floor(kaboomT2) % 10;
+                    // ctx.drawImage(images.scoreboom.obj.img, 0, 0, kaboomInfo.cw, kaboomInfo.ch, kaboomInfo.x - adjx2, kaboomInfo.y - adjx2, kaboomInfo.w + adjx, kaboomInfo.h + adjx);
+                    ctx.drawImage(images.scoreboom.obj.img, frame * kaboomInfo.cw, 0, kaboomInfo.cw, kaboomInfo.ch, kaboomInfo.x, kaboomInfo.y, kaboomInfo.w, kaboomInfo.h);
+                    
                 }
 
                 if (ouchT) {
-                    ctx.drawImage(images.ouch.obj.img, 0, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
+                    ouchT2 += 10 * delta;
+                    
+                    let frame = Math.floor(ouchT2) % 10;
+                    // ctx.drawImage(images.ouch.obj.img, 0, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
+                    ctx.drawImage(images.boom.obj.img, frame * ouchInfo.cw, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
                 }
 
                 // canons
@@ -2010,25 +2082,27 @@ function gameCycle() {
 
                 // canons
                 canons.draw();
+
+                let frame = Math.floor(startScreenHandAnimT) % 8;
                 
                 ctx.drawImage(images.title.obj.img, 0, 0, startPageInfo.title.cw, startPageInfo.title.ch, startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
-                
+                ctx.drawImage(images.hand.obj.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
                 // tap
-                ctx.save();
-                // Untransformed draw position
-                const position = {x: startPageInfo.hand.x, y: startPageInfo.hand.y};
-                // In degrees
-                const rotation = { x: 0, y: Math.sin(startScreenHandAnimT) * 35, z: 0};
-                // Rotation relative to here (this is the center of the image)
-                const rotPt = { x: startPageInfo.hand.w / 2, y: startPageInfo.hand.h / 2 };
+                // ctx.save();
+                // // Untransformed draw position
+                // const position = {x: startPageInfo.hand.x, y: startPageInfo.hand.y};
+                // // In degrees
+                // const rotation = { x: 0, y: Math.sin(startScreenHandAnimT) * 35, z: 0};
+                // // Rotation relative to here (this is the center of the image)
+                // const rotPt = { x: startPageInfo.hand.w / 2, y: startPageInfo.hand.h / 2 };
 
-                ctx.setTransform(new DOMMatrix()
-                    .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
-                    .rotateSelf(rotation.x, rotation.y, rotation.z)
-                );
+                // ctx.setTransform(new DOMMatrix()
+                //     .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+                //     .rotateSelf(rotation.x, rotation.y, rotation.z)
+                // );
                 
-                ctx.drawImage(images.hand.obj.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, -rotPt.x, -rotPt.y, startPageInfo.hand.w, startPageInfo.hand.h);
-                ctx.restore();
+                // ctx.drawImage(images.hand.obj.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, -rotPt.x, -rotPt.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                // ctx.restore();
                 //
                 
                 ctx.drawImage(images.startballoon.obj.img, 0, 0, startPageInfo.startballoon.cw, startPageInfo.startballoon.ch, startPageInfo.startballoon.x + handx, startPageInfo.startballoon.y + handy, startPageInfo.startballoon.w, startPageInfo.startballoon.h);

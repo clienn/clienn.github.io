@@ -387,8 +387,8 @@ var volumeInfo = {
     y: 25,
     w: 25 * 2,
     h: 25 * 2,
-    cw: 50,
-    ch: 50,
+    cw: 46,
+    ch: 46,
 }
 
 const topHUD = {
@@ -648,8 +648,8 @@ var startPageInfo = {
         y: 280,
         w: 64 * 2,
         h: 65 * 2,
-        cw: 64,
-        ch: 65,
+        cw: 56,
+        ch: 57,
     },
     turtle: {
         x: 817,
@@ -880,6 +880,22 @@ function main(w, h) {
 
     loadAssets();
 
+    window.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    window.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+
+    document.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    document.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+
     canvas.addEventListener('touchstart', e => {
         // mousedownE(e.touches[0].clientX, e.touches[0].clientY);
     });
@@ -928,6 +944,7 @@ function main(w, h) {
                         // let msgs = [1, 11, 12, 13, 14, 15, 16, 17];
                         let rng = Math.floor(Math.random() * 8) + 1;
                         if (rng > 1) rng += 9;
+                        else rng = 11;
 
                         // msg = TEXT_ID.CORRECT;
                         msg = rng;
@@ -950,7 +967,7 @@ function main(w, h) {
                         // msg = 'wrong';
                         let rng = Math.floor(Math.random() * 8) + 1;
                         if (rng > 1) rng += 16;
-                        else rng = TEXT_ID.WRONG;
+                        else rng = 18;
 
                         msg = rng;
                         // msg = TEXT_ID.WRONG;
@@ -1032,6 +1049,12 @@ function main(w, h) {
     init();
 
     gameCycle();
+}
+
+function muteAllAudio(flag) {
+    for (let k in music) {
+        music[k].obj.audio.muted = flag;
+    }   
 }
 
 function initStartPage() {
@@ -1953,22 +1976,25 @@ function gameCycle() {
                 ctx.drawImage(images.startbg.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
                 ctx.drawImage(images.title.obj.img, 0, 0, startPageInfo.title.cw, startPageInfo.title.ch, startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
                 
-                // tap
-                ctx.save();
-                // Untransformed draw position
-                var position = {x: startPageInfo.hand.x, y: startPageInfo.hand.y};
-                // In degrees
-                var rotation = { x: 0, y: Math.sin(startScreenHandAnimT) * 35, z: 0};
-                // Rotation relative to here (this is the center of the image)
-                var rotPt = { x: startPageInfo.hand.w / 2, y: startPageInfo.hand.h / 2 };
-
-                ctx.setTransform(new DOMMatrix()
-                    .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
-                    .rotateSelf(rotation.x, rotation.y, rotation.z)
-                );
+                let frame = Math.floor(startScreenHandAnimT) % 8;
                 
-                ctx.drawImage(images.hand.obj.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, -rotPt.x, -rotPt.y, startPageInfo.hand.w, startPageInfo.hand.h);
-                ctx.restore();
+                ctx.drawImage(images.hand.obj.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                // tap
+                // ctx.save();
+                // // Untransformed draw position
+                // var position = {x: startPageInfo.hand.x, y: startPageInfo.hand.y};
+                // // In degrees
+                // var rotation = { x: 0, y: Math.sin(startScreenHandAnimT) * 35, z: 0};
+                // // Rotation relative to here (this is the center of the image)
+                // var rotPt = { x: startPageInfo.hand.w / 2, y: startPageInfo.hand.h / 2 };
+
+                // ctx.setTransform(new DOMMatrix()
+                //     .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+                //     .rotateSelf(rotation.x, rotation.y, rotation.z)
+                // );
+                
+                // ctx.drawImage(images.hand.obj.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, -rotPt.x, -rotPt.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                // ctx.restore();
                 //
                 // ctx.drawImage(images.hand.obj.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x + handx, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
                 

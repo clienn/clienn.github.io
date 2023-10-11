@@ -116,8 +116,8 @@
             "id": "sfish_0",
             "src": "fishes/sprites/0",
             "ext": "png",
-            "cw": 187,
-            "ch": 180,
+            "cw": 479,
+            "ch": 438,
             "frames": 1
         },
         {
@@ -354,15 +354,15 @@
             "id": "volume",
             "src": "hud/volume",
             "ext": "png",
-            "cw": 50,
-            "ch": 50
+            "cw": 46,
+            "ch": 46
         },
         {
             "id": "mute",
             "src": "hud/mute",
             "ext": "png",
-            "cw": 50,
-            "ch": 50
+            "cw": 46,
+            "ch": 46
         }
     ]
 }

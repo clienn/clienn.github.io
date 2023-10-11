@@ -409,14 +409,37 @@ function addGarbage() {
     let trash = new Sprite(rngX, -rngY, w, h, AM.images[key].cw, AM.images[key].ch);
     trash.id = rng;
     trash.vy = Math.floor(Math.random() * garbageDropSpeed) + 20;
+    trash.maxDegree = Math.floor(Math.random() * 540) + 180;
+    trash.hasBounce = Math.floor(Math.random() * 2);
+    if (trash.hasBounce) {
+        let mid = Math.floor(canvas.height / 2);
+        trash.bounceLo = Math.floor(Math.random() * mid) + mid;
+        trash.bounceHi = Math.floor(Math.random() * mid) + 1;
+    }
     garbage.push(trash);
 }
 
 function drawGarbage() {
     for (let i = 0; i < garbage.length; ++i) {
         let key = 'garbage_' + garbage[i].id;
-        garbage[i].draw(ctx, AM.images[key].img);
+        // garbage[i].draw(ctx, AM.images[key].img);
+
+        let rotPercentage = garbage[i].y / canvas.height;
+        garbage[i].degrees = rotPercentage * garbage[i].maxDegree;
+        garbage[i].drawWithRotation(ctx, AM.images[key].img, garbage[i].w / 2, garbage[i].h / 2);
         garbage[i].update(delta, 1);
+
+        if (garbage[i].hasBounce) {
+            if (garbage[i].bounceLo && garbage[i].y >= garbage[i].bounceLo) {
+                garbage[i].vy *= -1;
+                garbage[i].bounceLo = 0
+            } else if (!garbage[i].bounceLo && garbage[i].bounceHi && garbage[i].y <= garbage[i].bounceHi) {
+                garbage[i].vy *= -1;
+                garbage[i].bounceHi = 0;
+            } else if (!garbage[i].bounceLo && !garbage[i].bounceHi) {
+                garbage[i].hasBounce = false;
+            }
+        }
 
         if (garbage[i].y > canvas.height) {
             // mutateGarbage(garbage[i]);
@@ -461,6 +484,13 @@ function resetGarbage(trash) {
     let rngX = Math.floor(Math.random() * canvas.width);
     trash.x = rngX;
     trash.ox = rngX;
+    trash.maxDegree = Math.floor(Math.random() * 540) + 180;
+    trash.hasBounce = Math.floor(Math.random() * 2);
+    if (trash.hasBounce) {
+        let mid = Math.floor(canvas.height / 2);
+        trash.bounceLo = Math.floor(Math.random() * mid) + mid;
+        trash.bounceHi = Math.floor(Math.random() * mid) + 1;
+    }
 }
 
 function addSmartFish() {
@@ -501,7 +531,7 @@ function drawSmartFishes() {
         // smartSwimmers[i].update(delta, 3);
         smartSwimmers[i].smartSwim(ctx, AM.images[key].img);
         smartSwimmers[i].t += smartSwimmers[i].vx * delta;
-        smartSwimmers[i].t2 += 10 * delta;
+        // smartSwimmers[i].t2 += 10 * delta;
         smartSwimmers[i].t3 += 10 * delta;
 
         if (smartSwimmers[i].x > canvas.width || smartSwimmers[i].y > canvas.height) {
@@ -621,9 +651,32 @@ function mutateSchool(idx) {
     }
 }
 
+function muteAllAudio(flag) {
+    for (let k in AM.audio) {
+        AM.audio[k].img.muted = flag;
+    }
+    
+}
+
 function controls() {
     let mid = canvas.width / 2;
     let prevPos = 0;
+
+    window.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    window.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+
+    document.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    document.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
 
     document.addEventListener('touchstart', (e) => {
         e.preventDefault();
@@ -710,7 +763,7 @@ function controls() {
 
                     eelNeck.x = eelHead.x + eelHead.w / 2 - eelNeck.w / 2;
 
-                    prevPos = mx;
+                    // prevPos = mx;
                 }
 
                 prevPos = x;
@@ -918,8 +971,8 @@ function setFishInfo(sx, sy, sizePercentage) {
     fishInfo[0] = {
         x: 0,
         y: 0,
-        w: AM.images.sfish_0.cw * 1.5 * sx,
-        h: AM.images.sfish_0.ch * 1.5 * sy,
+        w: AM.images.sfish_0.cw * 0.75 * sx,
+        h: AM.images.sfish_0.ch * 0.75 * sy,
         frames: AM.images.sfish_0.frames
     };
 }
@@ -982,7 +1035,7 @@ function drawFishes() {
     for (let i = 0; i < fishes.length; ++i) {
         let key = 'sfish_' + fishes[i].id;
         fishes[i].swim(ctx, AM.images[key].img);
-        fishes[i].t += 10 * delta;
+        // fishes[i].t += 10 * delta;
     }
 }
 
@@ -1450,7 +1503,7 @@ function gameCycle() {
             // TXT.draw('angle');
             // TXT.draw('angle'); 
             HUD.draw(ctx);  
-            displaySchool();          
+            // displaySchool();          
             drawFishes();
             drawSmartFishes();
             drawGarbage();

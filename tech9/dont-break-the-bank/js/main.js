@@ -269,9 +269,32 @@ function main(w, h) {
     gameCycle();
 }
 
+function muteAllAudio(flag) {
+    for (let k in AM.audio) {
+        AM.audio[k].img.muted = flag;
+    }
+    
+}
+
 function controls() {
     let mid = canvas.width / 2;
     let prevPos = 0;
+
+    window.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    window.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+
+    document.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    document.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
 
     document.addEventListener('touchstart', (e) => {
         e.preventDefault();

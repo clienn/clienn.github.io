@@ -117,11 +117,12 @@ var chats = [];
 var chatID = 0;
 var nextRoundT = 0;
 
-var gameDuration = 90;
+var gameDuration = 30;
 var startT = 2;
 
 var startScreenTimerAnimT = 0;
 var startScreenHandAnimT = 0;
+var startScreenHandAnimT2 = 0;
 
 var startPage = {
     hand: {
@@ -250,8 +251,31 @@ function main(w, h) {
     gameCycle();
 }
 
+function muteAllAudio(flag) {
+    for (let k in AM.audio) {
+        AM.audio[k].img.muted = flag;
+    }
+    
+}
+
 function controls() {
     let mid = canvas.width / 2;
+
+    window.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    window.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+
+    document.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    document.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
 
     canvas.addEventListener('mousedown', e => {
         // mousedownE(e.offsetX, e.offsetY);
@@ -700,8 +724,28 @@ function startPageAnimations() {
     ctx.fill();
 
     let handx = Math.sin(startScreenHandAnimT) * 20;
+    let frame = Math.floor(startScreenHandAnimT) % 8;
+                
+    // ctx.drawImage(images.hand.obj.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
+    ctx.drawImage(AM.images.hand.img, frame * AM.images.hand.cw, 0, AM.images.hand.cw, AM.images.hand.ch, startPage.hand.x, startPage.hand.y, startPage.hand.w, startPage.hand.h);
+    // ctx.drawImage(AM.images.hand.img, 0, 0, AM.images.hand.cw, AM.images.hand.ch, startPage.hand.x + handx, startPage.hand.y, startPage.hand.w, startPage.hand.h);
+    // tap
+    // ctx.save();
+    // // Untransformed draw position
+    // var position = {x: startPage.hand.x, y: startPage.hand.y};
+    // // In degrees
+    // var rotation = { x: 0, y: Math.sin(startScreenHandAnimT2) * 35, z: 0};
+    // // Rotation relative to here (this is the center of the image)
+    // var rotPt = { x: startPage.hand.w / 2, y: startPage.hand.h / 2 };
 
-    ctx.drawImage(AM.images.hand.img, 0, 0, AM.images.hand.cw, AM.images.hand.ch, startPage.hand.x + handx, startPage.hand.y, startPage.hand.w, startPage.hand.h);
+    // ctx.setTransform(new DOMMatrix()
+    //     .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+    //     .rotateSelf(rotation.x, rotation.y, rotation.z)
+    // );
+    
+    // ctx.drawImage(AM.images.hand.img, 0, 0, AM.images.hand.cw, AM.images.hand.ch, -rotPt.x, -rotPt.y, startPage.hand.w, startPage.hand.h);
+    // ctx.restore();
+    
     ctx.drawImage(AM.images.gopher.img, 0, 0, AM.images.gopher.cw, AM.images.gopher.ch, startPage.gopher.x, startPage.gopher.y, startPage.gopher.w, startPage.gopher.h);
     
     //
@@ -742,6 +786,7 @@ function startPageAnimations() {
         ctx.restore();
 
         startScreenHandAnimT += 10 * delta;
+        startScreenHandAnimT2 += 5 * delta;
     }
 }
 

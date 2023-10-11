@@ -193,15 +193,15 @@
             "id": "volume",
             "src": "hud/volume",
             "ext": "png",
-            "cw": 50,
-            "ch": 50
+            "cw": 46,
+            "ch": 46
         },
         {
             "id": "mute",
             "src": "hud/mute",
             "ext": "png",
-            "cw": 50,
-            "ch": 50
+            "cw": 46,
+            "ch": 46
         },
         {
             "id": "complete",

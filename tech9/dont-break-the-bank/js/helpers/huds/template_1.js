@@ -43,7 +43,7 @@ class Template_1 {
         
         
 
-        this.timeProgressBar = new ProgressBar(this.timecircle.w / 2 + paddingX / 2, this.timecircle.h / 2 - 30 * sx / 2 + paddingY, 200 * sx, 45 * sy);
+        this.timeProgressBar = new ProgressBar(this.timecircle.w / 2 + paddingX / 1.5, this.timecircle.h / 2 - 30 * sx / 2 + paddingY, 200 * sx, 45 * sy);
         this.timeProgressBar.progress = 100;
 
         let scorebarWidth = 200 * sx + 70 * sy;

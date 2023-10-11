@@ -355,15 +355,15 @@
             "id": "volume",
             "src": "volume",
             "ext": "png",
-            "cw": 50,
-            "ch": 50
+            "cw": 46,
+            "ch": 46
         },
         {
             "id": "mute",
             "src": "mute",
             "ext": "png",
-            "cw": 50,
-            "ch": 50
+            "cw": 46,
+            "ch": 46
         }
     ]
 }

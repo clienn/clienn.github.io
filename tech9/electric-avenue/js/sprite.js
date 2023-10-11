@@ -41,6 +41,11 @@ class Sprite {
 
         this.show = true;
         this.frames = 1;
+
+        this.maxDegree = 360;
+        this.hasBounce = false;
+        this.bounceLo = 0;
+        this.bounceHi = 0;
     }
 
     updateBounds(w, hitbox) {

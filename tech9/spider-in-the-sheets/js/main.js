@@ -258,12 +258,12 @@ var music = {
 }
 
 var volumeInfo = {
-    x: 55,
-    y: 45,
+    x: 25,
+    y: 25,
     w: 25 * 2,
     h: 25 * 2,
-    cw: 50,
-    ch: 50,
+    cw: 46,
+    ch: 46,
 }
 
 var volumeOn = true;
@@ -479,10 +479,10 @@ function main(w, h) {
         timerFontSize = 40;
         timerAdjX = [8, 22];
 
-        volumeInfo.x = 45;
-        volumeInfo.y = 45;
-        volumeInfo.w = 35;
-        volumeInfo.h = 35;
+        // volumeInfo.x = 45;
+        // volumeInfo.y = 45;
+        // volumeInfo.w = 35;
+        // volumeInfo.h = 35;
 
         // textList.scoreLabel.desc.weight = 'normal';
         // textList.scoreN.desc.weight = 'normal';
@@ -683,6 +683,22 @@ function main(w, h) {
         }
     });
 
+    window.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    window.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+
+    document.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    document.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+
     // addSpider();
     // addSpider();
     // addSpider();
@@ -693,6 +709,12 @@ function main(w, h) {
     // moveDestinations = calcDestinations();
     
     gameCycle();
+}
+
+function muteAllAudio(flag) {
+    for (let k in music) {
+        music[k].obj.audio.muted = flag;
+    }   
 }
 
 function initTopHUD() {

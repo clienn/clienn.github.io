@@ -240,17 +240,17 @@
         },
         {
             "id": "volume",
-            "src": "huds/volume_white",
+            "src": "huds/volume",
             "ext": "png",
-            "cw": 256,
-            "ch": 256
+            "cw": 46,
+            "ch": 46
         },
         {
             "id": "mute",
-            "src": "huds/mute_white",
+            "src": "huds/mute",
             "ext": "png",
-            "cw": 256,
-            "ch": 256
+            "cw": 46,
+            "ch": 46
         }
     ]
 }

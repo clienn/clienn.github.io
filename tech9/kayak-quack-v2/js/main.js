@@ -300,7 +300,7 @@ function main(w, h) {
     scaleY = h / 922;
 
     bgInfo.w = w;
-    bgInfo.h *= scaleY;
+    // bgInfo.h *= scaleY;
 
     initBGTiles();
     initBGWalls();
@@ -336,7 +336,7 @@ function main(w, h) {
     // for (let i = 0; i < parallaxInfo.tile.rows; ++i) {
     //     parallaxInfo.tile.yPos[i] = parallaxInfo.tile.startY + i * parallaxInfo.tile.h;
     // }
-    containerH *= scaleY;
+    // containerH *= scaleY;
     
     for (let i = 0; i < 24; ++i) {
         parallaxInfo.tile.yPos[i] = bgTilesPosY[0] + i * containerH;
@@ -656,7 +656,7 @@ function updateWaterObjContainer(idx) {
     for (let i = 0; i < waterObjContainer[idx].length; ++i) {
         waterObjContainer[idx][i].x *= scaleX;
         waterObjContainer[idx][i].w *= scaleX;
-        waterObjContainer[idx][i].h *= scaleY;
+        // waterObjContainer[idx][i].h *= scaleY;
     }
 }
 
@@ -690,7 +690,7 @@ function drawWaterObjContainer() {
 }
 
 function updateBGWall(idx) {
-    let distY = 107 * scaleY;
+    let distY = 107;
 
     if (idx == 0) {
         bgWalls[idx] = [
@@ -792,12 +792,12 @@ function updateBGWall(idx) {
     for (let j = 0; j < bgWalls[idx].length; ++j) {
         bgWalls[idx][j].x *= scaleX;
         bgWalls[idx][j].w *= scaleX;
-        bgWalls[idx][j].h *= scaleY;
+        // bgWalls[idx][j].h *= scaleY;
     }
 }
 
 function initBGWalls() {
-    let distY = 107 * scaleY;
+    let distY = 107;
 
     bgWalls = [
         [
@@ -893,7 +893,7 @@ function initBGWalls() {
         for (let j = 0; j < bgWalls[i].length; ++j) {
             bgWalls[i][j].x *= scaleX;
             bgWalls[i][j].w *= scaleX;
-            bgWalls[i][j].h *= scaleY;
+            // bgWalls[i][j].h *= scaleY;
         }
     }
 }
@@ -1525,10 +1525,32 @@ function updateParallax() {
     }
 }
 
+function muteAllAudio(flag) {
+    for (let k in AM.audio) {
+        AM.audio[k].img.muted = flag;
+    }
+}
 
 function controls() {
     let mid = canvas.width / 2;
     let prevPos = 0;
+
+    window.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    window.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+
+    document.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    document.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+
 
     document.addEventListener('touchstart', (e) => {
         e.preventDefault();
