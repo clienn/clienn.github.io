@@ -89,6 +89,8 @@ class Text {
         this.ctx.fillText(str, 0, 0);
 
         
+        // this.ctx.strokeStyle= "#f00";
+        // this.ctx.lineWidth= "5";
         // this.ctx.beginPath();
         // this.ctx.rect(x, y, rectW, fontH - 4 * this.sy);
         // this.ctx.stroke();

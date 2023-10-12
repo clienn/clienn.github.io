@@ -279,6 +279,9 @@ var containerH = 140;
 var waterObjHolder = [];
 var bgTileGroup = [];
 
+var level = Infinity;
+var speedInc = 10;
+
 // pool - 606px
 // rect - 12px, 6px
 // total width - 926px
@@ -299,7 +302,10 @@ function main(w, h) {
     scaleX = w / 1792;
     scaleY = h / 922;
 
+    speedInc *= scaleY;
+
     bgInfo.w = w;
+    bgInfo.h *= scaleX;
     // bgInfo.h *= scaleY;
 
     initBGTiles();
@@ -336,7 +342,7 @@ function main(w, h) {
     // for (let i = 0; i < parallaxInfo.tile.rows; ++i) {
     //     parallaxInfo.tile.yPos[i] = parallaxInfo.tile.startY + i * parallaxInfo.tile.h;
     // }
-    // containerH *= scaleY;
+    containerH *= scaleX;
     
     for (let i = 0; i < 24; ++i) {
         parallaxInfo.tile.yPos[i] = bgTilesPosY[0] + i * containerH;
@@ -357,7 +363,7 @@ function main(w, h) {
     rescaleSize(kayakHitBox, scaleX, scaleY);
     
     // kayak = new Sprite(w / 2 - kayakInfo.w / 2, h - kayakInfo.h * 1, kayakInfo.w, kayakInfo.h, 129.125, AM.images.kayak.ch);
-    console.log(AM.images.kayak.cw)
+    // console.log(AM.images.kayak.cw)
     kayak = new Sprite(w / 2 - kayakInfo.w / 2, h - kayakInfo.h * 0.85, kayakInfo.w, kayakInfo.h, AM.images.kayak.cw, AM.images.kayak.ch);
     kayak.screenW = w;
     kayakHitBox.y = kayak.y;
@@ -481,9 +487,9 @@ function drawWaterObj(idx) {
                 let col = i % 3;
 
                 waterObjHolder[i].y = bgTilesPosY[idx] + containerH / 2 - waterObjHolder[i].h / 2 + col * containerH;
-                waterObjHolder[i].swim(ctx, AM.images[waterObjHolder[i].key].img);
 
                 if (waterObjHolder[i].id == 3) {
+                    waterObjHolder[i].swim(ctx, AM.images[waterObjHolder[i].key].img);
                     waterObjHolder[i].updateFrameAnimation(6, 15, delta);
                     waterObjHolder[i].updatePos(delta, 1);
                     
@@ -496,6 +502,14 @@ function drawWaterObj(idx) {
                         waterObjHolder[i].setDirection(waterObjHolder[i].facing * -1);
                         waterObjHolder[i].setRandomSpeed(100, 50);
                     }
+                } else {
+                    waterObjHolder[i].draw(ctx, AM.images[waterObjHolder[i].key].img);
+
+                    // if (waterObjHolder[i].key == 'wstone1' || waterObjHolder[i].key == 'wstone2' || waterObjHolder[i].key == 'wstone1') {
+                    //     if (waterObjHolder[i].w < wstoneInfo.w) {
+                    //         console.log('test')
+                    //     }
+                    // }
                 }
 
                 if (checkAngledCollisions(kayakHitBox, waterObjHolder[i])) {
@@ -591,7 +605,8 @@ function morphWaterObj(i) {
         
         waterObjHolder[i].morph(rng, w, h, cw, ch);
         waterObjHolder[i].key = key;
-
+        waterObjHolder[i].clipX = 0;
+        // console.log(key, rng, w, h, cw, ch);
         if (!AM.images[waterObjHolder[i].key]) console.log(key)
     } else {
         waterObjHolder[i].id = rng;
@@ -656,6 +671,7 @@ function updateWaterObjContainer(idx) {
     for (let i = 0; i < waterObjContainer[idx].length; ++i) {
         waterObjContainer[idx][i].x *= scaleX;
         waterObjContainer[idx][i].w *= scaleX;
+        waterObjContainer[idx][i].h *= scaleX;
         // waterObjContainer[idx][i].h *= scaleY;
     }
 }
@@ -690,7 +706,7 @@ function drawWaterObjContainer() {
 }
 
 function updateBGWall(idx) {
-    let distY = 107;
+    let distY = 107 * scaleX;
 
     if (idx == 0) {
         bgWalls[idx] = [
@@ -792,12 +808,13 @@ function updateBGWall(idx) {
     for (let j = 0; j < bgWalls[idx].length; ++j) {
         bgWalls[idx][j].x *= scaleX;
         bgWalls[idx][j].w *= scaleX;
+        bgWalls[idx][j].h *= scaleX;
         // bgWalls[idx][j].h *= scaleY;
     }
 }
 
 function initBGWalls() {
-    let distY = 107;
+    let distY = 107 * scaleX;
 
     bgWalls = [
         [
@@ -894,6 +911,7 @@ function initBGWalls() {
             bgWalls[i][j].x *= scaleX;
             bgWalls[i][j].w *= scaleX;
             // bgWalls[i][j].h *= scaleY;
+            bgWalls[i][j].h *= scaleX;
         }
     }
 }
@@ -1950,7 +1968,8 @@ function updateScore() {
 }
 
 function updateFinalScore() {
-    HUD.txt.texts['score2'].str = zeroPad(score, 2);
+    // HUD.txt.texts['score2'].str = zeroPad(score, 2);
+    HUD.updateScore(zeroPad(score, 2));
 }
 
 // *********************************** TEXT DISPLAYS END ******************************************************** //
@@ -2108,6 +2127,14 @@ function update() {
 
     if (delta < 1) {
         timer.tick(delta);
+        let tmpT = Math.floor(timer.timer / 24);
+
+        if (tmpT % 10 == 0 && level > tmpT) {
+            level = tmpT - 1;
+            parallaxInfo.tile.moveSpeed += speedInc;
+            console.log(parallaxInfo.tile.moveSpeed);
+        }
+
         updateBGTiles(parallaxInfo.tile.moveSpeed);
         updateBGWallsPos(parallaxInfo.tile.moveSpeed);
         updateWaterObjContainerPos(parallaxInfo.tile.moveSpeed);
@@ -2139,7 +2166,7 @@ function gameCycle() {
             // ctx.drawImage(AM.images.bg.img, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 0, 0, canvas.width, 428);
             drawBGTiles();
             // drawBGWalls();
-            drawWaterObjContainer();
+            // drawWaterObjContainer();
               
             // parallaxBG();
             // drawBunnies();

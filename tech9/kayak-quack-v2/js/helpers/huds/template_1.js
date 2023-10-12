@@ -4,6 +4,11 @@ class Template_1 {
         this.txt = new Text(ctx, w, h); 
         this.txt.setScale(sx, sy); 
 
+        this.w = w;
+        this.h = h;
+        this.sx = sx;
+        this.sy = sy;
+
         this.health = 100;
 
         this.centerX = w / 2;
@@ -65,7 +70,7 @@ class Template_1 {
         this.txt.addText('score', 'x 00', 'bold', 30, 'Montserrat', this.duck.x + this.duck.w * 2, this.duck.y + (10) * sy, 120, 50, '#fff', true);
         this.txt.addText('reset', 'Tap to play again.', 'bold', 30, 'Montserrat', w / 2, h * 0.65, 500, 40, '#fff', true);
 
-        this.txt.addText('score2', '00', 'bold', 30, 'Montserrat', w / 2 - 10 * sx, this.yourscore.y + this.yourscore.h - 40 * sy, 130, 85, '#fff', true);
+        // this.txt.addText('score2', '05', 'bold', 30, 'Montserrat', w / 2 - 10 * sx, this.yourscore.y + this.yourscore.h - 40 * sy, 130, 85, '#fff', true);
 
         this.complete.x = w / 2 - this.complete.w / 2;
         this.yourscore.x = w / 2 - this.yourscore.w / 2;
@@ -73,7 +78,9 @@ class Template_1 {
         // this.txt.texts['score'].str = this.health + '%';
     }
 
-    
+    updateScore(score) {
+        this.txt.addText('score2', score, 'bold', 30, 'Montserrat', this.w / 2 - 10 * this.sx, this.yourscore.y + this.yourscore.h - 40 * this.sy, 130, 85, '#fff', true);
+    }
 
     draw(ctx) {
         this.timeProgressBar.draw(ctx);
