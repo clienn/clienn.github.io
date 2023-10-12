@@ -191,6 +191,9 @@ var mouseMoveOrigin = {
     y: 0
 };
 
+var eelLowestPosY = 0;
+var eelMoveUpSpeed = 10;
+
 /*
  * GAME INITIATLIZATIONS AND CONTROLS
  */
@@ -206,6 +209,8 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    eelMoveUpSpeed *= scaleY;
 
     G *= scaleY;
     F *= scaleX;
@@ -254,6 +259,8 @@ function main(w, h) {
     eel_hitbox.y = eelHead.y + 50 * scaleY;
     updateHitBox();
     initStartPage();
+
+    eelLowestPosY = eelHead.y;
 
     // TXT = new Text(ctx, w, h); 
     // TXT.setScale(scaleX, scaleY);
@@ -333,6 +340,17 @@ function main(w, h) {
     
     
     gameCycle();
+}
+
+function moveUp(d) {
+    let val = eelHead.y - d;
+
+    if (val > canvas.height * 0.4 && val < eelLowestPosY) {
+        eelHead.y = val;
+        eelNeck.y -= d * 2;
+        eel_hitbox.y -= d;
+        eelNeck.h += d * 2;
+    }
 }
 
 function updateHitBox() {
@@ -661,6 +679,7 @@ function muteAllAudio(flag) {
 function controls() {
     let mid = canvas.width / 2;
     let prevPos = 0;
+    let prevPosY = 0;
 
     window.addEventListener('blur', () => {
         muteAllAudio(true);
@@ -688,6 +707,7 @@ function controls() {
                 var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
                 var touch = evt.touches[0] || evt.changedTouches[0];
                 prevPos = touch.pageX;
+                prevPosY = touch.pageY;
 
                 if (isBtnClicked(touch.pageX, touch.pageY, {
                     x: HUD.volume.x,
@@ -710,6 +730,7 @@ function controls() {
                 if (!mDown) {
                     mDown = true;
                     mouseMoveOrigin.x = prevPos;
+                    mouseMoveOrigin.y = prevPosY;
                 }
             }
         }
@@ -746,6 +767,7 @@ function controls() {
                 var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
                 var touch = evt.touches[0] || evt.changedTouches[0];
                 let x = touch.pageX;
+                let y = touch.pageY;
 
                 // if (x > prevPos) {
                 //     // forceD = F;
@@ -763,10 +785,13 @@ function controls() {
 
                     eelNeck.x = eelHead.x + eelHead.w / 2 - eelNeck.w / 2;
 
+                    let distY = prevPosY - y;
+                    moveUp(distY);
                     // prevPos = mx;
                 }
 
                 prevPos = x;
+                prevPosY = y;
             }
         }
     });
@@ -835,6 +860,7 @@ function controls() {
 
                 mDown = true;
                 mouseMoveOrigin.x = mx;
+                prevPosY = mouseMoveOrigin.y = my;
             }
         }
 
@@ -845,7 +871,7 @@ function controls() {
     canvas.addEventListener('mousemove', e => {
         // mousemoveE(e.offsetX, e.offsetY);
         let mx = e.offsetX;
-        // let my = e.offsetY;
+        let my = e.offsetY;
 
         // eelLookAt[0] = mx;
         // eelLookAt[1] = my;
@@ -857,12 +883,18 @@ function controls() {
 
         if (mDown) {
             let dist = mx - mouseMoveOrigin.x;
+            let distY = prevPosY - my;
+            // let distY = mouseMoveOrigin.y - my;
+
             eelHead.x = eelHead.ox + dist;
             eelHead.updateBounds(canvas.width, eel_hitbox);
 
             eelNeck.x = eelHead.x + eelHead.w / 2 - eelNeck.w / 2;
 
+            moveUp(distY);
+
             prevPos = mx;
+            prevPosY = my;
         }
     });
     
@@ -895,6 +927,12 @@ function controls() {
 
     document.addEventListener('keydown', e => {
         if (!gameover) {
+            // if (e.key == 'ArrowUp') {
+            //     moveUp(eelMoveUpSpeed);
+            // } else if (e.key == 'ArrowDown') {
+            //     moveUp(-eelMoveUpSpeed);
+            // }
+
             if (e.key == 'ArrowRight') {
                 if (!rDown) {
                     rDown = true;
@@ -915,6 +953,8 @@ function controls() {
 
     document.addEventListener('keyup', e => {
         if (!gameover) {
+            
+
             if (e.key == 'ArrowRight') {
                 rDown = false;
             } else if (e.key == 'ArrowLeft') {
