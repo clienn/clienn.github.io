@@ -828,11 +828,12 @@ function update() {
 
     if (delta < 1) {
         HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24) / gameDuration * 100);
-        console.log( Math.floor(timer.timer / 24) / gameDuration * 100)
+        // console.log( Math.floor(timer.timer / 24) / gameDuration * 100)
         timer.tick(delta);
 
         if (timer.timer <= 0) {
             gameover = true;
+            HUD.updateFinalScore(score);
         }
     }
 }

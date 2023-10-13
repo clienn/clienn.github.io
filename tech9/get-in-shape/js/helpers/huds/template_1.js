@@ -3,6 +3,7 @@ class Template_1 {
         this.isMuted = false;
         this.txt = new Text(ctx, w, h); 
         this.txt.setScale(sx, sy); 
+        this.w = w;
 
         this.volumeOn = true;
         this.volume = new StaticSprite(15, 15, 55, 55, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
@@ -14,7 +15,7 @@ class Template_1 {
         // this.life = new StaticSprite(0, 10, 60, 60, 0, 0, AM.images.life.cw, AM.images.life.ch, 'life');
         this.star = new StaticSprite(0, 0, 60, 60, 0, 0, AM.images.star.cw, AM.images.star.ch, 'star');
         // this.emptystar = new StaticSprite(0, 0, 60, 60, 0, 0, AM.images.emptystar.cw, AM.images.emptystar.ch, 'emptystar');
-        let adjY = 130;
+        let adjY = 170;
         this.shine = new StaticSprite(0, adjY, 309, 309, 0, 0, AM.images.shine.cw, AM.images.shine.ch, 'shine');
         this.rays = new StaticSprite(0, adjY, 309, 309, 0, 0, AM.images.rays.cw, AM.images.rays.ch, 'rays');
         this.complete = new StaticSprite(0, 50 + adjY, 370, 50, 0, 0, AM.images.complete.cw, AM.images.complete.ch, 'complete');
@@ -80,8 +81,8 @@ class Template_1 {
 
         // gameover
         this.txt.addText('yourscore', 'Your Score!', 'bold', 30, 'Montserrat', w / 2, this.complete.y + this.complete.h + this.star.h * 3, 175, 30, '#fff', true);
-        this.txt.addText('total', '00', 'bold', 30, 'Montserrat', w / 2, this.complete.y + this.complete.h + this.star.h * 3.5, 150, 125, '#fff', true);
-        this.txt.addText('betterluck', 'Better Luck Next Time', 'bold', 30, 'Montserrat', w / 2, this.complete.y + this.complete.h + this.star.h * 4 + 100 * sy, 350, 25, '#F78A3B', true);
+        // this.txt.addText('total', '00', 'bold', 30, 'Montserrat', w / 2, this.complete.y + this.complete.h + this.star.h * 3.7, 150, 125, '#fff', true);
+        this.txt.addText('betterluck', 'Better Luck Next Time', 'bold', 30, 'Montserrat', w / 2, this.complete.y + this.complete.h + this.star.h * 4 + 120 * sy, 350, 25, '#F78A3B', true);
         this.txt.addText('reset', 'Tap to play again.', 'bold', 30, 'Montserrat', w / 2, h / 1.5, 500, 40, '#fff', true);
         // this.shine.x = w / 2 - this.shine.w / 2;
         // this.pigscore.x = w / 2 - this.pigscore.w / 2;
@@ -95,6 +96,10 @@ class Template_1 {
         ];
 
         this.scoreBar.w = 100;
+    }
+
+    updateFinalScore(score) {
+        this.txt.addText('total', zeroPad(Math.floor(score), 2), 'bold', 30, 'Montserrat', this.w / 2, this.complete.y + this.complete.h + this.star.h * 3.7, 150, 125, '#fff', true);
     }
 
     draw(ctx) {
@@ -140,8 +145,8 @@ class Template_1 {
         this.txt.draw('yourscore');
         this.txt.draw('total');
 
-        if (totalScore == 0)
-            this.txt.draw('betterluck');
+        // if (totalScore == 0)
+        //     this.txt.draw('betterluck');
 
         // this.txt.draw('reset');
     }

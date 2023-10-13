@@ -375,7 +375,7 @@ var seagullInfo = {
 
 var shineInfo = {
     x: 0,
-    y: 150,
+    y: 200,
     w: 352,
     h: 290,
     cw: 352,
@@ -816,9 +816,9 @@ function main(w, h) {
     TXT.addText(TEXT_ID.TRY_AGAIN, 'Try again!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
 
     TXT.addText(TEXT_ID.TOOSLOW, 'Too Slow!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
-    TXT.addText(TEXT_ID.COMPLETE, 'Complete!', 'bold', 20, 'Montserrat', w / 2, (55 + 145) * scaleY, 300, 70, '#fff', true); 
-    TXT.addText(TEXT_ID.SCORELABEL, 'Score', 'bold', 20, 'Montserrat', w / 2, (270 + 145) * scaleY, 100, 50, '#fff', true); 
-    TXT.addText(TEXT_ID.FINALSCORE, '00', 'bold', 20, 'Montserrat', w / 2, (320 + 145) * scaleY, 65, 60, '#fff', true); 
+    TXT.addText(TEXT_ID.COMPLETE, 'Complete!', 'bold', 20, 'Montserrat', w / 2, shineInfo.y - 25 * scaleY, 300, 70, '#fff', true); 
+    TXT.addText(TEXT_ID.SCORELABEL, 'Score', 'bold', 20, 'Montserrat', w / 2, shineInfo.y + shineInfo.h, 100, 50, '#fff', true); 
+    // TXT.addText(TEXT_ID.FINALSCORE, '11', 'bold', 20, 'Montserrat', w / 2, (320 + 145) * scaleY, 65, 60, '#fff', true); 
     TXT.addText(TEXT_ID.RESETMSG, 'Tap to play again.', 'bold', 20, 'Montserrat', w / 2, h / 2, 600, 100, '#fff', true); 
     TXT.addText(TEXT_ID.TOPTIMER, '09', (isMobile ? 'normal' : 'bold'), 20, 'Montserrat', 
         topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2, 29 * scaleY, 40, 40, '#000', true); 
@@ -1236,6 +1236,7 @@ function init() {
     showTarget = true;
 
     gameover = false;
+    // TXT.addText(TEXT_ID.FINALSCORE, zeroPad(25, 2), 'bold', 20, 'Montserrat', canvas.width / 2, shineInfo.y + shineInfo.h * 0.8, 65, 60, '#fff', true);
     canReset = false;
     msg = '';
     fade = false;
@@ -1536,6 +1537,7 @@ function checkSwaps() {
 function reduceHP() {
     if (--lives < 0) {
         gameover = true;
+        TXT.addText(TEXT_ID.FINALSCORE, zeroPad(score, 2), 'bold', 20, 'Montserrat', canvas.width / 2, shineInfo.y + shineInfo.h * 0.8, 65, 60, '#fff', true); 
         msg = 'Complete!';
     }
 }
@@ -1643,6 +1645,7 @@ function update() {
             } else {
                 // alert('You scored: ' + score + ' out of ' + rounds + '.');
                 gameover = true;
+                TXT.addText(TEXT_ID.FINALSCORE, zeroPad(score, 2), 'bold', 20, 'Montserrat', canvas.width / 2, shineInfo.y + shineInfo.h * 0.8, 65, 60, '#fff', true);
             }
         }
     } else if (showTarget) {
@@ -2109,10 +2112,13 @@ function gameCycle() {
                 // textList.finalScore.obj.str = zeroPad(score, 2);
                 // TM.draw(textList.finalScore.obj);
                 // TM.draw(textList.resetMsg.obj);
-
+                // score = 11;
                 TXT.draw(TEXT_ID.COMPLETE);
                 TXT.draw(TEXT_ID.SCORELABEL);
-                TXT.texts[TEXT_ID.FINALSCORE].str = zeroPad(score, 2);
+
+                // TXT.texts[TEXT_ID.FINALSCORE].str = zeroPad(score, 2);
+                // TXT.addText(TEXT_ID.FINALSCORE, '00', 'bold', 20, 'Montserrat', w / 2, (320 + 145) * scaleY, 65, 60, '#fff', true); 
+
                 TXT.draw(TEXT_ID.FINALSCORE);
                 // TXT.draw(TEXT_ID.RESETMSG);
             }

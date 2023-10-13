@@ -925,7 +925,7 @@ function main(w, h) {
     shineInfo.w *= 2;
     shineInfo.h *= 2;
     shineInfo.x = w / 2 - shineInfo.w / 2;
-    shineInfo.y = 150 * scaleY;
+    shineInfo.y = 200 * scaleY;
 
     compassInfo.x = topHUDInfo.score.x + compassAdjX * scaleX;
     compassInfo.y = topHUDInfo.score.y + compassAdjY * scaleY;
@@ -974,7 +974,7 @@ function main(w, h) {
     textList.topTimer.obj.tx = 45 * scaleX + volumeInfo.x + volumeInfo.w;
     textList.topTimer.obj.ty = topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2 - textList.topTimer.desc.h / 2 * scaleY;
 
-    textList.scoreLabel.obj.tx = w / 2 - textList.scoreLabel.desc.w * scaleX / 2 - 10 * scaleX;
+    textList.scoreLabel.obj.tx = w / 2 - textList.scoreLabel.desc.w * scaleX / 2 - 13 * scaleX;
     textList.scoreLabel.obj.ty = 450 * scaleY;
     textList.finalScore.obj.tx = w / 2 - textList.finalScore.desc.w * scaleX / 2 - 8 * scaleX;
     textList.finalScore.obj.ty = 490 * scaleY;
@@ -1749,7 +1749,7 @@ function checkProjectileCollisions() {
                         music.ouch.obj.audio.currentTime = 0;
                         music.ouch.obj.audio.play();
                     }
-                    
+
                     resetProjectile([i, j]);
                     initAnimateCanon(i);
                     initAnimateCanon(j);
@@ -2198,10 +2198,10 @@ function gameCycle() {
                     shineInfo.ch, x, y, w, h);
 
                 ctx.drawImage(images.complete.obj.img, 0, 0, completeInfo.cw, 
-                    completeInfo.ch, completeInfo.x, completeInfo.y, completeInfo.w, completeInfo.h);
+                    completeInfo.ch, completeInfo.x, shineInfo.y, completeInfo.w, completeInfo.h);
                 
                 ctx.drawImage(images.trophy.obj.img, 0, 0, trophyInfo.cw, 
-                    trophyInfo.ch, trophyInfo.x, trophyInfo.y, trophyInfo.w, trophyInfo.h);
+                    trophyInfo.ch, trophyInfo.x, (shineInfo.y + shineInfo.h / 2) - trophyInfo.h, trophyInfo.w, trophyInfo.h);
                 // ctx.drawImage(images.shine.obj.img, 0, 0, shineInfo.cw, 
                 //     shineInfo.ch, shineInfo.x, shineInfo.y, shineInfo.w, shineInfo.h);
                 
@@ -2212,8 +2212,27 @@ function gameCycle() {
                 
 
                 // TM.draw(textList.complete.obj);
-                TM.draw(textList.scoreLabel.obj);
+                
+
+                // score = 11;
+                let adjX = 12;
+                let a = Math.floor(score / 10);
+                let b = score % 10;
+                let countOnes = (a == 1) + (b == 1);
+
+                // if (score > 9) adjX = 2;
+                if (countOnes == 1) adjX = 0;
+                else if (countOnes == 2) adjX = -4;
+                else if (score > 19 && score < 100) adjX = 5.5;
+                
+                textList.finalScore.obj.tx = canvas.width / 2 - textList.finalScore.desc.w * scaleX / 2 - adjX * scaleX;
+                textList.finalScore.obj.ty = shineInfo.y + shineInfo.h / 2 + 60 * scaleY;
+                // textList.scoreLabel.obj.tx = shineInfo.y + shineInfo.h / 2 + 20 * scaleY;
+                textList.scoreLabel.obj.ty = shineInfo.y + shineInfo.h / 2 + 20 * scaleY;
+                
                 textList.finalScore.obj.str = zeroPad(score, 2);
+
+                TM.draw(textList.scoreLabel.obj);
                 TM.draw(textList.finalScore.obj);
                 // TM.draw(textList.resetMsg.obj);
             }

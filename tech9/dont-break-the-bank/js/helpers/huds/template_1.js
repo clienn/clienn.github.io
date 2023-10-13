@@ -22,7 +22,7 @@ class Template_1 {
         this.life = new StaticSprite(0, 10, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.life.cw, AM.images.life.ch, 'life');
         this.coin0 = new StaticSprite(0, 0, 60, 60, 0, 0, AM.images.coin_0.cw, AM.images.coin_0.ch, 'coin_0');
         
-        let gameoverAdjY = 150;
+        let gameoverAdjY = 180;
 
         this.shine = new StaticSprite(0, 80 + gameoverAdjY, 352, 290, 0, 0, AM.images.shine.cw, AM.images.shine.ch, 'shine');
         this.pigscore = new StaticSprite(0, 140 + gameoverAdjY, 120 * 2, 90 * 2, 0, 0, AM.images.pigscore.cw, AM.images.pigscore.ch, 'pigscore');
@@ -87,8 +87,8 @@ class Template_1 {
         // alert(h + ' ' + this.txt.texts['score'].h + ' ' + this.txt.texts['score'].y);
 
         // gameover
-        this.txt.addText('complete', 'Complete!', 'bold', 30, 'Montserrat', w / 2, (35 + 90) * 1.5 * sy, 180 * 2, 35 * 2, '#fff', true);
-        this.txt.addText('total', '$00.00', 'bold', 30, 'Montserrat', w / 2, this.shine.h + (45 + 130) * sy, 100 * 2, 35 * 2, '#fff', true);
+        this.txt.addText('complete', 'Complete!', 'bold', 30, 'Montserrat', w / 2, this.shine.y - 50 * sy, 180 * 2, 35 * 2, '#fff', true);
+        this.txt.addText('total', '$00.00', 'bold', 30, 'Montserrat', w / 2, this.shine.y + this.shine.h - 25 * sy, 100 * 2, 35 * 2, '#fff', true);
         this.txt.addText('reset', 'Tap to play again.', 'bold', 30, 'Montserrat', w / 2, h / 2, 700, 100, '#fff', true);
         this.shine.x = w / 2 - this.shine.w / 2;
         this.pigscore.x = w / 2 - this.pigscore.w / 2;
