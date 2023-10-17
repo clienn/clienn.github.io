@@ -614,7 +614,7 @@ function mouseupE() {
                 score += 1 + portal.bonus;
                 let scoreFormat = zeroPad(Math.floor(score), 2);
                 HUD.txt.texts['score'].str = scoreFormat;
-                HUD.txt.texts['total'].str = scoreFormat;
+                // HUD.txt.texts['total'].str = scoreFormat;
 
                 TXT.texts['points'].color = '#4ED20E';
                 TXT.texts['points'].str = '+' + Math.floor(1 + portal.bonus);
@@ -635,7 +635,7 @@ function mouseupE() {
 
                     let scoreFormat = zeroPad(Math.floor(score), 2);
                     HUD.txt.texts['score'].str = scoreFormat;
-                    HUD.txt.texts['total'].str = scoreFormat;
+                    // HUD.txt.texts['total'].str = scoreFormat;
 
                     TXT.texts['points'].color = '#fb2121';
                     TXT.texts['points'].str = '-1';
@@ -671,7 +671,7 @@ function restart() {
 
     let scoreFormat = zeroPad(Math.floor(score), 2);
     HUD.txt.texts['score'].str = scoreFormat;
-    HUD.txt.texts['total'].str = scoreFormat;
+    // HUD.txt.texts['total'].str = scoreFormat;
 }
 
 function drawShapesContainer() {
