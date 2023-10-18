@@ -174,7 +174,7 @@ var images = {
         obj: {}
     },
     boom: {
-        src: 'boom_sprite',
+        src: 'kaboom_sprite',
         obj: {}
     },
     scoreboom: {
@@ -304,10 +304,14 @@ var explosionStarInfo = {
 var ouchInfo = {
     x: 0,
     y: 0,
-    w: 48.125 * 3,
-    h: 49 * 3,
-    cw: 48.125,
-    ch: 49,
+    w: 192.167 * 1.5,
+    h: 145 * 1.5,
+    // w: 48.125 * 3,
+    // h: 49 * 3,
+    cw: 192.167,
+    ch: 145,
+    // cw: 48.125,
+    // ch: 49,
     // cw: 70,
     // ch: 28,
 }
@@ -2035,7 +2039,7 @@ function gameCycle() {
                 if (ouchT) {
                     ouchT2 += 10 * delta;
                     
-                    let frame = Math.floor(ouchT2) % 10;
+                    let frame = Math.floor(ouchT2) % 6;
                     // ctx.drawImage(images.ouch.obj.img, 0, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
                     ctx.drawImage(images.boom.obj.img, frame * ouchInfo.cw, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
                 }
