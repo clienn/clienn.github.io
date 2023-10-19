@@ -475,8 +475,8 @@ const clips = [
 ];
 
 var projectileRanges = {
-    x: [50, 250],
-    y: [50, 600]
+    x: [200, 250],
+    y: [450, 600]
 }
 
 var radius = 28;

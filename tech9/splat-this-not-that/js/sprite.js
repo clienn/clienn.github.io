@@ -102,14 +102,14 @@ class Spirte {
         // delta *= 0.2;
         this.vy = (2 * this.fx) / this.x;
 
-        this.fy += (this.vy + g) * delta;
+        this.fy += (this.vy + g);
 
         this.x += this.fx * delta;
         this.y += this.fy * delta;
         this.prevX = this.x;
         this.prevY = this.y;
 
-        this.fy += g;
+        // this.fy += g;
 
         if (this.y > 1000) {
             
