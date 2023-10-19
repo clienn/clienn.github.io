@@ -836,19 +836,19 @@ function main(w, h) {
 
     // alert(scaleX + ', ' + scaleY)
 
-    if (scaleX > 0.6 && scaleX < 1) {
-        projectileRanges = {
-            x: [50, 350],
-            y: [50, 1000]
-        }
-    }
+    // if (scaleX > 0.6 && scaleX < 1) {
+    //     projectileRanges = {
+    //         x: [50, 350],
+    //         y: [50, 1000]
+    //     }
+    // }
 
-    if (detectMob()) {
-        projectileRanges = {
-            x: [50, 300],
-            y: [50, 700]
-        }
-    }
+    // if (detectMob()) {
+    //     projectileRanges = {
+    //         x: [50, 300],
+    //         y: [50, 700]
+    //     }
+    // }
 
     initStartPage();
 
@@ -900,8 +900,8 @@ function main(w, h) {
     
     projectileRanges.x[0] *= scaleX;
     projectileRanges.x[1] *= scaleX;
-    projectileRanges.y[0] *= scaleY;
-    projectileRanges.y[1] *= scaleY;
+    projectileRanges.y[0] *= scaleX;
+    projectileRanges.y[1] *= scaleX;
 
     canvas.style.display = 'block';
     instrucions.style.display = 'none';
@@ -1837,51 +1837,69 @@ function reduceHP() {
 }
 
 function splat(mx, my) {
+    let idx = -1;
+    let minDist = Infinity;
     for (let i = 0; i < projectiles.length; ++i) {
         if (isSplatted(projectiles[i], { x: mx, y: my })) {
+            let dx = projectiles[i].x - mx;
+            let dy = projectiles[i].y - my;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (minDist > dist) {
+                idx = i;
+                minDist = dist;
+            }
+            
             // if (projectiles[i].clipY > 0) {
             // if (projectiles[i].id == 'bombs') {
-            if (projectiles[i].currFrame > 30) {
-                // console.log('ouch!');
-                score += OUCH_MINUS;
-                reduceHP();
-
-                if (projectiles[i].currFrame > 40) {
-                    ouchSpriteKey = 'ouch';
-                } else {
-                    ouchSpriteKey = 'boom';
-                }
-
-                if (volumeOn) {
-                    music[ouchSpriteKey].obj.audio.pause();
-                    music[ouchSpriteKey].obj.audio.currentTime = 0;
-                    music[ouchSpriteKey].obj.audio.play();
-                }
-                
-                ouchT = 1;
-                ouchT2 = 0;
-
-                ouchInfo.x = projectiles[i].x;
-                ouchInfo.y = projectiles[i].y;
-            } else {
-                // console.log('splatted!');
-                // kaboomT = 0.15;
-                kaboomT = 1;
-                kaboomT2 = 0;
-                kaboomInfo.x = projectiles[i].x;
-                kaboomInfo.y = projectiles[i].y;
-                score += SPLAT_POINTS;
-                if (volumeOn) {
-                    music.score.obj.audio.pause();
-                    music.score.obj.audio.currentTime = 0;
-                    music.score.obj.audio.play();
-                }
-            }
-            resetProjectile([i]);
-            initAnimateCanon(i);
-            break;
+            
         }
     }
+
+    if (idx > -1) {
+        let i = idx;
+
+        if (projectiles[i].currFrame > 30) {
+            // console.log('ouch!');
+            score += OUCH_MINUS;
+            reduceHP();
+
+            if (projectiles[i].currFrame > 40) {
+                ouchSpriteKey = 'ouch';
+            } else {
+                ouchSpriteKey = 'boom';
+            }
+
+            if (volumeOn) {
+                music[ouchSpriteKey].obj.audio.pause();
+                music[ouchSpriteKey].obj.audio.currentTime = 0;
+                music[ouchSpriteKey].obj.audio.play();
+            }
+            
+            ouchT = 1;
+            ouchT2 = 0;
+
+            ouchInfo.x = projectiles[i].x;
+            ouchInfo.y = projectiles[i].y;
+        } else {
+            // console.log('splatted!');
+            // kaboomT = 0.15;
+            kaboomT = 1;
+            kaboomT2 = 0;
+            kaboomInfo.x = projectiles[i].x;
+            kaboomInfo.y = projectiles[i].y;
+            score += SPLAT_POINTS;
+            if (volumeOn) {
+                music.score.obj.audio.pause();
+                music.score.obj.audio.currentTime = 0;
+                music.score.obj.audio.play();
+            }
+        }
+        resetProjectile([i]);
+        initAnimateCanon(i);
+        // break;
+    }
+    
 }
 
 function isSplatted(p1, p2) {
