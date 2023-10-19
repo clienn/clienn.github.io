@@ -267,8 +267,8 @@ var images = {
 var volumeInfo = {
     x: 15,
     y: 20,
-    w: 25 * 2,
-    h: 25 * 2,
+    w: 30 * 2,
+    h: 30 * 2,
     cw: 46,
     ch: 46,
 }
@@ -885,8 +885,8 @@ function main(w, h) {
 
         // volumeInfo.x = 45;
         // volumeInfo.y = 85;
-        volumeInfo.w = 35;
-        volumeInfo.h = 35;
+        // volumeInfo.w = 35;
+        // volumeInfo.h = 35;
 
         // textList.topTimer.desc.weight = 'normal';
         // textList.scoreN.desc.weight = 'normal';
@@ -1175,8 +1175,9 @@ function initStartPage() {
 
 function initTopHUD() {
     let isMobile = detectMob();
-
+    let progressX = 10;
     if (isMobile) {
+        progressX = 30;
         // topHUD.timer.timecircle.w = 75;
         // topHUD.timer.timecircle.h = 75;
         // topHUD.timer.stopwatch.w = 75;
@@ -1216,7 +1217,7 @@ function initTopHUD() {
     topHUDInfo.timer.w = topHUD.timer.timecircle.w / 2 + 100 * scaleX;
     topHUDInfo.timer.progress.h *= scaleX;
     
-    topHUDInfo.timer.progress.x = topHUDInfo.w / 2 - topHUDInfo.timer.w / 2 + volumeAdjX + 10 * scaleX;
+    topHUDInfo.timer.progress.x = topHUDInfo.w / 2 - topHUDInfo.timer.w / 2 + volumeAdjX + progressX * scaleX;
 
     // topHUDInfo.timer.x = topHUDInfo.timer.progress.x - topHUD.timer.timecircle.w / 2;
     topHUDInfo.timer.x = volumeAdjX;
