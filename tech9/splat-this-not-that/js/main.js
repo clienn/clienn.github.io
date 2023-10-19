@@ -79,8 +79,13 @@ var music = {
         obj: {},
         ext: 'wav',
     },
-    ouch: {
+    boom: {
         src: 'sounds/ouch',
+        obj: {},
+        ext: 'wav',
+    },
+    ouch: {
+        src: 'sounds/spike',
         obj: {},
         ext: 'wav',
     },
@@ -133,10 +138,6 @@ var images = {
         src: 'text3',
         obj: {},
     },
-    ouch: {
-        src: 'ouch',
-        obj: {},
-    },
     explosion_star: {
         src: 'explosion_star',
         obj: {},
@@ -175,6 +176,10 @@ var images = {
     },
     boom: {
         src: 'kaboom_sprite',
+        obj: {}
+    },
+    ouch: {
+        src: 'ouch_sprite',
         obj: {}
     },
     scoreboom: {
@@ -806,6 +811,8 @@ var projSpriteInfo = {
 // 2065 × 49, 43, 48.023
 var projDimX = 85;
 var projDimY = 85;
+
+var ouchSpriteKey = 'boom';
 
 function main(w, h) {
     canvas.width = w;
@@ -1749,9 +1756,9 @@ function checkProjectileCollisions() {
                     // console.log('collision detected');
                     drawExplosionStar(projectiles[i].x, projectiles[i].y);
                     if (volumeOn) {
-                        music.ouch.obj.audio.pause();
-                        music.ouch.obj.audio.currentTime = 0;
-                        music.ouch.obj.audio.play();
+                        music.boom.obj.audio.pause();
+                        music.boom.obj.audio.currentTime = 0;
+                        music.boom.obj.audio.play();
                     }
 
                     resetProjectile([i, j]);
@@ -1838,14 +1845,22 @@ function splat(mx, my) {
                 // console.log('ouch!');
                 score += OUCH_MINUS;
                 reduceHP();
+
+                if (projectiles[i].currFrame > 40) {
+                    ouchSpriteKey = 'ouch';
+                } else {
+                    ouchSpriteKey = 'boom';
+                }
+
                 if (volumeOn) {
-                    music.ouch.obj.audio.pause();
-                    music.ouch.obj.audio.currentTime = 0;
-                    music.ouch.obj.audio.play();
+                    music[ouchSpriteKey].obj.audio.pause();
+                    music[ouchSpriteKey].obj.audio.currentTime = 0;
+                    music[ouchSpriteKey].obj.audio.play();
                 }
                 
                 ouchT = 1;
                 ouchT2 = 0;
+
                 ouchInfo.x = projectiles[i].x;
                 ouchInfo.y = projectiles[i].y;
             } else {
@@ -2041,7 +2056,8 @@ function gameCycle() {
                     
                     let frame = Math.floor(ouchT2) % 6;
                     // ctx.drawImage(images.ouch.obj.img, 0, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
-                    ctx.drawImage(images.boom.obj.img, frame * ouchInfo.cw, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
+                    
+                    ctx.drawImage(images[ouchSpriteKey].obj.img, frame * ouchInfo.cw, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
                 }
 
                 // canons
