@@ -2578,7 +2578,9 @@ function main() {
               anim.time = 0;
               anim2.time = 0;
             } else if (tileAnim[idx].t <= 1) {
-              tileNums[idx] = tileNumsT[idx];
+              if (tileAnim[idx].type == 1) {
+                tileNums[idx] = tileNumsT[idx];
+              }
             }
           }
           var textRun = artboard.textRun("Count");
@@ -2783,7 +2785,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54483" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54268" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
