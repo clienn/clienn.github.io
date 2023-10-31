@@ -2457,6 +2457,7 @@ function main() {
           var tapTrigger = void 0;
           for (var i_1 = 0, l = tileMachine.inputCount(); i_1 < l; i_1++) {
             var input = tileMachine.input(i_1);
+            console.log(input.name);
             switch (input.name) {
               case "Tap":
                 tapTrigger = input.asTrigger();
@@ -2513,9 +2514,9 @@ function main() {
       renderer.save();
       if (artboardG && artboardBG) {
         var idx = 0;
-        if (bgAnim) {
-          bgAnim.advance(elapsedTimeSec);
-          bgAnim.apply(1);
+        if (bgAnimPlane) {
+          bgAnimPlane.advance(elapsedTimeSec);
+          bgAnimPlane.apply(1);
         }
         // for (let i = 0, l = bgMachine.inputCount(); i < l; i++) {
         //   const input = bgMachine.input(i);
@@ -2526,10 +2527,16 @@ function main() {
         if (progressT > 0) {
           progressT -= 1 * elapsedTimeSec;
           bgMachineProgress.asNumber().value += 1;
+          balloonX += balloonDirection * 2.5;
+          if (Math.abs(balloonX) >= 100) {
+            balloonX = 100 * balloonDirection;
+          }
+          bgMachineBalloonX.asNumber().value = balloonX;
           if (progressT <= 0) {
             progressT = 0;
           }
         }
+        // bgMachineBalloonX.asNumber().value += 1000 * elapsedTimeSec;
         bgMachine.advance(elapsedTimeSec);
         renderer.save();
         var x = padX + dim;
@@ -2570,10 +2577,13 @@ function main() {
               tileAnim[idx].type = 0;
               anim.time = 0;
               anim2.time = 0;
+            } else if (tileAnim[idx].t <= 1) {
+              tileNums[idx] = tileNumsT[idx];
             }
           }
           var textRun = artboard.textRun("Count");
           textRun.text = tileNums[idx].toString();
+          // console.log(textRun.text)
           renderer.translate(x_1, y_1);
           renderer.align(rive.Fit.contain, rive.Alignment.center, {
             minX: 0,
@@ -2581,6 +2591,7 @@ function main() {
             maxX: dim,
             maxY: dim
           }, artboard.bounds);
+          tapTrigger.fire();
           artboard.advance(elapsedTimeSec);
           artboard.draw(renderer);
           renderer.restore();
@@ -2590,7 +2601,7 @@ function main() {
       renderer.restore();
       rive.requestAnimationFrame(renderLoop);
     }
-    var rive, canvas, scaleX, scaleY, padX, padY, dim, bgWidth, renderer, bytes, file, artboardG, bytes2, file2, artboardBG, bgAnim, bgMachine, progressT, bgMachineProgress, i, l, input, tileNums, currTile, currNum, topNum, isCorrect, tileAnim, i, lastTime, tile, tiles, mDown;
+    var rive, canvas, scaleX, scaleY, padX, padY, dim, bgWidth, renderer, bytes, file, artboardG, bytes2, file2, artboardBG, bgAnim, bgAnimPlane, bgMachine, i, progressT, bgMachineProgress, bgMachineTileSide, bgMachineBalloonX, bgMachineTap, balloonDirection, balloonX, i, l, input, tileNums, tileNumsT, currTile, currNum, topNum, isCorrect, tileAnim, i, lastTime, tile, tiles, mDown;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
@@ -2612,22 +2623,29 @@ function main() {
           dim = (canvas.height - padY * 6) / 5;
           bgWidth = canvas.width - (padX + dim) * 2;
           renderer = rive.makeRenderer(canvas);
-          return [4 /*yield*/, fetch(new Request("2023-10-23-tile_test-001.riv"))];
+          return [4 /*yield*/, fetch(new Request("2023-10-23-tile_test-001.riv"))
+          // await fetch(new Request("Button.riv"))
+          ];
+
         case 2:
-          return [4 /*yield*/, _a.sent().arrayBuffer()];
+          return [4 /*yield*/, _a.sent()
+          // await fetch(new Request("Button.riv"))
+          .arrayBuffer()];
         case 3:
           bytes = _a.sent();
           return [4 /*yield*/, rive.load(new Uint8Array(bytes))];
         case 4:
           file = _a.sent();
           artboardG = file.defaultArtboard();
-          return [4 /*yield*/, fetch(new Request("2023-10-26-Background-Test-001.riv"))
+          return [4 /*yield*/, fetch(new Request("Background.riv"))
+          // await fetch(new Request("2023-10-26-Background-Test-001.riv"))
           // await fetch(new Request("2023-10-25-Background-Test-001.riv"))
           // await fetch(new Request("2023-10-23-Background-Test-001.riv"))
           ];
 
         case 5:
           return [4 /*yield*/, _a.sent()
+          // await fetch(new Request("2023-10-26-Background-Test-001.riv"))
           // await fetch(new Request("2023-10-25-Background-Test-001.riv"))
           // await fetch(new Request("2023-10-23-Background-Test-001.riv"))
           .arrayBuffer()];
@@ -2637,15 +2655,38 @@ function main() {
         case 7:
           file2 = _a.sent();
           artboardBG = file2.defaultArtboard();
-          bgAnim = new rive.LinearAnimationInstance(artboardBG.animationByIndex(0), artboardBG);
+          bgAnim = new rive.LinearAnimationInstance(
+          // artboardBG.animationByIndex(0),
+          artboardBG.animationByName("Tap"), artboardBG);
+          bgAnimPlane = new rive.LinearAnimationInstance(
+          // artboardBG.animationByIndex(0),
+          artboardBG.animationByName("Plane Flying"), artboardBG);
           bgMachine = new rive.StateMachineInstance(artboardBG.stateMachineByName("State Machine"), artboardBG);
+          // console.log(artboardBG);
+          for (i = 0; i < artboardBG.animationCount(); ++i) {
+            console.log(artboardBG.animationByIndex(i).name);
+          }
           progressT = 0;
+          balloonDirection = 1;
+          balloonX = 0;
           for (i = 0, l = bgMachine.inputCount(); i < l; i++) {
             input = bgMachine.input(i);
+            console.log(input.name, input.type);
             // console.log(input, input.name, input.type, input.asNumber().value)
-            bgMachineProgress = input;
+            if (input.name == "Progress") {
+              bgMachineProgress = input;
+            } else if (input.name == "TileSide") {
+              bgMachineTileSide = input;
+            } else if (input.name == "BalloonX") {
+              bgMachineBalloonX = input;
+            } else if (input.name == "Tap") {
+              bgMachineTap = input;
+              // console.log(bgMachineTap)
+            }
           }
+
           tileNums = [];
+          tileNumsT = [];
           currTile = -1;
           currNum = 1;
           topNum = 10;
@@ -2653,6 +2694,7 @@ function main() {
           tileAnim = [];
           for (i = 0; i < 10; ++i) {
             tileNums[i] = i + 1;
+            tileNumsT[i] = tileNums[i];
             tileAnim[i] = {
               type: 0,
               t: 0
@@ -2680,10 +2722,20 @@ function main() {
                   if (currNum == tileNums[currTile]) {
                     isCorrect = true;
                     currNum++;
-                    tileNums[currTile] = ++topNum;
+                    // bgMachineTileSide.asNumber().value += 100;
+                    bgMachineTap.asTrigger().fire();
+                    // tileNums[currTile] = ++topNum;
+                    tileNumsT[currTile] = ++topNum;
                     tileAnim[currTile].type = 1;
                     tileAnim[currTile].t = 2;
                     progressT = 0.5;
+                    if (currTile < 5) {
+                      bgMachineTileSide.asNumber().value = 0;
+                      balloonDirection = 1;
+                    } else {
+                      bgMachineTileSide.asNumber().value = 1;
+                      balloonDirection = -1;
+                    }
                   } else {
                     isCorrect = false;
                     tileAnim[currTile].type = 2;
@@ -2731,7 +2783,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55830" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54483" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
