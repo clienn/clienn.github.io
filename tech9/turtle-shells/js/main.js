@@ -1223,7 +1223,7 @@ function init() {
     score = 0;
     rounds = 0;
 
-    for (let i = 0; i < 3; ++i) {
+    for (let i = 0; i < 5; ++i) {
         addTurtle();
     }
 

@@ -929,6 +929,7 @@ function main(w, h) {
 
     rescaleAll(volumeInfo);
 
+
     initTopHUD();
 
     waterInfo.y = h - waterInfo.h;
@@ -962,7 +963,8 @@ function main(w, h) {
     let pbW = 150 * scaleX;
     let pbH = 45 * scaleY;
 
-    timeProgressBar = new ProgressBar(topHUDInfo.timer.progress.x * scaleX, 30 * scaleY, pbW, pbH);
+    // timeProgressBar = new ProgressBar(topHUDInfo.timer.progress.x * scaleX, 30 * scaleY, pbW, pbH);
+    timeProgressBar = new ProgressBar(topHUDInfo.timer.x + topHUDInfo.timer.w / 3, 30 * scaleY, pbW, pbH);
     timeProgressBar.progress = 100;
 
     pbW = 150 * scaleX;
@@ -1757,9 +1759,14 @@ function checkProjectileCollisions() {
                     // console.log('collision detected');
                     drawExplosionStar(projectiles[i].x, projectiles[i].y);
                     if (volumeOn) {
-                        music.boom.obj.audio.pause();
-                        music.boom.obj.audio.currentTime = 0;
-                        music.boom.obj.audio.play();
+                        // music.boom.obj.audio.pause();
+                        // music.boom.obj.audio.currentTime = 0;
+                        // music.boom.obj.audio.play();
+
+                        setTimeout(() => {
+                            music.boom.obj.audio.currentTime = 0;
+                            music.boom.obj.audio.play();
+                        }, 20)
                     }
 
                     resetProjectile([i, j]);
@@ -1872,9 +1879,14 @@ function splat(mx, my) {
             }
 
             if (volumeOn) {
-                music[ouchSpriteKey].obj.audio.pause();
-                music[ouchSpriteKey].obj.audio.currentTime = 0;
-                music[ouchSpriteKey].obj.audio.play();
+                // music[ouchSpriteKey].obj.audio.pause();
+                // music[ouchSpriteKey].obj.audio.currentTime = 0;
+                setTimeout(() => {
+                    // music[ouchSpriteKey].obj.audio.pause();
+                    music[ouchSpriteKey].obj.audio.currentTime = 0;
+                    music[ouchSpriteKey].obj.audio.play();
+                }, 20)
+                // music[ouchSpriteKey].obj.audio.play();
             }
             
             ouchT = 1;
@@ -1891,9 +1903,14 @@ function splat(mx, my) {
             kaboomInfo.y = projectiles[i].y;
             score += SPLAT_POINTS;
             if (volumeOn) {
-                music.score.obj.audio.pause();
-                music.score.obj.audio.currentTime = 0;
-                music.score.obj.audio.play();
+                // music.score.obj.audio.pause();
+                // music.score.obj.audio.currentTime = 0;
+                setTimeout(() => {
+                    // music.score.obj.audio.pause();
+                    music.score.obj.audio.currentTime = 0; 
+                    music.score.obj.audio.play();
+                }, 20)
+                // music.score.obj.audio.play();
             }
         }
         resetProjectile([i]);

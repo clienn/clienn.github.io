@@ -40,23 +40,7 @@ class Sprite {
                 this.goto = this.moveDestinations.shift();
             }
 
-            this.x = lerp(this.ox, this.goto[1], this.t);
-            this.y = lerp(this.oy, this.goto[0], this.t);
-
-            let dx = this.x - this.goto[1];
-            let dy = this.y - this.goto[0];
-            let dist = Math.sqrt(dx * dx + dy * dy);
-            // console.log(dist);
-
-            this.trail.push([this.x, this.y]);
-
-            if (this.trail.length > 7) {
-                this.trail.shift();
-            }
-
-            // console.log(this.trail.length);
-
-            if (dist < 10) {
+            if (this.t >= 1) {
                 this.ox = this.x;
                 this.oy = this.y;
                 
@@ -64,7 +48,36 @@ class Sprite {
                 // console.log(dist, this.goto);
                 this.t = 0;
                 this.trail = [];
+            } else {
+                this.x = lerp(this.ox, this.goto[1], this.t);
+                this.y = lerp(this.oy, this.goto[0], this.t);
+
+                this.trail.push([this.x, this.y]);
+
+                if (this.trail.length > 7) {
+                    this.trail.shift();
+                }
             }
+            
+
+            // let dx = this.x - this.goto[1];
+            // let dy = this.y - this.goto[0];
+            // let dist = Math.sqrt(dx * dx + dy * dy);
+            // console.log(dist);
+
+            
+
+            // console.log(this.trail.length);
+
+            // if (dist < 10) {
+            //     this.ox = this.x;
+            //     this.oy = this.y;
+                
+            //     this.goto = null;
+            //     // console.log(dist, this.goto);
+            //     this.t = 0;
+            //     this.trail = [];
+            // }
         } else {
             this.t2 += speed * delta;
         }
@@ -75,7 +88,7 @@ class Sprite {
         for (let i = this.trail.length - 1; i >= 0; --i) {
             ctx.save();
             ctx.globalAlpha = 0.5 - i / 10;
-            ctx.drawImage(img, 0, 0, this.clipW, this.clipH, this.trail[i][0], this.trail[i][1], this.w, this.h);
+            ctx.drawImage(img, this.clipX, 0, this.clipW, this.clipH, this.trail[i][0], this.trail[i][1], this.w, this.h);
             ctx.restore();
             // console.log(this.trail[i].x)
         }
@@ -84,7 +97,19 @@ class Sprite {
         // ctx.stroke();
     }
 
+    drawTo(ctx, img, x, y) {
+        ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, x, y, this.w, this.h);
+        for (let i = this.trail.length - 1; i >= 0; --i) {
+            ctx.save();
+            ctx.globalAlpha = 0.5 - i / 10;
+            ctx.drawImage(img, this.clipX, 0, this.clipW, this.clipH, this.trail[i][0], this.trail[i][1], this.w, this.h);
+            ctx.restore();
+            // console.log(this.trail[i].x)
+        }
+       
+    }
+
     dynamicdraw(ctx, img, x, y, w, h, cw, ch) {
-        ctx.drawImage(img, 0, 0, cw, ch, x, y, w, h);
+        ctx.drawImage(img, this.clipX, 0, cw, ch, x, y, w, h);
     }
 }

@@ -30,10 +30,31 @@
         },
         {
             "id": "gopher",
-            "src": "gopher",
+            "src": "gopher/gopher",
             "ext": "png",
-            "cw": 55,
-            "ch": 55
+            "cw": 64,
+            "ch": 65
+        },
+        {
+            "id": "gopher_carrot",
+            "src": "gopher/gopher_carrot",
+            "ext": "png",
+            "cw": 64,
+            "ch": 65
+        },
+        {
+            "id": "gopher_dig",
+            "src": "gopher/dig",
+            "ext": "png",
+            "cw": 64,
+            "ch": 64
+        },
+        {
+            "id": "gopher_caught",
+            "src": "gopher/caught",
+            "ext": "png",
+            "cw": 64,
+            "ch": 65
         },
         {
             "id": "gopher_stun",

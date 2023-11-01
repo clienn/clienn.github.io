@@ -93,8 +93,10 @@ var carrotInfo = {
 }
 
 var gopherInfo = {
-    w: 125,
-    h: 85,
+    // w: 125,
+    // h: 85,
+    w: 64 * 2,
+    h: 65 * 2,
 }
 
 var gopherStunInfo = {
@@ -118,7 +120,7 @@ var chatID = 0;
 var nextRoundT = 0;
 
 var gameDuration = 30;
-var startT = 2;
+var startT = 3;
 
 var startScreenTimerAnimT = 0;
 var startScreenHandAnimT = 0;
@@ -174,6 +176,7 @@ var startPage = {
 }
 
 var stunT = 0
+var digT = 0
 var stunAnimStars = [];
 
 /*
@@ -228,7 +231,7 @@ function main(w, h) {
     px = 60 * scaleX;
     py = 150 * scaleY;
     bg = new StaticSprite(px, py, w - px * 2, h - py * 1.50, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 'bg');
-    soil = new StaticSprite(w / 2 - 366 / 2 * scaleX, bg.x + bg.h + 50 * scaleY, 366 * scaleX, 56 * scaleX, 0, 0, AM.images.soil.cw, AM.images.soil.ch, 'soil');
+    soil = new StaticSprite(w / 2 - 366 / 2 * scaleX, bg.y + bg.h - 28 * scaleY, 366 * scaleX, 56 * scaleY, 0, 0, AM.images.soil.cw, AM.images.soil.ch, 'soil');
 
     
 
@@ -238,8 +241,11 @@ function main(w, h) {
     addCarrot(soil.x + padLeft + padDist, soil.y - carrotInfo.h / 2);
     addCarrot(soil.x + padLeft + padDist * 2, soil.y - carrotInfo.h / 2);
 
-    gopher = new Sprite(w / 2 - gopherInfo.w / 2, h / 2 - 100 * scaleY, gopherInfo.w, gopherInfo.h, AM.images.gopher_show.cw, AM.images.gopher_show.ch);
-    gopher_hide = new Sprite(w / 2 - gopherHideInfo.w / 2, h / 2 - 100 * scaleY, gopherHideInfo.w, gopherHideInfo.h, AM.images.gopher_hide.cw, AM.images.gopher_hide.ch);
+    gopher = new Sprite(w / 2 - gopherInfo.w / 2, h / 2 - 100 * scaleY, gopherInfo.w, gopherInfo.h, AM.images.gopher.cw, AM.images.gopher.ch);
+    // gopher = new Sprite(w / 2 - gopherInfo.w / 2, h / 2 - 100 * scaleY, gopherInfo.w, gopherInfo.h, AM.images.gopher_show.cw, AM.images.gopher_show.ch);
+    gopher_hide = new Sprite(w / 2 - gopherInfo.w / 2, h / 2 - 100 * scaleY, gopherInfo.w, gopherInfo.h, AM.images.gopher.cw, AM.images.gopher.ch);
+    // gopher_hide.clipX = AM.images.gopher.cw * 2;
+    // gopher_hide = new Sprite(w / 2 - gopherHideInfo.w / 2, h / 2 - 100 * scaleY, gopherHideInfo.w, gopherHideInfo.h, AM.images.gopher_hide.cw, AM.images.gopher_hide.ch);
     moveGopher();
 
     controls();
@@ -422,24 +428,49 @@ function drawCarrots() {
 
 function drawGopher() {
     if (startT > 0) {
-        gopher.draw(ctx, AM.images.gopher_show.img);
+        // 
+        if (startT < 2) {
+            digT += 10 * delta;
+            let frame = Math.floor(digT) % 6;
+            gopher.clipX = frame * AM.images.gopher.cw;
+            gopher.drawTo(ctx, AM.images.gopher_dig.img, gopher_hide.x, gopher_hide.y);
+        } else {
+            gopher.clipX = 0;
+            gopher.draw(ctx, AM.images.gopher.img);
+        }
+        
     } else if (gopher_hide.goto != null || gopher_hide.moveDestinations.length > 0) {
-        gopher_hide.draw(ctx, AM.images.gopher_hide.img);
+        // gopher.clipX = AM.images.gopher.cw;
+        gopher_hide.clipX = AM.images.gopher.cw;
+        gopher_hide.draw(ctx, AM.images.gopher.img);
+        // console.log(gopher_hide.clipX)
     } else if (gopher_hide.t2 > shuffleDuration) {
         if (chatID > -1) {
             let key = 'gopher_show';
             if (chatID == 0) {
-                key = 'gopher_stun';
-                gopher_hide.dynamicdraw(ctx, AM.images[key].img, gopher_hide.ox, gopher_hide.oy, gopherStunInfo.w, gopherStunInfo.h, AM.images[key].cw, AM.images[key].ch);
-                HP.y = gopher_hide.y + gopherStunInfo.h + 5;
-                animateStars(gopher_hide.x + gopher_hide.w / 2, gopher_hide.y);
-                stunT += 1 * delta;
+                // key = 'gopher_stun';
+                key = 'gopher_caught';
+                // gopher_hide.dynamicdraw(ctx, AM.images[key].img, gopher_hide.ox, gopher_hide.oy, gopherStunInfo.w, gopherStunInfo.h, AM.images[key].cw, AM.images[key].ch);
+                
+                stunT += 20 * delta;
+                let frame = Math.floor(stunT) % 9;
+                gopher_hide.clipX = frame * AM.images.gopher.cw;
+                gopher_hide.dynamicdraw(ctx, AM.images.gopher_caught.img, gopher_hide.ox, gopher_hide.oy, gopherInfo.w, gopherInfo.h, AM.images.gopher.cw, AM.images.gopher.ch);
+                HP.y = gopher_hide.y + gopherInfo.h + 5;
+                // animateStars(gopher_hide.x + gopher_hide.w / 2, gopher_hide.y);
+                // stunT += 1 * delta;
+                // console.log(frame);
             } else if (chatID == 2) {
-                key = 'gopher_steal';
-                gopher_hide.dynamicdraw(ctx, AM.images[key].img, gopher_hide.ox, gopher_hide.oy, gopherStunInfo.w, gopherStunInfo.h, AM.images[key].cw, AM.images[key].ch);
-                HP.y = gopher_hide.y + gopherStunInfo.h + 5;
-            } else {
+                // key = 'gopher_steal';
+                key = 'gopher_carrot';
+                
+                gopher_hide.clipX = 0;
                 gopher_hide.dynamicdraw(ctx, AM.images[key].img, gopher_hide.ox, gopher_hide.oy, gopherInfo.w, gopherInfo.h, AM.images[key].cw, AM.images[key].ch);
+                HP.y = gopher_hide.y + gopherInfo.h + 5;
+            } else {
+                gopher_hide.clipX = 0;
+                gopher_hide.draw(ctx, AM.images.gopher.img);
+                // gopher_hide.dynamicdraw(ctx, AM.images[key].img, gopher_hide.ox, gopher_hide.oy, gopherInfo.w, gopherInfo.h, AM.images[key].cw, AM.images[key].ch);
                 HP.y = gopher_hide.y + gopherInfo.h + 5;
             }
             
@@ -448,6 +479,10 @@ function drawGopher() {
             HP.draw(ctx);
             drawChat();
             updateGopherHP();
+
+            if (gopher_hide.t2 < 0.5) {
+                startT = 1;
+            }
             
         }
     }
@@ -511,19 +546,19 @@ function calcDestinations() {
     let padX = bg_rect.x + destPadX;
     let padY = bg_rect.y + destPadX;;
 
-    let rows = Math.floor(h / gopherHideInfo.h);
-    let cols = Math.floor(w / gopherHideInfo.w);
+    let rows = Math.floor(h / gopher.h);
+    let cols = Math.floor(w / gopher.w);
 
-    let rowRem = (h - rows * gopherHideInfo.h) / rows;
-    let colRem = (w - cols * gopherHideInfo.w) / cols;
+    let rowRem = (h - rows * gopher.h) / rows;
+    let colRem = (w - cols * gopher.w) / cols;
 
     let destinations = [];
     let rng = Math.floor(Math.random() * 7) + 3;
     for (let i = 0, c = 0; i < rng; ++i) {
         let r = Math.floor(Math.random() * rows);
 
-        let currX = c * gopherHideInfo.w + c * colRem + padX;
-        let currY = r * gopherHideInfo.h + r * rowRem + padY;
+        let currX = c * gopher.w + c * colRem + padX;
+        let currY = r * gopher.h + r * rowRem + padY;
 
         if (currX > canvas.width || currX < 0) currX = canvas.width / 2; 
         if (currY > canvas.height || currY < 0) currY = canvas.height / 2; 
@@ -541,8 +576,8 @@ function calcDestinations() {
         let r = Math.floor(Math.random() * rows);
         let c = Math.floor(Math.random() * cols);
 
-        let currX = c * gopherHideInfo.w + c * colRem + padX;
-        let currY = r * gopherHideInfo.h + r * rowRem + padY;
+        let currX = c * gopher.w + c * colRem + padX;
+        let currY = r * gopher.h + r * rowRem + padY;
 
         if (currX > canvas.width || currX < 0) currX = canvas.width / 2; 
         if (currY > canvas.height || currY < 0) currY = canvas.height / 2; 
@@ -553,7 +588,7 @@ function calcDestinations() {
     // let r = Math.floor(Math.random() * (rows - 4)) + 4;
     // let c = Math.floor(Math.random() * (cols - 8)) + 4;
     let c = Math.floor(Math.random() * cols);
-    let currX = c * gopherHideInfo.w + c * colRem + padX;
+    let currX = c * gopher.w + c * colRem + padX;
     if (currX > canvas.width || currX < 0) currX = canvas.width / 2; 
 
     // destinations.push([carrots[0].y - gopher_hide.h * 2, c * gopherHideInfo.w + c * colRem + padX]); // r, c
@@ -636,7 +671,7 @@ function reset() {
     HUD.carrotIDX = 0;
     HUD.gopherIDX = 0;
 
-    startT = 2;
+    startT = 3;
 
     timer.setTimer(gameDuration);
 
