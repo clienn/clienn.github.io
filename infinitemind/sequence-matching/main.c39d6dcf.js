@@ -2457,7 +2457,7 @@ function main() {
           var tapTrigger = void 0;
           for (var i_1 = 0, l = tileMachine.inputCount(); i_1 < l; i_1++) {
             var input = tileMachine.input(i_1);
-            console.log(input.name);
+            // console.log(input.name)
             switch (input.name) {
               case "Tap":
                 tapTrigger = input.asTrigger();
@@ -2526,8 +2526,9 @@ function main() {
         // 
         if (progressT > 0) {
           progressT -= 1 * elapsedTimeSec;
-          bgMachineProgress.asNumber().value += 1;
-          balloonX += balloonDirection * 2.5;
+          var val = 1 * progressT;
+          bgMachineProgress.asNumber().value += val;
+          balloonX += balloonDirection * val;
           if (Math.abs(balloonX) >= 100) {
             balloonX = 100 * balloonDirection;
           }
@@ -2603,7 +2604,7 @@ function main() {
       renderer.restore();
       rive.requestAnimationFrame(renderLoop);
     }
-    var rive, canvas, scaleX, scaleY, padX, padY, dim, bgWidth, renderer, bytes, file, artboardG, bytes2, file2, artboardBG, bgAnim, bgAnimPlane, bgMachine, i, progressT, bgMachineProgress, bgMachineTileSide, bgMachineBalloonX, bgMachineTap, balloonDirection, balloonX, i, l, input, tileNums, tileNumsT, currTile, currNum, topNum, isCorrect, tileAnim, i, lastTime, tile, tiles, mDown;
+    var rive, canvas, scaleX, scaleY, padX, padY, dim, bgWidth, renderer, bytes, file, artboardG, bytes2, file2, artboardBG, bgAnim, bgAnimPlane, bgMachine, progressDuration, i, progressT, bgMachineProgress, bgMachineTileSide, bgMachineBalloonX, bgMachineTap, balloonDirection, balloonX, i, l, input, tileNums, tileNumsT, currTile, currNum, topNum, isCorrect, tileAnim, i, lastTime, tile, tiles, mDown;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
@@ -2664,6 +2665,7 @@ function main() {
           // artboardBG.animationByIndex(0),
           artboardBG.animationByName("Plane Flying"), artboardBG);
           bgMachine = new rive.StateMachineInstance(artboardBG.stateMachineByName("State Machine"), artboardBG);
+          progressDuration = 2;
           // console.log(artboardBG);
           for (i = 0; i < artboardBG.animationCount(); ++i) {
             console.log(artboardBG.animationByIndex(i).name);
@@ -2730,7 +2732,7 @@ function main() {
                     tileNumsT[currTile] = ++topNum;
                     tileAnim[currTile].type = 1;
                     tileAnim[currTile].t = 2;
-                    progressT = 0.5;
+                    progressT = progressDuration;
                     if (currTile < 5) {
                       bgMachineTileSide.asNumber().value = 0;
                       balloonDirection = 1;
@@ -2785,7 +2787,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54268" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63719" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
