@@ -1,0 +1,14 @@
+{
+    "data": [
+        {
+            "id": "cry",
+            "src": "sounds/kaboom",
+            "ext": "wav"
+        },
+        {
+            "id": "score",
+            "src": "sounds/score",
+            "ext": "wav"
+        }
+    ]
+}
