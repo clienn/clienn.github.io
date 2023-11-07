@@ -36,7 +36,9 @@ const cardInfo = {
     lineWidth: 40
 }
 
-colors = ['#FEE1D4', '#D0E8F2', '#DAEEC9', '#FFF7D3', '#FFE9E7']
+colors = ['#FEE1D4', '#D0E8F2', '#DAEEC9', '#FFF7D3', '#FFE9E7', 
+    '#fbf3d0', '#f4e477', '#bc9640', '#fed4d7', 'fe9ba3', '#a8e6cf', '#dcedc1', '#ffd3b6', '#ffaaa5', '#ff8b94'];
+
 var cardCount = 10;
 var startIdx = 0;
 var currCard = cardCount - 1;
