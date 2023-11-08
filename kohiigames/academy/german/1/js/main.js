@@ -37,7 +37,7 @@ const cardInfo = {
 }
 
 colors = ['#FEE1D4', '#D0E8F2', '#DAEEC9', '#FFF7D3', '#FFE9E7', 
-    '#fbf3d0', '#f4e477', '#bc9640', '#fed4d7', 'fe9ba3', '#a8e6cf', '#dcedc1', '#ffd3b6', '#ffaaa5', '#ff8b94'];
+    '#fbf3d0', '#f4e477', '#bc9640', '#fed4d7', '#fe9ba3', '#a8e6cf', '#dcedc1', '#ffd3b6', '#ffaaa5', '#ff8b94'];
 
 var cardCount = 10;
 var startIdx = 0;
@@ -79,6 +79,11 @@ var progress = {
 var answers = [];
 
 var gameoverImageInfo = {};
+var gameDuration = 60;
+var timerTick = 0;
+var progressLength = 0;
+var progressTotalLength = 0;
+var progressLimit = {};
 
 // 1792 922
 
@@ -96,6 +101,13 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    progressTotalLength = w * 2 + h * 2;
+
+    progressLimit.top = w;
+    progressLimit.right = progressLimit.top + h;
+    progressLimit.bottom = progressLimit.right + w;
+    progressLimit.left = progressLimit.bottom + h;
 
     jumpPoint.x = w / 2;
     jumpPoint.y = h / 3;
@@ -263,15 +275,12 @@ function setPoint(pts, color) {
     }
 }
 
-function progressUpdate(k, limit) {
-    if (progress[k] < limit) {
-        progress[k] += 24 * delta;
-        
-        if (progress[k] >= limit) {
-            progress[k] = limit;
-        }
-
+function progressUpdate(k, limit, prevL) {
+    if (progressLength < progressLimit[k]) {
+        progress[k] = progressLength - prevL;
         return true;
+    } else {
+        progress[k] = limit;
     }
 
     return false;
@@ -283,13 +292,13 @@ function drawProgress() {
     ctx.lineWidth = '15';
     
     if (delta < 1) {
-        if (progressUpdate('top', canvas.width)) {
+        if (progressUpdate('top', canvas.width, 0)) {
             ctx.strokeStyle = '#C7FC12';
-        } else if (progressUpdate('right', canvas.height)) {
+        } else if (progressUpdate('right', canvas.height, progressLimit.top)) {
             ctx.strokeStyle = '#FFE095';
-        } else if (progressUpdate('bottom', canvas.width)) {
+        } else if (progressUpdate('bottom', canvas.width, progressLimit.right)) {
             ctx.strokeStyle = '#f9a139';
-        } else if (progressUpdate('left', canvas.height)) {
+        } else if (progressUpdate('left', canvas.height, progressLimit.bottom)) {
             ctx.strokeStyle = '#fb2121';
         } else {
             setFinalScoreText();
@@ -479,6 +488,7 @@ function controls() {
                     validateAnswer(d > 0 ? true : false);
                     nextCard();
 
+                    
                 }
                 
             }
@@ -732,6 +742,7 @@ function playScore() {
         // AM.audio.score.img.pause();
         // AM.audio.score.img.currentTime = 0;
         setTimeout(() => {
+            // AM.audio.score.img.pause();
             AM.audio.score.img.currentTime = 0;
             AM.audio.score.img.play();
         }, 0);
@@ -756,7 +767,20 @@ function playScore() {
  */
 
 function update() {
-    
+    if (delta < 1) {
+        if (timerTick >= gameDuration) {
+            setFinalScoreText();
+            gameover = true;
+        }
+
+        let p = timerTick / gameDuration;
+        progressLength = p * progressTotalLength;
+        if (progressLength >= progressTotalLength) {
+            progressLength = progressTotalLength;
+        }
+
+        timerTick += 1 * delta;
+    }
 }
 
 function gameCycle() {
