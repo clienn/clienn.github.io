@@ -2468,6 +2468,10 @@ function main() {
           }
           var x = i ? canvas.width - (dim + padX) : padX;
           var anim = new rive.LinearAnimationInstance(tileInstance.animationByName("Tap / Correct"), tileInstance);
+          // tapTrigger.fire();
+          // console.log(anim, tileInstance.animationByName("Tap / Correct"))
+          // anim.advance(0);
+          // anim.apply(0);
           var anim2 = new rive.LinearAnimationInstance(tileInstance.animationByName("Tap / Incorrect"), tileInstance);
           var blockInstance = {
             x: x,
@@ -2527,7 +2531,7 @@ function main() {
         if (progressT > 0) {
           progressT -= 1 * elapsedTimeSec;
           var val = 1 * progressT;
-          bgMachineProgress.asNumber().value += val;
+          bgMachineProgress.asNumber().value += val * 0.25;
           balloonX += balloonDirection * val;
           if (Math.abs(balloonX) >= 100) {
             balloonX = 100 * balloonDirection;
@@ -2540,7 +2544,8 @@ function main() {
         // bgMachineBalloonX.asNumber().value += 1000 * elapsedTimeSec;
         bgMachine.advance(elapsedTimeSec);
         renderer.save();
-        var x = padX + dim;
+        // let x = padX + dim;
+        var x = 0;
         var y = 0;
         renderer.translate(x, y);
         renderer.align(rive.Fit.fitWidth, rive.Alignment.center, {
@@ -2594,7 +2599,7 @@ function main() {
             maxX: dim,
             maxY: dim
           }, artboard.bounds);
-          tapTrigger.fire();
+          // tapTrigger.fire();
           artboard.advance(elapsedTimeSec);
           artboard.draw(renderer);
           renderer.restore();
@@ -2621,17 +2626,19 @@ function main() {
           canvas.width = document.documentElement.clientWidth;
           scaleX = canvas.width / 1792;
           scaleY = canvas.height / 922;
-          padX = 10 * scaleX;
+          padX = 25 * scaleX;
           padY = 10 * scaleY;
           dim = (canvas.height - padY * 6) / 5;
-          bgWidth = canvas.width - (padX + dim) * 2;
+          bgWidth = canvas.width;
           renderer = rive.makeRenderer(canvas);
           return [4 /*yield*/, fetch(new Request("2023-10-23-tile_test-001.riv"))
+          // await fetch(new Request("Button.riv"))
           // await fetch(new Request("Button.riv"))
           ];
 
         case 2:
           return [4 /*yield*/, _a.sent()
+          // await fetch(new Request("Button.riv"))
           // await fetch(new Request("Button.riv"))
           .arrayBuffer()];
         case 3:
@@ -2667,15 +2674,19 @@ function main() {
           bgMachine = new rive.StateMachineInstance(artboardBG.stateMachineByName("State Machine"), artboardBG);
           progressDuration = 2;
           // console.log(artboardBG);
-          for (i = 0; i < artboardBG.animationCount(); ++i) {
-            console.log(artboardBG.animationByIndex(i).name);
+          for (i = 0; i < artboardG.animationCount(); ++i) {
+            console.log(artboardG.animationByIndex(i).name);
+            // if (artboardG.animationByIndex(i).name == 'Tap / Correct') {
+            //   console.log('test')
+            // }
           }
+
           progressT = 0;
           balloonDirection = 1;
           balloonX = 0;
           for (i = 0, l = bgMachine.inputCount(); i < l; i++) {
             input = bgMachine.input(i);
-            console.log(input.name, input.type);
+            // console.log(input.name, input.type)
             // console.log(input, input.name, input.type, input.asNumber().value)
             if (input.name == "Progress") {
               bgMachineProgress = input;
@@ -2787,7 +2798,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63719" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53265" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
