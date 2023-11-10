@@ -107,12 +107,13 @@ class Sprite {
 
         // let w = right - left;
         // let hw = w / 2;
-        let percentage = Math.abs(this.screenW / 2 - this.x) / this.screenW;
+        // let percentage = Math.abs(this.screenW / 2 - this.x) / this.screenW;
 
-        let angle = 45 * percentage;
+        // let angle = 45 * percentage;
 
-        if (this.x < this.screenW / 2) angle *= -1;
-        this.degrees = angle;
+        // if (this.x < this.screenW / 2) angle *= -1;
+        // this.degrees = angle;
+        this.degrees = this.zRotate;
         // let angle = Math.atan2(oy - py, ox - px) * 180 / Math.PI;
         // if (angle >= 105) angle -= 90;
         // else angle -= 90;
@@ -124,7 +125,7 @@ class Sprite {
         // Untransformed draw position
         const position = {x: this.x, y: this.y};
         // In degrees
-        const rotation = { x: 0, y: 0, z: angle};
+        const rotation = { x: 0, y: 0, z: this.zRotate};
         // Rotation relative to here (this is the center of the image)
         const rotPt = { x: this.w / 2, y: this.h / 2 };
         // const rotPt = { x: rx, y: ry };

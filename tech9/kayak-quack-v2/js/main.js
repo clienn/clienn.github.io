@@ -1628,6 +1628,7 @@ function controls() {
             if (mDown) {
                 mDown = false;
                 kayak.updateOriginalPos();
+                kayak.zRotate = 0;
             }
         }
     });
@@ -1654,6 +1655,8 @@ function controls() {
                     let dist = x - mouseMoveOrigin.x;
                     kayak.x = kayak.ox + dist;
                     kayak.updateBounds(kayakBounds, kayakHitBox);
+
+                    setKayakRotation(prevPos, x, dist);
                 }
 
                 prevPos = x;
@@ -1729,6 +1732,9 @@ function controls() {
             let dist = mx - mouseMoveOrigin.x;
             kayak.x = kayak.ox + dist;
             kayak.updateBounds(kayakBounds, kayakHitBox);
+            
+            setKayakRotation(prevPos, mx, dist);
+            
             prevPos = mx;
         }
 
@@ -1753,6 +1759,7 @@ function controls() {
         if (mDown) {
             mDown = false;
             kayak.updateOriginalPos();
+            kayak.zRotate = 0;
             // eelLookAt[0] = canvas.width / 2;
             // eelLookAt[1] = 0;
             if (gameover) {
@@ -1797,6 +1804,16 @@ function controls() {
             }
         }
     });
+}
+
+function setKayakRotation(oldPos, newPos, dist) {
+    if (Math.abs(dist) > 5) {
+        if (newPos > oldPos) {
+            kayak.zRotate = 30;
+        } else if (newPos < oldPos) {
+            kayak.zRotate = -30;
+        }
+    }
 }
 
 function initStartPage() {
