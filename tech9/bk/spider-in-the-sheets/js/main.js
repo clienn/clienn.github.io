@@ -43,6 +43,13 @@ var sounds = {
         obj.audio.src = 'assets/' + fn + '.' + ext;
         obj.audio.preload = 'auto';
         obj.audio.autoplay = (/iPad|iPhone|iPod/).test(navigator.userAgent);
+
+        if (fn == 'bg' || fn == 'bg3') {
+            obj.audio.volume = 0.1;
+        } else {
+            obj.audio.volume = 0.5;
+        }
+
         // obj.audio.canplaythrough = function() {
         //     ++sounds.loaded;
         // }
@@ -70,7 +77,26 @@ var images = {
         src: 'bg',
         obj: {},
     },
-
+    bg3: {
+        src: 'bg3',
+        obj: {},
+    },
+    bgUnder: {
+        src: 'bg_under',
+        obj: {},
+    },
+    bgFold: {
+        src: 'bg_fold',
+        obj: {},
+    },
+    fold: {
+        src: 'fold',
+        obj: {},
+    },
+    fold2: {
+        src: 'fold2',
+        obj: {},
+    },
     intro: {
         src: 'intro',
         obj: {},
@@ -84,7 +110,19 @@ var images = {
         obj: {},
     },
     spider: {
-        src: 'spider/1',
+        src: 'spider/spider_2',
+        obj: {},
+    },
+    squish_0: {
+        src: 'bumps/squash/0',
+        obj: {},
+    },
+    squish_1: {
+        src: 'bumps/squash/1',
+        obj: {},
+    },
+    squish_2: {
+        src: 'bumps/squash/2',
         obj: {},
     },
     moving: {
@@ -101,6 +139,10 @@ var images = {
     },
     squash_1: {
         src: 'bumps/squash_1',
+        obj: {},
+    },
+    squash_2: {
+        src: 'bumps/squash_2',
         obj: {},
     },
     t1: {
@@ -124,7 +166,7 @@ var images = {
         obj: {},
     },
     t6: {
-        src: 'texts/Gotcha!',
+        src: 'texts/gotcha',
         obj: {},
     },
     t7: {
@@ -171,16 +213,39 @@ var images = {
         src: 'texts/That was close!',
         obj: {},
     },
+    volume: {
+        src: 'volume',
+        obj: {},
+    },
+    mute: {
+        src: 'mute',
+        obj: {},
+    },
 };
 
 var music = {
     bg: {
-        src: 'sounds/bg2',
+        src: 'sounds/bg4',
         obj: {},
         ext: 'mp3',
     }, 
     crawl: {
         src: 'sounds/crawl',
+        obj: {},
+        ext: 'wav',
+    }, 
+    squish: {
+        src: 'sounds/squish2',
+        obj: {},
+        ext: 'mp3',
+    }, 
+    hidelaugh: {
+        src: 'sounds/laugh2',
+        obj: {},
+        ext: 'wav',
+    }, 
+    laugh: {
+        src: 'sounds/evil_laugh',
         obj: {},
         ext: 'wav',
     }, 
@@ -192,11 +257,43 @@ var music = {
 
 }
 
+var volumeInfo = {
+    x: 25,
+    y: 25,
+    w: 25 * 2,
+    h: 25 * 2,
+    cw: 46,
+    ch: 46,
+}
+
+var volumeOn = true;
+
+var foldInfo = {
+    x: 0,
+    y: 0,
+    w: 232,
+    h: 215,
+    cw: 232,
+    ch: 215,
+}
+
+var foldInfo2 = {
+    x: 0,
+    y: 0,
+    w: 292,
+    h: 275,
+    cw: 292,
+    ch: 275,
+}
+
+
 var spiderInfo = {
     w: 100,
     h: 100,
-    cw: 633,
-    ch: 633,
+    cw: 256,
+    ch: 256,
+    // cw: 633,
+    // ch: 633,
 }
 
 var gameoverInfo = {
@@ -249,7 +346,7 @@ var squash = [];
 
 var crawlXPos = [0];
 var levelSpeed = 5;
-var shuffleDuration = 30;
+var shuffleDuration = 0.1;
 var isTalking = false;
 var talkTime = 0;
 var isClickable = false;
@@ -267,7 +364,7 @@ var textList = {
     },
     scoreN: {
         obj: null,
-        desc: TM.addTextObj('Score: 00', 'Montserrat', 'bold', 25, 0, 0, 55, 25, '#fff'),
+        desc: TM.addTextObj('Score: 00', 'Montserrat', 'bold', 25, 0, 0, 55 * 1.5, 25 * 1.5, '#fff'),
     },
     scoreLabel: {
         obj: null,
@@ -290,8 +387,8 @@ const topHUDInfo = {
         x: 0,
         y: 50,
         w: 100,
-        h: 50,
-        pw: 150,
+        h: 100,
+        pw: 300,
         fontsize: 20,
         fontsize2: 25,
         fontX: 0,
@@ -305,7 +402,7 @@ const topHUDInfo = {
         h: 45,
         cw: 45,
         ch: 45,
-        lives: 3,
+        lives: 0,
         totalW: 0,
         sx: 0,
         pad: 0
@@ -313,6 +410,13 @@ const topHUDInfo = {
 }
 
 var lives = topHUDInfo.life.lives;
+var moveDestinations = [];
+var minDist = 0;
+
+var squishT = 0;
+
+var scoreProgressBar = null;
+var TXT = null;
 
 function main(w, h) {
     canvas.width = w;
@@ -324,11 +428,19 @@ function main(w, h) {
     scaleX = w / 1792;
     scaleY = h / 922;
 
+    TXT = new Text(ctx, w, h); 
+    TXT.setScale(scaleX, scaleY);
+    
+     
+
     btnBegin.w *= scaleX;
     btnBegin.h *= scaleY;
 
     btnBegin.x = w / 2 - btnBegin.w / 2;
     btnBegin.y = h - 235 * scaleY;
+
+    // topHUDInfo.score.h *= scaleY;
+    // topHUDInfo.score.pw *= scaleX;
 
     sheetPadding.left *= scaleX;
     sheetPadding.right *= scaleX;
@@ -359,11 +471,22 @@ function main(w, h) {
 
     let isMobile = detectMob();
 
+    let scoreAdjY = 0;
+
     if (isMobile) {
         timerRadius = 70;
         timerY = 120;
         timerFontSize = 40;
         timerAdjX = [8, 22];
+
+        // volumeInfo.x = 45;
+        // volumeInfo.y = 45;
+        // volumeInfo.w = 35;
+        // volumeInfo.h = 35;
+
+        // textList.scoreLabel.desc.weight = 'normal';
+        // textList.scoreN.desc.weight = 'normal';
+        scoreAdjY = 2;
     }
 
     timer = new Timer(w / 2, h / 2, timerRadius, '#fb2121');
@@ -375,6 +498,26 @@ function main(w, h) {
 
     initTopHUD();
 
+    rescaleAll(volumeInfo);
+
+    foldInfo.w = 450;
+    foldInfo.h = 450;
+
+    rescaleAll(foldInfo);
+
+
+    foldInfo2.w = 600;
+    foldInfo2.h = 600;
+
+    rescaleAll(foldInfo2);
+
+    foldInfo.x = w - foldInfo.w;
+    foldInfo.y = h - foldInfo.h;
+
+    
+
+    foldInfo2.x = w - foldInfo2.w;
+    foldInfo2.y = h - foldInfo2.h;
 
     for (let k in textList) {
         if (textList[k].desc != null) {
@@ -382,13 +525,23 @@ function main(w, h) {
         }
     }
 
-    textList.scoreN.obj.tx = w / 2 - (textList.scoreN.desc.w + 30) / 2 * scaleX;
-    textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h * scaleY / 2);
+    let pbW = 200 * scaleX;
+    let pbH = 75 * scaleY;
+
+    scoreProgressBar = new ProgressBar(w / 2 - pbW / 2, 30 * scaleY, pbW, pbH, '#9F51FE');
+    scoreProgressBar.progress = 100;
+
+    let pbWidth = (scoreProgressBar.w + scoreProgressBar.h);
+
+    TXT.addText('score', 'Score: 00', 'bold', 20, 'Montserrat', scoreProgressBar.x + pbWidth / 2, scoreProgressBar.y + 15 * scaleY, 220, 50, '#fff', true);
+
+    textList.scoreN.obj.tx = scoreProgressBar.x + scoreProgressBar.w / 2 - textList.scoreN.desc.w / 2;
+    textList.scoreN.obj.ty = scoreProgressBar.y + 15 * scaleY;
 
     // textList.complete.obj.tx = w / 2 - textList.complete.desc.w / 2 * scaleX - 10 * scaleX;
     // textList.complete.obj.ty = 75 * scaleY;
     textList.scoreLabel.obj.tx = w / 2 - textList.scoreLabel.desc.w / 2 * scaleX - 100 * scaleX;
-    textList.scoreLabel.obj.ty = 240 * scaleY;
+    textList.scoreLabel.obj.ty = (240 - scoreAdjY) * scaleY;
     textList.finalScore.obj.tx = w / 2 - textList.finalScore.desc.w / 2 * scaleX - 50 * scaleX;
     textList.finalScore.obj.ty = 300 * scaleY;
     textList.resetMsg.obj.tx = w / 2 - textList.resetMsg.desc.w / 2 * scaleX - 20 * scaleX;
@@ -396,7 +549,7 @@ function main(w, h) {
 
     // gameoverInfo.x = w / 2 - gameoverInfo.w / 2;
     textList.gameover.obj.tx = w / 2 - (textList.gameover.desc.w + 100) * scaleX;
-    textList.gameover.obj.ty = 100 * scaleY;
+    textList.gameover.obj.ty = 120 * scaleY;
     
     canvas.addEventListener('touchstart', e => {
         // mousedownE(e.touches[0].clientX, e.touches[0].clientY);
@@ -417,13 +570,48 @@ function main(w, h) {
             let mx = e.offsetX;
             let my = e.offsetY;
 
-            if (gameStart) {
+            if (gameover) {
+                // resetGame();
+                
+            } else if (gameStart) {
                 // spiders[0].move(1, 1, 1);
-                if (isClickable) {
+                isClickable = true;
+                for (let i = 0; i < spiders.length; ++i) {
+                    if (spiders[i].t2 < shuffleDuration) {
+                        // spiders[i].draw(ctx, images.hiding.obj.img, 3);
+                        isClickable = false;
+                    }
+                    
+                }
+                if (isBtnClicked(mx, my, {
+                    x: volumeInfo.x,
+                    y: volumeInfo.y,
+                    w: volumeInfo.w,
+                    h: volumeInfo.h
+                })) {
+                    volumeOn = !volumeOn; 
+                    if (volumeOn) {
+                        music.bg.obj.audio.currentTime = 0;
+                        music.bg.obj.audio.play();
+
+                        music.crawl.obj.audio.currentTime = 0;
+                        music.crawl.obj.volume = 1;
+                    } else {
+                        music.bg.obj.audio.pause();
+                        music.bg.obj.volume = 0;
+
+                        music.crawl.obj.audio.pause();
+                        music.crawl.obj.volume = 0;
+                    }
+                } else if (isClickable && nextRoundTime == 0 && !isCrawl && !isTalking) {
                     isClickable = false;
                     
-                    if (checkCollission(mx, my)) {
+                    if (checkCollission(mx, my) || minDist < 75) {
                         ++score;
+                        music.squish.obj.audio.play();
+                        squishT = 0;
+                        // music.squish.obj.audio.play();
+
                         if (nextRound()) {
                             nextRoundTime = 5;
                             timer.setTimer(5);
@@ -434,11 +622,24 @@ function main(w, h) {
                             moveSpiders();
                         }
                     } else {
-                        randomizePhrases();
-                        isTalking = true;
-                        talkTime = 3;
-                        mistakes++;
-                        reduceHP();
+                        // console.log(minDist);
+                        if (minDist > 250) {
+                            reduceHP();
+                        } else {
+                            score--;
+                            if (score < 0) score = 0;
+                        }
+
+                        music.laugh.obj.audio.play();
+
+                        if (!gameover) {
+                            randomizePhrases();
+                            console.log(showPhrases.length);
+                            isTalking = true;
+                            talkTime = 3;
+                            mistakes++;
+                        }
+                        
                     }
                     
                     // accuracy.push(checkAccuracy(mx, my));
@@ -447,7 +648,7 @@ function main(w, h) {
             } else {
                 if (isBtnClicked(mx, my, btnBegin)) {
                     gameStart = true;
-                    music.bg.obj.audio.volume = 0.3;
+                    music.bg.obj.audio.volume = 0.1;
                     music.bg.obj.audio.loop = true;
                     music.bg.obj.audio.play();
                 }
@@ -482,23 +683,47 @@ function main(w, h) {
         }
     });
 
+    window.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    window.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+
+    document.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    document.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+
     // addSpider();
     // addSpider();
     // addSpider();
 
     // console.log(images['t17']);
     timer.setTimer(5);
+
+    // moveDestinations = calcDestinations();
     
     gameCycle();
+}
+
+function muteAllAudio(flag) {
+    for (let k in music) {
+        music[k].obj.audio.muted = flag;
+    }   
 }
 
 function initTopHUD() {
     let isMobile = detectMob();
 
     if (isMobile) {
-        topHUDInfo.score.w = 130;
-        topHUDInfo.score.h = 65;
-        topHUDInfo.score.pw = 195;
+        // topHUDInfo.score.w = 130;
+        // topHUDInfo.score.h = 65;
+        // topHUDInfo.score.pw = 195;
         // topHUDInfo.score.y = 3;
 
         topHUDInfo.score.fontX = 15;
@@ -517,7 +742,9 @@ function initTopHUD() {
 
     let sx = canvas.width / 2 - topHUDInfo.w / 2;
     // topHUDInfo.score.x = sx + (topHUDInfo.w  - topHUDInfo.score.w) / 2;
-    topHUDInfo.score.x = sx + (topHUDInfo.w - topHUDInfo.score.pw) / 2;
+    // topHUDInfo.score.x = sx + (topHUDInfo.w - topHUDInfo.score.pw) / 2;
+    let pad = isMobile ? 10 : 30;
+    topHUDInfo.score.x = canvas.width / 2 - topHUDInfo.score.pw / 2 - pad * scaleX;
     topHUDInfo.score.y *= scaleY;
 
     topHUDInfo.score.fontX += topHUDInfo.score.x + (topHUDInfo.w - topHUDInfo.score.pw) / 2 + 10 * scaleX;
@@ -540,22 +767,38 @@ function drawScoreHUD() {
     // let x = canvas.width / 2;
     // let y = topHUD.timer.timecircle.h / 2 - h / 2 + 30;
 
-    const { x, y, w, h, pw } = topHUDInfo.score;
-    const p = pw;
+    // const { x, y, w, h, pw } = topHUDInfo.score;
+    // const p = pw;
     
-    ctx.beginPath();
-    ctx.arc(h / 2 + x, h / 2+ y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
-    ctx.lineTo(p - 2 * h + x, 0 + y);
-    ctx.arc(p - (h / 2) + x, h / 2 + y, h / 2, 3 / 2 * Math.PI,Math.PI / 2);
-    ctx.lineTo(h / 2 + x, h + y);
-    ctx.fillStyle = "#9F51FE";
-    ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = '2';
-    ctx.stroke();
+    // ctx.beginPath();
+    // ctx.arc(h / 2 + x, h / 2+ y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
+    // ctx.lineTo(p - 2 * h + x, 0 + y);
+    // ctx.arc(p + (h / 2) + x, h / 2 + y, h / 2, 3 / 2 * Math.PI,Math.PI / 2);
+    // ctx.lineTo(h / 2 + x, h + y);
+    // ctx.fillStyle = "#9F51FE";
+    // ctx.fill();
+    // ctx.strokeStyle = '#fff';
+    // ctx.lineWidth = '2';
+    // ctx.stroke();
 
-    textList.scoreN.obj.str = 'Score: ' + zeroPad(score, 2);
-    TM.draw(textList.scoreN.obj);
+    scoreProgressBar.draw(ctx);
+
+    // textList.scoreN.obj.str = 'Score: ' + zeroPad(score, 2);
+    // TM.draw(textList.scoreN.obj);
+
+    TXT.texts['score'].str = 'Score: ' + zeroPad(score, 2);
+    TXT.draw('score');
+
+    // ctx.lineWidth = 3;
+
+    // ctx.beginPath();
+    // ctx.rect(TXT.texts['score'].x, TXT.texts['score'].y, TXT.texts['score'].w, TXT.texts['score'].h);
+    // ctx.stroke();
+
+    // let pbWidth = (scoreProgressBar.w + scoreProgressBar.h);
+    // ctx.beginPath();
+    // ctx.rect(scoreProgressBar.x, scoreProgressBar.y, pbWidth, scoreProgressBar.h);
+    // ctx.stroke();
 }
 
 function drawLives() {
@@ -578,6 +821,10 @@ function resetGame() {
     gameover = false;
     canReset = false;
     lives = topHUDInfo.life.lives;
+    nextRoundTime = 6;
+    timer.setTimer(5);
+
+    showPhrases = [];
 
     spiders = [];
 }
@@ -627,17 +874,38 @@ function drawSpiders() {
         if (isCrawl) {
             spiders[i].draw(ctx, images.spider.obj.img);
         } else {
-            if (spiders[i].t < shuffleDuration) {
-                spiders[i].draw(ctx, images.moving.obj.img);
-            } else if (spiders[i].t < shuffleDuration + 5) {
-                spiders[i].draw(ctx, images.hiding.obj.img);
+            if (spiders[i].moveDestinations.length > 0) {
+                spiders[i].draw(ctx, images.moving.obj.img, 3);
+            } else if (spiders[i].t2 < shuffleDuration) {
+                spiders[i].draw(ctx, images.hiding.obj.img, 3);
+                if (!music.crawl.obj.audio.paused) {
+                    music.crawl.obj.audio.pause();
+                    if (volumeOn) {
+                        music.hidelaugh.obj.audio.currentTime = 0;
+                        music.hidelaugh.obj.audio.play();
+                    }
+                }
+                    
             } else {
                 if (squash[i] == 1) {
-                    spiders[i].draw(ctx, images.squash_1.obj.img);
+                    // spiders[i].draw(ctx, images.squash_2.obj.img, 2);
+
+                    let frame = Math.floor(squishT);
+                    if (frame > 2) frame = 2;
+                    else squishT += 5 * delta;
+
+                    // spiders[i].draw(ctx, images['squish_' + frame].obj.img, 2);
+                    spiders[i].dynamicDraw(ctx, images['squish_' + frame].obj.img, 235, 256);
+
+                    let x = spiders[i].x + spiders[i].w / 2;
+                    let y = spiders[i].y - phraseInfo.h;
+                    let w = phrasesWidth[5];
+                    let cw = phrasesClipWidth[5];
+                    ctx.drawImage(images['t6'].obj.img, 0, 0, cw, phraseInfo.ch, x - w / 2.5, y, w, phraseInfo.h);
                 } else if (isTalking) {
                     spiders[i].draw(ctx, images.angry.obj.img, true);
                 } else {
-                    isClickable = true;
+                    // isClickable = true;
                 }
                 // spiders[i].draw(ctx, images.spider.obj.img);
             }
@@ -649,10 +917,16 @@ function moveSpiders() {
     for (let i = 0; i < spiders.length; ++i) {
         if (squash[i] != 1) {
             spiders[i].move(1, 1, Math.floor(Math.random() * 2) + 1);
+            spiders[i].moveDestinations = calcDestinations();
         }
     }
 
-    music.crawl.obj.audio.play();
+    if (volumeOn) {
+        music.crawl.obj.audio.loop = true;
+        music.crawl.obj.audio.currentTime = 0;
+        music.crawl.obj.audio.play();
+    }
+        
 }
 
 function checkAccuracy(mx, my) {
@@ -678,30 +952,50 @@ function nextRound() {
 
 function reset() {
     if (score % 2 == 0) {
-        if (spiders.length < 3) {
+        if (spiders.length < 1) {
             addSpider();
             levelSpeed += 2.5;
-            shuffleDuration += 10;
+            // shuffleDuration += 10;
+            // calcDestinations();
         }
     }
+
+    console.log('reset');
 
     for (let i = 0; i < spiders.length; ++i) {
         spiders[i].x = bounds.left;
         spiders[i].y = bounds.top;
+        spiders[i].moveDestinations = calcDestinations();
         squash[i] = 0;
     }
 
     isCrawl = true;
 
-    music.crawl.obj.audio.play();
+    if (volumeOn) {
+        music.crawl.obj.audio.loop = true;
+        music.crawl.obj.audio.currentTime = 0;
+        music.crawl.obj.audio.play();
+    }
+        
 }
 
 function checkCollission(mx, my) {
+    minDist = Infinity;
+
     for (let i = 0; i < spiders.length; ++i) {
-        if (mx >= spiders[i].x && mx <= spiders[i].x + spiders[i].w && my >= spiders[i].y && my <= spiders[i].y + spiders[i].h) {
-            squash[i] = 1;
-            return true;
+        if (squash[i] == 0) {
+            if (mx >= spiders[i].x && mx <= spiders[i].x + spiders[i].w && my >= spiders[i].y && my <= spiders[i].y + spiders[i].h) {
+                squash[i] = 1;
+                return true;
+            } 
+    
+            let dx = (spiders[i].x + spiders[i].w / 2) - mx;
+            let dy = (spiders[i].y + spiders[i].h / 2) - my;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+    
+            minDist = Math.min(minDist, dist);
         }
+        
     }
     return false;
 }
@@ -758,6 +1052,7 @@ function setPhrases() {
 function addSpider() {
     const { w, h, cw, ch } = spiderInfo;
     let spider = new Sprite(bounds.left, bounds.top, w, h, cw, ch);
+    // spider.moveDestinations = calcDestinations();
     spiders.push(spider);
     addPhrase(spiders.length - 1);
 }
@@ -852,6 +1147,7 @@ function update() {
             if (crawlT >= 0.05) {
                 isCrawl = false;
                 crawlT = 0;
+                
                 for (let i = 0; i < spiders.length; ++i) {
                     spiders[i].ox = spiders[i].tmpX = spiders[i].x;
                     spiders[i].oy = spiders[i].tmpY = spiders[i].y;
@@ -861,11 +1157,69 @@ function update() {
             }
         } else {
             for (let i = 0; i < spiders.length; ++i) {
-                spiders[i].update(levelSpeed, shuffleDuration, delta, bounds);
+                // spiders[i].update(levelSpeed, shuffleDuration, delta, bounds);
+                spiders[i].update(1, shuffleDuration, delta);
             }
         }
     }
     
+}
+
+function drawGrid() {
+    let r = Math.floor(canvas.height / spiderInfo.h);
+    let c = Math.floor(canvas.width / spiderInfo.w);
+
+    let rowRem = (canvas.height - r * spiderInfo.h) / r;
+    let colRem = (canvas.width - c * spiderInfo.w) / c;
+
+    ctx.save();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#000';
+    for (let i = 0; i < r; ++i) {
+        for (let j = 0; j < c; ++j) {
+            ctx.beginPath();
+            ctx.rect(j * spiderInfo.w + j * colRem, i * spiderInfo.h + i * rowRem, spiderInfo.w, spiderInfo.h);
+            ctx.stroke();
+        }
+    }
+    
+    ctx.restore();
+}
+
+function calcDestinations() {
+    let rows = Math.floor(canvas.height / spiderInfo.h);
+    let cols = Math.floor(canvas.width / spiderInfo.w);
+
+    let rowRem = (canvas.height - rows * spiderInfo.h) / rows;
+    let colRem = (canvas.width - cols * spiderInfo.w) / cols;
+
+    let destinations = [];
+    let rng = Math.floor(Math.random() * 7) + 3;
+    for (let i = 0, c = 0; i < rng; ++i) {
+        let r = Math.floor(Math.random() * rows);
+        destinations.push([r * spiderInfo.h + r * rowRem, c * spiderInfo.w + c * colRem]); // r, c
+        if (c == 0) {
+            c = cols - 1;
+        } else {
+            c = 0;
+        }
+    }
+
+    rng = Math.floor(Math.random() * 7) + 3;
+    for (let i = 0; i < rng; ++i) {
+        let r = Math.floor(Math.random() * rows);
+        let c = Math.floor(Math.random() * cols);
+        destinations.push([r * spiderInfo.h + r * rowRem, c * spiderInfo.w + c * colRem]); // r, c
+    }
+
+    let r = Math.floor(Math.random() * (rows - 4)) + 4;
+    let c = Math.floor(Math.random() * (cols - 8)) + 4;
+
+    destinations.push([r * spiderInfo.h + r * rowRem, c * spiderInfo.w + c * colRem]); // r, c
+
+    console.log(destinations[destinations.length - 1]);
+
+    return destinations;
 }
 //#9F51FE
 function gameCycle() {
@@ -877,23 +1231,40 @@ function gameCycle() {
         if (assets.loaded == assets.count && sounds.loaded == sounds.count) {
             
             if (gameStart) {
+                
+
                 if (isCrawl || nextRoundTime) {
                     // bg 
-                    ctx.drawImage(images.bg.obj.img, 0, 0, 1265, 712, 0, 0, canvas.width, canvas.height);
+                    // ctx.drawImage(images.bg.obj.img, 0, 0, 1265, 712, 0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(images.bgUnder.obj.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(images.bgFold.obj.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
+                    
+                    ctx.drawImage(images.fold2.obj.img, 0, 0, foldInfo2.cw, foldInfo2.ch, foldInfo2.x, foldInfo2.y, foldInfo2.w, foldInfo2.h);
+                    ctx.drawImage(images.fold.obj.img, 0, 0, foldInfo.cw, foldInfo.ch, foldInfo.x, foldInfo.y, foldInfo.w, foldInfo.h);
                 } else {
+                    ctx.drawImage(images.bg3.obj.img, 0, 0, 926, 428, 0, 0, canvas.width, canvas.height);
+                    // ctx.beginPath();
+                    // ctx.fillStyle = "#3c6c8e";
+                    // ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                    ctx.beginPath();
-                    ctx.fillStyle = "#3c6c8e";
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                    ctx.beginPath();
-                    ctx.fillStyle = "#80b1d3";
-                    ctx.fillRect(15, 13, canvas.width - 28, canvas.height - 26);
+                    // ctx.beginPath();
+                    // ctx.fillStyle = "#80b1d3";
+                    // ctx.fillRect(15, 13, canvas.width - 28, canvas.height - 26);
                     // ctx.drawImage(images.spider.obj.img, 0, 0, 633, 633, 0, 0, 100, 100);
                 }
 
+                // drawGrid();
+
+                let volumeKey = 'mute';
+                if (volumeOn) {
+                    volumeKey = 'volume';
+                }
+
+                ctx.drawImage(images[volumeKey].obj.img, 0, 0, volumeInfo.cw, 
+                    volumeInfo.ch, volumeInfo.x, volumeInfo.y, volumeInfo.w, volumeInfo.h);
+
                 drawScoreHUD();
-                drawLives();
+                // drawLives();
 
                 drawSpiders();
                 talk();
@@ -904,13 +1275,14 @@ function gameCycle() {
                 // ctx.beginPath();
                 // ctx.rect(btnBegin.x, btnBegin.y, btnBegin.w, btnBegin.h);
                 // ctx.stroke();
-
+                
             }
             
         }
     } else {
         TM.draw(textList.gameover.obj);
         TM.draw(textList.scoreLabel.obj);
+        textList.finalScore.obj.str = zeroPad(score, 2);
         TM.draw(textList.finalScore.obj);
         TM.draw(textList.resetMsg.obj);
         // ctx.drawImage(images.gameover.obj.img, 0, 0, gameoverInfo.cw, gameoverInfo.ch, gameoverInfo.x, gameoverInfo.y, gameoverInfo.w, gameoverInfo.h);

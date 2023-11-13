@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+        
         <title>
             Boilerplate Landscape - Prototype
         </title>
         <style>
+            :root {
+                touch-action: pan-x pan-y;
+                height: 100%;
+            }
             @font-face {
                 font-family: 'Montserrat';
                 src: url('assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf');
@@ -52,17 +58,16 @@
         <script type="text/javascript" src="js/textmanager.js"></script>
         <script type="text/javascript" src="js/sprite.js"></script>
         <script type="text/javascript" src="js/timer.js"></script>
+        <script type="text/javascript" src="js/helpers/globals.js"></script>
+        <script type="text/javascript" src="js/helpers/assetmanager.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
         <script type="text/javascript">
             var e = document.getElementById('directions-text');
 
             if (isPortrait()) {
-               e.innerHTML = "Rotate to landscape to start the game.";
+                e.innerHTML = "Rotate to landscape to start the game.";
             } else {
-                e.innerHTML = "Loading...";
-                setTimeout(() => {
-                    main(document.documentElement.clientWidth, document.documentElement.clientHeight);
-                }, 1000);
+                initializeGame();
             }
 
             window.addEventListener("orientationchange", function() {
@@ -76,22 +81,65 @@
                     startGame = isPortrait();
 
                     if (startGame) {
-                        e.innerHTML = "Loading...";
-                        setTimeout(() => {
-                            main(document.documentElement.clientWidth, document.documentElement.clientHeight);
-                        }, 1000);
-                    } else if (!isPortrait()) {
-                        startGame = true;
-                        e.innerHTML = "Loading...";
-                        setTimeout(() => {
-                            main(document.documentElement.clientWidth, document.documentElement.clientHeight);
-                        }, 1000);
-                        // main(document.documentElement.clientWidth, document.documentElement.clientHeight);
-                    } else {
-                        alert('Rotate to landscape to start game.');
-                    }
+                        initializeGame();
+                    } 
                 }
             }, false);
+
+            function initializeGame() {
+                e.innerHTML = "Loading...";
+                setTimeout(() => {
+                    AM = new AssetManager(() => {
+                        console.log(AM.audio.crawl)
+                        setTimeout(() => {
+                            main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+                        }, 2000);
+                    });
+
+                    AM.initImageAssets('data/images.json');
+                    AM.initAudioAssets('data/audio.json');
+                }, 1000);
+
+            }
+
+            // var e = document.getElementById('directions-text');
+
+            // if (isPortrait()) {
+            //    e.innerHTML = "Rotate to landscape to start the game.";
+            // } else {
+            //     e.innerHTML = "Loading...";
+            //     setTimeout(() => {
+            //         main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+            //     }, 1000);
+            // }
+
+            // window.addEventListener("orientationchange", function() {
+            //     if (!isPortrait()) {
+            //         canvas.style.display = 'none';
+            //         startGame = false;
+            //         location.href = '';
+            //     }
+
+            //     if (!startGame) {
+            //         startGame = isPortrait();
+
+            //         if (startGame) {
+            //             e.innerHTML = "Loading...";
+            //             setTimeout(() => {
+            //                 main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+            //             }, 1000);
+            //         } else if (!isPortrait()) {
+            //             startGame = true;
+            //             e.innerHTML = "Loading...";
+            //             setTimeout(() => {
+            //                 main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+            //             }, 1000);
+            //             // main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+            //         } else {
+            //             alert('Rotate to landscape to start game.');
+            //         }
+            //     }
+            // }, false);
 
             // btnStart.addEventListener('click', (e) => {
             //     if (startGame) {

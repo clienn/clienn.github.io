@@ -453,9 +453,9 @@ function main(w, h) {
         phrasesWidth[i] *= 0.7;
     }
 
-    rescaleSize(spiderInfo);
-    rescaleSize(phraseInfo);
-    rescaleSize(gameoverInfo);
+    rescaleSize(spiderInfo, scaleX, scaleY);
+    rescaleSize(phraseInfo, scaleX, scaleY);
+    rescaleSize(gameoverInfo, scaleX, scaleY);
 
     phraseInfo.h *= percentage;
 
@@ -494,22 +494,22 @@ function main(w, h) {
     timer.adjX = timerAdjX;
 
     setPhrases();
-    loadAssets();
+    // loadAssets();
 
     initTopHUD();
 
-    rescaleAll(volumeInfo);
+    rescaleAll(volumeInfo, scaleX, scaleY);
 
     foldInfo.w = 450;
     foldInfo.h = 450;
 
-    rescaleAll(foldInfo);
+    rescaleAll(foldInfo, scaleX, scaleY);
 
 
     foldInfo2.w = 600;
     foldInfo2.h = 600;
 
-    rescaleAll(foldInfo2);
+    rescaleAll(foldInfo2, scaleX, scaleY);
 
     foldInfo.x = w - foldInfo.w;
     foldInfo.y = h - foldInfo.h;
@@ -541,15 +541,15 @@ function main(w, h) {
     // textList.complete.obj.tx = w / 2 - textList.complete.desc.w / 2 * scaleX - 10 * scaleX;
     // textList.complete.obj.ty = 75 * scaleY;
     textList.scoreLabel.obj.tx = w / 2 - textList.scoreLabel.desc.w / 2 * scaleX - 100 * scaleX;
-    textList.scoreLabel.obj.ty = (240 - scoreAdjY) * scaleY;
+    textList.scoreLabel.obj.ty = (440 - scoreAdjY) * scaleY;
     textList.finalScore.obj.tx = w / 2 - textList.finalScore.desc.w / 2 * scaleX - 50 * scaleX;
-    textList.finalScore.obj.ty = 300 * scaleY;
+    textList.finalScore.obj.ty = 500 * scaleY;
     textList.resetMsg.obj.tx = w / 2 - textList.resetMsg.desc.w / 2 * scaleX - 20 * scaleX;
     textList.resetMsg.obj.ty = h / 2 - textList.resetMsg.desc.h / 2 * scaleY;
 
     // gameoverInfo.x = w / 2 - gameoverInfo.w / 2;
     textList.gameover.obj.tx = w / 2 - (textList.gameover.desc.w + 100) * scaleX;
-    textList.gameover.obj.ty = 120 * scaleY;
+    textList.gameover.obj.ty = 320 * scaleY;
     
     canvas.addEventListener('touchstart', e => {
         // mousedownE(e.touches[0].clientX, e.touches[0].clientY);
@@ -578,7 +578,7 @@ function main(w, h) {
                 isClickable = true;
                 for (let i = 0; i < spiders.length; ++i) {
                     if (spiders[i].t2 < shuffleDuration) {
-                        // spiders[i].draw(ctx, images.hiding.obj.img, 3);
+                        // spiders[i].draw(ctx, AM.images.hiding.img, 3);
                         isClickable = false;
                     }
                     
@@ -591,26 +591,28 @@ function main(w, h) {
                 })) {
                     volumeOn = !volumeOn; 
                     if (volumeOn) {
-                        music.bg.obj.audio.currentTime = 0;
-                        music.bg.obj.audio.play();
+                        // AM.audio.bg.img.currentTime = 0;
+                        AM.audio.bg.img.volume = 0.1;
+                        AM.audio.bg.img.play();
 
-                        music.crawl.obj.audio.currentTime = 0;
-                        music.crawl.obj.volume = 1;
+                        AM.audio.crawl.img.currentTime = 0;
+                        AM.audio.crawl.img.volume = 1;
+                        AM.audio.crawl.img.play();
                     } else {
-                        music.bg.obj.audio.pause();
-                        music.bg.obj.volume = 0;
+                        AM.audio.bg.img.pause();
+                        AM.audio.bg.img.volume = 0;
 
-                        music.crawl.obj.audio.pause();
-                        music.crawl.obj.volume = 0;
+                        AM.audio.crawl.img.pause();
+                        AM.audio.crawl.img.volume = 0;
                     }
                 } else if (isClickable && nextRoundTime == 0 && !isCrawl && !isTalking) {
                     isClickable = false;
                     
                     if (checkCollission(mx, my) || minDist < 75) {
                         ++score;
-                        music.squish.obj.audio.play();
+                        AM.audio.squish.img.play();
                         squishT = 0;
-                        // music.squish.obj.audio.play();
+                        // AM.audio.squish.img.play();
 
                         if (nextRound()) {
                             nextRoundTime = 5;
@@ -630,7 +632,7 @@ function main(w, h) {
                             if (score < 0) score = 0;
                         }
 
-                        music.laugh.obj.audio.play();
+                        AM.audio.laugh.img.play();
 
                         if (!gameover) {
                             randomizePhrases();
@@ -648,9 +650,9 @@ function main(w, h) {
             } else {
                 if (isBtnClicked(mx, my, btnBegin)) {
                     gameStart = true;
-                    music.bg.obj.audio.volume = 0.1;
-                    music.bg.obj.audio.loop = true;
-                    music.bg.obj.audio.play();
+                    AM.audio.bg.img.volume = 0.1;
+                    AM.audio.bg.img.loop = true;
+                    AM.audio.bg.img.play();
                 }
                 // gameStart = true;
                 // isCrawl = true;
@@ -674,7 +676,7 @@ function main(w, h) {
 
             if (gameover) {
                 if (canReset) {
-                    resetGame();
+                    // resetGame();
                 } else {
                     canReset = true;
                 }
@@ -713,7 +715,7 @@ function main(w, h) {
 
 function muteAllAudio(flag) {
     for (let k in music) {
-        music[k].obj.audio.muted = flag;
+        AM.audio[k].img.muted = flag;
     }   
 }
 
@@ -732,7 +734,7 @@ function initTopHUD() {
         topHUDInfo.life.y += 5;
     }
 
-    rescaleSize(topHUDInfo);
+    rescaleSize(topHUDInfo, scaleX, scaleY);
 
     
     topHUDInfo.score.w *= scaleX;
@@ -805,7 +807,7 @@ function drawLives() {
     const { x, y, cw, ch, w, h, pad } = topHUDInfo.life;
     
     for (let i = 0; i < lives; ++i) {
-        ctx.drawImage(images.life.obj.img, 0, 0, cw, ch, x + i * w + i * pad, y, w, h);
+        ctx.drawImage(AM.images.life.img, 0, 0, cw, ch, x + i * w + i * pad, y, w, h);
     }
 }
 
@@ -829,21 +831,21 @@ function resetGame() {
     spiders = [];
 }
 
-function zeroPad(num, places) {
-    return String(num).padStart(places, '0');
-}
+// function zeroPad(num, places) {
+//     return String(num).padStart(places, '0');
+// }
 
-function rescaleSize(obj) {
-    obj.w *= scaleX;
-    obj.h *= scaleY;
-}
+// function rescaleSize(obj) {
+//     obj.w *= scaleX;
+//     obj.h *= scaleY;
+// }
 
-function rescaleAll(obj) {
-    obj.x *= scaleX;
-    obj.y *= scaleY;
-    obj.w *= scaleX;
-    obj.h *= scaleY;
-}
+// function rescaleAll(obj) {
+//     obj.x *= scaleX;
+//     obj.y *= scaleY;
+//     obj.w *= scaleX;
+//     obj.h *= scaleY;
+// }
 
 function detectMob() {
     const toMatch = [
@@ -870,44 +872,44 @@ function isBtnClicked(mx, my, btn) {
 
 function drawSpiders() {
     for (let i = 0; i < spiders.length; ++i) {
-        // spiders[i].draw(ctx, images.spider.obj.img);
+        // spiders[i].draw(ctx, AM.images.spider.img);
         if (isCrawl) {
-            spiders[i].draw(ctx, images.spider.obj.img);
+            spiders[i].draw(ctx, AM.images.spider.img);
         } else {
             if (spiders[i].moveDestinations.length > 0) {
-                spiders[i].draw(ctx, images.moving.obj.img, 3);
+                spiders[i].draw(ctx, AM.images.moving.img, 3);
             } else if (spiders[i].t2 < shuffleDuration) {
-                spiders[i].draw(ctx, images.hiding.obj.img, 3);
-                if (!music.crawl.obj.audio.paused) {
-                    music.crawl.obj.audio.pause();
+                spiders[i].draw(ctx, AM.images.hiding.img, 3);
+                if (!AM.audio.crawl.img.paused) {
+                    AM.audio.crawl.img.pause();
                     if (volumeOn) {
-                        music.hidelaugh.obj.audio.currentTime = 0;
-                        music.hidelaugh.obj.audio.play();
+                        AM.audio.hidelaugh.img.currentTime = 0;
+                        AM.audio.hidelaugh.img.play();
                     }
                 }
                     
             } else {
                 if (squash[i] == 1) {
-                    // spiders[i].draw(ctx, images.squash_2.obj.img, 2);
+                    // spiders[i].draw(ctx, AM.images.squash_2.img, 2);
 
                     let frame = Math.floor(squishT);
                     if (frame > 2) frame = 2;
                     else squishT += 5 * delta;
 
                     // spiders[i].draw(ctx, images['squish_' + frame].obj.img, 2);
-                    spiders[i].dynamicDraw(ctx, images['squish_' + frame].obj.img, 235, 256);
+                    spiders[i].dynamicDraw(ctx, AM.images['squish_' + frame].img, 235, 256);
 
                     let x = spiders[i].x + spiders[i].w / 2;
                     let y = spiders[i].y - phraseInfo.h;
                     let w = phrasesWidth[5];
                     let cw = phrasesClipWidth[5];
-                    ctx.drawImage(images['t6'].obj.img, 0, 0, cw, phraseInfo.ch, x - w / 2.5, y, w, phraseInfo.h);
+                    ctx.drawImage(AM.images['t6'].img, 0, 0, cw, phraseInfo.ch, x - w / 2.5, y, w, phraseInfo.h);
                 } else if (isTalking) {
-                    spiders[i].draw(ctx, images.angry.obj.img, true);
+                    spiders[i].draw(ctx, AM.images.angry.img, true);
                 } else {
                     // isClickable = true;
                 }
-                // spiders[i].draw(ctx, images.spider.obj.img);
+                // spiders[i].draw(ctx, AM.images.spider.img);
             }
         }
     }
@@ -922,9 +924,9 @@ function moveSpiders() {
     }
 
     if (volumeOn) {
-        music.crawl.obj.audio.loop = true;
-        music.crawl.obj.audio.currentTime = 0;
-        music.crawl.obj.audio.play();
+        AM.audio.crawl.img.loop = true;
+        AM.audio.crawl.img.currentTime = 0;
+        AM.audio.crawl.img.play();
     }
         
 }
@@ -972,9 +974,9 @@ function reset() {
     isCrawl = true;
 
     if (volumeOn) {
-        music.crawl.obj.audio.loop = true;
-        music.crawl.obj.audio.currentTime = 0;
-        music.crawl.obj.audio.play();
+        AM.audio.crawl.img.loop = true;
+        AM.audio.crawl.img.currentTime = 0;
+        AM.audio.crawl.img.play();
     }
         
 }
@@ -1024,8 +1026,8 @@ function talk() {
 
                 // console.log(x, y);
                 // console.log(phrases[showPhrases[i].rng])
-                // ctx.drawImage(images[rng].obj.img, 0, 0, phraseInfo.cw, phraseInfo.ch, x, y, phraseInfo.cw, phraseInfo.ch);
-                ctx.drawImage(images[imgID].obj.img, 0, 0, cw, phraseInfo.ch, x - w / 2, y, w, phraseInfo.h);
+                // ctx.drawImage(AM.images[rng].img, 0, 0, phraseInfo.cw, phraseInfo.ch, x, y, phraseInfo.cw, phraseInfo.ch);
+                ctx.drawImage(AM.images[imgID].img, 0, 0, cw, phraseInfo.ch, x - w / 2, y, w, phraseInfo.h);
             }
         }
     }
@@ -1094,17 +1096,17 @@ function loadAssets() {
     }
 }
 
-function rescaleSize(obj) {
-    obj.w *= scaleX;
-    obj.h *= scaleY;
-}
+// function rescaleSize(obj) {
+//     obj.w *= scaleX;
+//     obj.h *= scaleY;
+// }
 
-function rescaleAll(obj) {
-    obj.x *= scaleX;
-    obj.y *= scaleY;
-    obj.w *= scaleX;
-    obj.h *= scaleY;
-}
+// function rescaleAll(obj) {
+//     obj.x *= scaleX;
+//     obj.y *= scaleY;
+//     obj.w *= scaleX;
+//     obj.h *= scaleY;
+// }
 
 function lerp(a, b, t) {
     return a + (b - a) * t;
@@ -1235,14 +1237,14 @@ function gameCycle() {
 
                 if (isCrawl || nextRoundTime) {
                     // bg 
-                    // ctx.drawImage(images.bg.obj.img, 0, 0, 1265, 712, 0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(images.bgUnder.obj.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(images.bgFold.obj.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
+                    // ctx.drawImage(AM.images.bg.img, 0, 0, 1265, 712, 0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(AM.images.bgUnder.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(AM.images.bgFold.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
                     
-                    ctx.drawImage(images.fold2.obj.img, 0, 0, foldInfo2.cw, foldInfo2.ch, foldInfo2.x, foldInfo2.y, foldInfo2.w, foldInfo2.h);
-                    ctx.drawImage(images.fold.obj.img, 0, 0, foldInfo.cw, foldInfo.ch, foldInfo.x, foldInfo.y, foldInfo.w, foldInfo.h);
+                    ctx.drawImage(AM.images.fold2.img, 0, 0, foldInfo2.cw, foldInfo2.ch, foldInfo2.x, foldInfo2.y, foldInfo2.w, foldInfo2.h);
+                    ctx.drawImage(AM.images.fold.img, 0, 0, foldInfo.cw, foldInfo.ch, foldInfo.x, foldInfo.y, foldInfo.w, foldInfo.h);
                 } else {
-                    ctx.drawImage(images.bg3.obj.img, 0, 0, 926, 428, 0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(AM.images.bg3.img, 0, 0, 926, 428, 0, 0, canvas.width, canvas.height);
                     // ctx.beginPath();
                     // ctx.fillStyle = "#3c6c8e";
                     // ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -1250,7 +1252,7 @@ function gameCycle() {
                     // ctx.beginPath();
                     // ctx.fillStyle = "#80b1d3";
                     // ctx.fillRect(15, 13, canvas.width - 28, canvas.height - 26);
-                    // ctx.drawImage(images.spider.obj.img, 0, 0, 633, 633, 0, 0, 100, 100);
+                    // ctx.drawImage(AM.images.spider.img, 0, 0, 633, 633, 0, 0, 100, 100);
                 }
 
                 // drawGrid();
@@ -1260,7 +1262,7 @@ function gameCycle() {
                     volumeKey = 'volume';
                 }
 
-                ctx.drawImage(images[volumeKey].obj.img, 0, 0, volumeInfo.cw, 
+                ctx.drawImage(AM.images[volumeKey].img, 0, 0, volumeInfo.cw, 
                     volumeInfo.ch, volumeInfo.x, volumeInfo.y, volumeInfo.w, volumeInfo.h);
 
                 drawScoreHUD();
@@ -1271,7 +1273,7 @@ function gameCycle() {
                 update();
 
             } else {
-                ctx.drawImage(images.intro.obj.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(AM.images.intro.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
                 // ctx.beginPath();
                 // ctx.rect(btnBegin.x, btnBegin.y, btnBegin.w, btnBegin.h);
                 // ctx.stroke();
@@ -1284,8 +1286,8 @@ function gameCycle() {
         TM.draw(textList.scoreLabel.obj);
         textList.finalScore.obj.str = zeroPad(score, 2);
         TM.draw(textList.finalScore.obj);
-        TM.draw(textList.resetMsg.obj);
-        // ctx.drawImage(images.gameover.obj.img, 0, 0, gameoverInfo.cw, gameoverInfo.ch, gameoverInfo.x, gameoverInfo.y, gameoverInfo.w, gameoverInfo.h);
+        // TM.draw(textList.resetMsg.obj);
+        // ctx.drawImage(AM.images.gameover.img, 0, 0, gameoverInfo.cw, gameoverInfo.ch, gameoverInfo.x, gameoverInfo.y, gameoverInfo.w, gameoverInfo.h);
     }
 
     requestAnimationFrame(gameCycle);

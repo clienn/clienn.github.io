@@ -1,0 +1,242 @@
+{
+    "data": [
+        {
+            "id": "bg3",
+            "src": "bg3",
+            "ext": "png",
+            "cw": 926,
+            "ch": 428
+        },
+        {
+            "id": "bgUnder",
+            "src": "bg_under",
+            "ext": "png",
+            "cw": 926,
+            "ch": 429
+        },
+        {
+            "id": "bgFold",
+            "src": "bg_fold",
+            "ext": "png",
+            "cw": 926,
+            "ch": 429
+        },
+        {
+            "id": "fold",
+            "src": "fold",
+            "ext": "png",
+            "cw": 232,
+            "ch": 215
+        },
+        {
+            "id": "fold2",
+            "src": "fold2",
+            "ext": "png",
+            "cw": 292,
+            "ch": 275
+        },
+        {
+            "id": "intro",
+            "src": "intro",
+            "ext": "png",
+            "cw": 926,
+            "ch": 429
+        },
+        {
+            "id": "life",
+            "src": "life",
+            "ext": "png",
+            "cw": 45,
+            "ch": 45
+        },
+        {
+            "id": "gameover",
+            "src": "gameover",
+            "ext": "png",
+            "cw": 221,
+            "ch": 45
+        },
+        {
+            "id": "spider",
+            "src": "spider/spider_2",
+            "ext": "png",
+            "cw": 221,
+            "ch": 45
+        },
+        {
+            "id": "squish_0",
+            "src": "bumps/squash/0",
+            "ext": "png",
+            "cw": 235,
+            "ch": 256
+        },
+        {
+            "id": "squish_1",
+            "src": "bumps/squash/1",
+            "ext": "png",
+            "cw": 235,
+            "ch": 256
+        },
+        {
+            "id": "squish_2",
+            "src": "bumps/squash/2",
+            "ext": "png",
+            "cw": 234,
+            "ch": 256
+        },
+        {
+            "id": "moving",
+            "src": "bumps/moving",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "hiding",
+            "src": "bumps/hiding",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "angry",
+            "src": "bumps/angry",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t1",
+            "src": "texts/Bazinga!",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t2",
+            "src": "texts/Better luck next time",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t3",
+            "src": "texts/booo!",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t4",
+            "src": "texts/close but not close enough",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t5",
+            "src": "texts/Fascinating!",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t6",
+            "src": "texts/gotcha",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t7",
+            "src": "texts/he! he! he!",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t8",
+            "src": "texts/Hello Neighbor!",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t9",
+            "src": "texts/I got long legs",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t10",
+            "src": "texts/I see you!",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t11",
+            "src": "texts/Magic!",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t12",
+            "src": "texts/right here!",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t13",
+            "src": "texts/Not-so-surelock",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t14",
+            "src": "texts/Peek-a-boo!",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t15",
+            "src": "texts/Phew!",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t16",
+            "src": "texts/So close!",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "t17",
+            "src": "texts/That was close!",
+            "ext": "png",
+            "cw": 895,
+            "ch": 979
+        },
+        {
+            "id": "volume",
+            "src": "volume",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        },
+        {
+            "id": "mute",
+            "src": "mute",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        }
+    ]
+}

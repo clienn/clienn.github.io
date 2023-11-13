@@ -361,12 +361,12 @@ var canons = {
         canons.black.right.upper.animateSprite(expSpeed, delta);
         canons.black.right.lower.animateSprite(expSpeed, delta);
 
-        canons.black.left.upper.draw(ctx, images.blackcannon.obj.img);
-        canons.black.left.lower.draw(ctx, images.blackcannon.obj.img);
-        canons.black.right.upper.drawRotate(ctx, images.blackcannon.obj.img);
-        canons.black.right.lower.drawRotate(ctx, images.blackcannon.obj.img);
+        canons.black.left.upper.draw(ctx, AM.images.blackcannon.img);
+        canons.black.left.lower.draw(ctx, AM.images.blackcannon.img);
+        canons.black.right.upper.drawRotate(ctx, AM.images.blackcannon.img);
+        canons.black.right.lower.drawRotate(ctx, AM.images.blackcannon.img);
 
-        // canons.black.right.lower.draw(ctx, images.blackCanonRight.obj.img);
+        // canons.black.right.lower.draw(ctx, AM.images.blackCanonRight.img);
     }
 }
 
@@ -487,8 +487,8 @@ const cannonCollisionBubble = [];
 var score = 0;
 const SPLAT_POINTS = 1;
 const OUCH_MINUS = -1;
-const PROJECTILE_COLLISION_MINUS = -20;
-const CANON_COLLISION_MINUS = -30;
+const PROJECTILE_COLLISION_MINUS = -1;
+const CANON_COLLISION_MINUS = -1;
 // const LEVEL_UP_THRESHOLD = 200;
 const LEVEL_UP_THRESHOLD = 2;
 
@@ -906,28 +906,28 @@ function main(w, h) {
     canvas.style.display = 'block';
     instrucions.style.display = 'none';
 
-    for (let k in images) {
-        assets.load(images[k].obj, images[k].src);
-    }
+    // for (let k in images) {
+    //     assets.load(images[k].obj, images[k].src);
+    // }
 
-    for (let k in music) {
-        sounds.load(music[k].obj, music[k].src, music[k].ext);
-    }
+    // for (let k in music) {
+    //     sounds.load(music[k].obj, music[k].src, music[k].ext);
+    // }
 
     init();
 
     
 
-    rescaleSize(compassInfo);
-    rescaleSize(shineInfo);
-    rescaleSize(completeInfo);
-    rescaleAll(trophyInfo);
-    rescaleAll(waterInfo);
-    rescaleAll(kaboomInfo);
-    rescaleAll(explosionStarInfo);
-    rescaleAll(ouchInfo);
+    rescaleSize(compassInfo, scaleX, scaleY);
+    rescaleSize(shineInfo, scaleX, scaleY);
+    rescaleSize(completeInfo, scaleX, scaleY);
+    rescaleAll(trophyInfo, scaleX, scaleY);
+    rescaleAll(waterInfo, scaleX, scaleY);
+    rescaleAll(kaboomInfo, scaleX, scaleY);
+    rescaleAll(explosionStarInfo, scaleX, scaleY);
+    rescaleAll(ouchInfo, scaleX, scaleY);
 
-    rescaleAll(volumeInfo);
+    rescaleAll(volumeInfo, scaleX, scaleY);
 
 
     initTopHUD();
@@ -994,9 +994,9 @@ function main(w, h) {
     textList.resetMsg.obj.tx = w / 2 - textList.resetMsg.desc.w / 2 * scaleX - 20 * scaleX;
     textList.resetMsg.obj.ty = h / 2 - textList.resetMsg.desc.h / 2 * scaleY + 20 * scaleX;
 
-    rescaleAll(bgInfo.cloud1);
-    rescaleAll(bgInfo.cloud2);
-    rescaleAll(bgInfo.cloud3);
+    rescaleAll(bgInfo.cloud1, scaleX, scaleY);
+    rescaleAll(bgInfo.cloud2, scaleX, scaleY);
+    rescaleAll(bgInfo.cloud3, scaleX, scaleY);
     bgInfo.cloud1.x = w - bgInfo.cloud1.w;
     bgInfo.cloud1.y = 200 * scaleY;
     bgInfo.cloud2.x = bgInfo.cloud2.w / 2;
@@ -1118,7 +1118,7 @@ function generateFloaters() {
 
 function drawFloaters() {
     for (let i = 0; i < floaters.length; ++i) {
-        floaters[i].draw(ctx, images[floaters[i].id].obj.img);
+        floaters[i].draw(ctx, AM.images[floaters[i].id].img);
         floaters[i].floatAnim(delta);
 
         if (floaters[i].x < 0 || floaters[i].x > canvas.width) floaters[i].vx *= -1;
@@ -1130,8 +1130,8 @@ function drawFloaters() {
 }
 
 function drawExplosionStar(x, y) {
-    // ctx.drawImage(images.explosion_star.obj.img, 0, 0, explosionStarInfo.cw, explosionStarInfo.ch, x, y, explosionStarInfo.w, explosionStarInfo.h);
-    // ctx.drawImage(images.boom.obj.img, 0, 0, explosionStarInfo.cw, explosionStarInfo.ch, x, y, explosionStarInfo.w, explosionStarInfo.h);
+    // ctx.drawImage(AM.images.explosion_star.img, 0, 0, explosionStarInfo.cw, explosionStarInfo.ch, x, y, explosionStarInfo.w, explosionStarInfo.h);
+    // ctx.drawImage(AM.images.boom.img, 0, 0, explosionStarInfo.cw, explosionStarInfo.ch, x, y, explosionStarInfo.w, explosionStarInfo.h);
     ouchT = 1;
     ouchT2 = 0;
     ouchInfo.x = x;
@@ -1208,11 +1208,11 @@ function initTopHUD() {
         topHUDInfo.life.y = 5;
     }
 
-    rescaleSize(topHUD.timer.timecircle);
-    rescaleSize(topHUD.timer.stopwatch);
+    rescaleSize(topHUD.timer.timecircle, scaleX, scaleY);
+    rescaleSize(topHUD.timer.stopwatch, scaleX, scaleY);
     // rescaleSize(topHUD.score.turtleshine);
-    rescaleAll(topHUD.score.turtleshine);
-    rescaleSize(topHUDInfo);
+    rescaleAll(topHUD.score.turtleshine, scaleX, scaleY);
+    rescaleSize(topHUDInfo, scaleX, scaleY);
 
     let volumeAdjX = volumeInfo.x + volumeInfo.w + 10 * scaleX;
 
@@ -1259,10 +1259,10 @@ function initTopHUD() {
 function drawTopHUD() {
     const { x, y, w, h } = topHUDInfo.timer;
     
-    ctx.drawImage(images.timecircle.obj.img, 0, 0, topHUD.timer.timecircle.cw, 
+    ctx.drawImage(AM.images.timecircle.img, 0, 0, topHUD.timer.timecircle.cw, 
         topHUD.timer.timecircle.ch, x, y, topHUD.timer.timecircle.w, topHUD.timer.timecircle.h);
 
-    ctx.drawImage(images.stopwatch.obj.img, 0, 0, topHUD.timer.stopwatch.cw, 
+    ctx.drawImage(AM.images.stopwatch.img, 0, 0, topHUD.timer.stopwatch.cw, 
         topHUD.timer.stopwatch.ch, x, y, topHUD.timer.stopwatch.w, topHUD.timer.stopwatch.h);
 
     // let timeText = showTarget ? '09' : zeroPad(Math.floor(timer.timer / 24), 2);
@@ -1343,7 +1343,7 @@ function drawScoreHUD() {
 
     scoreProgressBar.draw(ctx);
 
-    ctx.drawImage(images.compass.obj.img, 0, 0, compassInfo.cw, 
+    ctx.drawImage(AM.images.compass.img, 0, 0, compassInfo.cw, 
         compassInfo.ch, scoreProgressBar.x + 10 * scaleX, 25 * scaleY, compassInfo.w * 1.25, compassInfo.h * 1.25);
 
     
@@ -1359,7 +1359,7 @@ function drawLives() {
     const { x, y, cw, ch, w, h, pad } = topHUDInfo.life;
     
     for (let i = 0; i < lives; ++i) {
-        ctx.drawImage(images.life.obj.img, 0, 0, cw, ch, x + i * w + i * pad, y, w, h);
+        ctx.drawImage(AM.images.life.img, 0, 0, cw, ch, x + i * w + i * pad, y, w, h);
     }
     
 }
@@ -1367,7 +1367,7 @@ function drawLives() {
 function drawClouds() {
     for (let i = 1; i < 4; ++i) {
         let key = 'cloud' + i;
-        ctx.drawImage(images[key].obj.img, 0, 0, bgInfo[key].cw, bgInfo[key].ch, 
+        ctx.drawImage(AM.images[key].img, 0, 0, bgInfo[key].cw, bgInfo[key].ch, 
             bgInfo[key].x, bgInfo[key].y, bgInfo[key].w, bgInfo[key].h);
     }
 }
@@ -1422,26 +1422,26 @@ function setCloudSpeed(max) {
     
 }
 
-function zeroPad(num, places) {
-    return String(num).padStart(places, '0');
-}
+// function zeroPad(num, places) {
+//     return String(num).padStart(places, '0');
+// }
 
 
-function rescaleSize(obj) {
-    obj.w *= scaleX;
-    obj.h *= scaleY;
-}
+// function rescaleSize(obj) {
+//     obj.w *= scaleX;
+//     obj.h *= scaleY;
+// }
 
-function rescaleAll(obj) {
-    obj.x *= scaleX;
-    obj.y *= scaleY;
-    obj.w *= scaleX;
-    obj.h *= scaleY;
-}
+// function rescaleAll(obj) {
+//     obj.x *= scaleX;
+//     obj.y *= scaleY;
+//     obj.w *= scaleX;
+//     obj.h *= scaleY;
+// }
 
 function muteAllAudio(flag) {
     for (let k in music) {
-        music[k].obj.audio.muted = flag;
+        AM.audio[k].img.muted = flag;
     }
     
 }
@@ -1488,14 +1488,14 @@ function controls() {
                 })) {
                     volumeOn = !volumeOn; 
                     if (volumeOn) {
-                        music.bg.obj.audio.currentTime = 0;
-                        music.bg.obj.audio.play();
+                        AM.audio.bg.img.currentTime = 0;
+                        AM.audio.bg.img.play();
 
-                        music.explosion.obj.audio.currentTime = 0;
-                        music.explosion.obj.audio.play();
+                        AM.audio.explosion.img.currentTime = 0;
+                        AM.audio.explosion.img.play();
                     } else {
-                        music.bg.obj.audio.pause();
-                        music.explosion.obj.audio.pause();
+                        AM.audio.bg.img.pause();
+                        AM.audio.explosion.img.pause();
                     }
                 } else {
                     splat(mx, my);
@@ -1507,17 +1507,17 @@ function controls() {
                     gameStart = true;
 
                     
-                    music.bg.obj.audio.volume = 0.01;
-                    music.bg.obj.audio.loop = true;
-                    // music.bg.obj.audio.play();
+                    AM.audio.bg.img.volume = 0.5;
+                    AM.audio.bg.img.loop = true;
+                    // AM.audio.bg.img.play();
 
-                    music.explosion.obj.audio.volume = 0.2;
-                    music.explosion.obj.audio.loop = true;
-                    // music.explosion.obj.audio.play();
+                    AM.audio.explosion.img.volume = 0.8;
+                    AM.audio.explosion.img.loop = true;
+                    // AM.audio.explosion.img.play();
 
                     if (volumeOn) {
-                        music.bg.obj.audio.play();
-                        music.explosion.obj.audio.play();
+                        AM.audio.bg.img.play();
+                        AM.audio.explosion.img.play();
                     }
                 }
             }
@@ -1555,16 +1555,16 @@ function controls() {
                 })) {
                     volumeOn = !volumeOn; 
                     if (volumeOn) {
-                        music.bg.obj.audio.currentTime = 0;
-                        music.bg.obj.audio.play();
+                        AM.audio.bg.img.currentTime = 0;
+                        AM.audio.bg.img.play();
 
-                        music.explosion.obj.audio.currentTime = 0;
-                        music.explosion.obj.audio.play();
+                        AM.audio.explosion.img.currentTime = 0;
+                        AM.audio.explosion.img.play();
                     } else {
-                        music.bg.obj.audio.pause();
+                        AM.audio.bg.img.pause();
                         
 
-                        music.explosion.obj.audio.pause();
+                        AM.audio.explosion.img.pause();
                         // music.explosion.obj.volume = 0;
 
                         // music.correct.obj.volume = 0;
@@ -1578,17 +1578,17 @@ function controls() {
                 if (isBtnClicked(mx, my, btnBegin)) {
                     gameStart = true;
 
-                    music.bg.obj.audio.volume = 0.5;
-                    music.bg.obj.audio.loop = true;
-                    // music.bg.obj.audio.play();
+                    AM.audio.bg.img.volume = 0.5;
+                    AM.audio.bg.img.loop = true;
+                    // AM.audio.bg.img.play();
 
-                    music.explosion.obj.audio.volume = 0.8;
-                    music.explosion.obj.audio.loop = true;
-                    // music.explosion.obj.audio.play();
+                    AM.audio.explosion.img.volume = 0.8;
+                    AM.audio.explosion.img.loop = true;
+                    // AM.audio.explosion.img.play();
 
                     if (volumeOn) {
-                        music.bg.obj.audio.play();
-                        music.explosion.obj.audio.play();
+                        AM.audio.bg.img.play();
+                        AM.audio.explosion.img.play();
                     }
                 }
             }
@@ -1759,13 +1759,13 @@ function checkProjectileCollisions() {
                     // console.log('collision detected');
                     drawExplosionStar(projectiles[i].x, projectiles[i].y);
                     if (volumeOn) {
-                        // music.boom.obj.audio.pause();
-                        // music.boom.obj.audio.currentTime = 0;
-                        // music.boom.obj.audio.play();
+                        // AM.audio.boom.img.pause();
+                        // AM.audio.boom.img.currentTime = 0;
+                        // AM.audio.boom.img.play();
 
                         setTimeout(() => {
-                            music.boom.obj.audio.currentTime = 0;
-                            music.boom.obj.audio.play();
+                            AM.audio.boom.img.currentTime = 0;
+                            AM.audio.boom.img.play();
                         }, 20)
                     }
 
@@ -1879,14 +1879,14 @@ function splat(mx, my) {
             }
 
             if (volumeOn) {
-                // music[ouchSpriteKey].obj.audio.pause();
-                // music[ouchSpriteKey].obj.audio.currentTime = 0;
+                // AM.audio[ouchSpriteKey].img.pause();
+                // AM.audio[ouchSpriteKey].img.currentTime = 0;
                 setTimeout(() => {
-                    // music[ouchSpriteKey].obj.audio.pause();
-                    music[ouchSpriteKey].obj.audio.currentTime = 0;
-                    music[ouchSpriteKey].obj.audio.play();
+                    // AM.audio[ouchSpriteKey].img.pause();
+                    AM.audio[ouchSpriteKey].img.currentTime = 0;
+                    AM.audio[ouchSpriteKey].img.play();
                 }, 20)
-                // music[ouchSpriteKey].obj.audio.play();
+                // AM.audio[ouchSpriteKey].img.play();
             }
             
             ouchT = 1;
@@ -1903,14 +1903,14 @@ function splat(mx, my) {
             kaboomInfo.y = projectiles[i].y;
             score += SPLAT_POINTS;
             if (volumeOn) {
-                // music.score.obj.audio.pause();
-                // music.score.obj.audio.currentTime = 0;
+                // AM.audio.score.img.pause();
+                // AM.audio.score.img.currentTime = 0;
                 setTimeout(() => {
-                    // music.score.obj.audio.pause();
-                    music.score.obj.audio.currentTime = 0; 
-                    music.score.obj.audio.play();
+                    // AM.audio.score.img.pause();
+                    AM.audio.score.img.currentTime = 0; 
+                    AM.audio.score.img.play();
                 }, 20)
-                // music.score.obj.audio.play();
+                // AM.audio.score.img.play();
             }
         }
         resetProjectile([i]);
@@ -2013,8 +2013,8 @@ function gameCycle() {
         if (!gameover) {
             if (gameStart) {
                 // bg
-                // ctx.drawImage(images.bg.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
-                ctx.drawImage(images.sky.obj.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
+                // ctx.drawImage(AM.images.bg.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(AM.images.sky.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
 
                 drawFloaters();
 
@@ -2036,22 +2036,22 @@ function gameCycle() {
                     volumeKey = 'volume';
                 }
 
-                ctx.drawImage(images[volumeKey].obj.img, 0, 0, volumeInfo.cw, 
+                ctx.drawImage(AM.images[volumeKey].img, 0, 0, volumeInfo.cw, 
                     volumeInfo.ch, volumeInfo.x, volumeInfo.y + topHUDInfo.timer.y, volumeInfo.w, volumeInfo.h);
 
 
                 
 
                 // lands
-                ctx.drawImage(images.landLeft.obj.img, 0, 0, 157, 206, images.landLeft.x, images.landLeft.y, images.landLeft.w, images.landLeft.h);
-                ctx.drawImage(images.landRight.obj.img, 0, 0, 157, 206, images.landRight.x, images.landRight.y, images.landRight.w, images.landRight.h);
+                ctx.drawImage(AM.images.landLeft.img, 0, 0, 157, 206, images.landLeft.x, images.landLeft.y, images.landLeft.w, images.landLeft.h);
+                ctx.drawImage(AM.images.landRight.img, 0, 0, 157, 206, images.landRight.x, images.landRight.y, images.landRight.w, images.landRight.h);
 
                 
 
                 for (let i = 0; i < projectiles.length; ++i) {
                     if (difficulty[i] > 0) {
-                        // projectiles[i].draw(ctx, images.projectile.obj.img);
-                        projectiles[i].dive(ctx, images[projectiles[i].id].obj.img);
+                        // projectiles[i].draw(ctx, AM.images.projectile.img);
+                        projectiles[i].dive(ctx, AM.images[projectiles[i].id].img);
                         let r = projectiles[i].update(delta * difficulty[i], g, projectileRanges);
                         
                         if (r) {
@@ -2082,8 +2082,8 @@ function gameCycle() {
                     let adjx = Math.sin(kaboomT2) * 50;
                     let adjx2 = adjx / 2;
                     let frame = Math.floor(kaboomT2) % 10;
-                    // ctx.drawImage(images.scoreboom.obj.img, 0, 0, kaboomInfo.cw, kaboomInfo.ch, kaboomInfo.x - adjx2, kaboomInfo.y - adjx2, kaboomInfo.w + adjx, kaboomInfo.h + adjx);
-                    ctx.drawImage(images.scoreboom.obj.img, frame * kaboomInfo.cw, 0, kaboomInfo.cw, kaboomInfo.ch, kaboomInfo.x, kaboomInfo.y, kaboomInfo.w, kaboomInfo.h);
+                    // ctx.drawImage(AM.images.scoreboom.img, 0, 0, kaboomInfo.cw, kaboomInfo.ch, kaboomInfo.x - adjx2, kaboomInfo.y - adjx2, kaboomInfo.w + adjx, kaboomInfo.h + adjx);
+                    ctx.drawImage(AM.images.scoreboom.img, frame * kaboomInfo.cw, 0, kaboomInfo.cw, kaboomInfo.ch, kaboomInfo.x, kaboomInfo.y, kaboomInfo.w, kaboomInfo.h);
                     
                 }
 
@@ -2091,9 +2091,9 @@ function gameCycle() {
                     ouchT2 += 10 * delta;
                     
                     let frame = Math.floor(ouchT2) % 6;
-                    // ctx.drawImage(images.ouch.obj.img, 0, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
+                    // ctx.drawImage(AM.images.ouch.img, 0, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
                     
-                    ctx.drawImage(images[ouchSpriteKey].obj.img, frame * ouchInfo.cw, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
+                    ctx.drawImage(AM.images[ouchSpriteKey].img, frame * ouchInfo.cw, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
                 }
 
                 // canons
@@ -2108,9 +2108,9 @@ function gameCycle() {
                 // }
                 
 
-                // canons.black.left.lower.draw(ctx, images.blackCanonLeft.obj.img);
-                // canons.black.right.upper.draw(ctx, images.blackCanonRight.obj.img);
-                // canons.black.right.lower.draw(ctx, images.blackCanonRight.obj.img);
+                // canons.black.left.lower.draw(ctx, AM.images.blackCanonLeft.img);
+                // canons.black.right.upper.draw(ctx, AM.images.blackCanonRight.img);
+                // canons.black.right.lower.draw(ctx, AM.images.blackCanonRight.img);
 
                 // drawExplosionStar(canvas.width / 2, canvas.height / 2);
                 // drawExplosionStar(0, 0);
@@ -2124,8 +2124,8 @@ function gameCycle() {
                 let handy = Math.cos(startScreenHandAnimT) * 20;
                 // let handTapX = Math.cos(startScreenHandAnimT) * 2;
                 // let handTapY = Math.sin(startScreenHandAnimT) * 2;
-                // ctx.drawImage(images.splash.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
-                ctx.drawImage(images.sky.obj.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
+                // ctx.drawImage(AM.images.splash.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(AM.images.sky.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
                 ctx.beginPath();
                 ctx.fillStyle = '#70D2ED';
                 ctx.rect(0, waterInfo.y, canvas.width, waterInfo.h);
@@ -2133,16 +2133,16 @@ function gameCycle() {
                 drawClouds();
 
                 // lands
-                ctx.drawImage(images.landLeft.obj.img, 0, 0, 157, 206, images.landLeft.x, images.landLeft.y, images.landLeft.w, images.landLeft.h);
-                ctx.drawImage(images.landRight.obj.img, 0, 0, 157, 206, images.landRight.x, images.landRight.y, images.landRight.w, images.landRight.h);
+                ctx.drawImage(AM.images.landLeft.img, 0, 0, 157, 206, images.landLeft.x, images.landLeft.y, images.landLeft.w, images.landLeft.h);
+                ctx.drawImage(AM.images.landRight.img, 0, 0, 157, 206, images.landRight.x, images.landRight.y, images.landRight.w, images.landRight.h);
 
                 // canons
                 canons.draw();
 
                 let frame = Math.floor(startScreenHandAnimT) % 8;
                 
-                ctx.drawImage(images.title.obj.img, 0, 0, startPageInfo.title.cw, startPageInfo.title.ch, startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
-                ctx.drawImage(images.hand.obj.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                ctx.drawImage(AM.images.title.img, 0, 0, startPageInfo.title.cw, startPageInfo.title.ch, startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
+                ctx.drawImage(AM.images.hand.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
                 // tap
                 // ctx.save();
                 // // Untransformed draw position
@@ -2157,11 +2157,11 @@ function gameCycle() {
                 //     .rotateSelf(rotation.x, rotation.y, rotation.z)
                 // );
                 
-                // ctx.drawImage(images.hand.obj.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, -rotPt.x, -rotPt.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                // ctx.drawImage(AM.images.hand.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, -rotPt.x, -rotPt.y, startPageInfo.hand.w, startPageInfo.hand.h);
                 // ctx.restore();
                 //
                 
-                ctx.drawImage(images.startballoon.obj.img, 0, 0, startPageInfo.startballoon.cw, startPageInfo.startballoon.ch, startPageInfo.startballoon.x + handx, startPageInfo.startballoon.y + handy, startPageInfo.startballoon.w, startPageInfo.startballoon.h);
+                ctx.drawImage(AM.images.startballoon.img, 0, 0, startPageInfo.startballoon.cw, startPageInfo.startballoon.ch, startPageInfo.startballoon.x + handx, startPageInfo.startballoon.y + handy, startPageInfo.startballoon.w, startPageInfo.startballoon.h);
                 //
                     ctx.save();
 
@@ -2176,7 +2176,7 @@ function gameCycle() {
                     startPageInfo.startmine.x = -0.5 * startPageInfo.startmine.w;
                     startPageInfo.startmine.y = -0.5 * startPageInfo.startmine.h;
 
-                    ctx.drawImage(images.startmine.obj.img, 0, 0, startPageInfo.startmine.cw, startPageInfo.startmine.ch, startPageInfo.startmine.x, startPageInfo.startmine.y, startPageInfo.startmine.w, startPageInfo.startmine.h);
+                    ctx.drawImage(AM.images.startmine.img, 0, 0, startPageInfo.startmine.cw, startPageInfo.startmine.ch, startPageInfo.startmine.x, startPageInfo.startmine.y, startPageInfo.startmine.w, startPageInfo.startmine.h);
                     // we’re done with the rotating so restore the unrotated context
                     ctx.restore();
                 //
@@ -2185,10 +2185,10 @@ function gameCycle() {
 
                 for (let i = 1; i < 4; ++i) {
                     let key = 'text' + i;
-                    ctx.drawImage(images[key].obj.img, 0, 0, startPageInfo[key].cw, startPageInfo[key].ch, startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
+                    ctx.drawImage(AM.images[key].img, 0, 0, startPageInfo[key].cw, startPageInfo[key].ch, startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
                 }
 
-                ctx.drawImage(images.beginbutton.obj.img, 0, 0, startPageInfo.beginbutton.cw, startPageInfo.beginbutton.ch, startPageInfo.beginbutton.x, startPageInfo.beginbutton.y, startPageInfo.beginbutton.w, startPageInfo.beginbutton.h);
+                ctx.drawImage(AM.images.beginbutton.img, 0, 0, startPageInfo.beginbutton.cw, startPageInfo.beginbutton.ch, startPageInfo.beginbutton.x, startPageInfo.beginbutton.y, startPageInfo.beginbutton.w, startPageInfo.beginbutton.h);
                 
 
                 // ctx.beginPath();
@@ -2203,8 +2203,8 @@ function gameCycle() {
         } else {
             if (!fade) {
                 // bg
-                // ctx.drawImage(images.bg.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
-                ctx.drawImage(images.sky.obj.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
+                // ctx.drawImage(AM.images.bg.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(AM.images.sky.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
                 ctx.beginPath();
                 ctx.fillStyle = '#70D2ED';
                 ctx.rect(0, waterInfo.y, canvas.width, waterInfo.h);
@@ -2217,8 +2217,8 @@ function gameCycle() {
                 drawLives();
 
                 // lands
-                ctx.drawImage(images.landLeft.obj.img, 0, 0, 157, 206, images.landLeft.x, images.landLeft.y, images.landLeft.w, images.landLeft.h);
-                ctx.drawImage(images.landRight.obj.img, 0, 0, 157, 206, images.landRight.x, images.landRight.y, images.landRight.w, images.landRight.h);
+                ctx.drawImage(AM.images.landLeft.img, 0, 0, 157, 206, images.landLeft.x, images.landLeft.y, images.landLeft.w, images.landLeft.h);
+                ctx.drawImage(AM.images.landRight.img, 0, 0, 157, 206, images.landRight.x, images.landRight.y, images.landRight.w, images.landRight.h);
 
                 // canons
                 canons.draw();
@@ -2250,20 +2250,20 @@ function gameCycle() {
 
                 let x = shineInfo.x + (shineInfo.w / 2 - w / 2);
                 let y = shineInfo.y + (shineInfo.h / 2 - h / 2) - 50 * scaleY;
-                ctx.drawImage(images.shine.obj.img, 0, 0, shineInfo.cw, 
+                ctx.drawImage(AM.images.shine.img, 0, 0, shineInfo.cw, 
                     shineInfo.ch, x, y, w, h);
 
-                ctx.drawImage(images.complete.obj.img, 0, 0, completeInfo.cw, 
+                ctx.drawImage(AM.images.complete.img, 0, 0, completeInfo.cw, 
                     completeInfo.ch, completeInfo.x, shineInfo.y, completeInfo.w, completeInfo.h);
                 
-                ctx.drawImage(images.trophy.obj.img, 0, 0, trophyInfo.cw, 
+                ctx.drawImage(AM.images.trophy.img, 0, 0, trophyInfo.cw, 
                     trophyInfo.ch, trophyInfo.x, (shineInfo.y + shineInfo.h / 2) - trophyInfo.h, trophyInfo.w, trophyInfo.h);
-                // ctx.drawImage(images.shine.obj.img, 0, 0, shineInfo.cw, 
+                // ctx.drawImage(AM.images.shine.img, 0, 0, shineInfo.cw, 
                 //     shineInfo.ch, shineInfo.x, shineInfo.y, shineInfo.w, shineInfo.h);
                 
                 // x = shineInfo.x + (shineInfo.w / 2 - turtleInfo.w / 2);
                 // y = shineInfo.y + (shineInfo.h / 2 - turtleInfo.h / 2 - 10 * scaleY);
-                // ctx.drawImage(images.turtle.obj.img, 0, 0, turtleInfo.cw, 
+                // ctx.drawImage(AM.images.turtle.img, 0, 0, turtleInfo.cw, 
                 //     turtleInfo.ch, x, y, turtleInfo.w, turtleInfo.h);
                 
 

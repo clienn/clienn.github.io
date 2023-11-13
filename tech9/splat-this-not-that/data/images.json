@@ -1,0 +1,200 @@
+{
+    "data": [
+        {
+            "id": "sky",
+            "src": "sky",
+            "ext": "png",
+            "cw": 926,
+            "ch": 428
+        },
+        {
+            "id": "title",
+            "src": "title",
+            "ext": "png",
+            "cw": 261,
+            "ch": 101
+        },
+        {
+            "id": "hand",
+            "src": "hand",
+            "ext": "png",
+            "cw": 56,
+            "ch": 57
+        },
+        {
+            "id": "startballoon",
+            "src": "startballoon",
+            "ext": "png",
+            "cw": 56,
+            "ch": 57
+        },
+        {
+            "id": "startmine",
+            "src": "startmine",
+            "ext": "png",
+            "cw": 56,
+            "ch": 57
+        },
+        {
+            "id": "text1",
+            "src": "text1",
+            "ext": "png",
+            "cw": 119,
+            "ch": 25
+        },
+        {
+            "id": "text2",
+            "src": "text2",
+            "ext": "png",
+            "cw": 115,
+            "ch": 27
+        },
+        {
+            "id": "text3",
+            "src": "text3",
+            "ext": "png",
+            "cw": 89,
+            "ch": 27
+        },
+        {
+            "id": "beginbutton",
+            "src": "beginbutton",
+            "ext": "png",
+            "cw": 213,
+            "ch": 49
+        },
+        {
+            "id": "landLeft",
+            "src": "land",
+            "ext": "png",
+            "cw": 157,
+            "ch": 206
+        },
+        {
+            "id": "landRight",
+            "src": "land2",
+            "ext": "png",
+            "cw": 156,
+            "ch": 201
+        },
+        {
+            "id": "blackcannon",
+            "src": "cannon_sprite",
+            "ext": "png",
+            "cw": "192.11",
+            "ch": 145
+        },
+        {
+            "id": "scoreboom",
+            "src": "score_sprite",
+            "ext": "png",
+            "cw": "48.1",
+            "ch": 49
+        },
+        {
+            "id": "ouch",
+            "src": "ouch_sprite",
+            "ext": "png",
+            "cw": "192.167",
+            "ch": 145
+        },
+        {
+            "id": "boom",
+            "src": "kaboom_sprite",
+            "ext": "png",
+            "cw": "192.167",
+            "ch": 145
+        },
+        {
+            "id": "compass",
+            "src": "tophud/compass",
+            "ext": "png",
+            "cw": 35,
+            "ch": 37
+        },
+        {
+            "id": "life",
+            "src": "tophud/life",
+            "ext": "png",
+            "cw": 45,
+            "ch": 45
+        },
+        {
+            "id": "timecircle",
+            "src": "tophud/timecircle",
+            "ext": "png",
+            "cw": 45,
+            "ch": 45
+        },
+        {
+            "id": "stopwatch",
+            "src": "tophud/stopwatch",
+            "ext": "png",
+            "cw": 43,
+            "ch": 45
+        },
+        {
+            "id": "complete",
+            "src": "completed/complete",
+            "ext": "png",
+            "cw": 185,
+            "ch": 25
+        },
+        {
+            "id": "trophy",
+            "src": "completed/trophy",
+            "ext": "png",
+            "cw": 61,
+            "ch": 81
+        },
+        {
+            "id": "shine",
+            "src": "completed/shine",
+            "ext": "png",
+            "cw": 289,
+            "ch": 274
+        },
+        {
+            "id": "cloud1",
+            "src": "cloud1",
+            "ext": "png",
+            "cw": 286,
+            "ch": 67
+        },
+        {
+            "id": "cloud2",
+            "src": "cloud2",
+            "ext": "png",
+            "cw": 371,
+            "ch": 99
+        },
+        {
+            "id": "cloud3",
+            "src": "cloud3",
+            "ext": "png",
+            "cw": 188,
+            "ch": 42
+        },
+        {
+            "id": "projectiles",
+            "src": "shapes/projectiles",
+            "ext": "png",
+            "cw": "48.023",
+            "ch": 49
+        },
+        {
+            "id": "volume",
+            "src": "volume",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        },
+        {
+            "id": "mute",
+            "src": "mute",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        }
+    ]
+}

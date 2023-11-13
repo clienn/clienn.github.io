@@ -1,0 +1,29 @@
+{
+    "data": [
+        {
+            "id": "bg",
+            "src": "sounds/bg4",
+            "ext": "mp3"
+        }, 
+        {
+            "id": "crawl",
+            "src": "sounds/crawl",
+            "ext": "wav"
+        }, 
+        {
+            "id": "squish",
+            "src": "sounds/squish2",
+            "ext": "mp3"
+        },
+        {
+            "id": "hidelaugh",
+            "src": "sounds/laugh2",
+            "ext": "wav"
+        },
+        {
+            "id": "laugh",
+            "src": "sounds/evil_laugh",
+            "ext": "wav"
+        }
+    ]
+}

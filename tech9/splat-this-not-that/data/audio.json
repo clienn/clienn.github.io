@@ -1,0 +1,29 @@
+{
+    "data": [
+        {
+            "id": "bg",
+            "src": "sounds/bg-area12",
+            "ext": "mp3"
+        }, 
+        {
+            "id": "explosion",
+            "src": "sounds/explosion",
+            "ext": "wav"
+        }, 
+        {
+            "id": "boom",
+            "src": "sounds/ouch",
+            "ext": "wav"
+        },
+        {
+            "id": "score",
+            "src": "sounds/score",
+            "ext": "wav"
+        },
+        {
+            "id": "ouch",
+            "src": "sounds/spike",
+            "ext": "wav"
+        }
+    ]
+}

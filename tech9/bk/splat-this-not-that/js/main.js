@@ -43,6 +43,12 @@ var sounds = {
         //     ++sounds.loaded;
         // });
 
+        if (fn == 'bg') {
+            obj.audio.volume = 0.0;
+        } else {
+            obj.audio.volume = 1;
+        }
+
         obj.audio.addEventListener("loadedmetadata", () => {
             //audio is ready to play all the way through
             ++sounds.loaded;
@@ -59,12 +65,27 @@ var sounds = {
 
 var music = {
     bg: {
-        src: 'sounds/bg',
+        src: 'sounds/bg-area12',
         obj: {},
         ext: 'mp3',
     }, 
     explosion: {
         src: 'sounds/explosion',
+        obj: {},
+        ext: 'wav',
+    },
+    score: {
+        src: 'sounds/score',
+        obj: {},
+        ext: 'wav',
+    },
+    boom: {
+        src: 'sounds/ouch',
+        obj: {},
+        ext: 'wav',
+    },
+    ouch: {
+        src: 'sounds/spike',
         obj: {},
         ext: 'wav',
     },
@@ -89,6 +110,42 @@ var images = {
         src: 'splash-screen',
         obj: {},
     },
+    title: {
+        src: 'title',
+        obj: {},
+    },
+    hand: {
+        src: 'hand',
+        obj: {},
+    },
+    startballoon: {
+        src: 'startballoon',
+        obj: {},
+    },
+    startmine: {
+        src: 'startmine',
+        obj: {},
+    },
+    text1: {
+        src: 'text1',
+        obj: {},
+    },
+    text2: {
+        src: 'text2',
+        obj: {},
+    },
+    text3: {
+        src: 'text3',
+        obj: {},
+    },
+    explosion_star: {
+        src: 'explosion_star',
+        obj: {},
+    },
+    beginbutton: {
+        src: 'beginbutton',
+        obj: {},
+    },
     landLeft: {
         src: 'land',
         obj: {},
@@ -105,14 +162,50 @@ var images = {
         w: 314,
         h: 412
     },
+    blackcannon: {
+        src: 'cannon_sprite',
+        obj: {}
+    },
     blackCanonLeft: {
         src: 'black-canon',
+        obj: {}
+    },
+    kaboom: {
+        src: 'kaboom',
+        obj: {}
+    },
+    boom: {
+        src: 'kaboom_sprite',
+        obj: {}
+    },
+    ouch: {
+        src: 'ouch_sprite',
+        obj: {}
+    },
+    scoreboom: {
+        src: 'score_sprite',
         obj: {}
     },
     blackCanonRight: {
         src: 'black-canon-2',
         obj: {}
     },
+    projectiles: {
+        src: 'shapes/projectiles',
+        obj: {}
+    },
+    // softobjects: {
+    //     src: 'shapes/soft',
+    //     obj: {}
+    // },
+    // hardobjects: {
+    //     src: 'shapes/hard',
+    //     obj: {}
+    // },
+    // bombs: {
+    //     src: 'shapes/bombs',
+    //     obj: {}
+    // },
     mine: {
         src: 'mine',
         obj: {},
@@ -161,28 +254,119 @@ var images = {
         src: 'cloud3',
         obj: {},
     },
+    volume: {
+        src: 'volume',
+        obj: {},
+    },
+    mute: {
+        src: 'mute',
+        obj: {},
+    },
 }
+
+var volumeInfo = {
+    x: 15,
+    y: 20,
+    w: 30 * 2,
+    h: 30 * 2,
+    cw: 46,
+    ch: 46,
+}
+
+// 481 × 49
+var kaboomInfo = {
+    x: 0,
+    y: 0,
+    // w: 108,
+    // h: 28,
+    w: 48.1 * 3,
+    h: 49 * 3,
+    cw: 48.1,
+    ch: 49,
+    // cw: 108,
+    // ch: 28,
+}
+
+// var explosionStarInfo = {
+//     x: 0,
+//     y: 0,
+//     w: 77 * 3,
+//     h: 77 * 3,
+//     cw: 77,
+//     ch: 77,
+// }
+
+var explosionStarInfo = {
+    x: 0,
+    y: 0,
+    w: 48.125 * 3,
+    h: 49 * 3,
+    cw: 48.125,
+    ch: 49,
+}
+
+// 385 × 49
+var ouchInfo = {
+    x: 0,
+    y: 0,
+    w: 192.167 * 1.5,
+    h: 145 * 1.5,
+    // w: 48.125 * 3,
+    // h: 49 * 3,
+    cw: 192.167,
+    ch: 145,
+    // cw: 48.125,
+    // ch: 49,
+    // cw: 70,
+    // ch: 28,
+}
+
+var volumeOn = true;
 
 var canons = {
     black: {
         left: {
-            upper: new Spirte(0, 310, 285, 225, 636, 504),
-            lower: new Spirte(0, 540, 285, 225, 636, 504),
+            upper: new Spirte(0, 310, 280, 235, 192.11, 145),
+            lower: new Spirte(0, 540, 280, 235, 192.11, 145),
+            // upper: new Spirte(0, 310, 285, 225, 636, 504),
+            // lower: new Spirte(0, 540, 285, 225, 636, 504),
         },
         right: {
-            upper: new Spirte(0, 320, 285, 225, 570, 451),
-            lower: new Spirte(0, 540, 285, 225, 570, 451),
+            upper: new Spirte(0, 320, 280, 235, 192.11, 145),
+            lower: new Spirte(0, 540, 280, 235, 192.11, 145),
+            // upper: new Spirte(0, 320, 285, 225, 570, 451),
+            // lower: new Spirte(0, 540, 285, 225, 570, 451),
         },
     },
+    index: [],
     init: () => {
         canons.black.right.upper.x = canvas.width - canons.black.right.upper.w;
+        canons.black.right.upper.ox = canvas.width - canons.black.right.upper.w;
         canons.black.right.lower.x = canvas.width - canons.black.right.lower.w;
+        canons.black.right.lower.ox = canvas.width - canons.black.right.lower.w;
+
+        canons.black.right.upper.yRotate = 180;
+        canons.black.right.lower.yRotate = 180;
+
+        canons.black.left.upper.frames = 9;
+        canons.black.left.lower.frames = 9;
+        canons.black.right.upper.frames = 9;
+        canons.black.right.lower.frames = 9;
+
     },
     draw: () => {
-        canons.black.left.upper.draw(ctx, images.blackCanonLeft.obj.img);
-        canons.black.left.lower.draw(ctx, images.blackCanonLeft.obj.img);
-        canons.black.right.upper.draw(ctx, images.blackCanonRight.obj.img);
-        canons.black.right.lower.draw(ctx, images.blackCanonRight.obj.img);
+        let expSpeed = 15;
+        canons.black.left.upper.animateSprite(expSpeed, delta);
+        canons.black.left.lower.animateSprite(expSpeed, delta);
+        canons.black.right.upper.animateSprite(expSpeed, delta);
+        canons.black.right.lower.animateSprite(expSpeed, delta);
+
+        canons.black.left.upper.draw(ctx, images.blackcannon.obj.img);
+        canons.black.left.lower.draw(ctx, images.blackcannon.obj.img);
+        canons.black.right.upper.drawRotate(ctx, images.blackcannon.obj.img);
+        canons.black.right.lower.drawRotate(ctx, images.blackcannon.obj.img);
+
+        // canons.black.right.lower.draw(ctx, images.blackCanonRight.obj.img);
     }
 }
 
@@ -191,7 +375,7 @@ var landPosY = 0;
 var scaleX = 1;
 var scaleY = 1;
 
-const g = 9.81;
+var g = 9.81;
 const friction = 2.14;
 
 var projectiles = [];
@@ -290,9 +474,9 @@ const clips = [
     
 ];
 
-const projectileRanges = {
-    x: [200, 500],
-    y: [220, 300]
+var projectileRanges = {
+    x: [200, 250],
+    y: [450, 600]
 }
 
 var radius = 28;
@@ -305,7 +489,8 @@ const SPLAT_POINTS = 1;
 const OUCH_MINUS = -1;
 const PROJECTILE_COLLISION_MINUS = -20;
 const CANON_COLLISION_MINUS = -30;
-const LEVEL_UP_THRESHOLD = 200;
+// const LEVEL_UP_THRESHOLD = 200;
+const LEVEL_UP_THRESHOLD = 2;
 
 var textPos = {
     x: 0,
@@ -324,22 +509,22 @@ var btnBegin = {
 const topHUD = {
     timer: {
         timecircle: {
-            w: 45,
-            h: 45,
+            w: 45 * 2,
+            h: 45 * 2,
             cw: 45,
             ch: 45,
         },
         stopwatch: {
-            w: 45,
-            h: 45,
+            w: 45 * 2,
+            h: 45 * 2,
             cw: 43,
             ch: 45,
         },
     },
     score: {
         turtleshine: {
-            w: 45,
-            h: 45,
+            w: 45 * 2,
+            h: 45 * 2,
             cw: 42,
             ch: 43,
         }
@@ -374,8 +559,8 @@ const topHUDInfo = {
         x: 0,
         y: 0,
         w: 100,
-        h: 50,
-        pw: 150,
+        h: 55,
+        pw: 230,
         fontsize: 20,
         fontsize2: 25,
         fontX: 0,
@@ -385,8 +570,8 @@ const topHUDInfo = {
     life: {
         x: 0,
         y: 0,
-        w: 45,
-        h: 45,
+        w: 45 * 2,
+        h: 45 * 2,
         cw: 45,
         ch: 45,
         lives: 3,
@@ -427,15 +612,15 @@ var TM = new TextManager(ctx);
 var textList = {
     topTimer: {
         obj: null,
-        desc: TM.addTextObj('09', 'Montserrat', 'bold', 20, 0, 0, 20, 20, '#000'),
+        desc: TM.addTextObj('09', 'Montserrat', 'bold', 20, 0, 0, 35, 35, '#000'),
     },
     scoreX: {
         obj: null,
-        desc: TM.addTextObj('x', 'Montserrat', 'normal', 25, 0, 0, 10, 20, '#fff'),
+        desc: TM.addTextObj('x', 'Montserrat', 'normal', 25, 0, 0, 20, 40, '#fff'),
     },
     scoreN: {
         obj: null,
-        desc: TM.addTextObj('00', 'Montserrat', 'bold', 25, 0, 0, 20, 27, '#fff'),
+        desc: TM.addTextObj('00', 'Montserrat', 'bold', 25, 0, 0, 25, 37, '#fff'),
     },
     scoreLabel: {
         obj: null,
@@ -471,7 +656,7 @@ const completeInfo = {
 
 const trophyInfo = {
     x: 0,
-    y: 120,
+    y: 270,
     w: 122,
     h: 162,
     cw: 61,
@@ -500,6 +685,7 @@ var gameStart = false;
 var level = 1;
 var levelScore = LEVEL_UP_THRESHOLD;
 var difficulty = [0, 0, 0, 0];
+var difficultyAdj = [0, 0, 0, 0];
 var mDown = false;
 
 const maxTimer = 60;
@@ -510,18 +696,168 @@ var canReset = false;
 // canvas.width / 2 - 200, canvas.height - 225, 400, 100
 const cloudMovements = [-100, 100, 100];
 
+var scaleProj = 1.5;
+var kaboomT = 0;
+var kaboomT2 = 0;
+var ouchT = 0;
+var ouchT2 = 0;
+
+// 448 × 57
+var startPageInfo = {
+    title: {
+        x: 0,
+        y: 70,
+        w: 261 * 2,
+        h: 101 * 2,
+        cw: 261,
+        ch: 101,
+    },
+    hand: {
+        x: 557,
+        y: 333,
+        w: 64 * 2,
+        h: 65 * 2,
+        cw: 56,
+        ch: 57,
+        // cw: 64,
+        // ch: 65,
+    },
+    startballoon: {
+        x: 837,
+        y: 345,
+        w: 56 * 2,
+        h: 57 * 2,
+        cw: 56,
+        ch: 57,
+    },
+    startmine: {
+        x: 1113,
+        y: 345,
+        ox: 1113,
+        oy: 345,
+        w: 56 * 2,
+        h: 57 * 2,
+        cw: 56,
+        ch: 57,
+    },
+    text1: {
+        x: 505,
+        y: 485,
+        w: 119 * 2,
+        h: 25 * 2,
+        cw: 119,
+        ch: 25,
+    },
+    text2: {
+        x: 780,
+        y: 485,
+        w: 115 * 2,
+        h: 27 * 2,
+        cw: 115,
+        ch: 27,
+    },
+    text3: {
+        x: 1080,
+        y: 485,
+        w: 89 * 2,
+        h: 27 * 2,
+        cw: 89,
+        ch: 27,
+    },
+    beginbutton: {
+        x: 0,
+        y: 690,
+        w: 213 * 2,
+        h: 49 * 2,
+        cw: 213,
+        ch: 49,
+    },
+}
+
+var startScreenTimerAnimT = 0;
+var startScreenHandAnimT = 0;
+var startPulseT = 0;
+
+var floaters = [];
+
+var timeProgressBar = null;
+
+var projSpriteInfo = {
+    0: {
+        frames: 18,
+        cw: 48.056,
+        ch: 48,
+        key: "softobjects"
+    },
+    1: {
+        frames: 13,
+        cw: 48.077,
+        ch: 49,
+        key: "hardobjects"
+    },
+    2: {
+        frames: 5,
+        cw: 48,
+        ch: 48,
+        key: "bombs"
+    },
+    3: {
+        frames: 43,
+        cw: 48.023,
+        ch: 49,
+        key: "projectiles"
+    },
+};
+// 2065 × 49, 43, 48.023
+var projDimX = 85;
+var projDimY = 85;
+
+var ouchSpriteKey = 'boom';
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
 
     let cols = [0, 1, 2, 3];
     shuffleArr(cols);
-    difficulty[cols[0]] = 0.2;
-    difficulty[cols[1]] = 0.2;
+    difficulty[cols[0]] = Math.floor(Math.random() * 100) / 100 + 0.2;
+    difficulty[cols[1]] = Math.floor(Math.random() * 100) / 100 + 0.2;
+    difficulty[cols[2]] = Math.floor(Math.random() * 100) / 100 + 0.2;
+    difficulty[cols[3]] = Math.floor(Math.random() * 100) / 100 + 0.2;
     // 980 452
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    projDimX *= scaleX;
+    projDimY *= scaleX;
+
+    g *= scaleY;
+
+    // alert(scaleX + ', ' + scaleY)
+
+    // if (scaleX > 0.6 && scaleX < 1) {
+    //     projectileRanges = {
+    //         x: [50, 350],
+    //         y: [50, 1000]
+    //     }
+    // }
+
+    // if (detectMob()) {
+    //     projectileRanges = {
+    //         x: [50, 300],
+    //         y: [50, 700]
+    //     }
+    // }
+
+    initStartPage();
+
+    canons.index = [
+        canons.black.left.upper,
+        canons.black.left.lower,
+        canons.black.right.upper,
+        canons.black.right.lower
+    ];
 
     radius *= scaleX;
     dradius *= scaleX;
@@ -539,19 +875,33 @@ function main(w, h) {
     let compassAdjX = 10;
     let compassAdjY = 5;
 
+    let scoreNAdjY = 0;
+
     if (isMobile) {
         compassAdjX = 17;
         compassAdjY = 13;
-        trophyInfo.y = 70;
+        // trophyInfo.y = 70;
+        scaleProj = 1.7;
+
+        // volumeInfo.x = 45;
+        // volumeInfo.y = 85;
+        // volumeInfo.w = 35;
+        // volumeInfo.h = 35;
+
+        // textList.topTimer.desc.weight = 'normal';
+        // textList.scoreN.desc.weight = 'normal';
+
+        scoreNAdjY = 2;
+        
     }
 
     timer = new Timer(w / 2, 0, 50, '#fb2121');
     timer.setTimer(maxTimer);
     
     projectileRanges.x[0] *= scaleX;
-    // projectileRanges.x[1] *= scaleX;
-    projectileRanges.y[0] *= scaleY;
-    // projectileRanges.y[1] *= scaleY;
+    projectileRanges.x[1] *= scaleX;
+    projectileRanges.y[0] *= scaleX;
+    projectileRanges.y[1] *= scaleX;
 
     canvas.style.display = 'block';
     instrucions.style.display = 'none';
@@ -566,27 +916,35 @@ function main(w, h) {
 
     init();
 
-    initTopHUD();
+    
 
     rescaleSize(compassInfo);
     rescaleSize(shineInfo);
     rescaleSize(completeInfo);
-    rescaleSize(trophyInfo);
+    rescaleAll(trophyInfo);
     rescaleAll(waterInfo);
+    rescaleAll(kaboomInfo);
+    rescaleAll(explosionStarInfo);
+    rescaleAll(ouchInfo);
+
+    rescaleAll(volumeInfo);
+
+
+    initTopHUD();
 
     waterInfo.y = h - waterInfo.h;
 
     shineInfo.w *= 2;
     shineInfo.h *= 2;
     shineInfo.x = w / 2 - shineInfo.w / 2;
-    shineInfo.y = 0;
+    shineInfo.y = 200 * scaleY;
 
     compassInfo.x = topHUDInfo.score.x + compassAdjX * scaleX;
     compassInfo.y = topHUDInfo.score.y + compassAdjY * scaleY;
 
     completeInfo.x = w / 2 - completeInfo.w / 2;
     trophyInfo.x = w / 2 - trophyInfo.w / 2;
-    // completeInfo.y = 15 * scaleY;
+    completeInfo.y = shineInfo.y + 15 * scaleY;
 
     for (let k in textList) {
         if (textList[k].desc != null) {
@@ -594,18 +952,45 @@ function main(w, h) {
         }
     }
 
-    textList.scoreX.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw / 2 - 5 * scaleX;
-    textList.scoreN.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw - (textList.scoreN.desc.w + 70) / 2 * scaleX;
-    textList.scoreX.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreX.desc.h * scaleY / 2);
-    textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h * scaleY / 2);
+    let padY = 0;
+    let padY2 = 0;
 
-    textList.topTimer.obj.tx = topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2 - (textList.topTimer.desc.w - 5) / 2 * scaleX;
+    if (isMobile) {
+        padY =  10 * scaleY;
+        padY2 = 5 * scaleY;
+    }
+
+    let pbW = 150 * scaleX;
+    let pbH = 45 * scaleY;
+
+    // timeProgressBar = new ProgressBar(topHUDInfo.timer.progress.x * scaleX, 30 * scaleY, pbW, pbH);
+    timeProgressBar = new ProgressBar(topHUDInfo.timer.x + topHUDInfo.timer.w / 3, 30 * scaleY, pbW, pbH);
+    timeProgressBar.progress = 100;
+
+    pbW = 150 * scaleX;
+    pbH = 55 * scaleY;
+
+    scoreProgressBar = new ProgressBar(w / 2 - pbW / 2, 20 * scaleY, pbW, pbH, '#2D3E58');
+    scoreProgressBar.progress = 100;
+
+    // textList.scoreX.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw / 2 - 5 * scaleX;
+    // textList.scoreN.obj.tx = topHUDInfo.score.x + topHUDInfo.score.pw - (textList.scoreN.desc.w + 230 * scaleX) / 2 * scaleX;
+    textList.scoreN.obj.tx = scoreProgressBar.x + scoreProgressBar.w - 5 * scaleX;
+    textList.scoreX.obj.tx = scoreProgressBar.x + scoreProgressBar.w / 2 + 15 * scaleX;
+    // textList.scoreX.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreX.desc.h * scaleY / 2) - padY;
+    // textList.scoreN.obj.ty = topHUDInfo.score.y + (topHUDInfo.score.h / 2 - textList.scoreN.desc.h * scaleY / 2) - scoreNAdjY - padY2;
+    
+    textList.scoreX.obj.ty = 25 * scaleY;
+    textList.scoreN.obj.ty = 28 * scaleY;
+
+    // textList.topTimer.obj.tx = topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2 - (textList.topTimer.desc.w - 5) / 2 * scaleX;
+    textList.topTimer.obj.tx = 45 * scaleX + volumeInfo.x + volumeInfo.w;
     textList.topTimer.obj.ty = topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2 - textList.topTimer.desc.h / 2 * scaleY;
 
-    textList.scoreLabel.obj.tx = w / 2 - textList.scoreLabel.desc.w * scaleX / 2 - 10 * scaleX;
-    textList.scoreLabel.obj.ty = 320 * scaleY;
+    textList.scoreLabel.obj.tx = w / 2 - textList.scoreLabel.desc.w * scaleX / 2 - 13 * scaleX;
+    textList.scoreLabel.obj.ty = 450 * scaleY;
     textList.finalScore.obj.tx = w / 2 - textList.finalScore.desc.w * scaleX / 2 - 8 * scaleX;
-    textList.finalScore.obj.ty = 360 * scaleY;
+    textList.finalScore.obj.ty = 490 * scaleY;
     textList.resetMsg.obj.tx = w / 2 - textList.resetMsg.desc.w / 2 * scaleX - 20 * scaleX;
     textList.resetMsg.obj.ty = h / 2 - textList.resetMsg.desc.h / 2 * scaleY + 20 * scaleX;
 
@@ -620,30 +1005,43 @@ function main(w, h) {
     bgInfo.cloud3.y = h / 2 - (150 * scaleY);
     
     let c = Math.floor(Math.random() * clips.length);
-    projectiles[0] = new Spirte(canons.black.left.upper.w - 50, canons.black.left.upper.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
-    projectiles[0].clipX = clips[c].clipX;
-    projectiles[0].clipY = clips[c].clipY;
+    projectiles[0] = new Spirte(canons.black.left.upper.w - 100 * scaleX, canons.black.left.upper.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
+    // projectiles[0].clipX = clips[c].clipX;
+    // projectiles[0].clipY = clips[c].clipY;
     projectiles[0].init(projectileRanges);
 
     c = Math.floor(Math.random() * clips.length);
-    projectiles[1] = new Spirte(canons.black.left.upper.w - 50, canons.black.left.lower.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
-    projectiles[1].clipX = clips[c].clipX;
-    projectiles[1].clipY = clips[c].clipY;
+    projectiles[1] = new Spirte(canons.black.left.upper.w - 100 * scaleX, canons.black.left.lower.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
+    // projectiles[1].clipX = clips[c].clipX;
+    // projectiles[1].clipY = clips[c].clipY;
     projectiles[1].init(projectileRanges);
 
     c = Math.floor(Math.random() * clips.length);
     projectiles[2] = new Spirte(canons.black.right.upper.x, canons.black.left.upper.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
-    projectiles[2].clipX = clips[c].clipX;
-    projectiles[2].clipY = clips[c].clipY;
+    // projectiles[2].clipX = clips[c].clipX;
+    // projectiles[2].clipY = clips[c].clipY;
     projectiles[2].direction = -1;
     projectiles[2].init(projectileRanges);
 
     c = Math.floor(Math.random() * clips.length);
     projectiles[3] = new Spirte(canons.black.right.upper.x, canons.black.left.lower.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
-    projectiles[3].clipX = clips[c].clipX;
-    projectiles[3].clipY = clips[c].clipY;
+    // projectiles[3].clipX = clips[c].clipX;
+    // projectiles[3].clipY = clips[c].clipY;
     projectiles[3].direction = -1;
     projectiles[3].init(projectileRanges);
+
+    projectiles[0].zRotate = 0;
+    projectiles[1].zRotate = 0;
+    projectiles[2].zRotate = 180;
+    projectiles[3].zRotate = 180;
+
+    updateSprite(0);
+    updateSprite(1);
+    updateSprite(2);
+    updateSprite(3);
+    
+
+    // generateFloaters();
 
     controls();
 
@@ -652,27 +1050,153 @@ function main(w, h) {
     gameCycle();
 }
 
+function setFloater(i) {
+    let depth = Math.floor(Math.random() * 15) + 5;
+    
+    floaters[i].x = canvas.width / 2;
+    floaters[i].y = canvas.height + clips[i].h * depth;
+    floaters[i].id = i;
+
+    floaters[i].clipW = clips[i].clipW;
+    floaters[i].clipH = clips[i].clipH;
+
+    floaters[i].clipX = clips[i].clipX;
+    floaters[i].clipY = clips[i].clipY;
+
+    let mul = Math.floor(Math.random() * 2);
+    if (mul == 0) mul = -1;
+    let moveSpeed = Math.floor(Math.random() * 80) + 20;
+    floaters[i].vx = moveSpeed * scaleX * mul;
+    floaters[i].vy = -60 * scaleY;
+    floaters[i].density = waterInfo.y - floaters[i].density;
+}
+
+function generateFloater(i) {
+    if (floaters.length < 7) {
+        let depth = Math.floor(Math.random() * 15) + 5;
+
+        // let rng = Math.floor(Math.random() * 2);
+        let rng = 3;
+        // let frames = projSpriteInfo[rng].frames;
+        let frames = 31;
+
+        let frame = Math.floor(Math.random() * frames);
+        let key = projSpriteInfo[rng].key;
+
+        let proj = new Spirte(canvas.width / 2, canvas.height + projDimY * depth, projDimX, projDimY, projSpriteInfo[rng].cw, projSpriteInfo[rng].ch, key);
+        proj.clipX = frame * projSpriteInfo[rng].cw;
+
+        // let proj = new Spirte(canvas.width / 2, canvas.height + clips[i].h * depth, clips[i].w, clips[i].h, clips[i].clipW, clips[i].clipH, i);
+        // proj.clipX = clips[i].clipX;
+        // proj.clipY = clips[i].clipY;
+        let mul = Math.floor(Math.random() * 2);
+        if (mul == 0) mul = -1;
+        let moveSpeed = Math.floor(Math.random() * 80) + 20;
+        proj.vx = moveSpeed * scaleX * mul;
+        proj.vy = -60 * scaleY;
+        proj.density = waterInfo.y - proj.density;
+        floaters.push(proj);
+    }
+   
+}
+
+function generateFloaters() {
+    for (let i = 0; i < 6; ++i) {
+        let depth = Math.floor(Math.random() * 15) + 5;
+        let proj = new Spirte(canvas.width / 2, canvas.height + clips[i].h * depth, clips[i].w, clips[i].h, clips[i].clipW, clips[i].clipH, i);
+        proj.clipX = clips[i].clipX;
+        proj.clipY = clips[i].clipY;
+        let mul = Math.floor(Math.random() * 2);
+        if (mul == 0) mul = -1;
+        let moveSpeed = Math.floor(Math.random() * 80) + 20;
+        proj.vx = moveSpeed * scaleX * mul;
+        proj.vy = -60 * scaleY;
+        proj.density = waterInfo.y - proj.density;
+        floaters.push(proj);
+    }
+}
+
+function drawFloaters() {
+    for (let i = 0; i < floaters.length; ++i) {
+        floaters[i].draw(ctx, images[floaters[i].id].obj.img);
+        floaters[i].floatAnim(delta);
+
+        if (floaters[i].x < 0 || floaters[i].x > canvas.width) floaters[i].vx *= -1;
+
+        if (floaters[i].y < floaters[i].density) {
+            floaters[i].vy = 0;
+        }
+    }
+}
+
+function drawExplosionStar(x, y) {
+    // ctx.drawImage(images.explosion_star.obj.img, 0, 0, explosionStarInfo.cw, explosionStarInfo.ch, x, y, explosionStarInfo.w, explosionStarInfo.h);
+    // ctx.drawImage(images.boom.obj.img, 0, 0, explosionStarInfo.cw, explosionStarInfo.ch, x, y, explosionStarInfo.w, explosionStarInfo.h);
+    ouchT = 1;
+    ouchT2 = 0;
+    ouchInfo.x = x;
+    ouchInfo.y = y;
+}
+
+function initAnimateCanon(idx) {
+    canons.index[idx].x = canons.index[idx].ox;
+    canons.index[idx].y = canons.index[idx].oy;
+    canons.index[idx].w = canons.index[idx].ow;
+    canons.index[idx].h = canons.index[idx].oh;
+    canons.index[idx].t2 = 0;
+    canons.index[idx].startAnimation = true;
+}
+
+function animateCanons() {
+    // if (i == 0) {
+    for (let i = 0; i < canons.index.length; ++i) {
+        if (canons.index[i].t2 > -5) {
+            canons.index[i].t2 -= 20 * delta;
+            let spring = Math.sin(canons.index[i].t2) * 5;
+            canons.index[i].y += spring;
+            canons.index[i].h += -spring;
+            canons.index[i].w += spring;
+        }
+    }
+    // }
+}
+
+function initStartPage() {
+    for (let k in startPageInfo) {
+        startPageInfo[k].x *= scaleX;
+        startPageInfo[k].y *= scaleY;
+        startPageInfo[k].w *= scaleX;
+        startPageInfo[k].h *= scaleY;
+    }
+    startPageInfo.startmine.ox *= scaleX;
+    startPageInfo.startmine.oy *= scaleY;
+
+    startPageInfo.title.x = canvas.width / 2 - startPageInfo.title.w / 2;
+    startPageInfo.beginbutton.x = canvas.width / 2 - startPageInfo.beginbutton.w / 2;
+}
+
 function initTopHUD() {
     let isMobile = detectMob();
-
+    let progressX = 10;
     if (isMobile) {
-        topHUD.timer.timecircle.w = 75;
-        topHUD.timer.timecircle.h = 75;
-        topHUD.timer.stopwatch.w = 75;
-        topHUD.timer.stopwatch.h = 75;
-        topHUDInfo.timer.progress.h = 30;
-        topHUDInfo.timer.progress.max = 167;
-        topHUDInfo.timer.text.fontsize = 18;
-        topHUDInfo.timer.text.rectSize = 35;
-        topHUDInfo.timer.text.y = 1;
+        progressX = 30;
+        // topHUD.timer.timecircle.w = 75;
+        // topHUD.timer.timecircle.h = 75;
+        // topHUD.timer.stopwatch.w = 75;
+        // topHUD.timer.stopwatch.h = 75;
+        // topHUDInfo.timer.progress.h = 30;
+        // topHUDInfo.timer.progress.max = 167;
+        // topHUDInfo.timer.text.fontsize = 18;
+        // topHUDInfo.timer.text.rectSize = 35;
+        // topHUDInfo.timer.text.y = 1;
 
         // (/iPad|iPhone|iPod/).test(navigator.userAgent);
         let sx = 844 / canvas.width;
         // let sy = 390 / canvas.height;
 
-        topHUDInfo.score.w = 130;
-        topHUDInfo.score.h = 65;
-        topHUDInfo.score.pw = 195;
+        // topHUDInfo.score.w = 130;
+        topHUDInfo.score.h = 75;
+        // topHUDInfo.score.pw = 195;
         // topHUDInfo.score.y = 3;
 
         topHUD.score.turtleshine.w = 65;
@@ -690,15 +1214,20 @@ function initTopHUD() {
     rescaleAll(topHUD.score.turtleshine);
     rescaleSize(topHUDInfo);
 
+    let volumeAdjX = volumeInfo.x + volumeInfo.w + 10 * scaleX;
+
     topHUDInfo.timer.w = topHUD.timer.timecircle.w / 2 + 100 * scaleX;
     topHUDInfo.timer.progress.h *= scaleX;
     
-    topHUDInfo.timer.progress.x = topHUDInfo.w / 2 - topHUDInfo.timer.w / 2;
+    topHUDInfo.timer.progress.x = topHUDInfo.w / 2 - topHUDInfo.timer.w / 2 + volumeAdjX + progressX * scaleX;
 
-    topHUDInfo.timer.x = topHUDInfo.timer.progress.x - topHUD.timer.timecircle.w / 2;
+    // topHUDInfo.timer.x = topHUDInfo.timer.progress.x - topHUD.timer.timecircle.w / 2;
+    topHUDInfo.timer.x = volumeAdjX;
+    // topHUDInfo.timer.x = 30;
     topHUDInfo.timer.y = topHUDInfo.h / 2 - topHUD.timer.timecircle.h / 2;
 
     topHUDInfo.timer.progress.y = (topHUDInfo.h / 2 - topHUDInfo.timer.progress.h / 2);
+    // topHUDInfo.timer.text.x = topHUDInfo.timer.x + topHUDInfo.timer.text.rectSize * scaleX / 2;
     topHUDInfo.timer.text.x = topHUDInfo.timer.x + topHUDInfo.timer.text.rectSize * scaleX / 2;
     topHUDInfo.timer.text.y += topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2;
     
@@ -709,7 +1238,8 @@ function initTopHUD() {
 
     let sx = canvas.width / 2 - topHUDInfo.w / 2;
     // topHUDInfo.score.x = sx + (topHUDInfo.w  - topHUDInfo.score.w) / 2;
-    topHUDInfo.score.x = sx + (topHUDInfo.w - topHUDInfo.score.pw) / 2;
+    // topHUDInfo.score.x = sx + (topHUDInfo.w - topHUDInfo.score.pw) / 2;
+    topHUDInfo.score.x = sx + (topHUDInfo.w - 230 * scaleX) / 2;
     topHUDInfo.score.y += topHUDInfo.timer.y;
 
     topHUDInfo.score.fontX += topHUDInfo.score.x + (topHUDInfo.w - topHUDInfo.score.pw) / 2 + 10 * scaleX;
@@ -721,7 +1251,8 @@ function initTopHUD() {
     topHUDInfo.life.pad = 20 * scaleX;
     let lifeW = topHUDInfo.life.pad * 2 + topHUDInfo.life.w * topHUDInfo.life.lives;
     sx = (canvas.width - topHUDInfo.w);
-    topHUDInfo.life.x = sx + (topHUDInfo.w - lifeW) / 2;
+    // topHUDInfo.life.x = sx + (topHUDInfo.w - lifeW) / 2;
+    topHUDInfo.life.x = canvas.width - lifeW * 1.15;
     topHUDInfo.life.y += topHUDInfo.timer.y;
 }
 
@@ -741,9 +1272,12 @@ function drawTopHUD() {
 }
 
 function drawProgress() {
-    const { w } = topHUDInfo.timer;
-    const { x, y, h, max } = topHUDInfo.timer.progress;
-    let p = (max * scaleX * (timer.timer / (maxTimer * 24)));
+    // const { w } = topHUDInfo.timer;
+    let w = 200 * scaleX;
+    let h = 35 * scaleY;
+    // const { x, y, h, max } = topHUDInfo.timer.progress;
+    const { x, y, max } = topHUDInfo.timer.progress;
+    let p = (w * (timer.timer / (maxTimer * 24)));
 
     const grd = ctx.createLinearGradient(0, 0, 0, p);
 
@@ -792,26 +1326,33 @@ function drawProgress() {
 }
 
 function drawScoreHUD() {
-    const { x, y, w, h, pw } = topHUDInfo.score;
-    const p = pw;
+    // const { x, y, w, h, pw } = topHUDInfo.score;
+    // // const { x, y, w, pw } = topHUDInfo.score;
+    // // let h = 55 * scaleY;
+    // // const p = 230 * scaleX;
+    // const p = pw;
+    // ctx.beginPath();
+    // ctx.arc(h / 2 + x, h / 2+ y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
+    // ctx.lineTo(p - 2 * h + x, 0 + y);
+    // ctx.arc(p - (h / 2) + x, h / 2 + y, h / 2, 3 / 2 * Math.PI,Math.PI / 2);
+    // ctx.lineTo(h / 2 + x, h + y);
+    // ctx.fillStyle = "#2D3E58";
+    // ctx.fill();
+    // ctx.strokeStyle = '#fff';
+    // ctx.stroke();
 
-    ctx.beginPath();
-    ctx.arc(h / 2 + x, h / 2+ y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
-    ctx.lineTo(p - 2 * h + x, 0 + y);
-    ctx.arc(p - (h / 2) + x, h / 2 + y, h / 2, 3 / 2 * Math.PI,Math.PI / 2);
-    ctx.lineTo(h / 2 + x, h + y);
-    ctx.fillStyle = "#2D3E58";
-    ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.stroke();
+    scoreProgressBar.draw(ctx);
 
     ctx.drawImage(images.compass.obj.img, 0, 0, compassInfo.cw, 
-        compassInfo.ch, compassInfo.x, compassInfo.y, compassInfo.w, compassInfo.h);
+        compassInfo.ch, scoreProgressBar.x + 10 * scaleX, 25 * scaleY, compassInfo.w * 1.25, compassInfo.h * 1.25);
 
+    
     TM.draw(textList.scoreX.obj);
     score = Math.max(0, score);
     textList.scoreN.obj.str = zeroPad(score, 2);
     TM.draw(textList.scoreN.obj);
+
+    
 }
 
 function drawLives() {
@@ -898,7 +1439,30 @@ function rescaleAll(obj) {
     obj.h *= scaleY;
 }
 
+function muteAllAudio(flag) {
+    for (let k in music) {
+        music[k].obj.audio.muted = flag;
+    }
+    
+}
+
 function controls() {
+    window.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    window.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+
+    document.addEventListener('blur', () => {
+        muteAllAudio(true);
+    });
+
+    document.addEventListener('focus', () => {
+        muteAllAudio(false);
+    });
+
     canvas.addEventListener('touchstart', e => {
         // mousedownE(e.touches[0].clientX, e.touches[0].clientY);
         if (!mDown) {
@@ -916,19 +1480,45 @@ function controls() {
 
             // mDown = true;
             if (gameStart) {
-                splat(mx, my);
-                updateLevel();
+                if (isBtnClicked(mx, my, {
+                    x: volumeInfo.x,
+                    y: volumeInfo.y + topHUDInfo.timer.y,
+                    w: volumeInfo.w,
+                    h: volumeInfo.h
+                })) {
+                    volumeOn = !volumeOn; 
+                    if (volumeOn) {
+                        music.bg.obj.audio.currentTime = 0;
+                        music.bg.obj.audio.play();
+
+                        music.explosion.obj.audio.currentTime = 0;
+                        music.explosion.obj.audio.play();
+                    } else {
+                        music.bg.obj.audio.pause();
+                        music.explosion.obj.audio.pause();
+                    }
+                } else {
+                    splat(mx, my);
+                    updateLevel();
+                }
+                
             } else {
                 if (isBtnClicked(mx, my, btnBegin)) {
                     gameStart = true;
 
-                    music.bg.obj.audio.volume = 0.5;
+                    
+                    music.bg.obj.audio.volume = 0.01;
                     music.bg.obj.audio.loop = true;
-                    music.bg.obj.audio.play();
+                    // music.bg.obj.audio.play();
 
-                    music.explosion.obj.audio.volume = 0.8;
+                    music.explosion.obj.audio.volume = 0.2;
                     music.explosion.obj.audio.loop = true;
-                    music.explosion.obj.audio.play();
+                    // music.explosion.obj.audio.play();
+
+                    if (volumeOn) {
+                        music.bg.obj.audio.play();
+                        music.explosion.obj.audio.play();
+                    }
                 }
             }
 
@@ -957,19 +1547,49 @@ function controls() {
             let my = e.offsetY;
 
             if (gameStart) {
-                splat(mx, my);
-                updateLevel();
+                if (isBtnClicked(mx, my, {
+                    x: volumeInfo.x,
+                    y: volumeInfo.y + topHUDInfo.timer.y,
+                    w: volumeInfo.w,
+                    h: volumeInfo.h
+                })) {
+                    volumeOn = !volumeOn; 
+                    if (volumeOn) {
+                        music.bg.obj.audio.currentTime = 0;
+                        music.bg.obj.audio.play();
+
+                        music.explosion.obj.audio.currentTime = 0;
+                        music.explosion.obj.audio.play();
+                    } else {
+                        music.bg.obj.audio.pause();
+                        
+
+                        music.explosion.obj.audio.pause();
+                        // music.explosion.obj.volume = 0;
+
+                        // music.correct.obj.volume = 0;
+                    }
+                } else {
+                    // updateDifficulty();
+                    splat(mx, my);
+                    updateLevel();
+                }
             } else {
                 if (isBtnClicked(mx, my, btnBegin)) {
                     gameStart = true;
 
                     music.bg.obj.audio.volume = 0.5;
                     music.bg.obj.audio.loop = true;
-                    music.bg.obj.audio.play();
+                    // music.bg.obj.audio.play();
 
                     music.explosion.obj.audio.volume = 0.8;
                     music.explosion.obj.audio.loop = true;
-                    music.explosion.obj.audio.play();
+                    // music.explosion.obj.audio.play();
+
+                    if (volumeOn) {
+                        music.bg.obj.audio.play();
+                        music.explosion.obj.audio.play();
+                    }
                 }
             }
 
@@ -995,7 +1615,7 @@ function controls() {
 
             if (gameover) {
                 if (canReset) {
-                    resetGame();
+                    // resetGame();
                 } else {
                     canReset = true;
                 }
@@ -1033,9 +1653,11 @@ function init() {
         rescale(projectiles[i]);
     }
 
+
+
     for (let i = 0; i < clips.length; ++i) {
-        clips[i].w *= scaleX;
-        clips[i].h *= scaleY;
+        clips[i].w *= scaleX * scaleProj;
+        clips[i].h *= scaleY * scaleProj;
     }
 
     canons.init();
@@ -1050,21 +1672,25 @@ function init() {
     cannonCollisionBubble[0] = {
         x: canons.black.left.upper.x + canons.black.left.upper.w - dradius,
         y: canons.black.left.upper.y + dradius,
+        id: 'bombs'
     }
 
     cannonCollisionBubble[1] = {
         x: canons.black.left.lower.x + canons.black.left.lower.w - dradius,
         y: canons.black.left.lower.y + dradius,
+        id: 'bombs'
     }
 
     cannonCollisionBubble[2] = {
         x: canons.black.right.upper.x + dradius,
         y: canons.black.right.upper.y + dradius,
+        id: 'bombs'
     }
 
     cannonCollisionBubble[3] = {
         x: canons.black.right.lower.x + dradius,
         y: canons.black.right.lower.y + dradius,
+        id: 'bombs'
     }
 }
 
@@ -1087,21 +1713,24 @@ function updateLevel() {
     if (score >= levelScore) {
         levelScore = ++level * LEVEL_UP_THRESHOLD;
         updateDifficulty();
-        console.log('level up');
+        // console.log('level up');
     }
 }
 
 function updateDifficulty() {
-    let cols = [];
-    for (let i = 0; i < difficulty.length; ++i) {
-        if (difficulty[i] < 1) {
-            cols.push(i);
-        }
-    }
+    let cols = [0, 1, 2, 3];
+    // for (let i = 0; i < difficulty.length; ++i) {
+    //     if (difficulty[i] < 1) {
+    //         cols.push(i);
+    //     }
+    // }
 
     if (cols.length > 0) {
         let rng = Math.floor(Math.random() * cols.length);
-        difficulty[cols[rng]] += 0.2;
+        difficulty[rng] += 0.2;
+        difficultyAdj[rng] += 0.2;
+        if (difficultyAdj[rng] > 2) difficultyAdj[rng] = 2;
+        // console.log('test', difficulty[rng])
     }
 }
 
@@ -1124,9 +1753,26 @@ function checkProjectileCollisions() {
     for (let i = 0; i < 2; ++i) {
         for (let j = 2; j < 4; ++j) {
             if (isCollided(projectiles[i], projectiles[j])) {
-                if (projectiles[i].clipY != projectiles[j].clipY) {
-                    console.log('collision detected');
+                // if (projectiles[i].clipY != projectiles[j].clipY) {
+                // if ((projectiles[i].id != 'bombs' && projectiles[j].id == 'bombs') || (projectiles[i].id == 'bombs' && projectiles[j].id != 'bombs')) {
+                if ((projectiles[i].currFrame < 31 && projectiles[j].currFrame > 30) || (projectiles[i].currFrame > 30 && projectiles[j].currFrame < 31)) {
+                    // console.log('collision detected');
+                    drawExplosionStar(projectiles[i].x, projectiles[i].y);
+                    if (volumeOn) {
+                        // music.boom.obj.audio.pause();
+                        // music.boom.obj.audio.currentTime = 0;
+                        // music.boom.obj.audio.play();
+
+                        setTimeout(() => {
+                            music.boom.obj.audio.currentTime = 0;
+                            music.boom.obj.audio.play();
+                        }, 20)
+                    }
+
                     resetProjectile([i, j]);
+                    initAnimateCanon(i);
+                    initAnimateCanon(j);
+                    
                     score += PROJECTILE_COLLISION_MINUS;
                 }
             }
@@ -1139,27 +1785,42 @@ function checkCanonCollisions() {
     if (isCollided(projectiles[0], cannonCollisionBubble[2]) || isCollided(projectiles[0], cannonCollisionBubble[3])) {
         resetProjectile([0]);
         score += CANON_COLLISION_MINUS;
+        initAnimateCanon(0);
     }
 
     if (isCollided(projectiles[1], cannonCollisionBubble[2]) || isCollided(projectiles[1], cannonCollisionBubble[3])) {
         resetProjectile([1]);
         score += CANON_COLLISION_MINUS;
+        initAnimateCanon(1);
     }
 
     if (isCollided(projectiles[2], cannonCollisionBubble[0]) || isCollided(projectiles[2], cannonCollisionBubble[1])) {
         resetProjectile([2]);
         score += CANON_COLLISION_MINUS;
+        initAnimateCanon(2);
     }
 
     if (isCollided(projectiles[3], cannonCollisionBubble[0]) || isCollided(projectiles[3], cannonCollisionBubble[1])) {
         resetProjectile([3]);
         score += CANON_COLLISION_MINUS;
+        initAnimateCanon(3);
     }
 }
 
 function updateSprite(idx) {
-    let c = Math.floor(Math.random() * clips.length);
-    projectiles[idx].updateSprite(clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, clips[c].clipX, clips[c].clipY, c);
+//     let c = Math.floor(Math.random() * clips.length);
+//     projectiles[idx].updateSprite(clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, clips[c].clipX, clips[c].clipY, c);
+    // let rng = Math.floor(Math.random() * 3);
+    let rng = 3;
+    let frames = projSpriteInfo[rng].frames;
+
+    let frame = Math.floor(Math.random() * frames);
+    let key = projSpriteInfo[rng].key;
+
+    projectiles[idx].updateSprite(projDimX, projDimY, 
+        projSpriteInfo[rng].cw, projSpriteInfo[rng].ch, frame * projSpriteInfo[rng].cw, 0, key);
+
+    projectiles[idx].currFrame = frame;
 }
 
 function resetProjectile(range) {
@@ -1184,25 +1845,109 @@ function reduceHP() {
 }
 
 function splat(mx, my) {
+    let idx = -1;
+    let minDist = Infinity;
     for (let i = 0; i < projectiles.length; ++i) {
         if (isSplatted(projectiles[i], { x: mx, y: my })) {
-            if (projectiles[i].clipY > 0) {
-                console.log('ouch!');
-                score += OUCH_MINUS;
-                reduceHP();
-            } else {
-                console.log('splatted!');
-                score += SPLAT_POINTS;
+            let dx = projectiles[i].x - mx;
+            let dy = projectiles[i].y - my;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (minDist > dist) {
+                idx = i;
+                minDist = dist;
             }
-            resetProjectile([i]);
-            break;
+            
+            // if (projectiles[i].clipY > 0) {
+            // if (projectiles[i].id == 'bombs') {
+            
         }
     }
+
+    if (idx > -1) {
+        let i = idx;
+
+        if (projectiles[i].currFrame > 30) {
+            // console.log('ouch!');
+            score += OUCH_MINUS;
+            reduceHP();
+
+            if (projectiles[i].currFrame > 40) {
+                ouchSpriteKey = 'ouch';
+            } else {
+                ouchSpriteKey = 'boom';
+            }
+
+            if (volumeOn) {
+                // music[ouchSpriteKey].obj.audio.pause();
+                // music[ouchSpriteKey].obj.audio.currentTime = 0;
+                setTimeout(() => {
+                    // music[ouchSpriteKey].obj.audio.pause();
+                    music[ouchSpriteKey].obj.audio.currentTime = 0;
+                    music[ouchSpriteKey].obj.audio.play();
+                }, 20)
+                // music[ouchSpriteKey].obj.audio.play();
+            }
+            
+            ouchT = 1;
+            ouchT2 = 0;
+
+            ouchInfo.x = projectiles[i].x;
+            ouchInfo.y = projectiles[i].y;
+        } else {
+            // console.log('splatted!');
+            // kaboomT = 0.15;
+            kaboomT = 1;
+            kaboomT2 = 0;
+            kaboomInfo.x = projectiles[i].x;
+            kaboomInfo.y = projectiles[i].y;
+            score += SPLAT_POINTS;
+            if (volumeOn) {
+                // music.score.obj.audio.pause();
+                // music.score.obj.audio.currentTime = 0;
+                setTimeout(() => {
+                    // music.score.obj.audio.pause();
+                    music.score.obj.audio.currentTime = 0; 
+                    music.score.obj.audio.play();
+                }, 20)
+                // music.score.obj.audio.play();
+            }
+        }
+        resetProjectile([i]);
+        initAnimateCanon(i);
+        // break;
+    }
+    
 }
 
 function isSplatted(p1, p2) {
-    return (p2.x >= p1.x && p2.x <= p1.x + p1.w && p2.y >= p1.y && p2.y <= p1.y + p1.h);
+    // let dx = (p1.x + p1.w / 2) - p2.x;
+    // let dy = (p1.y + p1.h / 2) - p2.y;
+    // let dist = Math.sqrt(dx * dx + dy * dy);
+    // return dist < 20;
+
+    let w = p1.w * 1.5;
+    
+    if (p1.currFrame > 30) w = p1.w;
+
+    // return (p2.x >= p1.x - 10 && p2.x <= p1.x + p1.w - 10 && p2.y >= p1.y - 10 && p2.y <= p1.y + p1.h - 10);
+    // return (p2.x + w >= p1.x && p2.x <= p1.x + p1.w);
+    return circleCollision(p1.x, p1.y, w, p2.x, p2.y, w);
+
+    // circleCollision
 }
+
+function circleCollision(p1x, p1y, r1, p2x, p2y, r2) {
+    var a = r1 + r2;
+    var x = p1x - p2x;
+    var y = p1y - p2y;
+  
+    if (a > Math.sqrt((x * x) + (y * y))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
 function rescale(obj) {
     console.log(obj.x, obj.y, obj.w, obj.h);
@@ -1210,6 +1955,12 @@ function rescale(obj) {
     obj.y *= scaleY;
     obj.w *= scaleX;
     obj.h *= scaleY;
+
+    obj.ox = obj.x;
+    obj.oy = obj.y;
+    obj.ow = obj.w;
+    obj.oh = obj.h;
+
     console.log(obj.x, obj.y, obj.w, obj.h);
 }
 
@@ -1232,6 +1983,8 @@ function update() {
     // placeholder
     // projectiles[0].vy += g * 50 * delta;
     timer.tick(delta);
+    let percent = timer.timer / (maxTimer * 24) * 100;
+    timeProgressBar.update(delta, percent);
 
     if (timer.timer <= 0) {
         canReset = true;
@@ -1239,6 +1992,16 @@ function update() {
     }
 
     moveClouds();
+
+    if (kaboomT > 0) {
+        kaboomT -= 1 * delta;
+        if (kaboomT <= 0) kaboomT = 0;
+    }
+
+    if (ouchT > 0) {
+        ouchT -= 1 * delta;
+        if (ouchT <= 0) ouchT = 0;
+    }
 }
 
 function gameCycle() {
@@ -1252,15 +2015,122 @@ function gameCycle() {
                 // bg
                 // ctx.drawImage(images.bg.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
                 ctx.drawImage(images.sky.obj.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
+
+                drawFloaters();
+
+                ctx.beginPath();
+                ctx.fillStyle = '#70D2ED';
+                ctx.rect(0, waterInfo.y, canvas.width, waterInfo.h);
+                ctx.fill();
+
+                drawClouds();
+                // drawProgress();
+                timeProgressBar.draw(ctx);
+                drawTopHUD();
+                
+                drawScoreHUD();
+                drawLives();
+
+                let volumeKey = 'mute';
+                if (volumeOn) {
+                    volumeKey = 'volume';
+                }
+
+                ctx.drawImage(images[volumeKey].obj.img, 0, 0, volumeInfo.cw, 
+                    volumeInfo.ch, volumeInfo.x, volumeInfo.y + topHUDInfo.timer.y, volumeInfo.w, volumeInfo.h);
+
+
+                
+
+                // lands
+                ctx.drawImage(images.landLeft.obj.img, 0, 0, 157, 206, images.landLeft.x, images.landLeft.y, images.landLeft.w, images.landLeft.h);
+                ctx.drawImage(images.landRight.obj.img, 0, 0, 157, 206, images.landRight.x, images.landRight.y, images.landRight.w, images.landRight.h);
+
+                
+
+                for (let i = 0; i < projectiles.length; ++i) {
+                    if (difficulty[i] > 0) {
+                        // projectiles[i].draw(ctx, images.projectile.obj.img);
+                        projectiles[i].dive(ctx, images[projectiles[i].id].obj.img);
+                        let r = projectiles[i].update(delta * difficulty[i], g, projectileRanges);
+                        
+                        if (r) {
+                            // difficulty[i] = Math.floor(Math.random() * 100) / 100 + 0.2 + difficultyAdj[i];
+                            difficulty[i] = Math.floor(Math.random() * 100) / 100 + 0.2;
+                            // difficulty[i] += 0.2;
+                            updateSprite(i);
+                            initAnimateCanon(i);
+
+                            if (i < 6) {
+                                generateFloater(i);
+                            }
+                            
+                            // if (i == 0) {
+                            //     canons.black.left.upper.x = canons.black.left.upper.ox;
+                            //     canons.black.left.upper.y = canons.black.left.upper.oy;
+                            //     canons.black.left.upper.w = canons.black.left.upper.ow;
+                            //     canons.black.left.upper.h = canons.black.left.upper.oh;
+                            //     canons.black.left.upper.t2 = 0;
+                            // }
+                            
+                        }
+                    }
+                }
+
+                if (kaboomT) {
+                    kaboomT2 += 10 * delta;
+                    let adjx = Math.sin(kaboomT2) * 50;
+                    let adjx2 = adjx / 2;
+                    let frame = Math.floor(kaboomT2) % 10;
+                    // ctx.drawImage(images.scoreboom.obj.img, 0, 0, kaboomInfo.cw, kaboomInfo.ch, kaboomInfo.x - adjx2, kaboomInfo.y - adjx2, kaboomInfo.w + adjx, kaboomInfo.h + adjx);
+                    ctx.drawImage(images.scoreboom.obj.img, frame * kaboomInfo.cw, 0, kaboomInfo.cw, kaboomInfo.ch, kaboomInfo.x, kaboomInfo.y, kaboomInfo.w, kaboomInfo.h);
+                    
+                }
+
+                if (ouchT) {
+                    ouchT2 += 10 * delta;
+                    
+                    let frame = Math.floor(ouchT2) % 6;
+                    // ctx.drawImage(images.ouch.obj.img, 0, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
+                    
+                    ctx.drawImage(images[ouchSpriteKey].obj.img, frame * ouchInfo.cw, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
+                }
+
+                // canons
+                canons.draw();
+                // animateCanons();
+                // if (canons.black.left.upper.t2 > -5) {
+                //     canons.black.left.upper.t2 -= 20 * delta;
+                //     let spring = Math.sin(canons.black.left.upper.t2) * 5;
+                //     canons.black.left.upper.y += spring;
+                //     canons.black.left.upper.h += -spring;
+                //     canons.black.left.upper.w += spring;
+                // }
+                
+
+                // canons.black.left.lower.draw(ctx, images.blackCanonLeft.obj.img);
+                // canons.black.right.upper.draw(ctx, images.blackCanonRight.obj.img);
+                // canons.black.right.lower.draw(ctx, images.blackCanonRight.obj.img);
+
+                // drawExplosionStar(canvas.width / 2, canvas.height / 2);
+                // drawExplosionStar(0, 0);
+
+                checkProjectileCollisions();
+                checkCanonCollisions();
+                // displayScore();
+                update();
+            } else {
+                let handx = Math.sin(startScreenHandAnimT) * 20;
+                let handy = Math.cos(startScreenHandAnimT) * 20;
+                // let handTapX = Math.cos(startScreenHandAnimT) * 2;
+                // let handTapY = Math.sin(startScreenHandAnimT) * 2;
+                // ctx.drawImage(images.splash.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(images.sky.obj.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
                 ctx.beginPath();
                 ctx.fillStyle = '#70D2ED';
                 ctx.rect(0, waterInfo.y, canvas.width, waterInfo.h);
                 ctx.fill();
                 drawClouds();
-                drawProgress();
-                drawTopHUD();
-                drawScoreHUD();
-                drawLives();
 
                 // lands
                 ctx.drawImage(images.landLeft.obj.img, 0, 0, 157, 206, images.landLeft.x, images.landLeft.y, images.landLeft.w, images.landLeft.h);
@@ -1269,28 +2139,66 @@ function gameCycle() {
                 // canons
                 canons.draw();
 
-                for (let i = 0; i < projectiles.length; ++i) {
-                    if (difficulty[i] > 0) {
-                        projectiles[i].draw(ctx, images.projectile.obj.img);
-                        let r = projectiles[i].update(delta * difficulty[i], g, projectileRanges);
-                        
-                        if (r) {
-                            updateSprite(i);
-                        }
-                    }
+                let frame = Math.floor(startScreenHandAnimT) % 8;
+                
+                ctx.drawImage(images.title.obj.img, 0, 0, startPageInfo.title.cw, startPageInfo.title.ch, startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
+                ctx.drawImage(images.hand.obj.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                // tap
+                // ctx.save();
+                // // Untransformed draw position
+                // const position = {x: startPageInfo.hand.x, y: startPageInfo.hand.y};
+                // // In degrees
+                // const rotation = { x: 0, y: Math.sin(startScreenHandAnimT) * 35, z: 0};
+                // // Rotation relative to here (this is the center of the image)
+                // const rotPt = { x: startPageInfo.hand.w / 2, y: startPageInfo.hand.h / 2 };
+
+                // ctx.setTransform(new DOMMatrix()
+                //     .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+                //     .rotateSelf(rotation.x, rotation.y, rotation.z)
+                // );
+                
+                // ctx.drawImage(images.hand.obj.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, -rotPt.x, -rotPt.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                // ctx.restore();
+                //
+                
+                ctx.drawImage(images.startballoon.obj.img, 0, 0, startPageInfo.startballoon.cw, startPageInfo.startballoon.ch, startPageInfo.startballoon.x + handx, startPageInfo.startballoon.y + handy, startPageInfo.startballoon.w, startPageInfo.startballoon.h);
+                //
+                    ctx.save();
+
+                    // move to the center of the canvas
+                    ctx.translate(startPageInfo.startmine.ox + startPageInfo.startmine.w / 2, startPageInfo.startmine.oy + startPageInfo.startmine.h / 2);
+                    
+                    let degrees = Math.sin(startPulseT * 10) * 15;
+                    // rotate the canvas to the specified degrees
+                    ctx.rotate(degrees * Math.PI/180);
+
+                    // draw the image
+                    startPageInfo.startmine.x = -0.5 * startPageInfo.startmine.w;
+                    startPageInfo.startmine.y = -0.5 * startPageInfo.startmine.h;
+
+                    ctx.drawImage(images.startmine.obj.img, 0, 0, startPageInfo.startmine.cw, startPageInfo.startmine.ch, startPageInfo.startmine.x, startPageInfo.startmine.y, startPageInfo.startmine.w, startPageInfo.startmine.h);
+                    // we’re done with the rotating so restore the unrotated context
+                    ctx.restore();
+                //
+
+                
+
+                for (let i = 1; i < 4; ++i) {
+                    let key = 'text' + i;
+                    ctx.drawImage(images[key].obj.img, 0, 0, startPageInfo[key].cw, startPageInfo[key].ch, startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
                 }
 
-                checkProjectileCollisions();
-                checkCanonCollisions();
-                // displayScore();
-                update();
-            } else {
-            
-                ctx.drawImage(images.splash.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(images.beginbutton.obj.img, 0, 0, startPageInfo.beginbutton.cw, startPageInfo.beginbutton.ch, startPageInfo.beginbutton.x, startPageInfo.beginbutton.y, startPageInfo.beginbutton.w, startPageInfo.beginbutton.h);
+                
 
                 // ctx.beginPath();
                 // ctx.rect(btnBegin.x, btnBegin.y, btnBegin.w, btnBegin.h);
                 // ctx.stroke();
+
+                if (delta < 1) {
+                    startPulseT += 2 * delta;
+                    startScreenHandAnimT += 5 * delta;
+                }
             }
         } else {
             if (!fade) {
@@ -1302,7 +2210,8 @@ function gameCycle() {
                 ctx.rect(0, waterInfo.y, canvas.width, waterInfo.h);
                 ctx.fill();
                 drawClouds();
-                drawProgress();
+                // drawProgress();
+                timeProgressBar.draw(ctx);
                 drawTopHUD();
                 drawScoreHUD();
                 drawLives();
@@ -1345,10 +2254,10 @@ function gameCycle() {
                     shineInfo.ch, x, y, w, h);
 
                 ctx.drawImage(images.complete.obj.img, 0, 0, completeInfo.cw, 
-                    completeInfo.ch, completeInfo.x, completeInfo.y, completeInfo.w, completeInfo.h);
+                    completeInfo.ch, completeInfo.x, shineInfo.y, completeInfo.w, completeInfo.h);
                 
                 ctx.drawImage(images.trophy.obj.img, 0, 0, trophyInfo.cw, 
-                    trophyInfo.ch, trophyInfo.x, trophyInfo.y, trophyInfo.w, trophyInfo.h);
+                    trophyInfo.ch, trophyInfo.x, (shineInfo.y + shineInfo.h / 2) - trophyInfo.h, trophyInfo.w, trophyInfo.h);
                 // ctx.drawImage(images.shine.obj.img, 0, 0, shineInfo.cw, 
                 //     shineInfo.ch, shineInfo.x, shineInfo.y, shineInfo.w, shineInfo.h);
                 
@@ -1359,10 +2268,29 @@ function gameCycle() {
                 
 
                 // TM.draw(textList.complete.obj);
-                TM.draw(textList.scoreLabel.obj);
+                
+
+                // score = 11;
+                let adjX = 12;
+                let a = Math.floor(score / 10);
+                let b = score % 10;
+                let countOnes = (a == 1) + (b == 1);
+
+                // if (score > 9) adjX = 2;
+                if (countOnes == 1) adjX = 0;
+                else if (countOnes == 2) adjX = -4;
+                else if (score > 19 && score < 100) adjX = 5.5;
+                
+                textList.finalScore.obj.tx = canvas.width / 2 - textList.finalScore.desc.w * scaleX / 2 - adjX * scaleX;
+                textList.finalScore.obj.ty = shineInfo.y + shineInfo.h / 2 + 60 * scaleY;
+                // textList.scoreLabel.obj.tx = shineInfo.y + shineInfo.h / 2 + 20 * scaleY;
+                textList.scoreLabel.obj.ty = shineInfo.y + shineInfo.h / 2 + 20 * scaleY;
+                
                 textList.finalScore.obj.str = zeroPad(score, 2);
+
+                TM.draw(textList.scoreLabel.obj);
                 TM.draw(textList.finalScore.obj);
-                TM.draw(textList.resetMsg.obj);
+                // TM.draw(textList.resetMsg.obj);
             }
         }
     }
