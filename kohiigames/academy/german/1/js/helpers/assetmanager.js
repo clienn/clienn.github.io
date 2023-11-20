@@ -69,7 +69,7 @@ class AssetManager {
             if (type == 1) {
                 // obj.img.preload = 'auto';
             //     // obj.img.autoplay = (/iPad|iPhone|iPod/).test(navigator.userAgent);
-                obj.img.autoplay = true;
+                // obj.img.autoplay = true;
                 // obj.img.muted=true;
                 
             }

@@ -85,6 +85,8 @@ var progressLength = 0;
 var progressTotalLength = 0;
 var progressLimit = {};
 
+var level1Count = [0, 0, 0];
+
 // 1792 922
 
 // #fb2121 - red
@@ -157,6 +159,23 @@ function init() {
 
     finalScoreTxt.addText('finalscoreLabel', 'YOU SCORED', 'bold', 30, 'Montserrat', 0, 0, 800, 45, '#fff', true);
     finalScoreTxt.follow('finalscoreLabel', canvas.width / 2 - finalScoreTxt.texts['finalscoreLabel'].w / 2, canvas.height / 2 - finalScoreTxt.texts['finalscoreLabel'].h * 1.3, 0, 0);
+
+    // let idx = 0;
+    // for (let k in PHRASES) {
+    //     let count = 0;
+    //     for (let l in PHRASES[k]) {
+    //         if (PHRASES[k][l] == 1) {
+    //             if (idx == 1) {
+    //                 console.log(l);
+    //             }
+    //             ++count;
+    //         }
+    //     }
+    //     level1Count[idx++] = count;
+    //     console.log(count, k);
+    // }
+    // let list = Object.values(PHRASES)[0];
+    // console.log(Object.values(list)[0]);
 }
 
 function setFinalScoreText() {
@@ -232,6 +251,19 @@ function displayGameover() {
     ctx.drawImage(AM.images[k].img, 0, 0, AM.images[k].cw, AM.images[k].ch, gameoverImageInfo[k].x, gameoverImageInfo[k].y, gameoverImageInfo[k].w, gameoverImageInfo[k].h);
 }
 
+function raffleChance(percentage) {
+    let arr = [];
+
+    for (let i = 0; i < 100; ++i) {
+        arr[i] = i + 1;
+    }
+
+    shuffleArr(arr);
+    let rng = Math.floor(Math.random() * 100);
+
+    return arr[rng] <= percentage;
+}
+
 function getPhrase() {
     let n = Object.keys(PHRASES).length;
     let rng = Math.floor(Math.random() * n);
@@ -239,15 +271,33 @@ function getPhrase() {
 
     let nPhrases = Object.keys(list).length;
     let rng2 = Math.floor(Math.random() * nPhrases);
-    let phrase = Object.keys(list)[rng2];
+    // let phrase = Object.keys(list)[rng2];
+    
+    // let phrase = Math.floor(Math.random() * 2) ? Object.keys(list)[rng2] : Object.values(list)[rng2];
+    
 
     // console.log(n, nPhrases, phrase);
-
     let rng3 = Math.floor(Math.random() * n);
+    let phrase = '';
+    let flag = true;
+
+    if (score > 10000 && raffleChance(50)) {
+        let tmp = (Object.values(list)[rng2]).split(" ");
+        let gender = Object.keys(PHRASES)[Math.floor(Math.random() * n)];
+
+        if (gender != tmp[0]) {
+            flag = false;
+        }
+        
+        phrase = gender + ' ' + tmp[1];
+    } else {
+        phrase = Object.keys(PHRASES)[rng3] + ' ' + Object.keys(list)[rng2];
+    }
+    
 
     return {
-        phrase: Object.keys(PHRASES)[rng3] + ' ' + phrase,
-        result: rng == rng3
+        phrase: phrase,
+        result: rng == rng3 && flag
     }
 }
 
@@ -293,17 +343,28 @@ function drawProgress() {
     
     if (delta < 1) {
         if (progressUpdate('top', canvas.width, 0)) {
-            ctx.strokeStyle = '#C7FC12';
+            // ctx.strokeStyle = '#C7FC12';
         } else if (progressUpdate('right', canvas.height, progressLimit.top)) {
-            ctx.strokeStyle = '#FFE095';
+            // ctx.strokeStyle = '#FFE095';
         } else if (progressUpdate('bottom', canvas.width, progressLimit.right)) {
-            ctx.strokeStyle = '#f9a139';
+            // ctx.strokeStyle = '#f9a139';
         } else if (progressUpdate('left', canvas.height, progressLimit.bottom)) {
-            ctx.strokeStyle = '#fb2121';
+            // ctx.strokeStyle = '#fb2121';
         } else {
             setFinalScoreText();
             gameover = true;
         }
+
+        let p = timerTick / gameDuration * 100;
+        if (p < 25) {
+            ctx.strokeStyle = '#C7FC12';
+        } else if (p < 50) {
+            ctx.strokeStyle = '#FFE095';
+        } else if (p < 75) {
+            ctx.strokeStyle = '#f9a139';
+        } else {
+            ctx.strokeStyle = '#fb2121';
+        } 
     }
     
     ctx.beginPath();
