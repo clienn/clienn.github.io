@@ -86,6 +86,11 @@ var progressTotalLength = 0;
 var progressLimit = {};
 
 var level1Count = [0, 0, 0];
+var pluralT = 0;
+var pluralWarningText = null;
+var isPluralShown = false;
+
+var pluralThresholdScore = 10000;
 
 // 1792 922
 
@@ -152,6 +157,12 @@ function init() {
 
     finalScoreTxt = new Text(ctx, canvas.width, canvas.height);
     finalScoreTxt.setScale(scaleX, scaleY);
+    
+    pluralWarningText = new Text(ctx, canvas.width, canvas.height);
+    pluralWarningText.setScale(scaleX, scaleY);
+
+    pluralWarningText.addText('pluralWarningText', 'INCOMING PLURALS!!!', 'bold', 50, 'Montserrat', 0, 0, 1500, 55, '#fff', true);
+    pluralWarningText.follow('pluralWarningText', canvas.width / 2 - pluralWarningText.texts['pluralWarningText'].w / 2, canvas.height / 2 - pluralWarningText.texts['pluralWarningText'].h * 1.3, 0, 0);
 
     score = 0;
     
@@ -281,7 +292,7 @@ function getPhrase() {
     let phrase = '';
     let flag = true;
 
-    if (score > 10000 && raffleChance(50)) {
+    if (score > pluralThresholdScore && raffleChance(50)) {
         let tmp = (Object.values(list)[rng2]).split(" ");
         let gender = Object.keys(PHRASES)[Math.floor(Math.random() * n)];
 
@@ -475,6 +486,12 @@ function validateAnswer(flag) {
         }
 
         playScore();
+
+        if (!isPluralShown && score > pluralThresholdScore) {
+            pluralT = 10;
+            isPluralShown = true;
+            playSiren();
+        }
     } else {
         addScore(false); 
         setPoint('-' + negativeMultiplier, '#fb2121');
@@ -540,16 +557,17 @@ function controls() {
 
             if (mDown) {
                 mDown = false;
-                let d = prevPos < x ? 1 : -1;
-                let dist = Math.abs(prevPos - x);
-                // console.log(prevPos, x)
-                
-                if (dist > 1) {
-                    cards[currCard].initRotation(d * cardInfo.rotationSpeed);
-                    validateAnswer(d > 0 ? true : false);
-                    nextCard();
 
+                if (pluralT == 0) {
+                    let d = prevPos < x ? 1 : -1;
+                    let dist = Math.abs(prevPos - x);
+                    // console.log(prevPos, x)
                     
+                    if (dist > 1) {
+                        cards[currCard].initRotation(d * cardInfo.rotationSpeed);
+                        validateAnswer(d > 0 ? true : false);
+                        nextCard();
+                    }
                 }
                 
             }
@@ -606,8 +624,6 @@ function controls() {
                 mDown = true;
             }
         }
-
-        
     });
 
 
@@ -639,7 +655,6 @@ function controls() {
 
     document.addEventListener('keydown', e => {
         if (!gameover) {
-
             if (e.key == 'ArrowRight') {
                 if (!rDown) {
                     rDown = true;
@@ -659,24 +674,29 @@ function controls() {
 
     document.addEventListener('keyup', e => {
         if (!gameover) {
+            
             if (e.key == 'ArrowRight') {
                 rDown = false;
-                cards[currCard].initRotation(cardInfo.rotationSpeed);
-                // cards[currCard].rotationVel = cardInfo.rotationSpeed;
-                validateAnswer(true);
-                nextCard();
-                // addScore(); 
-                // setPoint('+' + multiplier, '#10aad7');
-                // jump = jumpHeight;
+                if (pluralT == 0) {
+                    cards[currCard].initRotation(cardInfo.rotationSpeed);
+                    // cards[currCard].rotationVel = cardInfo.rotationSpeed;
+                    validateAnswer(true);
+                    nextCard();
+                    // addScore(); 
+                    // setPoint('+' + multiplier, '#10aad7');
+                    // jump = jumpHeight;
+                }
             } else if (e.key == 'ArrowLeft') {
                 lDown = false;
-                cards[currCard].initRotation(-cardInfo.rotationSpeed);
-                // cards[currCard].rotationVel = -cardInfo.rotationSpeed;
-                // addScore(); 
-                // setPoint('+' + multiplier, '#10aad7');
-                // jump = jumpHeight;
-                validateAnswer(false);
-                nextCard();
+                if (pluralT == 0) {
+                    cards[currCard].initRotation(-cardInfo.rotationSpeed);
+                    // cards[currCard].rotationVel = -cardInfo.rotationSpeed;
+                    // addScore(); 
+                    // setPoint('+' + multiplier, '#10aad7');
+                    // jump = jumpHeight;
+                    validateAnswer(false);
+                    nextCard();
+                }
             }
         }
     });
@@ -811,6 +831,18 @@ function playScore() {
     // }
 }
 
+function playSiren() {
+    // if (HUD.volumeOn) {
+        // AM.audio.cry.img.pause();
+        // AM.audio.cry.img.currentTime = 0;
+        
+        setTimeout(() => {
+            AM.audio.siren.img.currentTime = 0;
+            AM.audio.siren.img.play();
+        }, 0);
+    // }
+}
+
 // function playBonus() {
 //     if (HUD.volumeOn) {
 //         AM.audio.bonus.img.pause();
@@ -829,18 +861,42 @@ function playScore() {
 
 function update() {
     if (delta < 1) {
-        if (timerTick >= gameDuration) {
-            setFinalScoreText();
-            gameover = true;
+        if (pluralT == 0) {
+            if (timerTick >= gameDuration) {
+                setFinalScoreText();
+                gameover = true;
+            }
+    
+            let p = timerTick / gameDuration;
+            progressLength = p * progressTotalLength;
+            if (progressLength >= progressTotalLength) {
+                progressLength = progressTotalLength;
+            }
+    
+            timerTick += 1 * delta;
+        }
+    }
+}
+
+function showIncomingPlurals() {
+    if (delta < 1 && pluralT > 0) {
+        let pulse = Math.floor(pluralT) % 2;
+        
+        ctx.save();
+        ctx.globalAlpha = pulse ? 0.75 : 0;
+        ctx.fillStyle = '#f00';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
+
+        if (pulse) {
+            pluralWarningText.draw('pluralWarningText');
         }
 
-        let p = timerTick / gameDuration;
-        progressLength = p * progressTotalLength;
-        if (progressLength >= progressTotalLength) {
-            progressLength = progressTotalLength;
-        }
+        pluralT -= 2 * delta;
 
-        timerTick += 1 * delta;
+        if (pluralT <= 0) {
+            pluralT = 0;
+        }
     }
 }
 
@@ -852,9 +908,14 @@ function gameCycle() {
     if (!gameover) {
         if (gameStart) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            
             drawCards(ctx);
             displayPoints();
             drawProgress();
+
+            showIncomingPlurals();
+
             update();
         }
     } else {

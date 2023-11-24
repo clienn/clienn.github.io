@@ -6,6 +6,11 @@
             "ext": "wav"
         },
         {
+            "id": "siren",
+            "src": "sounds/siren",
+            "ext": "wav"
+        },
+        {
             "id": "score",
             "src": "sounds/score",
             "ext": "wav"
