@@ -1,0 +1,74 @@
+{
+    "data": [
+        {
+            "id": "coin",
+            "src": "coin",
+            "ext": "png",
+            "cw": 81,
+            "ch": 82
+        },
+        {
+            "id": "bird_fly_1",
+            "src": "bird/fly/1",
+            "ext": "png",
+            "cw": 713,
+            "ch": 541
+        },
+        {
+            "id": "bird_fly_2",
+            "src": "bird/fly/2",
+            "ext": "png",
+            "cw": 713,
+            "ch": 541
+        },
+        {
+            "id": "bird_hit_1",
+            "src": "bird/hit/1",
+            "ext": "png",
+            "cw": 713,
+            "ch": 541
+        },
+        {
+            "id": "bird_hit_2",
+            "src": "bird/hit/2",
+            "ext": "png",
+            "cw": 713,
+            "ch": 541
+        },
+        {
+            "id": "cloud",
+            "src": "clouds",
+            "ext": "png",
+            "cw": 1154,
+            "ch": 820
+        },
+        {
+            "id": "happy1",
+            "src": "happy/1",
+            "ext": "png",
+            "cw": 400,
+            "ch": 400
+        },
+        {
+            "id": "happy2",
+            "src": "happy/2",
+            "ext": "png",
+            "cw": 480,
+            "ch": 480
+        },
+        {
+            "id": "happy3",
+            "src": "happy/3",
+            "ext": "png",
+            "cw": 659,
+            "ch": 439
+        },
+        {
+            "id": "sad1",
+            "src": "sad/1",
+            "ext": "png",
+            "cw": 150,
+            "ch": 155
+        }
+    ]
+}
