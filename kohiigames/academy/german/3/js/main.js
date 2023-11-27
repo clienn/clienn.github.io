@@ -84,7 +84,7 @@ var birdInfo = {
     h: 541 * 0.45,
     bounceF: -800,
     speed: 100,
-    moveXSpeed: 1000
+    moveXSpeed: 1300
 }
 
 var cloudInfo = {
