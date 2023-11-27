@@ -84,7 +84,7 @@ var birdInfo = {
     h: 541 * 0.45,
     bounceF: -800,
     speed: 100,
-    moveXSpeed: 1300
+    moveXSpeed: 1000
 }
 
 var cloudInfo = {
@@ -420,7 +420,7 @@ function drawClouds() {
         }
 
         if (bird.vy > 0) {
-            if (bird.x > x && bird.x < x + w && bird.y + bird.h > y && bird.y + bird.h < y + h) {
+            if (bird.x + bird.w >= x && bird.x <= x + w && bird.y + bird.h >= y && bird.y + bird.h <= y + h) {
                 
                 // bird.vy = birdInfo.bounceF;
                 let bounceF = bird.y + bird.h - canvas.height / 2;
