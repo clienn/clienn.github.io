@@ -676,6 +676,18 @@ function muteAllAudio(flag) {
     
 }
 
+function playAllAudio() {
+    for (let k in AM.audio) {
+        if (k != 'bg') {
+            AM.audio[k].img.volume = 0;
+            AM.audio[k].img.currentTime = 0;
+            AM.audio[k].img.play();
+            AM.audio[k].img.pause();
+        }
+    }
+    
+}
+
 function controls() {
     let mid = canvas.width / 2;
     let prevPos = 0;
@@ -806,6 +818,8 @@ function controls() {
             AM.audio.bg.img.volume = 0.5;
             AM.audio.bg.img.loop = true;
             AM.audio.bg.img.play();
+
+            playAllAudio();
 
             // playScore();
             // playKaboom();
@@ -1268,33 +1282,42 @@ function setPoints(points, color) {
  */
 function playCry() {
     if (HUD.volumeOn) {
-        AM.audio.cry.img.pause();
-        AM.audio.cry.img.currentTime = 0;
-        AM.audio.cry.img.play();
+        setTimeout(() => {
+            AM.audio.cry.img.volume = 0.3;
+            AM.audio.cry.img.currentTime = 0;
+            AM.audio.cry.img.play();
+        }, 0)
+        
     }
 }
 
 function playEat() {
     if (HUD.volumeOn) {
-        AM.audio.eat.img.pause();
-        AM.audio.eat.img.currentTime = 0;
-        AM.audio.eat.img.play();
+        setTimeout(() => {
+            AM.audio.eat.img.volume = 0.3;
+            AM.audio.eat.img.currentTime = 0;
+            AM.audio.eat.img.play();
+        }, 0);
     } 
 }
 
 function playScore() {
     if (HUD.volumeOn) {
-        AM.audio.score.img.pause();
-        AM.audio.score.img.currentTime = 0;
-        AM.audio.score.img.play();
+        setTimeout(() => {
+            AM.audio.score.img.volume = 0.3;
+            AM.audio.score.img.currentTime = 0;
+            AM.audio.score.img.play();
+        }, 0);
     }
 }
 
 function playBonus() {
     if (HUD.volumeOn) {
-        AM.audio.bonus.img.pause();
-        AM.audio.bonus.img.currentTime = 0;
-        AM.audio.bonus.img.play();
+        setTimeout(() => {
+            AM.audio.bonus.img.volume = 0.3;
+            AM.audio.bonus.img.currentTime = 0;
+            AM.audio.bonus.img.play();
+        }, 0);
     }
 }
 
