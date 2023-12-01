@@ -264,6 +264,18 @@ function muteAllAudio(flag) {
     
 }
 
+function playAllAudio() {
+    for (let k in AM.audio) {
+        if (k != 'bg') {
+            AM.audio[k].img.volume = 0;
+            AM.audio[k].img.currentTime = 0;
+            AM.audio[k].img.play();
+            // AM.audio[k].img.pause();
+        }
+    }
+    
+}
+
 function controls() {
     let mid = canvas.width / 2;
 
@@ -381,6 +393,7 @@ function controls() {
             
 
             gameStart = true;
+            playAllAudio();
             
         }
 
@@ -631,25 +644,33 @@ function showPoints(pointType) {
  */
 function playKaboom() {
     if (HUD.volumeOn) {
-        AM.audio.kaboom.img.pause();
-        AM.audio.kaboom.img.currentTime = 0;
-        AM.audio.kaboom.img.play();
+        setTimeout(() => {
+            AM.audio.kaboom.img.currentTime = 0;
+            AM.audio.kaboom.img.volume = 0.5;
+            AM.audio.kaboom.img.play();
+        }, 0);
+        
     }
 }
 
 function playLaugh() {
     if (HUD.volumeOn) {
-        AM.audio.laugh.img.pause();
-        AM.audio.laugh.img.currentTime = 0;
-        AM.audio.laugh.img.play();
+        setTimeout(() => {
+            AM.audio.laugh.img.currentTime = 0;
+            AM.audio.laugh.img.volume = 0.5;
+            AM.audio.laugh.img.play();
+        }, 0);
+        
     } 
 }
 
 function playScore() {
     if (HUD.volumeOn) {
-        AM.audio.score.img.pause();
-        AM.audio.score.img.currentTime = 0;
-        AM.audio.score.img.play();
+        setTimeout(() => {
+            AM.audio.score.img.currentTime = 0;
+            AM.audio.score.img.volume = 0.5;
+            AM.audio.score.img.play();
+        }, 0);
     }
 }
 

@@ -1446,6 +1446,20 @@ function muteAllAudio(flag) {
     
 }
 
+function playAllAudio() {
+    for (let k in AM.audio) {
+        if (k != 'bg' && k != 'explosion') {
+            AM.audio[k].img.volume = 0;
+            AM.audio[k].img.currentTime = 0;
+            AM.audio[k].img.play();
+            // AM.audio[k].img.pause();
+            
+        }
+    }
+    
+}
+
+
 function controls() {
     window.addEventListener('blur', () => {
         muteAllAudio(true);
@@ -1480,6 +1494,7 @@ function controls() {
 
             // mDown = true;
             if (gameStart) {
+                
                 if (isBtnClicked(mx, my, {
                     x: volumeInfo.x,
                     y: volumeInfo.y + topHUDInfo.timer.y,
@@ -1497,6 +1512,8 @@ function controls() {
                         AM.audio.bg.img.pause();
                         AM.audio.explosion.img.pause();
                     }
+
+                    
                 } else {
                     splat(mx, my);
                     updateLevel();
@@ -1514,6 +1531,8 @@ function controls() {
                     AM.audio.explosion.img.volume = 0.8;
                     AM.audio.explosion.img.loop = true;
                     // AM.audio.explosion.img.play();
+
+                    playAllAudio();
 
                     if (volumeOn) {
                         AM.audio.bg.img.play();
@@ -1765,6 +1784,7 @@ function checkProjectileCollisions() {
 
                         setTimeout(() => {
                             AM.audio.boom.img.currentTime = 0;
+                            AM.audio.boom.img.volume = 0.5;
                             AM.audio.boom.img.play();
                         }, 20)
                     }
@@ -1884,6 +1904,7 @@ function splat(mx, my) {
                 setTimeout(() => {
                     // AM.audio[ouchSpriteKey].img.pause();
                     AM.audio[ouchSpriteKey].img.currentTime = 0;
+                    AM.audio[ouchSpriteKey].img.volume = 0.5;
                     AM.audio[ouchSpriteKey].img.play();
                 }, 20)
                 // AM.audio[ouchSpriteKey].img.play();
@@ -1908,8 +1929,9 @@ function splat(mx, my) {
                 setTimeout(() => {
                     // AM.audio.score.img.pause();
                     AM.audio.score.img.currentTime = 0; 
+                    AM.audio.score.img.volume = 0.5; 
                     AM.audio.score.img.play();
-                }, 20)
+                }, 0)
                 // AM.audio.score.img.play();
             }
         }

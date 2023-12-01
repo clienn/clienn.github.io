@@ -523,7 +523,7 @@ function drawWaterObj(idx) {
                             score--;
                             if (score < 0) score = 0;
                             setPoints('-1', '#fb2121'); // red
-                            // playCry();
+                            playCry();
                         }
     
                         updateScore();
@@ -1549,6 +1549,18 @@ function muteAllAudio(flag) {
     }
 }
 
+function playAllAudio() {
+    for (let k in AM.audio) {
+        if (k != 'bg') {
+            AM.audio[k].img.volume = 0;
+            AM.audio[k].img.currentTime = 0;
+            AM.audio[k].img.play();
+            // AM.audio[k].img.pause();
+        }
+    }
+    
+}
+
 function controls() {
     let mid = canvas.width / 2;
     let prevPos = 0;
@@ -1677,6 +1689,7 @@ function controls() {
 
             gameStart = true;
             // HUD.health = 100;
+            playAllAudio();
         } 
 
         if (gameover) {
@@ -1997,9 +2010,12 @@ function updateFinalScore() {
  */
 function playCry() {
     if (HUD.volumeOn) {
-        AM.audio.cry.img.pause();
-        AM.audio.cry.img.currentTime = 0;
-        AM.audio.cry.img.play();
+        setTimeout(() => {
+            AM.audio.cry.img.currentTime = 0;
+            AM.audio.cry.img.volume = 0.2;
+            AM.audio.cry.img.play();
+        }, 0);
+        
     }
 }
 
@@ -2013,9 +2029,12 @@ function playCry() {
 
 function playScore() {
     if (HUD.volumeOn) {
-        AM.audio.score.img.pause();
-        AM.audio.score.img.currentTime = 0;
-        AM.audio.score.img.play();
+        setTimeout(() => {
+            AM.audio.score.img.currentTime = 0;
+            AM.audio.score.img.volume = 0.5;
+            AM.audio.score.img.play();
+        }, 0);
+        
     }
 }
 

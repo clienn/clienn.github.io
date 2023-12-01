@@ -37,7 +37,7 @@ var sounds = {
         // obj.audio.src = 'http://192.168.1.2:5501/assets/' + fn + '.' + ext;
         obj.audio.src = 'assets/' + fn + '.' + ext;
         obj.audio.preload = 'auto';
-        obj.audio.autoplay = (/iPad|iPhone|iPod/).test(navigator.userAgent);
+        // obj.audio.autoplay = (/iPad|iPhone|iPod/).test(navigator.userAgent);
 
         if (fn == 'bg') {
             obj.audio.volume = 0.1;
@@ -930,6 +930,7 @@ function main(w, h) {
                     if (volumeOn) {
                         music.bg.obj.audio.currentTime = 0;
                         music.bg.obj.audio.play();
+                        
                     } else {
                         music.bg.obj.audio.pause();
                         // music.correct.obj.volume = 0;
@@ -954,8 +955,14 @@ function main(w, h) {
                         //     music.correct.obj.audio.play();
                         // }
                         
-                        if (volumeOn)
-                            music.correct.obj.audio.play();
+                        if (volumeOn) {
+                            setTimeout(() => {
+                                music.correct.obj.audio.currentTime = 0;
+                                music.correct.obj.audio.volume = 0.5;
+                                music.correct.obj.audio.play();
+                            }, 0)
+                        }
+                            
 
                         turtles[target].jump = jumpHeight;
                         turtles[target].activateSpriteAnimation = true;
@@ -974,8 +981,14 @@ function main(w, h) {
                         // msg = 'Wrong!';
                         reduceHP();
 
-                        if (volumeOn)
-                            music.wrong.obj.audio.play();
+                        if (volumeOn) {
+                            setTimeout(() => {
+                                music.wrong.obj.audio.currentTime = 0;
+                                music.wrong.obj.audio.volume = 0.5;
+                                music.wrong.obj.audio.play();
+                            }, 0)
+                        }
+                            
                     }
 
                     // showAnswer = true;
@@ -998,6 +1011,8 @@ function main(w, h) {
                     // music.bg.obj.audio.volume = 1;
                     music.bg.obj.audio.loop = true;
                     music.bg.obj.audio.play();
+
+                    playAllAudio();
                 }
             }
 
@@ -1055,6 +1070,17 @@ function muteAllAudio(flag) {
     for (let k in music) {
         music[k].obj.audio.muted = flag;
     }   
+}
+
+function playAllAudio() {
+    for (let k in music) {
+        if (k != 'bg') {
+            music[k].obj.audio.volume = 0;
+            music[k].obj.audio.currentTime = 0;
+            music[k].obj.audio.play();
+        }
+    }   
+    
 }
 
 function initStartPage() {
@@ -1612,8 +1638,15 @@ function update() {
                 msg = TEXT_ID.TOOSLOW;
                 reduceHP();
 
-                if (volumeOn)
-                    music.wrong2.obj.audio.play();
+                if (volumeOn) {
+                    setTimeout(() => { 
+                        music.wrong2.obj.audio.currentTime = 0;
+                        music.wrong2.obj.audio.volume = 0.5;
+                        music.wrong2.obj.audio.play();
+                    }, 0)
+                    
+                }
+                    
             }
                 
 
