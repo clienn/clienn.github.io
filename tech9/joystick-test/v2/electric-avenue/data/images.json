@@ -1,0 +1,368 @@
+{
+    "data": [
+        {
+            "id": "intro",
+            "src": "intro",
+            "ext": "png",
+            "cw": 932,
+            "ch": 430
+        },
+        {
+            "id": "title",
+            "src": "splash/title",
+            "ext": "png",
+            "cw": 467,
+            "ch": 160
+        },
+        {
+            "id": "sub_title",
+            "src": "splash/sub_title",
+            "ext": "png",
+            "cw": 366,
+            "ch": 19
+        },
+        {
+            "id": "text1",
+            "src": "splash/text1",
+            "ext": "png",
+            "cw": 94,
+            "ch": 34
+        },
+        {
+            "id": "text2",
+            "src": "splash/text2",
+            "ext": "png",
+            "cw": 124,
+            "ch": 34
+        },
+        {
+            "id": "text3",
+            "src": "splash/text3",
+            "ext": "png",
+            "cw": 154,
+            "ch": 37
+        },
+        {
+            "id": "start",
+            "src": "splash/start",
+            "ext": "png",
+            "cw": 212,
+            "ch": 48
+        },
+        {
+            "id": "bg",
+            "src": "bg",
+            "ext": "png",
+            "cw": 932,
+            "ch": 430
+        },
+        {
+            "id": "eel_head_normal",
+            "src": "eel/expressions/normal",
+            "ext": "png",
+            "cw": 505,
+            "ch": 454
+        },
+        {
+            "id": "eel_head_eat",
+            "src": "eel/expressions/eat",
+            "ext": "png",
+            "cw": 505,
+            "ch": 454
+        },
+        {
+            "id": "eel_head_charged",
+            "src": "eel/expressions/charged",
+            "ext": "png",
+            "cw": 505,
+            "ch": 454
+        },
+        {
+            "id": "eel_head_dizzy",
+            "src": "eel/expressions/dizzy",
+            "ext": "png",
+            "cw": 505,
+            "ch": 454
+        },
+        {
+            "id": "eel_head",
+            "src": "eel/eel_head",
+            "ext": "png",
+            "cw": 505,
+            "ch": 454
+        },
+        {
+            "id": "eel_head2",
+            "src": "eel/eel_head2",
+            "ext": "png",
+            "cw": 124,
+            "ch": 185
+        },
+        {
+            "id": "eel_neck",
+            "src": "eel/neck",
+            "ext": "png",
+            "cw": 505,
+            "ch": 454
+        },
+        {
+            "id": "eel_neck2",
+            "src": "eel/eel_neck2",
+            "ext": "png",
+            "cw": 64,
+            "ch": 227
+        },
+        {
+            "id": "sfish_0",
+            "src": "fishes/sprites/0",
+            "ext": "png",
+            "cw": 479,
+            "ch": 438,
+            "frames": 1
+        },
+        {
+            "id": "sfish_1",
+            "src": "fishes/sprites/1",
+            "ext": "png",
+            "cw": 461,
+            "ch": 65,
+            "frames": 6
+        },
+        {
+            "id": "sfish_2",
+            "src": "fishes/sprites/2",
+            "ext": "png",
+            "cw": 1029,
+            "ch": 81,
+            "frames": 10
+        },
+        {
+            "id": "sfish_3",
+            "src": "fishes/sprites/3",
+            "ext": "png",
+            "cw": 515,
+            "ch": 65,
+            "frames": 6
+        },
+        {
+            "id": "sfish_4",
+            "src": "fishes/sprites/4",
+            "ext": "png",
+            "cw": 652,
+            "ch": 65,
+            "frames": 6
+        },
+        {
+            "id": "sfish_5",
+            "src": "fishes/sprites/5",
+            "ext": "png",
+            "cw": 413,
+            "ch": 65,
+            "frames": 6
+        },
+        {
+            "id": "sfish_6",
+            "src": "fishes/sprites/6",
+            "ext": "png",
+            "cw": 400,
+            "ch": 65,
+            "frames": 6
+        },
+        {
+            "id": "fish_0",
+            "src": "fishes/0",
+            "ext": "png",
+            "cw": 479,
+            "ch": 438
+        },
+        {
+            "id": "fish_1",
+            "src": "fishes/1",
+            "ext": "png",
+            "cw": 298,
+            "ch": 256
+        },
+        {
+            "id": "fish_2",
+            "src": "fishes/2",
+            "ext": "png",
+            "cw": 301,
+            "ch": 256
+        },
+        {
+            "id": "fish_3",
+            "src": "fishes/3",
+            "ext": "png",
+            "cw": 330,
+            "ch": 256
+        },
+        {
+            "id": "fish_4",
+            "src": "fishes/4",
+            "ext": "png",
+            "cw": 349,
+            "ch": 256
+        },
+        {
+            "id": "fish_5",
+            "src": "fishes/5",
+            "ext": "png",
+            "cw": 436,
+            "ch": 256
+        },
+        {
+            "id": "fish_6",
+            "src": "fishes/6",
+            "ext": "png",
+            "cw": 267,
+            "ch": 256
+        },
+        {
+            "id": "fish_7",
+            "src": "fishes/7",
+            "ext": "png",
+            "cw": 276,
+            "ch": 256
+        },
+        {
+            "id": "garbage_1",
+            "src": "garbages/1",
+            "ext": "png",
+            "cw": 261,
+            "ch": 257
+        },
+        {
+            "id": "garbage_2",
+            "src": "garbages/2",
+            "ext": "png",
+            "cw": 261,
+            "ch": 257
+        },
+        {
+            "id": "garbage_3",
+            "src": "garbages/3",
+            "ext": "png",
+            "cw": 260,
+            "ch": 257
+        },
+        {
+            "id": "garbage_4",
+            "src": "garbages/4",
+            "ext": "png",
+            "cw": 183,
+            "ch": 257
+        },
+        {
+            "id": "garbage_5",
+            "src": "garbages/5",
+            "ext": "png",
+            "cw": 183,
+            "ch": 257
+        },
+        {
+            "id": "garbage_6",
+            "src": "garbages/6",
+            "ext": "png",
+            "cw": 183,
+            "ch": 257
+        },
+        {
+            "id": "garbage_7",
+            "src": "garbages/7",
+            "ext": "png",
+            "cw": 239,
+            "ch": 257
+        },
+        {
+            "id": "garbage_8",
+            "src": "garbages/8",
+            "ext": "png",
+            "cw": 240,
+            "ch": 257
+        },
+        {
+            "id": "garbage_9",
+            "src": "garbages/9",
+            "ext": "png",
+            "cw": 239,
+            "ch": 257
+        },
+        {
+            "id": "battery_rect",
+            "src": "hud/battery/rect",
+            "ext": "png",
+            "cw": 49,
+            "ch": 117
+        },
+        {
+            "id": "battery_top",
+            "src": "hud/battery/top",
+            "ext": "png",
+            "cw": 23,
+            "ch": 5
+        },
+        {
+            "id": "battery_logo",
+            "src": "hud/battery/logo",
+            "ext": "png",
+            "cw": 18,
+            "ch": 37
+        },
+        {
+            "id": "battery_charge_lime",
+            "src": "hud/battery/charge_lime",
+            "ext": "png",
+            "cw": 49,
+            "ch": 116
+        },
+        {
+            "id": "battery_charge_red",
+            "src": "hud/battery/charge_red",
+            "ext": "png",
+            "cw": 50,
+            "ch": 12
+        },
+        {
+            "id": "stopwatch",
+            "src": "hud/stopwatch",
+            "ext": "png",
+            "cw": 43,
+            "ch": 45
+        },
+        {
+            "id": "timecircle",
+            "src": "hud/timecircle",
+            "ext": "png",
+            "cw": 45,
+            "ch": 45
+        },
+        {
+            "id": "complete",
+            "src": "hud/complete",
+            "ext": "png",
+            "cw": 185,
+            "ch": 25
+        },
+        {
+            "id": "yourscore",
+            "src": "hud/yourscore",
+            "ext": "png",
+            "cw": 197,
+            "ch": 30
+        },
+        {
+            "id": "volume",
+            "src": "hud/volume",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        },
+        {
+            "id": "mute",
+            "src": "hud/mute",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        }
+    ]
+}
