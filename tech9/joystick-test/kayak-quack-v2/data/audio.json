@@ -1,0 +1,19 @@
+{
+    "data": [
+        {
+            "id": "bg",
+            "src": "sounds/bg",
+            "ext": "mp3"
+        }, 
+        {
+            "id": "cry",
+            "src": "sounds/hit",
+            "ext": "wav"
+        },
+        {
+            "id": "score",
+            "src": "sounds/score",
+            "ext": "mp3"
+        }
+    ]
+}
