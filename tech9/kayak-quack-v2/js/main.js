@@ -282,6 +282,9 @@ var bgTileGroup = [];
 var level = Infinity;
 var speedInc = 10;
 
+var joystick = null;
+const onMobile = isMobile();
+
 // pool - 606px
 // rect - 12px, 6px
 // total width - 926px
@@ -348,19 +351,19 @@ function main(w, h) {
         parallaxInfo.tile.yPos[i] = bgTilesPosY[0] + i * containerH;
     }
 
-    for (let i = 0; i < 9; ++i) {
+    for (let i = 0; i < 12; ++i) {
         waterObjHolder[i] = new Sprite(0, 0, 0, 0, 0, 0);
         waterObjHolder[i].id = -1;
     }
 
     
 
-    rescaleSize(bunnyInfo, scaleX, scaleY);
-    rescaleSize(kayakInfo, scaleX, scaleY);
-    rescaleSize(lilyInfo, scaleX, scaleY);
-    rescaleSize(wstoneInfo, scaleX, scaleY);
-    rescaleSize(logInfo, scaleX, scaleY);
-    rescaleSize(kayakHitBox, scaleX, scaleY);
+    rescaleSize(bunnyInfo, scaleX, scaleX);
+    rescaleSize(kayakInfo, scaleX, scaleX);
+    rescaleSize(lilyInfo, scaleX, scaleX);
+    rescaleSize(wstoneInfo, scaleX, scaleX);
+    rescaleSize(logInfo, scaleX, scaleX);
+    rescaleSize(kayakHitBox, scaleX, scaleX);
     
     // kayak = new Sprite(w / 2 - kayakInfo.w / 2, h - kayakInfo.h * 1, kayakInfo.w, kayakInfo.h, 129.125, AM.images.kayak.ch);
     // console.log(AM.images.kayak.cw)
@@ -445,29 +448,68 @@ function main(w, h) {
     // addBunny(6, 1);
     // addBunny(7, 1);
 
+    let joystickX = w * 0.20;
+    let joystickY = h * 0.75;
+    
+    joystick = new Joystick(joystickX, joystickY, 150 * scaleX);
+
+    var url_string = location.href; 
+    var url = new URL(url_string);
+    var isOn = url.searchParams.get("on");
+    if (isOn == null) isOn = 1;
+    joystick.on = parseInt(isOn);
 
     gameCycle();
 }
 
 function initTileGroup() {
-    let arr = [1, 2, 3, 0, 0, 0];
+    let arr = [1, 2, 3, 4, 0, 0];
     shuffleArr(arr);
-    arr.push(0, 0);
+
+    for (let i = 0; i < 2; ++i) {
+        arr.push(0);
+    }
+    
     bgTileGroup = arr;
 
-    for (let i = 0; i < 9; ++i) {
-        morphWaterObj(i);
+    for (let i = 0; i < waterObjHolder.length; ++i) {
+        morphWaterObj(i, -1);
     }
 
-    for (let i = 0; i < 8; ++i) {
+    for (let i = 0; i < bgTileGroup.length; ++i) {
         let group = bgTileGroup[i];
         if (group > 0) {
             let start = (group - 1) * 3;
             let end = group * 3;
 
             for (let j = start; j < end; ++j) {
-                let col = i % 3;
-                let rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w - waterObjHolder[j].w)) + waterObjContainer[i][col].x;
+                let col = j % 3;
+                // let rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w - waterObjHolder[j].w)) + waterObjContainer[i][col].x;
+                let rngX = 0;
+
+                if (
+                    (i == 5 && col == 0) || 
+                    (i == 6 && col == 0) || 
+                    (i == 6 && col == 1) 
+                ) {
+                    // console.log(i, col);
+                    rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w / 2 - waterObjHolder[j].w)) + waterObjContainer[i][col].x;
+                } else if (
+                    (i == 5 && col == 2) || 
+                    (i == 5 && col == 1) || 
+                    (i == 3 && col == 2) || 
+                    (i == 3 && col == 1) || 
+                    (i == 3 && col == 0) ||
+                    (i == 2 && col == 2) || 
+                    (i == 2 && col == 1) || 
+                    (i == 2 && col == 0) 
+                ) {
+                    // console.log(i, col);
+                    rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w / 2 - waterObjHolder[j].w));
+                    rngX = waterObjContainer[i][col].x + waterObjContainer[i][col].w / 2 + rngX;
+                } else {
+                    rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w - waterObjHolder[j].w)) + waterObjContainer[i][col].x;
+                }
                 waterObjHolder[j].x = rngX;
                 // waterObjHolder[j].y = bgTilesPosY[idx] + containerH / 2 - waterObjHolder[i].h / 2 + col * containerH;
                 // waterObjHolder[j].swim(ctx, AM.images[waterObjHolder[i].key].img);
@@ -539,6 +581,7 @@ function drawWaterObj(idx) {
 
 function moveTileGroup(idx) {
     let next = (idx + 13) % 8;
+    // let next = (Math.floor(idx / 3) + 1) % 8;
     let group = bgTileGroup[idx];
 
     bgTileGroup[next] = group;
@@ -547,23 +590,72 @@ function moveTileGroup(idx) {
     let start = (group - 1) * 3;
     let end = group * 3;
 
+    // let start = idx * 3;
+    // let end = (idx + 1) * 3;
+    
     for (let j = start; j < end; ++j) {
-        morphWaterObj(j);
+        morphWaterObj(j, idx);
 
         let col = j % 3;
-        let rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w - waterObjHolder[j].w)) + waterObjContainer[next][col].x;
+        let rngX = 0;
+
+
+        // if (idx == 6 && j == 0) {
+        //     rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w)) + waterObjContainer[next][col].x;
+        // } else {
+        //     rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w - waterObjHolder[j].w)) + waterObjContainer[next][col].x;
+        // }
+        // console.log(idx, col, j);
+        if (
+            (idx == 5 && col == 0) || 
+            (idx == 6 && col == 0) || 
+            (idx == 6 && col == 1) 
+        ) {
+            // console.log(idx, col);
+            rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w)) + waterObjContainer[next][col].x;
+        } else if (
+            (idx == 5 && col == 2) || 
+            (idx == 5 && col == 1) || 
+            (idx == 3 && col == 2) || 
+            (idx == 3 && col == 1) || 
+            (idx == 3 && col == 0) ||
+            (idx == 2 && col == 2) || 
+            (idx == 2 && col == 1) || 
+            (idx == 2 && col == 0) 
+        ) {
+            // console.log(idx, col, j);
+            // rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w)) + waterObjContainer[next][col].x + waterObjContainer[next][col].w / 2;
+            rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w));
+            rngX = waterObjContainer[next][col].x + waterObjContainer[next][col].w / 2 + rngX;
+        } else {
+            rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w - waterObjHolder[j].w)) + waterObjContainer[next][col].x;
+        }
+
         waterObjHolder[j].x = rngX;
     }
 }
 
-function morphWaterObj(i) {
+function morphWaterObj(i, row) {
     let rng = Math.floor(Math.random() * 12) - 1;
+    
     
     if (rng > -1) {
         let w, h, cw, ch, key;
 
         let duckChances = Math.floor(Math.random() * 100);
         if (duckChances > 65) rng = 3;
+
+        if (rng != 3) {
+            if (row == 3 || row == 5 || row == 6) {
+                rng = Math.floor(Math.random() * 3);
+            } else {
+                if (rng > 2) {
+                    let tmpRng = Math.floor(Math.random() * 100);
+                    if (tmpRng > 30) rng = Math.floor(Math.random() * 3);
+                }
+            }
+            
+        }
 
         if (rng < 3) {
             key = 'lily' + (rng + 1);
@@ -696,9 +788,10 @@ function drawWaterObjContainer() {
         // if (waterObjContainer[i]) {
             for (let j = 0; j < waterObjContainer[i].length; ++j) {
                 const { x, y, w, h } = waterObjContainer[i][j];
-                // ctx.beginPath();
-                // ctx.rect(x, y, w, h);
-                // ctx.stroke();
+                ctx.beginPath();
+                ctx.rect(x, y, w, h);
+                ctx.stroke();
+                ctx.fillText(i + " " + j, x + w / 2, y + h / 2);
             }
         // }
     }
@@ -1307,7 +1400,30 @@ function updateWaterObject(rngY) {
                     let rowIdx = Math.floor(rngY / 3)
                     let colIdx = rngY % 3; 
                     let w = waterObjContainer[rowIdx][colIdx].w - waterObjects[idx].w;
-                    let rngX = Math.floor(Math.random() * w) + waterObjContainer[rowIdx][colIdx].x;
+                    let rngX = 0;
+                    // let rngX = Math.floor(Math.random() * w) + waterObjContainer[rowIdx][colIdx].x;
+
+                    if (
+                        (rowIdx == 6 && idx == 0) || 
+                        (rowIdx == 6 && idx == 1) 
+                    ) {
+                        console.log(rowIdx, j);
+                        rngX = Math.floor(Math.random() * (waterObjContainer[rowIdx][colIdx].w / 2 - waterObjects[idx].w)) + waterObjContainer[rowIdx][colIdx].x;
+                    } else if (
+                        (rowIdx == 5 && idx == 2) || 
+                        (rowIdx == 5 && idx == 1) || 
+                        (rowIdx == 3 && idx == 2) || 
+                        (rowIdx == 3 && idx == 1) || 
+                        (rowIdx == 3 && idx == 0) 
+                    ) {
+                        console.log(rowIdx, j);
+                        // rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w)) + waterObjContainer[next][col].x + waterObjContainer[next][col].w / 2;
+                        rngX = Math.floor(Math.random() * (waterObjContainer[rowIdx][colIdx].w / 2 - waterObjects[idx].w));
+                        rngX = waterObjContainer[rowIdx][col].x + waterObjContainer[rowIdx][col].w - rngX;
+                    } else {
+                        rngX = Math.floor(Math.random() * (waterObjContainer[rowIdx][colIdx].w - waterObjects[idx].w)) + waterObjContainer[rowIdx][colIdx].x;
+                    }
+
                     waterObjects[idx].x = rngX;
                     // waterObjects[idx].id = rngY;
                     
@@ -1558,12 +1674,33 @@ function playAllAudio() {
             // AM.audio[k].img.pause();
         }
     }
-    
+}
+
+function mouseMove(x, y, prevX, prevY) {
+    if (joystick.active) {
+        let dist = x - mouseMoveOrigin.x;
+        kayak.x = kayak.ox + dist;
+        kayak.updateBounds(kayakBounds, kayakHitBox);
+
+        setKayakRotation(prevX, x, dist);
+
+        let distX = x - prevX;
+        let distY = prevY - y;
+
+        joystick.update(distX * 0.5, distY);
+    }
+}
+
+function mouseUp() {
+    kayak.updateOriginalPos();
+    kayak.zRotate = 0;
+    joystick.touchUp();
 }
 
 function controls() {
     let mid = canvas.width / 2;
     let prevPos = 0;
+    let prevPosY = 0;
 
     window.addEventListener('blur', () => {
         muteAllAudio(true);
@@ -1592,6 +1729,7 @@ function controls() {
                 var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
                 var touch = evt.touches[0] || evt.changedTouches[0];
                 prevPos = touch.pageX;
+                prevPosY = touch.pageY;
 
                 if (!mDown) {
 
@@ -1615,6 +1753,10 @@ function controls() {
 
                     mDown = true;
                     mouseMoveOrigin.x = prevPos;
+
+                    if (isBtnClicked(touch.pageX, touch.pageY, joystick.hitbox) || !joystick.on) {
+                        joystick.active = true;
+                    }
                 }
             }
         }
@@ -1639,8 +1781,9 @@ function controls() {
 
             if (mDown) {
                 mDown = false;
-                kayak.updateOriginalPos();
-                kayak.zRotate = 0;
+                // kayak.updateOriginalPos();
+                // kayak.zRotate = 0;
+                mouseUp();
             }
         }
     });
@@ -1652,6 +1795,7 @@ function controls() {
                 var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
                 var touch = evt.touches[0] || evt.changedTouches[0];
                 let x = touch.pageX;
+                let y = touch.pageY;
 
                 // if (x > prevPos) {
                 //     // forceD = F;
@@ -1664,14 +1808,16 @@ function controls() {
                 if (gameover) mDown = false;
 
                 if (mDown) {
-                    let dist = x - mouseMoveOrigin.x;
-                    kayak.x = kayak.ox + dist;
-                    kayak.updateBounds(kayakBounds, kayakHitBox);
+                    // let dist = x - mouseMoveOrigin.x;
+                    // kayak.x = kayak.ox + dist;
+                    // kayak.updateBounds(kayakBounds, kayakHitBox);
 
-                    setKayakRotation(prevPos, x, dist);
+                    // setKayakRotation(prevPos, x, dist);
+                    mouseMove(x, y, prevPos, prevPosY);
                 }
 
                 prevPos = x;
+                prevPosY = y;
             }
         }
     });
@@ -1725,6 +1871,8 @@ function controls() {
                 // if (!mDown) {
                     mDown = true;
                     mouseMoveOrigin.x = mx;
+
+                    joystick.active = true;
                 // }
 
             }
@@ -1737,18 +1885,21 @@ function controls() {
     canvas.addEventListener('mousemove', e => {
         // mousemoveE(e.offsetX, e.offsetY);
         let mx = e.offsetX;
+        let my = e.offsetY;
         // let my = e.offsetY;
 
         if (gameover) mDown = false;
 
         if (mDown) {
-            let dist = mx - mouseMoveOrigin.x;
-            kayak.x = kayak.ox + dist;
-            kayak.updateBounds(kayakBounds, kayakHitBox);
+            // let dist = mx - mouseMoveOrigin.x;
+            // kayak.x = kayak.ox + dist;
+            // kayak.updateBounds(kayakBounds, kayakHitBox);
             
-            setKayakRotation(prevPos, mx, dist);
+            // setKayakRotation(prevPos, mx, dist);
+            mouseMove(mx, my, prevPos, prevPosY);
             
             prevPos = mx;
+            prevPosY = my;
         }
 
     });
@@ -1771,8 +1922,9 @@ function controls() {
 
         if (mDown) {
             mDown = false;
-            kayak.updateOriginalPos();
-            kayak.zRotate = 0;
+            mouseUp();
+            // kayak.updateOriginalPos();
+            // kayak.zRotate = 0;
             // eelLookAt[0] = canvas.width / 2;
             // eelLookAt[1] = 0;
             if (gameover) {
@@ -2216,6 +2368,10 @@ function gameCycle() {
             showPoints();
             
             HUD.draw(ctx);
+
+            if (onMobile)
+                joystick.draw(ctx);
+
             update();
 
             

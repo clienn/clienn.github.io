@@ -198,6 +198,8 @@ var mouseMoveOrigin = {
     y: 0
 };
 
+var joystick = null;
+const onMobile = isMobile();
 
 // #313350
 
@@ -230,13 +232,13 @@ function main(w, h) {
     timer.setTimer(90);
     
     
-    rescaleSize(pigInfo, scaleX, scaleY);
-    rescaleSize(moneyInfo, scaleX, scaleY);
-    rescaleSize(ballInfo, scaleX, scaleY);
-    rescaleSize(coinInfo, scaleX, scaleY);
-    rescaleSize(hammerInfo, scaleX, scaleY);
-    rescaleSize(glueInfo, scaleX, scaleY);
-    rescaleSize(kaboomInfo, scaleX, scaleY);
+    rescaleSize(pigInfo, scaleX, scaleX);
+    rescaleSize(moneyInfo, scaleX, scaleX);
+    rescaleSize(ballInfo, scaleX, scaleX);
+    rescaleSize(coinInfo, scaleX, scaleX);
+    rescaleSize(hammerInfo, scaleX, scaleX);
+    rescaleSize(glueInfo, scaleX, scaleX);
+    rescaleSize(kaboomInfo, scaleX, scaleX);
 
     pig = new Sprite(w / 2 - pigInfo.w / 2, h - pigInfo.h - 10, pigInfo.w, pigInfo.h, AM.images.pig_1.cw, AM.images.pig_1.ch);
     smoke = new Sprite(w / 2 - pigInfo.w / 2, h - pigInfo.h - 10, pigInfo.w, pigInfo.h, 192, 192);
@@ -266,6 +268,16 @@ function main(w, h) {
     addCoins();
     addCoins();
 
+    let joystickX = w * 0.20;
+    let joystickY = h * 0.75;
+    
+    joystick = new Joystick(joystickX, joystickY, 150 * scaleX);
+    var url_string = location.href; 
+    var url = new URL(url_string);
+    var isOn = url.searchParams.get("on");
+    if (isOn == null) isOn = 1;
+    joystick.on = parseInt(isOn);
+
     gameCycle();
 }
 
@@ -289,9 +301,38 @@ function playAllAudio() {
     
 }
 
+function mouseMove(x, y, prevX, prevY) {
+    if (joystick.active) {
+        let dist = x - mouseMoveOrigin.x;
+        pig.x = pig.ox + dist;
+        pig.updateBounds(canvas.width);
+
+        if (x >= prevX) {
+            // forceD = F;
+            pig.yRotate = 180;
+        } else  {
+            // forceD = -F;
+            pig.yRotate = 0;
+        }
+
+        let distX = x - prevX;
+        let distY = prevY - y;
+
+        joystick.update(distX * 0.5, distY);
+    }
+}
+
+function mouseUp() {
+    pig.updateOriginalPos();
+    joystick.touchUp();
+}
+
+
+
 function controls() {
     let mid = canvas.width / 2;
     let prevPos = 0;
+    let prevPosY = 0;
 
     window.addEventListener('blur', () => {
         muteAllAudio(true);
@@ -321,6 +362,7 @@ function controls() {
                 var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
                 var touch = evt.touches[0] || evt.changedTouches[0];
                 prevPos = touch.pageX;
+                prevPosY = touch.pageY;
 
                 if (isBtnClicked(touch.pageX, touch.pageY, {
                     x: HUD.volume.x,
@@ -342,7 +384,11 @@ function controls() {
                     mDown = true;
                     
                     mouseMoveOrigin.x = prevPos;
-                    console.log(prevPos)
+
+                    if (isBtnClicked(touch.pageX, touch.pageY, joystick.hitbox) || !joystick.on) {
+                        joystick.active = true;
+                    }
+                    // console.log(prevPos)
                 }
                 
             }
@@ -417,7 +463,8 @@ function controls() {
 
             if (mDown) {
                 mDown = false;
-                pig.updateOriginalPos();
+                // pig.updateOriginalPos();
+                mouseUp();
                 // mouseMoveOrigin.x = pig.x;
                 // console.log(x)
             }
@@ -451,21 +498,24 @@ function controls() {
                 var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
                 var touch = evt.touches[0] || evt.changedTouches[0];
                 let x = touch.pageX;
+                let y = touch.pageY;
 
                 if (mDown) {
-                    let dist = x - mouseMoveOrigin.x;
-                    pig.x = pig.ox + dist;
-                    pig.updateBounds(canvas.width);
+                    // let dist = x - mouseMoveOrigin.x;
+                    // pig.x = pig.ox + dist;
+                    // pig.updateBounds(canvas.width);
 
-                    if (x >= prevPos) {
-                        // forceD = F;
-                        pig.yRotate = 180;
-                    } else  {
-                        // forceD = -F;
-                        pig.yRotate = 0;
-                    }
+                    // if (x >= prevPos) {
+                    //     // forceD = F;
+                    //     pig.yRotate = 180;
+                    // } else  {
+                    //     // forceD = -F;
+                    //     pig.yRotate = 0;
+                    // }
+                    mouseMove(x, y, prevPos, prevPosY);
 
                     prevPos = x;
+                    prevPosY = y;
                     // if (evt.touches.length > 0) {
                     //     if (x > pig.x) {
                     //         if (!rDown) {
@@ -520,6 +570,8 @@ function controls() {
         if (!mDown) {
             mDown = true;
             mouseMoveOrigin.x = mx;
+
+            joystick.active = true;
         }
 
         if (isBtnClicked(mx, my, {
@@ -592,21 +644,23 @@ function controls() {
         if (gameover) mDown = false;
 
         if (mDown) {
-            let dist = mx - mouseMoveOrigin.x;
-            pig.x = pig.ox + dist;
-            pig.updateBounds(canvas.width);
+            // let dist = mx - mouseMoveOrigin.x;
+            // pig.x = pig.ox + dist;
+            // pig.updateBounds(canvas.width);
 
-            
 
-            if (mx >= prevPos) {
-                // forceD = F;
-                pig.yRotate = 180;
-            } else {
-                // forceD = -F;
-                pig.yRotate = 0;
-            }
+            // if (mx >= prevPos) {
+            //     // forceD = F;
+            //     pig.yRotate = 180;
+            // } else {
+            //     // forceD = -F;
+            //     pig.yRotate = 0;
+            // }
+
+            mouseMove(mx, my, prevPos, prevPosY);
 
             prevPos = mx;
+            prevPosY = my;
         }
     });
     
@@ -623,7 +677,9 @@ function controls() {
 
         if (mDown) {
             mDown = false;
-            pig.updateOriginalPos();
+            // pig.updateOriginalPos();
+
+            mouseUp();
             
             // prevPos = 0;
             // if (rDown) 
@@ -1198,8 +1254,8 @@ function showPoints(pointType) {
  */
 function playScore() {
     setTimeout(() => {
+        AM.audio.score.img.volume = 0.3;
         AM.audio.score.img.currentTime = 0;
-        AM.audio.score.img.volume = 0.5;
         AM.audio.score.img.play();
     }, 0);
     
@@ -1207,8 +1263,8 @@ function playScore() {
 
 function playGlue() {
     setTimeout(() => {
+        AM.audio.glue.img.volume = 0.3;
         AM.audio.glue.img.currentTime = 0;
-        AM.audio.glue.img.volume = 0.5;
         AM.audio.glue.img.play();
     }, 0);
     
@@ -1216,8 +1272,8 @@ function playGlue() {
 
 function playKaboom() {
     setTimeout(() => {
+        AM.audio.kaboom.img.volume = 0.3;
         AM.audio.kaboom.img.currentTime = 0;
-        AM.audio.kaboom.img.volume = 0.5;
         AM.audio.kaboom.img.play();
     }, 0);
     
@@ -1411,6 +1467,10 @@ function gameCycle() {
             
             drawMoney();
             drawBall();
+
+            if (onMobile)
+                joystick.draw(ctx);
+
             update();
         } else {
             // ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);

@@ -17,6 +17,9 @@ var gameover = false;
 var mDown = false;
 var rDown = false;
 var lDown = false;
+var uDown = false;
+var dDown = false;
+var keyDown = false;
 
 // timer
 var timer = null;
@@ -194,13 +197,13 @@ var mouseMoveOrigin = {
 var eelLowestPosY = 0;
 var eelMoveUpSpeed = 10;
 
+var joystick = null;
+var onMobile = isMobile();
 /*
  * GAME INITIATLIZATIONS AND CONTROLS
  */
 function main(w, h) {
     //
-    
-
     canvas.width = w;
     canvas.height = h;
 
@@ -234,12 +237,12 @@ function main(w, h) {
     // console.log(TXT.texts);
     
     
-    setFishInfo(scaleX, scaleY, 2.5);
-    setSchoolFishInfo(scaleX, scaleY, 0.5);
-    setGarbageInfo(scaleX, scaleY, 0.5);
-    rescaleSize(eelInfo.head, scaleX, scaleY);
-    rescaleSize(eelInfo.neck, scaleX, scaleY);
-    rescaleSize(eel_hitbox, scaleX, scaleY);
+    setFishInfo(scaleX, scaleX, 2.5);
+    setSchoolFishInfo(scaleX, scaleX, 0.5);
+    setGarbageInfo(scaleX, scaleX, 0.5);
+    rescaleSize(eelInfo.head, scaleX, scaleX);
+    rescaleSize(eelInfo.neck, scaleX, scaleX);
+    rescaleSize(eel_hitbox, scaleX, scaleX);
 
     // eelInfo.neck.h = w;
 
@@ -336,8 +339,16 @@ function main(w, h) {
     addGarbage();
     addGarbage();
     addGarbage();
+
+    let joystickX = w * 0.20;
+    let joystickY = h * 0.75;
     
-    
+    joystick = new Joystick(joystickX, joystickY, 150 * scaleX);
+    var url_string = location.href; 
+    var url = new URL(url_string);
+    var isOn = url.searchParams.get("on");
+    if (isOn == null) isOn = 1;
+    joystick.on = parseInt(isOn);
     
     gameCycle();
 }
@@ -378,6 +389,7 @@ function drawEel() {
     // eelHead.updatePos(delta, eelDirection);
     // eelNeck.updatePos(delta, eelDirection);
     
+    // if (!mDown || (joystick.active && joystick.prevMx == joystick.mx)) {
     if (!mDown) {
         eelHead.moveEel(canvas.width, delta, eel_hitbox, updateHitBox);
         eelNeck.x = eelHead.x + eelHead.w / 2 - eelNeck.w / 2;
@@ -682,16 +694,52 @@ function playAllAudio() {
             AM.audio[k].img.volume = 0;
             AM.audio[k].img.currentTime = 0;
             AM.audio[k].img.play();
-            AM.audio[k].img.pause();
+            // AM.audio[k].img.pause();
         }
     }
     
+}
+
+function mouseMove(x, y, prevX, prevY) {
+    if (joystick.active) {
+        let dist = x - mouseMoveOrigin.x;
+        eelHead.x = eelHead.ox + dist;
+        eelHead.updateBounds(canvas.width, eel_hitbox);
+
+        eelNeck.x = eelHead.x + eelHead.w / 2 - eelNeck.w / 2;
+
+        let distX = x - prevX;
+        let distY = prevY - y;
+
+        // joystick.totalDistX = eelHead.x - eelHead.ox;
+
+        // joystick.vx = distX;
+
+        joystick.update(distX * 0.5, distY);
+
+        // console.log(joystick.percentageX);
+
+        // joystick.moveByPercentX = canvas.width * joystick.percentageX;
+
+        // eelHead.x = eelHead.ox + joystick.moveByPercentX;
+        // eelHead.updateBounds(canvas.width, eel_hitbox);
+
+        // eelNeck.x = eelHead.x + eelHead.w / 2 - eelNeck.w / 2;
+
+        moveUp(distY);
+    }
+}
+
+function mouseUp() {
+    eelHead.updateOriginalPos();
+    joystick.touchUp();
 }
 
 function controls() {
     let mid = canvas.width / 2;
     let prevPos = 0;
     let prevPosY = 0;
+    let isMoving = false;
 
     window.addEventListener('blur', () => {
         muteAllAudio(true);
@@ -743,6 +791,10 @@ function controls() {
                     mDown = true;
                     mouseMoveOrigin.x = prevPos;
                     mouseMoveOrigin.y = prevPosY;
+
+                    if (isBtnClicked(touch.pageX, touch.pageY, joystick.hitbox) || !joystick.on) {
+                        joystick.active = true;
+                    }
                 }
             }
         }
@@ -767,7 +819,9 @@ function controls() {
 
             if (mDown) {
                 mDown = false;
-                eelHead.updateOriginalPos();
+                // eelHead.updateOriginalPos();
+                mouseUp();
+                eelHead.vx = 0;
             }
         }
     });
@@ -791,19 +845,23 @@ function controls() {
                 if (gameover) mDown = false;
 
                 if (mDown) {
-                    let dist = x - mouseMoveOrigin.x;
-                    eelHead.x = eelHead.ox + dist;
-                    eelHead.updateBounds(canvas.width, eel_hitbox);
+                    // let dist = x - mouseMoveOrigin.x;
+                    // eelHead.x = eelHead.ox + dist;
+                    // eelHead.updateBounds(canvas.width, eel_hitbox);
 
-                    eelNeck.x = eelHead.x + eelHead.w / 2 - eelNeck.w / 2;
+                    // eelNeck.x = eelHead.x + eelHead.w / 2 - eelNeck.w / 2;
 
-                    let distY = prevPosY - y;
-                    moveUp(distY);
+                    // let distY = prevPosY - y;
+                    // moveUp(distY);
                     // prevPos = mx;
+
+                    mouseMove(x, y, prevPos, prevPosY);
+
+                    prevPos = x;
+                    prevPosY = y;
                 }
 
-                prevPos = x;
-                prevPosY = y;
+                
             }
         }
     });
@@ -870,11 +928,17 @@ function controls() {
                     // isNeutral = false;
                     // isHunting = true;
                     // eelDirection = eelDirectionSpeed;
+
+                    
                 }
 
                 mDown = true;
                 mouseMoveOrigin.x = mx;
                 prevPosY = mouseMoveOrigin.y = my;
+                joystick.active = true;
+                // if (isBtnClicked(mx, my, joystick.hitbox)) {
+                    
+                // }
             }
         }
 
@@ -896,16 +960,18 @@ function controls() {
         if (gameover) mDown = false;
 
         if (mDown) {
-            let dist = mx - mouseMoveOrigin.x;
-            let distY = prevPosY - my;
-            // let distY = mouseMoveOrigin.y - my;
+            // let dist = mx - mouseMoveOrigin.x;
+            // let distY = prevPosY - my;
+            // // let distY = mouseMoveOrigin.y - my;
 
-            eelHead.x = eelHead.ox + dist;
-            eelHead.updateBounds(canvas.width, eel_hitbox);
+            // eelHead.x = eelHead.ox + dist;
+            // eelHead.updateBounds(canvas.width, eel_hitbox);
 
-            eelNeck.x = eelHead.x + eelHead.w / 2 - eelNeck.w / 2;
+            // eelNeck.x = eelHead.x + eelHead.w / 2 - eelNeck.w / 2;
 
-            moveUp(distY);
+            // moveUp(distY);
+
+            mouseMove(mx, my, prevPos, prevPosY);
 
             prevPos = mx;
             prevPosY = my;
@@ -930,7 +996,8 @@ function controls() {
 
         if (mDown) {
             mDown = false;
-            eelHead.updateOriginalPos();
+            // eelHead.updateOriginalPos();
+            mouseUp();
             // eelLookAt[0] = canvas.width / 2;
             // eelLookAt[1] = 0;
             if (gameover) {
@@ -954,26 +1021,50 @@ function controls() {
                     eelHead.vx = F;
                     
                 }
+                keyDown = true;
             } else if (e.key == 'ArrowLeft') {
                 if (!lDown) {
                     lDown = true;
                     // forceD = -F;
                     eelHead.vx = -F;
                 }
-            }
+                keyDown = true;
+            } 
+            
+            // else if (e.key == 'ArrowUp') {
+            //     if (!uDown) {
+            //         uDown = true;
+            //         // forceD = -F;
+            //         // eelHead.vx = -F;
+            //         moveUp(-distY);
+            //     }
+            // } else if (e.key == 'ArrowDown') {
+            //     if (!dDown) {
+            //         dDown = true;
+            //         // forceD = -F;
+            //         // eelHead.vx = -F;
+            //         moveUp(distY);
+            //     }
+            // }
         }
         
     });
 
     document.addEventListener('keyup', e => {
         if (!gameover) {
-            
-
             if (e.key == 'ArrowRight') {
                 rDown = false;
+                keyDown = false;
             } else if (e.key == 'ArrowLeft') {
                 lDown = false;
-            }
+                keyDown = false;
+            } 
+            
+            // else if (e.key == 'ArrowUp') {
+            //     uDown = false;
+            // } else if (e.key == 'ArrowDown') {
+            //     dDown = false;
+            // }
 
             if (!rDown && !lDown) {
                 // forceD = 0;
@@ -1550,6 +1641,17 @@ function update() {
     }
 
     HUD.decay(delta);
+
+    // if (joystick.active) {
+    //     if (joystick.prevMx == joystick.mx) {
+    //         let dist = joystick.vx > 0 ? F : -F;
+    //         joystick.totalDistX += dist * delta;
+    //         eelHead.x = eelHead.ox + joystick.totalDistX;
+    //         eelHead.updateBounds(canvas.width, eel_hitbox);
+
+    //         eelNeck.x = eelHead.x + eelHead.w / 2 - eelNeck.w / 2;
+    //     }
+    // }
 }
 
 function gameCycle() {
@@ -1574,6 +1676,9 @@ function gameCycle() {
             drawEel();
 
             showPoints(1);
+
+            if (onMobile)
+                joystick.draw(ctx);
 
             // divingFish.dive(ctx, AM.images['fish_4'].img);
             
