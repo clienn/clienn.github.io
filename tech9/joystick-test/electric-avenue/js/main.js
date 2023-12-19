@@ -199,6 +199,8 @@ var eelMoveUpSpeed = 10;
 
 var joystick = null;
 var onMobile = isMobile();
+
+const startingBatteryLife = 20;
 /*
  * GAME INITIATLIZATIONS AND CONTROLS
  */
@@ -262,6 +264,18 @@ function main(w, h) {
     eel_hitbox.y = eelHead.y + 50 * scaleY;
     updateHitBox();
     initStartPage();
+
+    let fishWidth = 102.9 * 1.5 * scaleX;
+    startPage.text2.x += 100 * scaleX;
+    let totalInstructionW = (startPage.text1.x - fishWidth) + startPage.text2.x + startPage.text2.w;
+    let adjX = w / 2 - totalInstructionW / 2;
+    startPage.text1.x += adjX;
+    startPage.text2.x += adjX;
+
+    TXT.addText('instruction1', 'Gobble up the fish.', 'normal', 20, 'Montserrat', startPage.text1.x, startPage.text1.y, 270 * scaleX, 30 * scaleX, '#fff', false);
+    TXT.addText('instruction1_2', '+3', 'bold', 20, 'Montserrat', startPage.text1.x, startPage.text1.y + 40 * scaleY, 30 * scaleX, 30 * scaleX, '#C7FC12', false);
+    TXT.addText('instruction2', 'Avoid the trash.', 'normal', 20, 'Montserrat', startPage.text2.x, startPage.text1.y, 230 * scaleX, 30 * scaleX, '#fff', false);
+    TXT.addText('instruction2_2', '-20', 'bold', 20, 'Montserrat', startPage.text2.x, startPage.text1.y + 40 * scaleY, 50 * scaleX, 30 * scaleX, '#FF4C4C', false);
 
     eelLowestPosY = eelHead.y;
 
@@ -344,7 +358,11 @@ function main(w, h) {
     let joystickY = h * 0.75;
     
     joystick = new Joystick(joystickX, joystickY, 150 * scaleX);
-    
+    var url_string = location.href; 
+    var url = new URL(url_string);
+    var isOn = url.searchParams.get("on");
+    if (isOn == null) isOn = 1;
+    joystick.on = parseInt(isOn);
     
     gameCycle();
 }
@@ -479,7 +497,8 @@ function drawGarbage() {
         if (checkAngledCollisions(garbage[i], eel_hitbox)) {
             // jump = jumpHeight;
             // TXT.texts['points'].str = '-1.00';
-            setPoints('-5.00','#fb2121');
+            // setPoints('-20.00','#fb2121');
+            setPoints('-20.00','#FF4C4C');
             HUD.updateBattery(-5);
             playCry();
 
@@ -788,7 +807,7 @@ function controls() {
                     mouseMoveOrigin.x = prevPos;
                     mouseMoveOrigin.y = prevPosY;
 
-                    if (isBtnClicked(touch.pageX, touch.pageY, joystick.hitbox)) {
+                    if (isBtnClicked(touch.pageX, touch.pageY, joystick.hitbox) || !joystick.on) {
                         joystick.active = true;
                     }
                 }
@@ -880,7 +899,7 @@ function controls() {
             // playGlue();
 
             gameStart = true;
-            HUD.health = 50;
+            HUD.health = startingBatteryLife;
         } 
 
         if (gameover) {
@@ -987,7 +1006,7 @@ function controls() {
             
 
             gameStart = true;
-            HUD.health = 50;
+            HUD.health = startingBatteryLife;
         }
 
         if (mDown) {
@@ -1442,20 +1461,25 @@ function drawStartPage() {
     ctx.drawImage(AM.images.title.img, 0, 0, AM.images.title.cw, AM.images.title.ch, startPage.title.x, startPage.title.y, startPage.title.w, startPage.title.h);
     ctx.drawImage(AM.images.sub_title.img, 0, 0, AM.images.sub_title.cw, AM.images.sub_title.ch, startPage.sub_title.x, startPage.sub_title.y, startPage.sub_title.w, startPage.sub_title.h);
     
-    for (let i = 1; i < 4; ++i) {
-        let key = 'text' + i;
-        ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, startPage[key].x, startPage[key].y, startPage[key].w, startPage[key].h);
-    }
+    // for (let i = 1; i < 4; ++i) {
+    //     let key = 'text' + i;
+    //     ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, startPage[key].x, startPage[key].y, startPage[key].w, startPage[key].h);
+    // }
+
+    TXT.draw('instruction1');
+    TXT.draw('instruction1_2');
+    TXT.draw('instruction2');
+    TXT.draw('instruction2_2');
 
     let id = 2;
     let key = 'sfish_' + id;
-    let fw = 102.9 * scaleX;
-    let fh = 81 * scaleY;
+    let fw = 102.9 * 1.5 * scaleX;
+    let fh = 81 * 1.5 * scaleX;
     let frame = Math.floor(T) % 10;
 
     ctx.save();
     // Untransformed draw position
-    const position2 = {x: startPage['text1'].x - fw * 1.1, y: startPage['text1'].y - fh * 0.15};
+    const position2 = {x: startPage['text1'].x - fw * 1.1, y: startPage['text1'].y - fh * 0.20};
     // In degrees
     const rotation2= { x: 0, y: Math.sin(T * 1.5) * 15, z: 0};
     // Rotation relative to here (this is the center of the image)
@@ -1496,7 +1520,7 @@ function drawStartPage() {
     ctx.restore();
     
     
-    HUD.drawMiniBattery(ctx);
+    // HUD.drawMiniBattery(ctx);
 
     let startBtnW = AM.images.start.cw * 2 * scaleX;
     let startBtnH = AM.images.start.ch * 2 * scaleY;
@@ -1513,7 +1537,7 @@ function drawStartPage() {
 function reset() {
     gameover = false;
    
-    HUD.health = 50;
+    HUD.health = startingBatteryLife;
     eelStatus = eelStatusEnum.NORMAL;
     
     timer.setTimer(gameDuration);
@@ -1547,7 +1571,7 @@ function update() {
 
                 let points = 3;
                 if (eelStatus == eelStatusEnum.CHARGED) {
-                    points = 9;
+                    points = 5;
                 }
 
                 setPoints('+' + points + '.00','#C7FC12');
@@ -1590,7 +1614,7 @@ function update() {
 
                 let points = 2;
                 if (eelStatus == eelStatusEnum.CHARGED) {
-                    points = 6;
+                    points = 4;
                 }
 
                 setPoints('+' + points + '.00','#C7FC12');

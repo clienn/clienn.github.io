@@ -51,6 +51,8 @@ class Joystick {
         this.percentageX = 0;
         this.moveByPercentX = 0;
 
+        this.on = true;
+
         // this.totalDistX = 0;
     }
 
@@ -100,51 +102,54 @@ class Joystick {
     }
 
     draw(ctx) {
-        ctx.save();
+        if (joystick.on) {
+            ctx.save();
 
-        ctx.globalAlpha = 0.2;
-        ctx.fillStyle = '#000';
+            ctx.globalAlpha = 0.2;
+            ctx.fillStyle = '#000';
 
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.r, this.startAngle, this.endAngle);
-        ctx.fill();
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.r, this.startAngle, this.endAngle);
+            ctx.fill();
 
-        ctx.globalAlpha = 0.25;
-        ctx.fillStyle = '#fff';
+            ctx.globalAlpha = 0.25;
+            ctx.fillStyle = '#fff';
 
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.r2, this.startAngle, this.endAngle);
-        ctx.fill();
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.r2, this.startAngle, this.endAngle);
+            ctx.fill();
 
-        ctx.save();
-        // Untransformed draw position
-        const position = {x: this.rect.x, y: this.rect.y};
-        // In degrees
-        const rotation = { x: 0, y: 0, z: 45};
-        // Rotation relative to here (this is the center of the image)
-        // const rotPt = { x: this.w / 2, y: this.h / 2 };
-        const rotPt = { x: this.rect.dim / 2, y: this.rect.dim / 2 };
+            ctx.save();
+            // Untransformed draw position
+            const position = {x: this.rect.x, y: this.rect.y};
+            // In degrees
+            const rotation = { x: 0, y: 0, z: 45};
+            // Rotation relative to here (this is the center of the image)
+            // const rotPt = { x: this.w / 2, y: this.h / 2 };
+            const rotPt = { x: this.rect.dim / 2, y: this.rect.dim / 2 };
 
-        ctx.setTransform(new DOMMatrix()
-            .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
-            .rotateSelf(rotation.x, rotation.y, rotation.z)
-        );
+            ctx.setTransform(new DOMMatrix()
+                .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+                .rotateSelf(rotation.x, rotation.y, rotation.z)
+            );
 
-        ctx.strokeStyle = '#fff';
-        ctx.beginPath();
-        ctx.rect(-rotPt.x, -rotPt.x, this.rect.dim, this.rect.dim);
-        ctx.stroke();
+            ctx.strokeStyle = '#fff';
+            ctx.beginPath();
+            ctx.rect(-rotPt.x, -rotPt.x, this.rect.dim, this.rect.dim);
+            ctx.stroke();
+            
+            ctx.restore();
+
+            ctx.globalAlpha = 0.55;
+            ctx.fillStyle = '#89CFF0';
+
+            ctx.beginPath();
+            ctx.arc(this.x + this.mx, this.y + this.my, this.r3, this.startAngle, this.endAngle);
+            ctx.fill();
+
+            ctx.restore();
+        }
         
-        ctx.restore();
-
-        ctx.globalAlpha = 0.55;
-        ctx.fillStyle = '#89CFF0';
-
-        ctx.beginPath();
-        ctx.arc(this.x + this.mx, this.y + this.my, this.r3, this.startAngle, this.endAngle);
-        ctx.fill();
-
-        ctx.restore();
 
         // this.drawHitbox();
     }
