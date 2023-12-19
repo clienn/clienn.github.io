@@ -475,8 +475,8 @@ const clips = [
 ];
 
 var projectileRanges = {
-    x: [200, 250],
-    y: [450, 600]
+    x: [200, 300],
+    y: [350, 400]
 }
 
 var radius = 28;
@@ -731,9 +731,10 @@ var startPageInfo = {
         ch: 57,
     },
     startmine: {
-        x: 1113,
+        // x: 1113,
+        x: 913,
         y: 345,
-        ox: 1113,
+        ox: 913,
         oy: 345,
         w: 56 * 2,
         h: 57 * 2,
@@ -814,25 +815,33 @@ var projDimY = 85;
 
 var ouchSpriteKey = 'boom';
 
+var TXT = null;
+
+var maxDifficultyRange = 50;
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
 
-    let cols = [0, 1, 2, 3];
-    shuffleArr(cols);
-    difficulty[cols[0]] = Math.floor(Math.random() * 100) / 100 + 0.2;
-    difficulty[cols[1]] = Math.floor(Math.random() * 100) / 100 + 0.2;
-    difficulty[cols[2]] = Math.floor(Math.random() * 100) / 100 + 0.2;
-    difficulty[cols[3]] = Math.floor(Math.random() * 100) / 100 + 0.2;
-    // 980 452
-
     scaleX = w / 1792;
     scaleY = h / 922;
 
+
+    maxDifficultyRange *= scaleX;
+
+    let cols = [0, 1, 2, 3];
+    shuffleArr(cols);
+    difficulty[cols[0]] = Math.floor(Math.random() * maxDifficultyRange) / 100 + 0.2 * scaleX;
+    difficulty[cols[1]] = Math.floor(Math.random() * maxDifficultyRange) / 100 + 0.2 * scaleX;
+    difficulty[cols[2]] = Math.floor(Math.random() * maxDifficultyRange) / 100 + 0.2 * scaleX;
+    difficulty[cols[3]] = Math.floor(Math.random() * maxDifficultyRange) / 100 + 0.2 * scaleX;
+    // 980 452
+
+    
     projDimX *= scaleX;
     projDimY *= scaleX;
 
-    g *= scaleY;
+    g *= scaleX;
 
     // alert(scaleX + ', ' + scaleY)
 
@@ -849,8 +858,14 @@ function main(w, h) {
     //         y: [50, 700]
     //     }
     // }
+    
 
     initStartPage();
+
+    let adjX = (w / 2 - 468 * scaleX / 2) - startPageInfo.hand.x;
+    startPageInfo.hand.x += adjX;
+    startPageInfo.startmine.x += adjX;
+    startPageInfo.startmine.ox = startPageInfo.startmine.x;
 
     canons.index = [
         canons.black.left.upper,
@@ -892,6 +907,11 @@ function main(w, h) {
         // textList.scoreN.desc.weight = 'normal';
 
         scoreNAdjY = 2;
+
+        projectileRanges = {
+            x: [300, 500],
+            y: [400, 500]
+        }
         
     }
 
@@ -1046,7 +1066,18 @@ function main(w, h) {
     controls();
 
     setCloudSpeed(30);
+
+    TXT = new Text(ctx, w, h); 
+    TXT.setScale(scaleX, scaleY);
+    let leftAdj = startPageInfo.hand.w / 2 - 280 * scaleX / 2;
+    TXT.addText('instruction1', 'Tap the squishy objects', 'normal', 20, 'Montserrat', startPageInfo.hand.x + leftAdj, startPageInfo.hand.y + 140 * scaleY, 280, 30, '#0a1010', false); 
+    let centerX = 280 / 2 - 170 / 2;
+    TXT.addText('instruction1_2', 'to splat them.', 'normal', 20, 'Montserrat', startPageInfo.hand.x + centerX * scaleX + leftAdj, startPageInfo.hand.y + 175 * scaleY, 170, 30, '#0a1010', false); 
     
+    leftAdj = startPageInfo.startmine.w / 2 - 170 * scaleX / 2;
+    TXT.addText('instruction2', "Don't poke the", 'normal', 20, 'Montserrat', startPageInfo.startmine.x + leftAdj, startPageInfo.hand.y + 140 * scaleY, 170, 30, '#0a1010', false); 
+    centerX = 170 / 2 - 170 / 2;
+    TXT.addText('instruction2_2', 'pokey objects!', 'normal', 20, 'Montserrat', startPageInfo.startmine.x + centerX * scaleX + leftAdj, startPageInfo.hand.y + 175 * scaleY, 170, 30, '#0a1010', false); 
     gameCycle();
 }
 
@@ -1746,8 +1777,8 @@ function updateDifficulty() {
 
     if (cols.length > 0) {
         let rng = Math.floor(Math.random() * cols.length);
-        difficulty[rng] += 0.2;
-        difficultyAdj[rng] += 0.2;
+        difficulty[rng] += 0.2 * scaleX;
+        difficultyAdj[rng] += 0.2 * scaleX;
         if (difficultyAdj[rng] > 2) difficultyAdj[rng] = 2;
         // console.log('test', difficulty[rng])
     }
@@ -2078,7 +2109,7 @@ function gameCycle() {
                         
                         if (r) {
                             // difficulty[i] = Math.floor(Math.random() * 100) / 100 + 0.2 + difficultyAdj[i];
-                            difficulty[i] = Math.floor(Math.random() * 100) / 100 + 0.2;
+                            difficulty[i] = Math.floor(Math.random() * maxDifficultyRange) / 100 + 0.2 * scaleX;
                             // difficulty[i] += 0.2;
                             updateSprite(i);
                             initAnimateCanon(i);
@@ -2183,7 +2214,7 @@ function gameCycle() {
                 // ctx.restore();
                 //
                 
-                ctx.drawImage(AM.images.startballoon.img, 0, 0, startPageInfo.startballoon.cw, startPageInfo.startballoon.ch, startPageInfo.startballoon.x + handx, startPageInfo.startballoon.y + handy, startPageInfo.startballoon.w, startPageInfo.startballoon.h);
+                // ctx.drawImage(AM.images.startballoon.img, 0, 0, startPageInfo.startballoon.cw, startPageInfo.startballoon.ch, startPageInfo.startballoon.x + handx, startPageInfo.startballoon.y + handy, startPageInfo.startballoon.w, startPageInfo.startballoon.h);
                 //
                     ctx.save();
 
@@ -2205,10 +2236,16 @@ function gameCycle() {
 
                 
 
-                for (let i = 1; i < 4; ++i) {
-                    let key = 'text' + i;
-                    ctx.drawImage(AM.images[key].img, 0, 0, startPageInfo[key].cw, startPageInfo[key].ch, startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
-                }
+                // for (let i = 1; i < 4; ++i) {
+                //     let key = 'text' + i;
+                //     ctx.drawImage(AM.images[key].img, 0, 0, startPageInfo[key].cw, startPageInfo[key].ch, startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
+                // }
+
+                TXT.draw('instruction1');
+                TXT.draw('instruction1_2');
+
+                TXT.draw('instruction2');
+                TXT.draw('instruction2_2');
 
                 ctx.drawImage(AM.images.beginbutton.img, 0, 0, startPageInfo.beginbutton.cw, startPageInfo.beginbutton.ch, startPageInfo.beginbutton.x, startPageInfo.beginbutton.y, startPageInfo.beginbutton.w, startPageInfo.beginbutton.h);
                 
