@@ -43,6 +43,9 @@ class Template_1 {
         this.lose.x = w / 2 - this.lose.w / 2;
         this.win.x = w / 2 - this.win.w / 2;
 
+        this.lose.y = h / 2 - this.lose.h / 2;
+        this.win.y = h / 2 - this.win.h / 2;
+
         let gopherW = this.gopher.w;
         let gopherH = this.gopher.h;
 
@@ -124,6 +127,6 @@ class Template_1 {
             this.lose.draw(ctx);
         }
         
-        this.txt.draw('reset');
+        // this.txt.draw('reset');
     }
 }

@@ -127,6 +127,12 @@ var startScreenHandAnimT = 0;
 var startScreenHandAnimT2 = 0;
 
 var startPage = {
+    coverAll: {
+        x: 400,
+        y: 280,
+        w: 1050,
+        h: 230,
+    },
     hand: {
         x: 475,
         y: 280,
@@ -175,6 +181,32 @@ var startPage = {
     }
 }
 
+const randomSpeeches = {
+    miss: [
+        "Missed me!",
+        "I'm over here!",
+        "A swing and a miss!", 
+        "Outsmarted by a gopher!", 
+        "Lost your mojo?", 
+        "Close!", 
+        "Nope!"
+    ],
+
+    caught: [
+        "Aaaah!!!", 
+        "Ouch! That hurt.", 
+        "You got me!", 
+        "Hey, you hit me on the head!", 
+        "Take it easy!", 
+        "Easy there, friend!", 
+        "That'll leave a mark!", 
+        "Don't like gophers, I see!", 
+        "C'mon now!"
+    ],
+    missPos: 0,
+    caughtPos: 0
+}
+
 var stunT = 0
 var digT = 0
 var stunAnimStars = [];
@@ -195,13 +227,30 @@ function main(w, h) {
     scaleX = w / 1792;
     scaleY = h / 922;
 
+    startPage.gopher.x += 100;
+    startPage.star.x += 100;
+    startPage.halo.x += 100;
+
     initStartPage();
+
+    let adjX = (w / 2 - 605 * scaleX / 2) - startPage.hand.x;
+    startPage.hand.x += adjX; 
+    startPage.gopher.x += adjX; 
+    startPage.star.x += adjX;
+    startPage.halo.x += adjX;
+    startPage.halo.ox = startPage.halo.x;
 
     TXT = new Text(ctx, w, h); 
     TXT.setScale(scaleX, scaleY);
     
     TXT.addText('points', '+1.00', 'bold', 20, 'Montserrat', 0, 0, 80, 30, '#10aad7', true); 
     jumpHeight *= scaleY;
+
+    TXT.addText('instruction1', 'Tap where the gopher', 'normal', 20, 'Montserrat', startPage.hand.x - 90 * scaleX, startPage.hand.y + 150 * scaleY, 330, 30, '#003057', false);
+    TXT.addText('instruction1_2', 'disappears.', 'normal', 20, 'Montserrat', startPage.hand.x, startPage.hand.y + 180 * scaleY, 170, 30, '#003057', false);
+
+    TXT.addText('instruction2', 'Watch the gopher as he', 'normal', 20, 'Montserrat', startPage.gopher.x - 70 * scaleX, startPage.hand.y + 150 * scaleY, 330, 30, '#003057', false);
+    TXT.addText('instruction2_2', 'moves around.', 'normal', 20, 'Montserrat', startPage.gopher.x, startPage.hand.y + 180 * scaleY, 200, 30, '#003057', false);
 
     timer = new Timer(0, 0, 0, '#fff');
     timer.setTimer(gameDuration);
@@ -253,6 +302,9 @@ function main(w, h) {
     AM.audio.bg.img.volume = 0.2;
     AM.audio.bg.img.loop = true;
     AM.audio.bg.img.play();
+
+    shuffleArr(randomSpeeches.miss);
+    shuffleArr(randomSpeeches.caught);
 
     gameCycle();
 }
@@ -322,6 +374,8 @@ function controls() {
 
                 if (chatID < 0 && gopher_hide.t2 > shuffleDuration) {
                     if (gopher_hide.goto == null || gopher_hide.moveDestinations.length == 0) {
+                        let speechID = 'miss';
+
                         if (isBtnClicked(mx, my, {
                             x: gopher_hide.x,
                             y: gopher_hide.y,
@@ -329,44 +383,75 @@ function controls() {
                             h: gopher_hide.h
                         })) {
                             
-                            console.log('collision!');
+                            // console.log('collision!');
                             chatID = 0;
-                            damageGopher(50);
+                            damageGopher(100);
                             playKaboom();
                             stunT = 0;
                             setAnimStars(7);
                             gopher_hide.t = 0;
+                            speechID = 'caught';
                         } else {
-                            let dx = mx - (gopher_hide.x + gopher_hide.w / 2);
-                            let dy = my - (gopher_hide.y + gopher_hide.h / 2);
-                            let dist = Math.sqrt(dx * dx + dy * dy);
-
-                            if (dist < 50) {
-                                chatID = 0;
-                                damageGopher(50);
-                                playKaboom();
-                                stunT = 0;
-                                setAnimStars(7);
-                            } else if (dist < 120) {
-                                damageGopher(25);
-                                chatID = 1;
-
-                                playScore();
-                            } else {
-                                chatID = 2;
-                                playLaugh();
-                                if (HUD.carrotIDX < HUD.remainingCarrots.length) {
-                                    HUD.remainingCarrots[HUD.carrotIDX] = 0;
-                                    HUD.carrotIDX++;
-                                }
-                                // carrots.shift();
+                            chatID = 2;
+                            playLaugh();
+                            if (HUD.carrotIDX < HUD.remainingCarrots.length) {
+                                HUD.remainingCarrots[HUD.carrotIDX] = 0;
+                                HUD.carrotIDX++;
                             }
+
+                            // let dx = mx - (gopher_hide.x + gopher_hide.w / 2);
+                            // let dy = my - (gopher_hide.y + gopher_hide.h / 2);
+                            // let dist = Math.sqrt(dx * dx + dy * dy);
+
+                            // if (dist < 50) {
+                            //     chatID = 0;
+                            //     damageGopher(50);
+                            //     playKaboom();
+                            //     stunT = 0;
+                            //     setAnimStars(7);
+                            // } else if (dist < 120) {
+                            //     damageGopher(25);
+                            //     chatID = 1;
+
+                            //     playScore();
+                            // } else {
+                            //     chatID = 2;
+                            //     playLaugh();
+                            //     if (HUD.carrotIDX < HUD.remainingCarrots.length) {
+                            //         HUD.remainingCarrots[HUD.carrotIDX] = 0;
+                            //         HUD.carrotIDX++;
+                            //     }
+                            //     // carrots.shift();
+                            // }
+
+                            
 
                             gopher_hide.t = 0;
                         }
     
                         chats[chatID].x = gopher_hide.x + gopher_hide.w / 3;
                         chats[chatID].y = gopher_hide.y - chats[chatID].h - 10;
+
+                        let rng = 0;
+
+                        if (speechID == 'miss') {
+                            randomSpeeches.missPos = (randomSpeeches.missPos + 1) % randomSpeeches[speechID].length;
+                            rng = randomSpeeches.missPos;
+
+                            // if (rng == randomSpeeches[speechID].length - 1) {
+                            //     shuffleArr(randomSpeeches[speechID]);
+                            //     randomSpeeches.missPos = -1;
+                            // }
+                        } else {
+                            randomSpeeches.caughtPos = (randomSpeeches.caughtPos + 1) % randomSpeeches[speechID].length;
+                            rng = randomSpeeches.caughtPos;
+
+                            // if (rng == randomSpeeches[speechID].length - 1) {
+                            //     shuffleArr(randomSpeeches[speechID]);
+                            //     randomSpeeches.caughtPos = -1;
+                            // }
+                        }
+                        console.log(randomSpeeches[speechID][rng]);
                     }
                 }
                 
@@ -400,7 +485,7 @@ function controls() {
         if (mDown) {
             mDown = false;
             if (gameover) {
-                reset();
+                // reset();
             }
 
             
@@ -491,6 +576,8 @@ function drawGopher() {
             
             HP.draw(ctx);
             drawChat();
+            
+
             updateGopherHP();
 
             if (gopher_hide.t2 < 0.5) {
@@ -772,8 +859,12 @@ function drawStunHalo(d) {
 function startPageAnimations() {
     ctx.beginPath();
     ctx.fillStyle = '#F8E7CD';
-    ctx.rect(startPage.handcover.x, startPage.handcover.y, startPage.handcover.w, startPage.handcover.h);
-    ctx.rect(startPage.gophercover.x, startPage.gophercover.y, startPage.gophercover.w, startPage.gophercover.h);
+    // ctx.fillStyle = '#f00';
+    ctx.rect(startPage.coverAll.x, startPage.coverAll.y, startPage.coverAll.w, startPage.coverAll.h);
+    // ctx.rect(startPage.handcover.x, startPage.handcover.y, startPage.handcover.w, startPage.handcover.h);
+    // ctx.rect(startPage.gophercover.x, startPage.gophercover.y, startPage.gophercover.w, startPage.gophercover.h);
+
+    
 
     // ctx.rect(740, 280, 310, 150);
     // ctx.rect(1100, 280, 310, 150);
@@ -784,26 +875,12 @@ function startPageAnimations() {
                 
     // ctx.drawImage(images.hand.obj.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
     ctx.drawImage(AM.images.hand.img, frame * AM.images.hand.cw, 0, AM.images.hand.cw, AM.images.hand.ch, startPage.hand.x, startPage.hand.y, startPage.hand.w, startPage.hand.h);
-    // ctx.drawImage(AM.images.hand.img, 0, 0, AM.images.hand.cw, AM.images.hand.ch, startPage.hand.x + handx, startPage.hand.y, startPage.hand.w, startPage.hand.h);
-    // tap
-    // ctx.save();
-    // // Untransformed draw position
-    // var position = {x: startPage.hand.x, y: startPage.hand.y};
-    // // In degrees
-    // var rotation = { x: 0, y: Math.sin(startScreenHandAnimT2) * 35, z: 0};
-    // // Rotation relative to here (this is the center of the image)
-    // var rotPt = { x: startPage.hand.w / 2, y: startPage.hand.h / 2 };
+    TXT.draw('instruction1');
+    TXT.draw('instruction1_2');
 
-    // ctx.setTransform(new DOMMatrix()
-    //     .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
-    //     .rotateSelf(rotation.x, rotation.y, rotation.z)
-    // );
-    
-    // ctx.drawImage(AM.images.hand.img, 0, 0, AM.images.hand.cw, AM.images.hand.ch, -rotPt.x, -rotPt.y, startPage.hand.w, startPage.hand.h);
-    // ctx.restore();
-    
     ctx.drawImage(AM.images.gopher.img, 0, 0, AM.images.gopher.cw, AM.images.gopher.ch, startPage.gopher.x, startPage.gopher.y, startPage.gopher.w, startPage.gopher.h);
-    
+    TXT.draw('instruction2');
+    TXT.draw('instruction2_2');
     //
     drawStunHalo(1);
     drawStunHalo(-1);
@@ -821,25 +898,25 @@ function startPageAnimations() {
     // ctx.arc(1250, 350, 30, 0, 2 * Math.PI);
     // ctx.stroke();
 
-    ctx.beginPath();
-    ctx.fillStyle = '#11A5CC';
-    ctx.ellipse(startPage.timer.x, startPage.timer.y, startPage.timer.w, startPage.timer.h, 0, 0, 2 * Math.PI);
+    // ctx.beginPath();
+    // ctx.fillStyle = '#11A5CC';
+    // ctx.ellipse(startPage.timer.x, startPage.timer.y, startPage.timer.w, startPage.timer.h, 0, 0, 2 * Math.PI);
     
-    ctx.fill();
+    // ctx.fill();
     if (delta < 1) {
         startScreenTimerAnimT += 15 * delta;
-        var radians = Math.PI / 180 * startScreenTimerAnimT;
+        // var radians = Math.PI / 180 * startScreenTimerAnimT;
 
-        ctx.save();
-        ctx.globalAlpha = 0.95;
-        ctx.beginPath();
-        ctx.moveTo(startPage.timer.x, startPage.timer.y);
-        ctx.fillStyle = '#fff';
-        ctx.ellipse(startPage.timer.x, startPage.timer.y, startPage.timer.w, startPage.timer.h, 0, radians, Math.PI + Math.PI / 2);
-        ctx.closePath();
+        // ctx.save();
+        // ctx.globalAlpha = 0.95;
+        // ctx.beginPath();
+        // ctx.moveTo(startPage.timer.x, startPage.timer.y);
+        // ctx.fillStyle = '#fff';
+        // ctx.ellipse(startPage.timer.x, startPage.timer.y, startPage.timer.w, startPage.timer.h, 0, radians, Math.PI + Math.PI / 2);
+        // ctx.closePath();
         
-        ctx.fill();
-        ctx.restore();
+        // ctx.fill();
+        // ctx.restore();
 
         startScreenHandAnimT += 10 * delta;
         startScreenHandAnimT2 += 5 * delta;
@@ -875,7 +952,12 @@ function gameCycle() {
         if (gameStart) {
             // bg
             // drawBG(ctx, 'bg');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.fillStyle = '#97DE54';
+            // ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.rect(0, 0, canvas.width, canvas.height);
+            ctx.fill();
+            ctx.restore();
 
             bg_rect.draw(ctx);
             bg.draw(ctx);
@@ -913,3 +995,81 @@ function gameCycle() {
     requestAnimationFrame(gameCycle);
 }
 // *********************************** GAME UPDATES AND CYCLES END ******************************************************** //
+
+// previous start page 3 instructions
+// function startPageAnimations() {
+//     ctx.beginPath();
+//     ctx.fillStyle = '#F8E7CD';
+//     ctx.rect(startPage.handcover.x, startPage.handcover.y, startPage.handcover.w, startPage.handcover.h);
+//     ctx.rect(startPage.gophercover.x, startPage.gophercover.y, startPage.gophercover.w, startPage.gophercover.h);
+
+//     // ctx.rect(740, 280, 310, 150);
+//     // ctx.rect(1100, 280, 310, 150);
+//     ctx.fill();
+
+//     let handx = Math.sin(startScreenHandAnimT) * 20;
+//     let frame = Math.floor(startScreenHandAnimT) % 8;
+                
+//     // ctx.drawImage(images.hand.obj.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
+//     ctx.drawImage(AM.images.hand.img, frame * AM.images.hand.cw, 0, AM.images.hand.cw, AM.images.hand.ch, startPage.hand.x, startPage.hand.y, startPage.hand.w, startPage.hand.h);
+//     // ctx.drawImage(AM.images.hand.img, 0, 0, AM.images.hand.cw, AM.images.hand.ch, startPage.hand.x + handx, startPage.hand.y, startPage.hand.w, startPage.hand.h);
+//     // tap
+//     // ctx.save();
+//     // // Untransformed draw position
+//     // var position = {x: startPage.hand.x, y: startPage.hand.y};
+//     // // In degrees
+//     // var rotation = { x: 0, y: Math.sin(startScreenHandAnimT2) * 35, z: 0};
+//     // // Rotation relative to here (this is the center of the image)
+//     // var rotPt = { x: startPage.hand.w / 2, y: startPage.hand.h / 2 };
+
+//     // ctx.setTransform(new DOMMatrix()
+//     //     .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+//     //     .rotateSelf(rotation.x, rotation.y, rotation.z)
+//     // );
+    
+//     // ctx.drawImage(AM.images.hand.img, 0, 0, AM.images.hand.cw, AM.images.hand.ch, -rotPt.x, -rotPt.y, startPage.hand.w, startPage.hand.h);
+//     // ctx.restore();
+    
+//     ctx.drawImage(AM.images.gopher.img, 0, 0, AM.images.gopher.cw, AM.images.gopher.ch, startPage.gopher.x, startPage.gopher.y, startPage.gopher.w, startPage.gopher.h);
+    
+//     //
+//     drawStunHalo(1);
+//     drawStunHalo(-1);
+//     //
+
+//     let starx1 = Math.sin(startScreenHandAnimT) * 20 * scaleY;
+//     let starx2 = Math.sin(startScreenHandAnimT * 1.5) * 10 * scaleY;
+//     let starx3 = Math.sin(startScreenHandAnimT * 2) * 20 * scaleY;
+//     ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 3.5, startPage.star.y + starx1, startPage.star.w, startPage.star.h);
+//     ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 2, startPage.star.y + starx3, startPage.star.w, startPage.star.h);
+//     ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 2.5, startPage.star.y + starx2, startPage.star.w, startPage.star.h);
+//     ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 1.5, startPage.star.y + starx1, startPage.star.w, startPage.star.h);
+
+//     // ctx.beginPath();
+//     // ctx.arc(1250, 350, 30, 0, 2 * Math.PI);
+//     // ctx.stroke();
+
+//     ctx.beginPath();
+//     ctx.fillStyle = '#11A5CC';
+//     ctx.ellipse(startPage.timer.x, startPage.timer.y, startPage.timer.w, startPage.timer.h, 0, 0, 2 * Math.PI);
+    
+//     ctx.fill();
+//     if (delta < 1) {
+//         startScreenTimerAnimT += 15 * delta;
+//         var radians = Math.PI / 180 * startScreenTimerAnimT;
+
+//         ctx.save();
+//         ctx.globalAlpha = 0.95;
+//         ctx.beginPath();
+//         ctx.moveTo(startPage.timer.x, startPage.timer.y);
+//         ctx.fillStyle = '#fff';
+//         ctx.ellipse(startPage.timer.x, startPage.timer.y, startPage.timer.w, startPage.timer.h, 0, radians, Math.PI + Math.PI / 2);
+//         ctx.closePath();
+        
+//         ctx.fill();
+//         ctx.restore();
+
+//         startScreenHandAnimT += 10 * delta;
+//         startScreenHandAnimT2 += 5 * delta;
+//     }
+// }
