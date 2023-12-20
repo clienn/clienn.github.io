@@ -6,11 +6,11 @@ class Template_1 {
         this.w = w;
 
         this.volumeOn = true;
-        this.volume = new StaticSprite(15, 15, 55, 55, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
-        this.mute = new StaticSprite(15, 15, 55, 55, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
+        this.volume = new StaticSprite(15, 25, 55, 55, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
+        this.mute = new StaticSprite(15, 25, 55, 55, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
         // this.timecircle = new StaticSprite(10, 10, 60, 60, 0, 0, AM.images.timecircle.cw, AM.images.timecircle.ch, 'timecircle');
         // this.stopwatch = new StaticSprite(10, 10, 60, 60, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
-        this.hourglass = new StaticSprite(this.volume.x + this.volume.w + 10, 10, 40, 60, 0, 0, AM.images.hourglass.cw, AM.images.hourglass.ch, 'hourglass');
+        this.hourglass = new StaticSprite(this.volume.x + this.volume.w + 10, 10, 60, 80, 0, 0, AM.images.hourglass.cw, AM.images.hourglass.ch, 'hourglass');
 
         // this.life = new StaticSprite(0, 10, 60, 60, 0, 0, AM.images.life.cw, AM.images.life.ch, 'life');
         this.star = new StaticSprite(0, 0, 60, 60, 0, 0, AM.images.star.cw, AM.images.star.ch, 'star');
@@ -44,7 +44,7 @@ class Template_1 {
 
         
         
-        this.timeProgressBar = new ProgressBar(this.hourglass.x + paddingX * 2, this.hourglass.h / 2 - 30 * sx / 2 + paddingY, 100 * sx, 30 * sy);
+        this.timeProgressBar = new ProgressBar(this.hourglass.x + paddingX * 2, this.hourglass.h / 2 - 30 * sx / 2 + paddingY, 160 * sx, 35 * sy);
         this.timeProgressBar.progress = 100;
 
         this.scoreBar = new ProgressBar(w / 2 - 50 * sx / 2 - 70 * sy, paddingY, 50 * sx, 70 * sy, '#00ABC8');
@@ -76,11 +76,13 @@ class Template_1 {
         // w / 2 + 50 * scaleX, topHUDInfo.score.y + scoreAdjY * scaleY, topHUD.score.fontW, topHUD.score.fontH, '#fff', true);
 
         //#15441D
-        this.shine.y = this.complete.y + this.complete.h + this.star.h * 2;
+        // this.shine.y = this.complete.y + this.complete.h + this.star.h * 2;
+        this.shine.y = this.complete.y + this.complete.h;
         this.rays.y = this.shine.y;
 
         // gameover
-        this.txt.addText('yourscore', 'Your Score!', 'bold', 30, 'Montserrat', w / 2, this.complete.y + this.complete.h + this.star.h * 3, 175, 30, '#fff', true);
+        this.txt.addText('yourscore', 'Your Score!', 'bold', 30, 'Montserrat', w / 2, this.complete.y + this.complete.h + 40 * scaleY, 175, 30, '#fff', true);
+        // this.txt.addText('yourscore', 'Your Score!', 'bold', 30, 'Montserrat', w / 2, this.complete.y + this.complete.h + this.star.h * 3, 175, 30, '#fff', true);
         // this.txt.addText('total', '00', 'bold', 30, 'Montserrat', w / 2, this.complete.y + this.complete.h + this.star.h * 3.7, 150, 125, '#fff', true);
         this.txt.addText('betterluck', 'Better Luck Next Time', 'bold', 30, 'Montserrat', w / 2, this.complete.y + this.complete.h + this.star.h * 4 + 120 * sy, 350, 25, '#F78A3B', true);
         this.txt.addText('reset', 'Tap to play again.', 'bold', 30, 'Montserrat', w / 2, h / 1.5, 500, 40, '#fff', true);
@@ -96,10 +98,13 @@ class Template_1 {
         ];
 
         this.scoreBar.w = 100;
+
+        // this.updateFinalScore(10);
     }
 
     updateFinalScore(score) {
-        this.txt.addText('total', zeroPad(Math.floor(score), 2), 'bold', 30, 'Montserrat', this.w / 2, this.complete.y + this.complete.h + this.star.h * 3.7, 150, 125, '#fff', true);
+        // this.txt.addText('total', zeroPad(Math.floor(score), 2), 'bold', 30, 'Montserrat', this.w / 2, this.complete.y + this.complete.h + this.star.h * 3.7, 150, 125, '#fff', true);
+        this.txt.addText('total', zeroPad(Math.floor(score), 2), 'bold', 30, 'Montserrat', this.w / 2, this.complete.y + this.complete.h + 125 * 0.8 * scaleY, 150, 125, '#fff', true);
     }
 
     draw(ctx) {
@@ -133,13 +138,13 @@ class Template_1 {
         let totalScore = parseInt(this.txt.texts['total'].str);
         let total = Math.floor(totalScore / 8);
 
-        for (let i = 0; i < this.starPos.length; ++i) {
-            if (i <= total && totalScore > 0) {
-                this.star.dynamicDraw(ctx, this.starPos[i][0], this.starPos[i][1], this.starPos[i][2], this.starPos[i][3], AM.images.star.cw, AM.images.star.ch, 'star');
-            } else {
-                this.star.dynamicDraw(ctx, this.starPos[i][0], this.starPos[i][1], this.starPos[i][2], this.starPos[i][3], AM.images.emptystar.cw, AM.images.emptystar.ch, 'emptystar');
-            }
-        }
+        // for (let i = 0; i < this.starPos.length; ++i) {
+        //     if (i <= total && totalScore > 0) {
+        //         this.star.dynamicDraw(ctx, this.starPos[i][0], this.starPos[i][1], this.starPos[i][2], this.starPos[i][3], AM.images.star.cw, AM.images.star.ch, 'star');
+        //     } else {
+        //         this.star.dynamicDraw(ctx, this.starPos[i][0], this.starPos[i][1], this.starPos[i][2], this.starPos[i][3], AM.images.emptystar.cw, AM.images.emptystar.ch, 'emptystar');
+        //     }
+        // }
         
         // this.pigscore.draw(ctx);
         this.txt.draw('yourscore');

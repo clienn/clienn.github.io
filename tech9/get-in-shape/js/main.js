@@ -37,7 +37,7 @@ var portal = {
     rng: [...Array(9).keys()],
     init: () => {
         portal.w *= scaleX;
-        portal.h *= scaleY;
+        portal.h *= scaleX;
         portal.gridDimX = portal.gridDim * scaleX;
         portal.gridDimY = portal.gridDim * scaleY;
         
@@ -295,6 +295,23 @@ function main(w, h) {
     TXT.addText('points', '+1', 'bold', 20, 'Montserrat', 0, 0, 40, 30, '#10aad7', true); 
     jumpHeight *= scaleY;
 
+    // let x = startPageInfo.x + (startPage.startcoin.w / 2 - 230 / 2 * scaleX);
+    let x = startPageInfo.img1.x + (startPageInfo.img1.w / 2 - 250 / 2 * scaleX);
+    let y = startPageInfo.img1.y + startPageInfo.img1.h + 30 * scaleY;
+    let center = (250 / 2 - 150 / 2) * scaleX;
+    TXT.addText('text1_1', 'Drag a shape into a hole of', 'bold', 20, 'Montserrat', x, y, 250, 30, '#fff', false); 
+    TXT.addText('text1_2', 'the same shape.', 'bold', 20, 'Montserrat', x + center, y + 30 * scaleY, 150, 30, '#fff', false); 
+
+    x = startPageInfo.img2.x + (startPageInfo.img2.w / 2 - 160 / 2 * scaleX);
+    center = (160 / 2 - 150 / 2) * scaleX;
+    TXT.addText('text2_1', 'Be quick before', 'bold', 20, 'Montserrat', x, y, 160, 30, '#fff', false); 
+    TXT.addText('text2_2', 'the portal closes.', 'bold', 20, 'Montserrat', x + center, y + 30 * scaleY, 150, 30, '#fff', false); 
+
+    x = startPageInfo.img3.x + (startPageInfo.img3.w / 2 - 220 / 2 * scaleX);
+    center = (220 / 2 - 70 / 2) * scaleX;
+    TXT.addText('text3_1', 'Watch out for shifting', 'bold', 20, 'Montserrat', x, y, 220, 30, '#fff', false); 
+    TXT.addText('text3_2', 'shapes!', 'bold', 20, 'Montserrat', x + center, y + 30 * scaleY, 70, 30, '#fff', false); 
+
     HUD = new Template_1(ctx, w, h, scaleX, scaleY);
 
     timer = new Timer(0, 0, 0, '#fff');
@@ -454,7 +471,7 @@ function initStartPage(scale) {
         startPageInfo[k].x *= scaleX;
         startPageInfo[k].y *= scaleY
         startPageInfo[k].w = AM.images[k].cw * scale * scaleX;
-        startPageInfo[k].h = AM.images[k].ch * scale * scaleY;
+        startPageInfo[k].h = AM.images[k].ch * scale * scaleX;
     }
 
     startPageInfo.title.x = canvas.width / 2 - startPageInfo.title.w / 2;
@@ -465,7 +482,7 @@ function initStartPage(scale) {
     startPageInfo.img2.tx = 900 * scaleX;
     startPageInfo.img2.ty = 380 * scaleY;
     startPageInfo.img2.tw = AM.images.img2.cw * 0.60 * scaleX;
-    startPageInfo.img2.th = AM.images.img2.ch * 0.60 * scaleY;
+    startPageInfo.img2.th = AM.images.img2.ch * 0.60 * scaleX;
 }
 
 function initShapesContainer() {
@@ -584,6 +601,7 @@ function mouseupE() {
         })) {
             HUD.volumeOn = !HUD.volumeOn; 
             if (HUD.volumeOn) {
+                AM.audio.bg.img.volume = 0.05;
                 AM.audio.bg.img.currentTime = 0;
                 AM.audio.bg.img.play();
             } else {
@@ -613,7 +631,7 @@ function mouseupE() {
     
             gameStart = true;
 
-            AM.audio.bg.img.volume = 0.2;
+            AM.audio.bg.img.volume = 0.05;
             AM.audio.bg.img.loop = true;
             AM.audio.bg.img.play();
         } else if (isDraggable) {
@@ -625,7 +643,7 @@ function mouseupE() {
                 // correctAnswers[hoveredContainerID] = dragID;
                 correctAnswers[hoveredContainerID] = dragID;
                 // score += 10 * portal.duration + portal.bonus;
-                score += 1 + portal.bonus;
+                score += Math.max(1, 1 + portal.bonus);
                 let scoreFormat = zeroPad(Math.floor(score), 2);
                 HUD.txt.texts['score'].str = scoreFormat;
                 // HUD.txt.texts['total'].str = scoreFormat;
@@ -641,7 +659,7 @@ function mouseupE() {
                     // AM.audio.score.img.pause();
                     setTimeout(() => {
                         AM.audio.score.img.currentTime = 0;
-                        AM.audio.score.img.volume = 0.5;
+                        AM.audio.score.img.volume = 1;
                         AM.audio.score.img.play();
                     }, 0)
                     
@@ -847,13 +865,17 @@ function update() {
     // HUD.txt.texts['time'].str = zeroPad(Math.floor(timer.timer / 24), 2);
 
     if (delta < 1) {
-        HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24) / gameDuration * 100);
+        
         // console.log( Math.floor(timer.timer / 24) / gameDuration * 100)
-        timer.tick(delta);
-
+        
         if (timer.timer <= 0) {
-            gameover = true;
-            HUD.updateFinalScore(score);
+            if (dragID == -1) {
+                gameover = true;
+                HUD.updateFinalScore(score);
+            }
+        } else {
+            HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24) / gameDuration * 100);
+            timer.tick(delta);
         }
     }
 }
@@ -893,11 +915,20 @@ function drawStartPage() {
         -rotPt.x, -rotPt.y, startPageInfo.img3.w, startPageInfo.img3.h);
     ctx.restore();
 
-    for (let i = 1; i < 4; ++i) {
-        let key = 'text' + i;
-        ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, 
-            startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
-    }
+    // for (let i = 1; i < 4; ++i) {
+    //     let key = 'text' + i;
+    //     ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, 
+    //         startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
+    // }
+
+    TXT.draw('text1_1');
+    TXT.draw('text1_2');
+
+    TXT.draw('text2_1');
+    TXT.draw('text2_2');
+
+    TXT.draw('text3_1');
+    TXT.draw('text3_2');
 
     ctx.beginPath();
     ctx.fillStyle = '#11A5CC';
@@ -937,7 +968,6 @@ function gameCycle() {
             ctx.drawImage(AM.images.bg.img, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 0, 0, canvas.width, canvas.height);
             HUD.draw(ctx);
             // displayScore();
-
             let a = Math.sin(portal.t);
             let pw = a * portal.w;
             let ph = a * portal.h;
@@ -965,17 +995,24 @@ function gameCycle() {
                 // drawGrid(portal.x, portal.y, portal.gridDim)
             }
 
-            // drawGrid(portal.x, portal.y, portal.gridDim)
 
+            if (timer.timer > 0) {
+                
+
+                
+                // drawGrid(portal.x, portal.y, portal.gridDim)
+
+                
+                // drawContainerGrid();
+
+                portal.animate();
+
+                portal.trigger();
+
+                
+            } 
             
-            // drawContainerGrid();
-
-            portal.animate();
-
-            portal.trigger();
-
             showPoints();
-
             update();
         } else {
             drawStartPage();
