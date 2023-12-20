@@ -165,13 +165,15 @@ var startPage = {
         h: 57 * 2,
     },
     startball: {
-        x: 1072,
+        // x: 1072,
+        x: 1052,
         y: 350,
         w: 90,
         h: 90,
     },
     starthammer: {
-        x: 1022,
+        // x: 1022,
+        x: 1002,
         y: 330,
         ox: 1022,
         oy: 330,
@@ -222,11 +224,40 @@ function main(w, h) {
 
     initStartPage();
 
+    let center = w / 2 - (739 / 2) * scaleX;
+    adjX = -Math.abs(center - startPage.startcoin.x);
+    // alert(center)
+    // startPage.startcoin.x = center;
+    startPage.startcoin.x += adjX;
+    startPage.startball.x += adjX;
+    startPage.starthammer.x += adjX + 20 * scaleX;
+    startPage.starthammer.y -= 15 * scaleX;
+    startPage.starthammer.oy = startPage.starthammer.y;
+    startPage.starthammer.ox = startPage.starthammer.x;
+    startPage.startpig.x += adjX;
+
     TXT = new Text(ctx, w, h); 
     TXT.setScale(scaleX, scaleY);
     
     TXT.addText('points', '+1.00', 'bold', 20, 'Montserrat', 0, 0, 80, 30, '#10aad7', true); 
     jumpHeight *= scaleY;
+
+    let x = startPage.startcoin.x + (startPage.startcoin.w / 2 - 230 / 2 * scaleX);
+    let y = startPage.startcoin.y + startPage.startcoin.h + 20 * scaleY;
+    center = (230 / 2 - 120 / 2) * scaleX;
+
+    TXT.addText('text1_1', 'Save as much money', 'normal', 20, 'Montserrat', x, y, 230, 35, '#fff', false); 
+    TXT.addText('text1_2', 'as you can.', 'normal', 20, 'Montserrat', x + center, y + 50 * scaleY, 120, 35, '#fff', false); 
+
+    x = startPage.startball.x + (startPage.startball.w / 2 - 230 / 2 * scaleX);
+    center = (230 / 2 - 210 / 2) * scaleX;
+    TXT.addText('text2_1', 'Avoid getting hit by', 'normal', 20, 'Montserrat', x, y, 230, 35, '#fff', false); 
+    TXT.addText('text2_2', 'marbles/hammers.', 'normal', 20, 'Montserrat', x + center, y + 50 * scaleY, 210, 35, '#fff', false); 
+
+    x = startPage.startpig.x + (startPage.startpig.w / 2 - 280 / 2 * scaleX);
+    center = (280 / 2 - 225 / 2) * scaleX;
+    TXT.addText('text3_1', '4 cracks to break the bank', 'normal', 20, 'Montserrat', x, y, 280, 35, '#fff', false); 
+    TXT.addText('text3_2', 'and one hammer hit.', 'normal', 20, 'Montserrat', x + center, y + 50 * scaleY, 225, 35, '#fff', false); 
 
     timer = new Timer(0, 0, 0, '#fff');
     timer.setTimer(90);
@@ -547,7 +578,7 @@ function controls() {
         // let x = touch.pageX;
 
         if (!gameStart) {
-            AM.audio.bg.img.volume = 0.2;
+            AM.audio.bg.img.volume = 0.4;
             AM.audio.bg.img.loop = true;
             AM.audio.bg.img.play();
 
@@ -668,7 +699,7 @@ function controls() {
         let mx = e.offsetX;
         // mouseupE();
         if (!gameStart) {
-            AM.audio.bg.img.volume = 0.2;
+            AM.audio.bg.img.volume = 0.4;
             AM.audio.bg.img.loop = true;
             AM.audio.bg.img.play();
 
@@ -914,23 +945,41 @@ function addHammer() {
 
 function drawHammers() {
     for (let i = 0; i < hammers.length; ++i) {
+        hammers[i].rotationT -= 100 * delta;
         ctx.save();
+        // Untransformed draw position
+        const position = {x: hammers[i].x, y: hammers[i].y};
+        // In degrees
+        const rotation = { x: 0, y: 0, z: hammers[i].rotationT};
+        // Rotation relative to here (this is the center of the image)
+        // const rotPt = { x: this.w / 2, y: this.h / 2 };
+        const rotPt = { x: hammers[i].w / 2, y: hammers[i].h / 2 };
 
-        // move to the center of the canvas
-        ctx.translate(hammers[i].ox + hammers[i].w / 2, (hammers[i].y + hammers[i].dropDist) + hammers[i].h / 2);
+        ctx.setTransform(new DOMMatrix()
+            .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+            .rotateSelf(rotation.x, rotation.y, rotation.z)
+        );
         
-        hammers[i].rotationT += 0.05 * delta;
-        hammers[i].degrees = Math.cos(hammers[i].rotationT) * 7200;
-        // rotate the canvas to the specified degrees
-        ctx.rotate(hammers[i].degrees * Math.PI/180);
-
-        // draw the image
-        hammers[i].x = -0.5 * hammers[i].w;
-        hammers[i].y = -0.5 * (hammers[i].h);
-
-        hammers[i].draw(ctx, AM.images.hammer.img);
-        // we’re done with the rotating so restore the unrotated context
+        ctx.drawImage(AM.images.hammer.img, hammers[i].clipX, hammers[i].clipY, hammers[i].clipW, hammers[i].clipH, -rotPt.x, -rotPt.y, hammers[i].w, hammers[i].h);
         ctx.restore();
+        
+        // ctx.save();
+
+        // // move to the center of the canvas
+        // ctx.translate(hammers[i].ox + hammers[i].w / 2, (hammers[i].y + hammers[i].dropDist) + hammers[i].h / 2);
+        
+        // hammers[i].rotationT += 0.05 * delta;
+        // hammers[i].degrees = Math.cos(hammers[i].rotationT) * 7200;
+        // // rotate the canvas to the specified degrees
+        // ctx.rotate(hammers[i].degrees * Math.PI/180);
+
+        // // draw the image
+        // hammers[i].x = -0.5 * hammers[i].w;
+        // hammers[i].y = -0.5 * (hammers[i].h);
+
+        // hammers[i].draw(ctx, AM.images.hammer.img);
+        // // we’re done with the rotating so restore the unrotated context
+        // ctx.restore();
         
     }
 }
@@ -1011,9 +1060,16 @@ function checkCollision(r1, r2) {
 
 function checkCollision2(r1, r2) {
     return r1.x + r1.w >= r2.x && r1.x <= r2.x + r2.w && r1.y + r1.h >= r2.oy + r2.dropDist && r1.y <= r2.oy + r2.dropDist + r2.h;
- }
+}
 
- function doPolygonsIntersect (a, b) {
+function checkAngledCollisions(obj1, obj2) {
+    return doPolygonsIntersect(
+        [{ x: obj1.x, y: obj1.y }, { x: obj1.x + obj1.w, y: obj1.y }, { x: obj1.x + obj1.w, y: obj1.y + obj1.h }, { x: obj1.x, y: obj1.y + obj1.h }],
+        [{ x: obj2.x, y: obj2.y }, { x: obj2.x + obj2.w, y: obj2.y }, { x: obj2.x + obj2.w, y: obj2.y + obj2.h }, { x: obj2.x, y: obj2.y + obj2.h }]
+    );
+}
+
+function doPolygonsIntersect (a, b) {
     var polygons = [a, b];
     var minA, maxA, projected, i, i1, j, minB, maxB;
 
@@ -1113,7 +1169,8 @@ function collisionUpdate() {
     for (let i = 0; i < balls.length; ++i) {
         if (checkCollision(pig, balls[i])) {
             kaboomT = 2;
-            health -= 10;
+            // health -= 10;
+            health -= 20;
             resetBall(i);
 
             if (HUD.volumeOn)
@@ -1124,7 +1181,8 @@ function collisionUpdate() {
 
     for (let i = 0; i < glues.length; ++i) {
         if (checkCollision(pig, glues[i])) {
-            health += 5;
+            // health += 10;
+            health = Math.min(100, health + 10);
             resetGlue(i);
             gluebonus.t = 0;
             if (HUD.volumeOn)
@@ -1134,19 +1192,32 @@ function collisionUpdate() {
     }
 
     for (let i = 0; i < hammers.length; ++i) {
-        let y = hammers[i].oy + hammers[i].dropDist;
-        if (doPolygonsIntersect(
-            [{ x: pig.x, y: pig.y }, { x: pig.x + pig.w, y: pig.y }, { x: pig.x + pig.w, y: pig.y + pig.h }, { x: pig.x, y: pig.y + pig.h }],
-            [{ x: hammers[i].ox, y: y }, { x: hammers[i].ox + hammers[i].w, y: y }, { x: hammers[i].ox + hammers[i].w, y: y + hammers[i].h }, { x: hammers[i].ox, y: y + hammers[i].h }]
-        )) {
+        // let y = hammers[i].oy + hammers[i].dropDist;
+        // if (doPolygonsIntersect(
+        //     [{ x: pig.x, y: pig.y }, { x: pig.x + pig.w, y: pig.y }, { x: pig.x + pig.w, y: pig.y + pig.h }, { x: pig.x, y: pig.y + pig.h }],
+        //     [{ x: hammers[i].ox, y: y }, { x: hammers[i].ox + hammers[i].w, y: y }, { x: hammers[i].ox + hammers[i].w, y: y + hammers[i].h }, { x: hammers[i].ox, y: y + hammers[i].h }]
+        // )) {
+        //     kaboomT = 2;
+        //     // health -= 10;
+        //     health = 0;
+        //     resetHammer(i);
+
+        //     if (HUD.volumeOn)
+        //         playKaboom();
+        //     break;
+        // }
+        if (checkAngledCollisions(pig, hammers[i])) {
             kaboomT = 2;
-            health -= 10;
+            // health -= 10;
+            health = 0;
             resetHammer(i);
 
             if (HUD.volumeOn)
                 playKaboom();
             break;
         }
+
+        
         // if (checkCollision2(pig, hammers[i])) {
         //     // jump = jumpHeight;
         //     // TXT.texts['points'].str = '+1.00';
@@ -1210,11 +1281,13 @@ function dropCoins() {
 function dropHammers() {
     for (let i = 0; i < hammers.length; ++i) {
         // hammers[i].y += hammers[i].vy * delta;
-        hammers[i].dropDist += hammers[i].vy * delta;
+        // hammers[i].dropDist += hammers[i].vy * delta;
+        // hammers[i].vy += G * delta * hammers[i].dropSpeed;
         hammers[i].vy += G * delta * hammers[i].dropSpeed;
+        hammers[i].y += hammers[i].vy * delta;
         // console.log('test', hammers[i].y + hammers[i].dropDist, canvas.height);
 
-        if (hammers[i].y + hammers[i].dropDist > canvas.height) {
+        if (hammers[i].y > canvas.height) {
             resetHammer(i);
         }
     }    
@@ -1380,15 +1453,23 @@ function startPageAnimations() {
 
     ctx.drawImage(AM.images.title.img, 0, 0, AM.images.title.cw, AM.images.title.ch, startPage.title.x, startPage.title.y, startPage.title.w, startPage.title.h);
     
-    for (let i = 1; i < 5; ++i) {
-        let key = 'text' + i;
-        ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, startPage[key].x, startPage[key].y, startPage[key].w, startPage[key].h);
-    }
+    // for (let i = 1; i < 5; ++i) {
+    //     let key = 'text' + i;
+    //     ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, startPage[key].x, startPage[key].y, startPage[key].w, startPage[key].h);
+    // }
    
+    TXT.draw('text1_1');
+    TXT.draw('text1_2');
+
+    TXT.draw('text2_1');
+    TXT.draw('text2_2');
+
+    TXT.draw('text3_1');
+    TXT.draw('text3_2');
 
     let handx = Math.sin(startScreenHandAnimT) * 20;
 
-    ctx.drawImage(AM.images.hand.img, 0, 0, AM.images.hand.cw, AM.images.hand.ch, startPage.hand.x + handx, startPage.hand.y, startPage.hand.w, startPage.hand.h);
+    // ctx.drawImage(AM.images.hand.img, 0, 0, AM.images.hand.cw, AM.images.hand.ch, startPage.hand.x + handx, startPage.hand.y, startPage.hand.w, startPage.hand.h);
 
     // Untransformed draw position
     const position = {x: startPage.startcoin.x, y: startPage.startcoin.y};
