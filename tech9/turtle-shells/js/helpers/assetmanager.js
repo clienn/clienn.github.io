@@ -17,7 +17,7 @@ class AssetManager {
             this.assetCount += data.length;
             for (let i = 0; i < data.length; ++i) {
                 let url = 'assets/' + data[i].src + '.' + data[i].ext;
-                this.loadImage(data[i].id, url, data[i].cw, data[i].ch, null);
+                this.loadImage(data[i].id, url, data[i].cw, data[i].ch, data[i].frames ? data[i].frames : 1, null);
             }
         })
     }
@@ -45,7 +45,7 @@ class AssetManager {
 
         this.progress = progress / (this.assetCount * 100) * 100;
 
-        // console.log(this.progress);
+        // console.log(this.progress, this.assetCount);
         if (this.progress >= 100) {
             if (this.callback) {
                 this.callback();
@@ -53,7 +53,7 @@ class AssetManager {
         }
     }
 
-    load(obj, url, callback) {
+    load(obj, url, callback, type) {
         var xmlHTTP = new XMLHttpRequest();
         xmlHTTP.open('GET', url, true);
         xmlHTTP.responseType = 'arraybuffer';
@@ -63,7 +63,17 @@ class AssetManager {
             // obj.img.src = window.URL.createObjectURL(blob);
             // console.log(obj.completedPercentage)
             // console.log()
+            
             obj.img.src = url;
+
+            if (type == 1) {
+                // obj.img.preload = 'auto';
+            //     // obj.img.autoplay = (/iPad|iPhone|iPod/).test(navigator.userAgent);
+                obj.img.autoplay = "";
+                // obj.img.muted=true;
+                
+            }
+            
         };
 
         xmlHTTP.onprogress = (e) => {
@@ -76,6 +86,8 @@ class AssetManager {
                 obj.completedPercentage = parseInt((e.loaded / e.total) * 100);
                 this.loaded += e.loaded;
 
+                // console.log(obj.completedPercentage)
+
                 this.checkProgress();
             }
         };
@@ -87,6 +99,9 @@ class AssetManager {
         xmlHTTP.onloadend = () => {
             // You can also remove your progress bar here, if you like.
             obj.completedPercentage = 100;
+            // console.log('test')
+
+            // this.checkProgress();
 
             if (callback) {
                 callback();
@@ -96,13 +111,14 @@ class AssetManager {
         xmlHTTP.send();
     }
 
-    loadImage(id, url, cw, ch, callback) {
+    loadImage(id, url, cw, ch, frames, callback) {
         this.images[id] = {
             img: new Image(),
             cw: cw,
             ch: ch,
             completedPercentage: 0,
-            totalsize: 0
+            totalsize: 0,
+            frames: frames
         }
 
         this.load(this.images[id], url, callback);
@@ -114,7 +130,7 @@ class AssetManager {
             completedPercentage: 0,
             totalsize: 0
         }
-
-        this.load(this.audio[id], url, callback);
+        // this.audio[id].img.autoplay = true;
+        this.load(this.audio[id], url, callback, 1);
     }
 }

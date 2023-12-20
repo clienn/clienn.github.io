@@ -8,6 +8,8 @@ var last = 0;
 var delta = 0;
 var startGame = false; // orientation prep
 var gameStart = false; // start game
+var totalTimeSpent = 0;
+const gameDuration = 90;
 
 var scaleX = 1;
 var scaleY = 1;
@@ -20,7 +22,7 @@ var assets = {
     loaded: 0,
     load: (obj, fn) => {
         obj.img = new Image();
-        obj.img.src = 'assets/' + fn + '.png';
+        obj.img.src = '/assets/' + fn + '.png';
         obj.img.onload = function() {
             ++assets.loaded;
         }
@@ -35,9 +37,9 @@ var sounds = {
     load: (obj, fn, ext) => {
         obj.audio = new Audio();
         // obj.audio.src = 'http://192.168.1.2:5501/assets/' + fn + '.' + ext;
-        obj.audio.src = 'assets/' + fn + '.' + ext;
+        obj.audio.src = '/assets/' + fn + '.' + ext;
         obj.audio.preload = 'auto';
-        // obj.audio.autoplay = (/iPad|iPhone|iPod/).test(navigator.userAgent);
+        obj.audio.autoplay = (/iPad|iPhone|iPod/).test(navigator.userAgent);
 
         if (fn == 'bg') {
             obj.audio.volume = 0.1;
@@ -554,49 +556,6 @@ var pulseT = 0;
 
 var TXT = null;
 
-// var textList = {
-//     topTimer: {
-//         obj: null,
-//         desc: TM.addTextObj('09', 'Montserrat', 'bold', 20, 0, 0, 20, 20, '#000'),
-//     },
-//     scoreX: {
-//         obj: null,
-//         desc: TM.addTextObj('x', 'Montserrat', 'normal', 20, 0, 0, 10, 20, '#fff'),
-//     },
-//     scoreN: {
-//         obj: null,
-//         desc: TM.addTextObj('00', 'Montserrat', 'bold', 25, 0, 0, 20, 27, '#fff'),
-//     },
-//     correct: {
-//         obj: null,
-//         desc: TM.addTextObj('Correct!', 'Montserrat', 'bold', 20, 0, 200, 150, 50, '#fff'),
-//     },
-//     wrong: {
-//         obj: null,
-//         desc: TM.addTextObj('Wrong!', 'Montserrat', 'bold', 20, 0, 200, 120, 50, '#fb2121'),
-//     },
-//     tooslow: {
-//         obj: null,
-//         desc: TM.addTextObj('Too Slow!', 'Montserrat', 'bold', 20, 0, 200, 170, 50, '#fb2121'),
-//     },
-//     complete: {
-//         obj: null,
-//         desc: TM.addTextObj('Complete!', 'Montserrat', 'bold', 20, 0, 0, 140, 40, '#fff'),
-//     },
-//     scoreLabel: {
-//         obj: null,
-//         desc: TM.addTextObj('Score', 'Montserrat', 'normal', 20, 0, 0, 40, 30, '#fff'),
-//     },
-//     finalScore: {
-//         obj: null,
-//         desc: TM.addTextObj('00', 'Montserrat', 'bold', 25, 0, 0, 25, 30, '#fff'),
-//     },
-//     resetMsg: {
-//         obj: null,
-//         desc: TM.addTextObj('Tap to play again.', 'Montserrat', 'bold', 20, 0, 0, 250, 50, '#fff'),
-//     }
-// };
-
 const TEXT_ID = {
     'CORRECT': 1,
     'WRONG': 2,
@@ -644,23 +603,31 @@ var startPageInfo = {
         ch: 40,
     },
     hand: {
-        x: 475,
-        y: 280,
+        // x: 817,
+        x: 837,
+        y: 270,
+        // x: 475,
+        // y: 280,
         w: 64 * 2,
         h: 65 * 2,
         cw: 56,
         ch: 57,
     },
     turtle: {
-        x: 817,
-        y: 270,
+        // x: 817,
+        // y: 270,
+        // x: 475,
+        x: 425,
+        // y: 280,
+        y: 261,
         w: 120 * 1.2,
         h: 121 * 1.2,
         cw: 120,
         ch: 121,
     },
     shell: {
-        x: 1183,
+        // x: 1183,
+        x: 1233,
         y: 251,
         w: 105 * 1.2,
         h: 116 * 1.2,
@@ -668,7 +635,9 @@ var startPageInfo = {
         ch: 116,
     },
     text1: {
-        x: 385,
+        // x: 385,
+        // x: 395,
+        x: 345,
         y: 435,
         w: 156 * 2,
         h: 25 * 2,
@@ -684,7 +653,9 @@ var startPageInfo = {
         ch: 28,
     },
     text3: {
-        x: 1110,
+        // x: 1110,
+        // x: 1100,
+        x: 1170,
         y: 435,
         w: 142 * 2,
         h: 25 * 2,
@@ -708,6 +679,8 @@ var startTurtleBlinkT = 0;
 var timeProgressBar = null;
 var scoreProgressBar = null;
 
+var gameT = gameDuration;
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
@@ -719,12 +692,19 @@ function main(w, h) {
     scaleX = w / 1792;
     scaleY = h / 922;
 
+    let isMobile = detectMob();
+    
+    // if (isMobile) {
+    //     startPageInfo.text1.y -= 20;
+    //     startPageInfo.text2.y -= 20;
+    //     startPageInfo.text3.y -= 20;
+    // }
+
     initStartPage();
 
     TXT = new Text(ctx, w, h);
     TXT.setScale(scaleX, scaleY);
 
-    let isMobile = detectMob();
     timerY = h / 2;
     textPos.x = w / 2;
     textPos.y = timerY / 2;
@@ -794,6 +774,27 @@ function main(w, h) {
     rescaleAll(bgInfo.cloud2);
     rescaleAll(bgInfo.cloud3);
     rescaleAll(shineInfo);
+
+
+    // startpage texts
+    let tx = startPageInfo.text1.x;
+    let ty = startPageInfo.text1.y;
+    let adjX = (300 / 2 - 115 / 2) * scaleX;
+    // let t1H = startPageInfo.text1.h;
+    TXT.addText("text1_1", 'Watch and follow the turtle', 'normal', 20, 'Montserrat', tx, ty, 300, 35, '#221F20', false);
+    TXT.addText("text1_2", 'as it hides.', 'normal', 20, 'Montserrat', tx + adjX, ty + 40 * scaleY, 115, 35, '#221F20', false);
+
+    tx = startPageInfo.text2.x;
+    ty = startPageInfo.text2.y;
+    adjX = (330 / 2 - 190 / 2) * scaleX;
+    TXT.addText("text2_1", 'After the shuffle, tap where you', 'normal', 20, 'Montserrat', tx, ty, 330, 35, '#221F20', false);
+    TXT.addText("text2_2", 'think he is hiding.', 'normal', 20, 'Montserrat', tx + adjX, ty + 40 * scaleY, 190, 35, '#221F20', false);
+
+    tx = startPageInfo.text3.x;
+    ty = startPageInfo.text3.y;
+    adjX = (240 / 2 - 180 / 2) * scaleX;
+    TXT.addText("text3_1", 'You lose if you miss the', 'normal', 20, 'Montserrat', tx, ty, 240, 35, '#221F20', false);
+    TXT.addText("text3_2", 'turtle three times.', 'normal', 20, 'Montserrat', tx + adjX, ty + 40 * scaleY, 180, 35, '#221F20', false);
 
     // Texts
     
@@ -878,7 +879,7 @@ function main(w, h) {
     scoreProgressBar = new ProgressBar(w / 2 - pbW / 2, 30 * scaleY, pbW, pbH, '#569E1A');
     scoreProgressBar.progress = 100;
 
-    loadAssets();
+    // loadAssets();
 
     window.addEventListener('blur', () => {
         muteAllAudio(true);
@@ -928,11 +929,11 @@ function main(w, h) {
                 })) {
                     volumeOn = !volumeOn; 
                     if (volumeOn) {
-                        music.bg.obj.audio.currentTime = 0;
-                        music.bg.obj.audio.play();
+                        AM.audio.bg.img.currentTime = 0;
+                        AM.audio.bg.img.play();
                         
                     } else {
-                        music.bg.obj.audio.pause();
+                        AM.audio.bg.img.pause();
                         // music.correct.obj.volume = 0;
                     }
                 } else if (startTimer && swaps.length == 0 && showAnswerT == 0) {
@@ -950,19 +951,18 @@ function main(w, h) {
                         // msg = TEXT_ID.CORRECT;
                         msg = rng;
                         score++;
-                        // if (!music.correct.obj.audio.paused) {
-                        //     music.correct.obj.audio.currentTime = 0;
-                        //     music.correct.obj.audio.play();
+                        // if (!AM.audio.correct.img.paused) {
+                        //     AM.audio.correct.img.currentTime = 0;
+                        //     AM.audio.correct.img.play();
                         // }
                         
                         if (volumeOn) {
                             setTimeout(() => {
-                                music.correct.obj.audio.currentTime = 0;
-                                music.correct.obj.audio.volume = 0.5;
-                                music.correct.obj.audio.play();
+                                AM.audio.correct.img.currentTime = 0;
+                                AM.audio.correct.img.volume = 0.5;
+                                AM.audio.correct.img.play();
                             }, 0)
                         }
-                            
 
                         turtles[target].jump = jumpHeight;
                         turtles[target].activateSpriteAnimation = true;
@@ -983,12 +983,11 @@ function main(w, h) {
 
                         if (volumeOn) {
                             setTimeout(() => {
-                                music.wrong.obj.audio.currentTime = 0;
-                                music.wrong.obj.audio.volume = 0.5;
-                                music.wrong.obj.audio.play();
+                                AM.audio.wrong.img.currentTime = 0;
+                                AM.audio.wrong.img.volume = 0.5;
+                                AM.audio.wrong.img.play();
                             }, 0)
                         }
-                            
                     }
 
                     // showAnswer = true;
@@ -1007,10 +1006,10 @@ function main(w, h) {
             } else {
                 if (isBtnClicked(mx, my, btnBegin)) {
                     gameStart = true;
-                    music.bg.obj.audio.volume = 0.08;
-                    // music.bg.obj.audio.volume = 1;
-                    music.bg.obj.audio.loop = true;
-                    music.bg.obj.audio.play();
+                    AM.audio.bg.img.volume = 0.08;
+                    // AM.audio.bg.img.volume = 1;
+                    AM.audio.bg.img.loop = true;
+                    AM.audio.bg.img.play();
 
                     playAllAudio();
                 }
@@ -1067,29 +1066,41 @@ function main(w, h) {
 }
 
 function muteAllAudio(flag) {
-    for (let k in music) {
-        music[k].obj.audio.muted = flag;
-    }   
+    // for (let k in music) {
+    //     music[k].obj.audio.muted = flag;
+    // }  
+    for (let k in AM.audio) {
+        AM.audio[k].img.muted = flag;
+    } 
 }
 
 function playAllAudio() {
-    for (let k in music) {
+    for (let k in AM.audio) {
+        
         if (k != 'bg') {
-            music[k].obj.audio.volume = 0;
-            music[k].obj.audio.currentTime = 0;
-            music[k].obj.audio.play();
+            console.log(k)
+            AM.audio[k].img.volume = 0;
+            AM.audio[k].img.currentTime = 0;
+            AM.audio[k].img.play();
+            AM.audio[k].img.pause();
+            
         }
-    }   
+    }
     
 }
+
 
 function initStartPage() {
     for (let k in startPageInfo) {
         startPageInfo[k].x *= scaleX;
         startPageInfo[k].y *= scaleY;
         startPageInfo[k].w *= scaleX;
-        startPageInfo[k].h *= scaleY;
+        startPageInfo[k].h *= scaleX;
     }
+
+    startPageInfo.text1.y = startPageInfo.turtle.y + startPageInfo.turtle.h + 30 * scaleY;
+    startPageInfo.text2.y = startPageInfo.turtle.y + startPageInfo.turtle.h + 30 * scaleY;
+    startPageInfo.text3.y = startPageInfo.turtle.y + startPageInfo.turtle.h + 30 * scaleY;
 
     startPageInfo.title.x = canvas.width / 2 - startPageInfo.title.w / 2;
     startPageInfo.beginbutton.x = canvas.width / 2 - startPageInfo.beginbutton.w / 2;
@@ -1159,8 +1170,8 @@ function setSeagullDirection(speedLimit, randomD) {
 function drawSeagulls() {
     for (let i = 0; i < seagulls.length; ++i) {
         seagulls[i].animateSprite(delta, seagullInfo, 15, 17, true);
-        // seagulls[i].draw(ctx, images.seagull.obj.img, 1, seagullInfo);
-        seagulls[i].dynamicDraw(ctx, images.seagull.obj.img);
+        // seagulls[i].draw(ctx, AM.images.seagull.img, 1, seagullInfo);
+        seagulls[i].dynamicDraw(ctx, AM.images.seagull.img);
     }
 }
 
@@ -1188,7 +1199,7 @@ function resetSeagullSize(seagull) {
 }
 
 function drawBGs() {
-    ctx.drawImage(images.sky.obj.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(AM.images.sky.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
                 
     ctx.beginPath();
     ctx.fillStyle = '#70D2ED';
@@ -1197,32 +1208,32 @@ function drawBGs() {
 
     drawClouds();
 
-    ctx.drawImage(images.sand2.obj.img, 0, 0, bgInfo.sand2.cw, bgInfo.sand2.ch, 0, bgInfo.sand2.y, canvas.width, bgInfo.sand2.h);
-    ctx.drawImage(images.sand.obj.img, 0, 0, bgInfo.sand.cw, bgInfo.sand.ch, 0, bgInfo.sand.y, canvas.width, bgInfo.sand.h);
+    ctx.drawImage(AM.images.sand2.img, 0, 0, bgInfo.sand2.cw, bgInfo.sand2.ch, 0, bgInfo.sand2.y, canvas.width, bgInfo.sand2.h);
+    ctx.drawImage(AM.images.sand.img, 0, 0, bgInfo.sand.cw, bgInfo.sand.ch, 0, bgInfo.sand.y, canvas.width, bgInfo.sand.h);
 
-    ctx.drawImage(images.umbrella.obj.img, 0, 0, bgInfo.umbrella.cw, bgInfo.umbrella.ch, 
+    ctx.drawImage(AM.images.umbrella.img, 0, 0, bgInfo.umbrella.cw, bgInfo.umbrella.ch, 
         bgInfo.umbrella.x, bgInfo.umbrella.y, bgInfo.umbrella.w, bgInfo.umbrella.h);
 
-    ctx.drawImage(images.palm.obj.img, 0, 0, bgInfo.palm.cw, bgInfo.palm.ch, 
+    ctx.drawImage(AM.images.palm.img, 0, 0, bgInfo.palm.cw, bgInfo.palm.ch, 
         bgInfo.palm.x, bgInfo.palm.y, bgInfo.palm.w, bgInfo.palm.h);
 
-    ctx.drawImage(images.palmshadow.obj.img, 0, 0, bgInfo.palmshadow.cw, bgInfo.palmshadow.ch, 
+    ctx.drawImage(AM.images.palmshadow.img, 0, 0, bgInfo.palmshadow.cw, bgInfo.palmshadow.ch, 
         bgInfo.palmshadow.x, bgInfo.palmshadow.y, bgInfo.palmshadow.w, bgInfo.palmshadow.h);
 
-    ctx.drawImage(images.kayak.obj.img, 0, 0, bgInfo.kayak.cw, bgInfo.kayak.ch, 
+    ctx.drawImage(AM.images.kayak.img, 0, 0, bgInfo.kayak.cw, bgInfo.kayak.ch, 
         bgInfo.kayak.x, bgInfo.kayak.y, bgInfo.kayak.w, bgInfo.kayak.h);
 }
 
 function drawClouds() {
-    ctx.drawImage(images.cloudleft.obj.img, 0, 0, bgInfo.cloudleft.cw, bgInfo.cloudleft.ch, 
+    ctx.drawImage(AM.images.cloudleft.img, 0, 0, bgInfo.cloudleft.cw, bgInfo.cloudleft.ch, 
         bgInfo.cloudleft.x, bgInfo.cloudleft.y, bgInfo.cloudleft.w, bgInfo.cloudleft.h);
 
-    ctx.drawImage(images.cloudright.obj.img, 0, 0, bgInfo.cloudright.cw, bgInfo.cloudright.ch, 
+    ctx.drawImage(AM.images.cloudright.img, 0, 0, bgInfo.cloudright.cw, bgInfo.cloudright.ch, 
         bgInfo.cloudright.x, bgInfo.cloudright.y, bgInfo.cloudright.w, bgInfo.cloudright.h);
     
     for (let i = 1; i < 4; ++i) {
         let key = 'cloud' + i;
-        ctx.drawImage(images[key].obj.img, 0, 0, bgInfo[key].cw, bgInfo[key].ch, 
+        ctx.drawImage(AM.images[key].img, 0, 0, bgInfo[key].cw, bgInfo[key].ch, 
             bgInfo[key].x, bgInfo[key].y, bgInfo[key].w, bgInfo[key].h);
     }
 }
@@ -1249,7 +1260,7 @@ function init() {
     score = 0;
     rounds = 0;
 
-    for (let i = 0; i < 5; ++i) {
+    for (let i = 0; i < 3; ++i) {
         addTurtle();
     }
 
@@ -1406,7 +1417,7 @@ function drawTurtle() {
                     // draw the image
                     turtles[i].x = -0.5 * turtles[i].w;
                     turtles[i].y = -0.5 * turtles[i].h;
-                    turtles[i].draw(ctx, images.shell.obj.img);
+                    turtles[i].draw(ctx, AM.images.shell.img);
 
                     // we’re done with the rotating so restore the unrotated context
                     ctx.restore();
@@ -1419,11 +1430,11 @@ function drawTurtle() {
                     }
 
                     turtles[i].animateSprite(delta, turtlehappyInfo, 8, 8, true);
-                    turtles[i].draw(ctx, images.turtlehappy.obj.img, 1, turtlehappyInfo);
+                    turtles[i].draw(ctx, AM.images.turtlehappy.img, 1, turtlehappyInfo);
                     // if (turtles[i].activateSpriteAnimation) {
                         
                     // } else {
-                    //     turtles[i].draw(ctx, images.turtle.obj.img);
+                    //     turtles[i].draw(ctx, AM.images.turtle.img);
                     // }
                     
                 }
@@ -1431,14 +1442,14 @@ function drawTurtle() {
             } else {
                 turtles[i].animateSprite(delta, turtlehideInfo, 5, 7);
                 if (turtles[i].activateSpriteAnimation) {
-                    turtles[i].draw(ctx, images.turtlehide.obj.img, 1, turtlehideInfo);
+                    turtles[i].draw(ctx, AM.images.turtlehide.img, 1, turtlehideInfo);
                 } else {
-                    turtles[i].draw(ctx, images.shell.obj.img, 1, turtlehideInfo);
+                    turtles[i].draw(ctx, AM.images.shell.img, 1, turtlehideInfo);
                 }
                 
             }
         } else {
-            turtles[i].draw(ctx, images.shell.obj.img);
+            turtles[i].draw(ctx, AM.images.shell.img);
         }
     }
 }
@@ -1509,7 +1520,7 @@ function detectMob() {
         /BlackBerry/i,
         /Windows Phone/i
     ];
-    
+
     return toMatch.some((toMatchItem) => {
         return navigator.userAgent.match(toMatchItem);
     });
@@ -1561,10 +1572,11 @@ function checkSwaps() {
 }
 
 function reduceHP() {
-    if (--lives < 0) {
+    if (--lives < 1) {
         gameover = true;
         TXT.addText(TEXT_ID.FINALSCORE, zeroPad(score, 2), 'bold', 20, 'Montserrat', canvas.width / 2, shineInfo.y + shineInfo.h * 0.8, 65, 60, '#fff', true); 
         msg = 'Complete!';
+        submitScore();
     }
 }
 
@@ -1618,6 +1630,12 @@ function moveClouds() {
     }
 }
 
+function submitScore() {
+    // let timeSpent = gameDuration - Math.floor(timer.timer / 24);
+    let result = {'game_score': score.toFixed(2), 'activity_id': serverData.id, 'time_spent': Math.floor(totalTimeSpent / 24)};
+    Vue.prototype.$postData(result, true);
+}
+
 function update() {
     checkSwaps();
 
@@ -1630,6 +1648,7 @@ function update() {
 
     if (startTimer && swaps.length == 0) {
         timer.tick(delta);
+        totalTimeSpent += 24 * delta;
 
         if (timer.timer <= 0) {
             if (msg == '') {
@@ -1640,13 +1659,12 @@ function update() {
 
                 if (volumeOn) {
                     setTimeout(() => { 
-                        music.wrong2.obj.audio.currentTime = 0;
-                        music.wrong2.obj.audio.volume = 0.5;
-                        music.wrong2.obj.audio.play();
+                        AM.audio.wrong2.img.currentTime = 0;
+                        AM.audio.wrong2.img.volume = 0.5;
+                        AM.audio.wrong2.img.play();
                     }, 0)
                     
                 }
-                    
             }
                 
 
@@ -1657,8 +1675,14 @@ function update() {
             // turtles[answerIdx].jump = jumpHeight;
         }
 
-        let percent = timer.timer / (9.0 * 24) * 100;
-        timeProgressBar.update(delta, percent);
+        // let percent = timer.timer / (9.0 * 24) * 100;
+        // timeProgressBar.update(delta, percent);
+
+        if (delta < 1) {
+            gameT -= 1 * delta;
+            let percent = gameT / gameDuration * 100;
+            timeProgressBar.update(delta, percent);
+        }
 
     } else if (showAnswerT > 0) {
         if (msg) {
@@ -1679,6 +1703,7 @@ function update() {
                 // alert('You scored: ' + score + ' out of ' + rounds + '.');
                 gameover = true;
                 TXT.addText(TEXT_ID.FINALSCORE, zeroPad(score, 2), 'bold', 20, 'Montserrat', canvas.width / 2, shineInfo.y + shineInfo.h * 0.8, 65, 60, '#fff', true);
+                submitScore();
             }
         }
     } else if (showTarget) {
@@ -1697,6 +1722,10 @@ function update() {
         }
     }
 
+    
+
+    
+
     moveClouds();
     updateSeagulls();
 }
@@ -1708,7 +1737,7 @@ function nextRound() {
     answerIdx = -1;
     showAnswerT = 0;
     target = Math.floor(Math.random() * turtles.length);
-    timeProgressBar.update(delta, 100);
+    // timeProgressBar.update(delta, 100);
     
     if (turtles.length < 8) {
         addTurtle();
@@ -1777,10 +1806,10 @@ function zeroPad(num, places) {
 function drawTopHUD() {
     const { x, y, w, h } = topHUDInfo.timer;
     
-    ctx.drawImage(images.timecircle.obj.img, 0, 0, topHUD.timer.timecircle.cw, 
+    ctx.drawImage(AM.images.timecircle.img, 0, 0, topHUD.timer.timecircle.cw, 
         topHUD.timer.timecircle.ch, x, y, topHUD.timer.timecircle.w, topHUD.timer.timecircle.h);
 
-    ctx.drawImage(images.stopwatch.obj.img, 0, 0, topHUD.timer.stopwatch.cw, 
+    ctx.drawImage(AM.images.stopwatch.img, 0, 0, topHUD.timer.stopwatch.cw, 
         topHUD.timer.stopwatch.ch, x, y, topHUD.timer.stopwatch.w, topHUD.timer.stopwatch.h);
     
     let volumeKey = 'mute';
@@ -1788,7 +1817,7 @@ function drawTopHUD() {
         volumeKey = 'volume';
     }
 
-    ctx.drawImage(images[volumeKey].obj.img, 0, 0, volumeInfo.cw, 
+    ctx.drawImage(AM.images[volumeKey].img, 0, 0, volumeInfo.cw, 
         volumeInfo.ch, volumeInfo.x, volumeInfo.y, volumeInfo.w, volumeInfo.h);
     
     // ctx.font = 'bold ' + topHUDInfo.timer.text.fontsize + 'px Montserrat';
@@ -1796,10 +1825,11 @@ function drawTopHUD() {
     // ctx.textBaseline = 'middle';
 
     
-    let timeText = showTarget ? '09' : zeroPad(Math.floor(timer.timer / 24), 2);
+    // let timeText = showTarget ? '09' : zeroPad(Math.floor(timer.timer / 24), 2);
     // textList.topTimer.obj.str = timeText;
     // TM.draw(textList.topTimer.obj);
-    TXT.texts[TEXT_ID.TOPTIMER].str = timeText;
+    // TXT.texts[TEXT_ID.TOPTIMER].str = timeText;
+    TXT.texts[TEXT_ID.TOPTIMER].str = Math.floor(gameT);
     TXT.draw(TEXT_ID.TOPTIMER);
 
     // ctx.fillText(timeText, topHUDInfo.timer.text.x, topHUDInfo.timer.text.y);
@@ -1810,7 +1840,7 @@ function drawLives() {
     const { x, y, w, h, pad } = topHUDInfo.life;
     
     for (let i = 0; i < lives; ++i) {
-        ctx.drawImage(images.turtle.obj.img, 0, 0, turtleInfo.cw, turtleInfo.ch, x + i * w + i * pad, y, w, h);
+        ctx.drawImage(AM.images.turtle.img, 0, 0, turtleInfo.cw, turtleInfo.ch, x + i * w + i * pad, y, w, h);
     }
     
 }
@@ -1881,7 +1911,7 @@ function drawScoreHUD() {
     // ctx.strokeStyle = '#fff';
     // ctx.stroke();
 
-    ctx.drawImage(images.turtleshine.obj.img, 0, 0, topHUD.score.turtleshine.cw, 
+    ctx.drawImage(AM.images.turtleshine.img, 0, 0, topHUD.score.turtleshine.cw, 
         topHUD.score.turtleshine.ch, scoreProgressBar.x + 10 * scaleX, 30 * scaleY, topHUD.score.turtleshine.w, topHUD.score.turtleshine.h);
 
     // TM.draw(textList.scoreX.obj);
@@ -1981,7 +2011,7 @@ function gameCycle() {
     delta = (now - last) / 1000;
     last = now;
 
-    if (assets.loaded == assets.count && sounds.loaded == sounds.count) {
+    // if (assets.loaded == assets.count && sounds.loaded == sounds.count) {
     // if (assets.loaded == assets.count) {
         if (!gameover) {
             if (gameStart) {
@@ -2008,13 +2038,13 @@ function gameCycle() {
             } else {
                 let handx = Math.sin(startScreenHandAnimT) * 20;
 
-                // ctx.drawImage(images.splash.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
-                ctx.drawImage(images.startbg.obj.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
-                ctx.drawImage(images.title.obj.img, 0, 0, startPageInfo.title.cw, startPageInfo.title.ch, startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
+                // ctx.drawImage(AM.images.splash.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(AM.images.startbg.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(AM.images.title.img, 0, 0, startPageInfo.title.cw, startPageInfo.title.ch, startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
                 
                 let frame = Math.floor(startScreenHandAnimT) % 8;
                 
-                ctx.drawImage(images.hand.obj.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                ctx.drawImage(AM.images.hand.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
                 // tap
                 // ctx.save();
                 // // Untransformed draw position
@@ -2029,17 +2059,17 @@ function gameCycle() {
                 //     .rotateSelf(rotation.x, rotation.y, rotation.z)
                 // );
                 
-                // ctx.drawImage(images.hand.obj.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, -rotPt.x, -rotPt.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                // ctx.drawImage(AM.images.hand.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, -rotPt.x, -rotPt.y, startPageInfo.hand.w, startPageInfo.hand.h);
                 // ctx.restore();
                 //
-                // ctx.drawImage(images.hand.obj.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x + handx, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                // ctx.drawImage(AM.images.hand.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x + handx, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
                 
                 let t = Math.floor(startTurtleBlinkT);
                 t = t % 8;
                 let clipX = t * startPageInfo.turtle.cw;
                 
 
-                ctx.drawImage(images.turtlehappy.obj.img, clipX, 0, startPageInfo.turtle.cw, startPageInfo.turtle.ch, startPageInfo.turtle.x, startPageInfo.turtle.y, startPageInfo.turtle.w, startPageInfo.turtle.h);
+                ctx.drawImage(AM.images.turtlehappy.img, clipX, 0, startPageInfo.turtle.cw, startPageInfo.turtle.ch, startPageInfo.turtle.x, startPageInfo.turtle.y, startPageInfo.turtle.w, startPageInfo.turtle.h);
                 
 
                 // Untransformed draw position
@@ -2055,20 +2085,26 @@ function gameCycle() {
                     .rotateSelf(rotation.x, rotation.y, rotation.z)
                 );
                 // ctx.drawImage(AM.images.startcoin.img, 0, 0, AM.images.startcoin.cw, AM.images.startcoin.ch, -rotPt.x, -rotPt.y, startPage.startcoin.w, startPage.startcoin.h);
-                ctx.drawImage(images.shell.obj.img, 0, 0, startPageInfo.shell.cw, startPageInfo.shell.ch, -rotPt.x, -rotPt.y, startPageInfo.shell.w, startPageInfo.shell.h);
+                ctx.drawImage(AM.images.shell.img, 0, 0, startPageInfo.shell.cw, startPageInfo.shell.ch, -rotPt.x, -rotPt.y, startPageInfo.shell.w, startPageInfo.shell.h);
                 ctx.restore();
 
-                
-                
+                // for (let i = 1; i < 4; ++i) {
+                //     let key = 'text' + i;
+                //     ctx.drawImage(AM.images[key].img, 0, 0, startPageInfo[key].cw, startPageInfo[key].ch, startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
+                // }
 
-                for (let i = 1; i < 4; ++i) {
-                    let key = 'text' + i;
-                    ctx.drawImage(images[key].obj.img, 0, 0, startPageInfo[key].cw, startPageInfo[key].ch, startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
-                }
+                TXT.draw('text1_1');
+                TXT.draw('text1_2');
 
-                ctx.drawImage(images.beginbutton.obj.img, 0, 0, startPageInfo.beginbutton.cw, startPageInfo.beginbutton.ch, startPageInfo.beginbutton.x, startPageInfo.beginbutton.y, startPageInfo.beginbutton.w, startPageInfo.beginbutton.h);
+                TXT.draw('text2_1');
+                TXT.draw('text2_2');
+
+                TXT.draw('text3_1');
+                TXT.draw('text3_2');
+
+                ctx.drawImage(AM.images.beginbutton.img, 0, 0, startPageInfo.beginbutton.cw, startPageInfo.beginbutton.ch, startPageInfo.beginbutton.x, startPageInfo.beginbutton.y, startPageInfo.beginbutton.w, startPageInfo.beginbutton.h);
                 // TXT.draw(0);
-                // ctx.drawImage(images.turtleshine.obj.img, 0, 0, topHUD.score.turtleshine.cw, 
+                // ctx.drawImage(AM.images.turtleshine.img, 0, 0, topHUD.score.turtleshine.cw, 
                 //     topHUD.score.turtleshine.ch, 0, 0, topHUD.score.turtleshine.w, topHUD.score.turtleshine.h);
                 // ctx.beginPath();
                 // ctx.rect(btnBegin.x, btnBegin.y, btnBegin.w, btnBegin.h);
@@ -2126,16 +2162,16 @@ function gameCycle() {
 
                 let x = shineInfo.x + (shineInfo.w / 2 - w / 2);
                 let y = shineInfo.y + (shineInfo.h / 2 - h / 2);
-                ctx.drawImage(images.shine.obj.img, 0, 0, shineInfo.cw, 
+                ctx.drawImage(AM.images.shine.img, 0, 0, shineInfo.cw, 
                     shineInfo.ch, x, y, w, h);
                 
 
-                // ctx.drawImage(images.shine.obj.img, 0, 0, shineInfo.cw, 
+                // ctx.drawImage(AM.images.shine.img, 0, 0, shineInfo.cw, 
                 //     shineInfo.ch, shineInfo.x, shineInfo.y, shineInfo.w, shineInfo.h);
                 
                 x = shineInfo.x + (shineInfo.w / 2 - turtleInfo.w / 2);
                 y = shineInfo.y + (shineInfo.h / 2 - turtleInfo.h / 2 - 10 * scaleY);
-                ctx.drawImage(images.turtle.obj.img, 0, 0, turtleInfo.cw, 
+                ctx.drawImage(AM.images.turtle.img, 0, 0, turtleInfo.cw, 
                     turtleInfo.ch, x, y, turtleInfo.w, turtleInfo.h);
                 
             
@@ -2157,9 +2193,9 @@ function gameCycle() {
             }
             
         }
-    } else {
+    // } else {
 
-    }
+    // }
 
     requestAnimationFrame(gameCycle);
 }

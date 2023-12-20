@@ -1,3 +1,6 @@
+// asset manager
+var AM = null;
+
 function parseAssets(path, callback) {
     fetch(path)
         .then(function (response) {
@@ -25,6 +28,7 @@ function isMobile() {
     ];
     
     return toMatch.some((toMatchItem) => {
+        
         return navigator.userAgent.match(toMatchItem);
     });
 }
@@ -46,4 +50,25 @@ function shuffleArr(array) {
 
 function zeroPad(num, places) {
     return String(num).padStart(places, '0');
+}
+
+function drawBG(ctx, id) {
+    const { img, cw, ch } = AM.images[id];
+    ctx.drawImage(img, 0, 0, cw, ch, 0, 0, canvas.width, canvas.height);
+}
+
+function isBtnClicked(mx, my, btn) {
+    return (mx >= btn.x && mx <= btn.x + btn.w && my >= btn.y && my <= btn.y + btn.h);
+}
+
+function rescaleSize(obj, scaleX, scaleY) {
+    obj.w *= scaleX;
+    obj.h *= scaleY;
+}
+
+function rescaleAll(obj, scaleX, scaleY) {
+    obj.x *= scaleX;
+    obj.y *= scaleY;
+    obj.w *= scaleX;
+    obj.h *= scaleY;
 }
