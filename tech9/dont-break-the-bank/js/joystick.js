@@ -105,14 +105,14 @@ class Joystick {
         if (joystick.on) {
             ctx.save();
 
-            ctx.globalAlpha = 0.2;
+            ctx.globalAlpha = 0.2 + 0.25;
             ctx.fillStyle = '#000';
 
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.r, this.startAngle, this.endAngle);
             ctx.fill();
 
-            ctx.globalAlpha = 0.25;
+            ctx.globalAlpha = 0.25 + 0.25;
             ctx.fillStyle = '#fff';
 
             ctx.beginPath();
@@ -140,7 +140,7 @@ class Joystick {
             
             ctx.restore();
 
-            ctx.globalAlpha = 0.55;
+            ctx.globalAlpha = 0.55 + 0.25;
             ctx.fillStyle = '#89CFF0';
 
             ctx.beginPath();

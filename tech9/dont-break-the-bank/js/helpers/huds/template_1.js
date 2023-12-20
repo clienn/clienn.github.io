@@ -10,8 +10,8 @@ class Template_1 {
         let volumePosX = 20;
         let volumePosY = 35;
 
-        this.volume = new StaticSprite(volumePosX, volumePosY, 25 * 2, 25 * 2, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
-        this.mute = new StaticSprite(volumePosX, volumePosY, 25 * 2, 25 * 2, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
+        this.volume = new StaticSprite(volumePosX, volumePosY, 55, 55, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
+        this.mute = new StaticSprite(volumePosX, volumePosY, 55, 55, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
 
         let paddingX = 20 * sx + this.volume.w;
         let paddingY = 10 * sy;

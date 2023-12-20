@@ -79,7 +79,7 @@ var startPage = {
         h: 19 * 2,
     },
     duck: {
-        x: 440,
+        x: 440 + 205,
         y: 320,
         w: 76 * 2,
         h: 65 * 2,
@@ -93,7 +93,7 @@ var startPage = {
         h: 65 * 2,
     },
     rock: {
-        x: 1210,
+        x: 1210 - 205,
         y: 320,
         w: 65 * 2,
         h: 65 * 2,
@@ -351,7 +351,7 @@ function main(w, h) {
         parallaxInfo.tile.yPos[i] = bgTilesPosY[0] + i * containerH;
     }
 
-    for (let i = 0; i < 12; ++i) {
+    for (let i = 0; i < 9; ++i) {
         waterObjHolder[i] = new Sprite(0, 0, 0, 0, 0, 0);
         waterObjHolder[i].id = -1;
     }
@@ -405,6 +405,19 @@ function main(w, h) {
     TXT.addText('points', '+1.00', 'bold', 20, 'Montserrat', 0, 0, 80, 30, '#10aad7', true); 
     jumpHeight *= scaleY;
 
+
+    let x = startPage.duck.x + (startPage.duck.w / 2 - 250 / 2 * scaleX);
+    let y = startPage.duck.y + startPage.duck.h + 20 * scaleY;
+    let center = (250 / 2 - 130 / 2) * scaleX;
+
+    TXT.addText('text1_1', 'Gather as many ducks', 'normal', 20, 'Montserrat', x, y, 250, 30, '#000', false); 
+    TXT.addText('text1_2', 'as possible.', 'normal', 20, 'Montserrat', x + center, y + 30 * scaleY, 130, 30, '#000', false); 
+
+    x = startPage.rock.x + (startPage.rock.w / 2 - 250 / 2 * scaleX);
+    center = (280 / 2 - 140 / 2) * scaleX;
+    TXT.addText('text2_1', 'Avoid obstacles to keep up', 'normal', 20, 'Montserrat', x, y, 280, 30, '#000', false); 
+    TXT.addText('text2_2', 'a good pace.', 'normal', 20, 'Montserrat', x + center, y + 30 * scaleY, 140, 30, '#000', false); 
+
     timer = new Timer(0, 0, 0, '#fff');
     timer.setTimer(gameDuration);
 
@@ -448,10 +461,10 @@ function main(w, h) {
     // addBunny(6, 1);
     // addBunny(7, 1);
 
-    let joystickX = w * 0.20;
+    let joystickX = w * 0.15;
     let joystickY = h * 0.75;
     
-    joystick = new Joystick(joystickX, joystickY, 150 * scaleX);
+    joystick = new Joystick(joystickX, joystickY, 150 * 0.9 * scaleX);
 
     var url_string = location.href; 
     var url = new URL(url_string);
@@ -463,12 +476,14 @@ function main(w, h) {
 }
 
 function initTileGroup() {
-    let arr = [1, 2, 3, 4, 0, 0];
+    let arr = [1, 2, 3, 0];
     shuffleArr(arr);
 
-    for (let i = 0; i < 2; ++i) {
+    for (let i = 0; i < 4; ++i) {
         arr.push(0);
     }
+
+    arr = arr.reverse();
     
     bgTileGroup = arr;
 
@@ -485,30 +500,51 @@ function initTileGroup() {
             for (let j = start; j < end; ++j) {
                 let col = j % 3;
                 // let rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w - waterObjHolder[j].w)) + waterObjContainer[i][col].x;
-                let rngX = 0;
+                // let rngX = 0;
 
+                // if (
+                //     (i == 5 && col == 0) || 
+                //     (i == 6 && col == 0) || 
+                //     (i == 6 && col == 1) 
+                // ) {
+                //     // console.log(i, col);
+                //     rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w / 2 - waterObjHolder[j].w)) + waterObjContainer[i][col].x;
+                // } else if (
+                //     (i == 5 && col == 2) || 
+                //     (i == 5 && col == 1) || 
+                //     (i == 3 && col == 2) || 
+                //     (i == 3 && col == 1) || 
+                //     (i == 3 && col == 0) ||
+                //     (i == 2 && col == 2) || 
+                //     (i == 2 && col == 1) || 
+                //     (i == 2 && col == 0) 
+                // ) {
+                //     // console.log(i, col);
+                //     rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w / 2 - waterObjHolder[j].w));
+                //     rngX = waterObjContainer[i][col].x + waterObjContainer[i][col].w / 2 + rngX;
+                // } else {
+                //     rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w - waterObjHolder[j].w)) + waterObjContainer[i][col].x;
+                // }
+                // waterObjHolder[j].x = rngX;
+                let rngX = waterObjContainer[i][col].x;
                 if (
-                    (i == 5 && col == 0) || 
-                    (i == 6 && col == 0) || 
-                    (i == 6 && col == 1) 
-                ) {
-                    // console.log(i, col);
-                    rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w / 2 - waterObjHolder[j].w)) + waterObjContainer[i][col].x;
-                } else if (
-                    (i == 5 && col == 2) || 
-                    (i == 5 && col == 1) || 
-                    (i == 3 && col == 2) || 
-                    (i == 3 && col == 1) || 
                     (i == 3 && col == 0) ||
-                    (i == 2 && col == 2) || 
-                    (i == 2 && col == 1) || 
-                    (i == 2 && col == 0) 
+                    (i == 3 && col == 1) ||
+                    (i == 5 && col == 0) ||
+                    (i == 5 && col == 1) ||
+                    (i == 5 && col == 2)
                 ) {
-                    // console.log(i, col);
-                    rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w / 2 - waterObjHolder[j].w));
-                    rngX = waterObjContainer[i][col].x + waterObjContainer[i][col].w / 2 + rngX;
+                    // rngX += waterObjContainer[i][col].w - waterObjHolder[j].w;
+                    rngX += waterObjContainer[i][col].w / 2 + Math.floor(Math.random() * (waterObjContainer[i][col].w / 2 - waterObjHolder[j].w));
+                } else if (
+                    (i == 6 && col == 0) || 
+                    (i == 6 && col == 1) || 
+                    (i == 4 && col == 2) || 
+                    (i == 3 && col == 2)
+                ) {
+                    rngX += Math.floor(Math.random() * (waterObjContainer[i][col].w / 2 - waterObjHolder[j].w));
                 } else {
-                    rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w - waterObjHolder[j].w)) + waterObjContainer[i][col].x;
+                    rngX += Math.floor(Math.random() * (waterObjContainer[i][col].w - waterObjHolder[j].w));
                 }
                 waterObjHolder[j].x = rngX;
                 // waterObjHolder[j].y = bgTilesPosY[idx] + containerH / 2 - waterObjHolder[i].h / 2 + col * containerH;
@@ -594,10 +630,10 @@ function moveTileGroup(idx) {
     // let end = (idx + 1) * 3;
     
     for (let j = start; j < end; ++j) {
-        morphWaterObj(j, idx);
+        morphWaterObj(j, next);
 
         let col = j % 3;
-        let rngX = 0;
+        // let rngX = 0;
 
 
         // if (idx == 6 && j == 0) {
@@ -606,56 +642,92 @@ function moveTileGroup(idx) {
         //     rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w - waterObjHolder[j].w)) + waterObjContainer[next][col].x;
         // }
         // console.log(idx, col, j);
+        // if (
+        //     (idx == 5 && col == 0) || 
+        //     (idx == 6 && col == 0) || 
+        //     (idx == 6 && col == 1) 
+        // ) {
+        //     // console.log(idx, col);
+        //     rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w)) + waterObjContainer[next][col].x;
+        // } else if (
+        //     (idx == 5 && col == 2) || 
+        //     (idx == 5 && col == 1) || 
+        //     (idx == 3 && col == 2) || 
+        //     (idx == 3 && col == 1) || 
+        //     (idx == 3 && col == 0) ||
+        //     (idx == 2 && col == 2) || 
+        //     (idx == 2 && col == 1) || 
+        //     (idx == 2 && col == 0) 
+        // ) {
+        //     // console.log(idx, col, j);
+        //     // rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w)) + waterObjContainer[next][col].x + waterObjContainer[next][col].w / 2;
+        //     rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w));
+        //     rngX = waterObjContainer[next][col].x + waterObjContainer[next][col].w / 2 + rngX;
+        // } else {
+        //     rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w - waterObjHolder[j].w)) + waterObjContainer[next][col].x;
+        // }
+
+        let rngX = waterObjContainer[next][col].x;
         if (
-            (idx == 5 && col == 0) || 
-            (idx == 6 && col == 0) || 
-            (idx == 6 && col == 1) 
+            (next == 3 && col == 0) ||
+            (next == 3 && col == 1) ||
+            (next == 5 && col == 0) ||
+            (next == 5 && col == 1) ||
+            (next == 5 && col == 2)
         ) {
-            // console.log(idx, col);
-            rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w)) + waterObjContainer[next][col].x;
+            // rngX += waterObjContainer[next][col].w - waterObjHolder[j].w;
+            rngX += waterObjContainer[next][col].w / 2 + Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w));
         } else if (
-            (idx == 5 && col == 2) || 
-            (idx == 5 && col == 1) || 
-            (idx == 3 && col == 2) || 
-            (idx == 3 && col == 1) || 
-            (idx == 3 && col == 0) ||
-            (idx == 2 && col == 2) || 
-            (idx == 2 && col == 1) || 
-            (idx == 2 && col == 0) 
+            (next == 6 && col == 0) || 
+            (next == 6 && col == 1) || 
+            (next == 4 && col == 2) || 
+            (next == 3 && col == 2)
         ) {
-            // console.log(idx, col, j);
-            // rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w)) + waterObjContainer[next][col].x + waterObjContainer[next][col].w / 2;
-            rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w));
-            rngX = waterObjContainer[next][col].x + waterObjContainer[next][col].w / 2 + rngX;
+            rngX += Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w));
         } else {
-            rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w - waterObjHolder[j].w)) + waterObjContainer[next][col].x;
+            rngX += Math.floor(Math.random() * (waterObjContainer[next][col].w - waterObjHolder[j].w));
         }
 
         waterObjHolder[j].x = rngX;
+        // waterObjHolder[j].x = waterObjContainer[next][col].x;
     }
 }
 
 function morphWaterObj(i, row) {
     let rng = Math.floor(Math.random() * 12) - 1;
+    // if (row == 5) {
+    //     rng = 7;
+    // }
     
+    let next = (i + 1) % waterObjHolder.length;
+    let prev = (i - 1 < 0) ? waterObjHolder.length - 1 : i - 1;
+    let s1 = waterObjHolder[prev].key;
+    let s2 = waterObjHolder[next].key;
+
+    if (waterObjHolder[prev].id > -1 && /wstone|log|plank/.test(s1)) {
+        rng = 3;
+    } else if (waterObjHolder[next].id > -1 && /wstone|log|plank/.test(s2)) {
+        rng = Math.floor(Math.random() * 3);
+    }
+
+    if (row < 0) rng = 2;
     
     if (rng > -1) {
         let w, h, cw, ch, key;
 
         let duckChances = Math.floor(Math.random() * 100);
-        if (duckChances > 65) rng = 3;
+        if (duckChances > 70) rng = 3;
 
-        if (rng != 3) {
-            if (row == 3 || row == 5 || row == 6) {
-                rng = Math.floor(Math.random() * 3);
-            } else {
-                if (rng > 2) {
-                    let tmpRng = Math.floor(Math.random() * 100);
-                    if (tmpRng > 30) rng = Math.floor(Math.random() * 3);
-                }
-            }
-            
-        }
+        // if (rng != 3) {
+        //     if (row == 3 || row == 5 || row == 6) {
+        //         rng = Math.floor(Math.random() * 3);
+        //     } else {
+        //         if (rng > 2) {
+        //             let tmpRng = Math.floor(Math.random() * 100);
+        //             if (tmpRng > 30) rng = Math.floor(Math.random() * 3);
+        //         }
+        //     }
+        // }
 
         if (rng < 3) {
             key = 'lily' + (rng + 1);
@@ -863,9 +935,9 @@ function updateBGWall(idx) {
     } else if (idx == 5) {
         bgWalls[idx] = [
             { x: 0, y: bgTilesPosY[5] + distY * 3.75, w: 300, h: 20, degrees: -25 },
-            { x: 300, y: bgTilesPosY[5] + distY * 3.15, w: 650, h: 20, degrees: 0 },
-            { x: 915, y: bgTilesPosY[5] + distY * 2.75, w: 100, h: 20, degrees: -55 },
-            { x: 815, y: bgTilesPosY[5] + distY * 1.88, w: 190, h: 20, degrees: -155 },
+            { x: 300 - 50, y: bgTilesPosY[5] + distY * 3.15, w: 650, h: 20, degrees: 0 },
+            { x: 915 - 50, y: bgTilesPosY[5] + distY * 2.75, w: 100, h: 20, degrees: -55 },
+            { x: 815 - 50, y: bgTilesPosY[5] + distY * 1.88, w: 190, h: 20, degrees: -155 },
             { x: 485, y: bgTilesPosY[5] + distY * 1.35, w: 320, h: 20, degrees: 5 },
             { x: 225, y: bgTilesPosY[5] + distY * 0.95, w: 270, h: 20, degrees: 15 },
             
@@ -879,8 +951,8 @@ function updateBGWall(idx) {
     
             // right
             { x: 1670, y: bgTilesPosY[6] + distY * 0.45, w: 80, h: 50, degrees: 0 },
-            { x: 1120, y: bgTilesPosY[6] + distY * 1.45, w: 500, h: 55, degrees: 0 },
-            { x: 1100, y: bgTilesPosY[6] + distY * 2.1, w: 600, h: 55, degrees: 10 },
+            { x: 1120 + 30, y: bgTilesPosY[6] + distY * 1.45, w: 500, h: 55, degrees: 0 },
+            { x: 1100 + 30, y: bgTilesPosY[6] + distY * 2.1, w: 600, h: 55, degrees: 10 },
         ]
     } else if (idx == 7) {
         bgWalls[idx] = [
@@ -966,9 +1038,9 @@ function initBGWalls() {
         ],
         [
             { x: 0, y: bgTilesPosY[5] + distY * 3.75, w: 300, h: 20, degrees: -25 },
-            { x: 300, y: bgTilesPosY[5] + distY * 3.15, w: 650, h: 20, degrees: 0 },
-            { x: 915, y: bgTilesPosY[5] + distY * 2.75, w: 100, h: 20, degrees: -55 },
-            { x: 815, y: bgTilesPosY[5] + distY * 1.88, w: 190, h: 20, degrees: -155 },
+            { x: 300 - 50, y: bgTilesPosY[5] + distY * 3.15, w: 650, h: 20, degrees: 0 },
+            { x: 915 - 50, y: bgTilesPosY[5] + distY * 2.75, w: 100, h: 20, degrees: -55 },
+            { x: 815 - 50, y: bgTilesPosY[5] + distY * 1.88, w: 190, h: 20, degrees: -155 },
             { x: 485, y: bgTilesPosY[5] + distY * 1.35, w: 320, h: 20, degrees: 5 },
             { x: 225, y: bgTilesPosY[5] + distY * 0.95, w: 270, h: 20, degrees: 15 },
             
@@ -981,8 +1053,8 @@ function initBGWalls() {
 
             // right
             { x: 1670, y: bgTilesPosY[6] + distY * 0.45, w: 80, h: 50, degrees: 0 },
-            { x: 1120, y: bgTilesPosY[6] + distY * 1.45, w: 500, h: 55, degrees: 0 },
-            { x: 1100, y: bgTilesPosY[6] + distY * 2.1, w: 600, h: 55, degrees: 10 },
+            { x: 1120 + 30, y: bgTilesPosY[6] + distY * 1.45, w: 500, h: 55, degrees: 0 },
+            { x: 1100 + 30, y: bgTilesPosY[6] + distY * 2.1, w: 600, h: 55, degrees: 10 },
         ],
         [
             // left
@@ -1016,6 +1088,7 @@ function updateBGWallsPos(speed) {
 
             if (checkAngledCollisions(kayakHitBox, bgWalls[i][j])) {
                 // console.log('hit');
+                playCry();
                 gameover = true;
                 updateFinalScore();
             }
@@ -1671,7 +1744,7 @@ function playAllAudio() {
             AM.audio[k].img.volume = 0;
             AM.audio[k].img.currentTime = 0;
             AM.audio[k].img.play();
-            // AM.audio[k].img.pause();
+            AM.audio[k].img.pause();
         }
     }
 }
@@ -1687,7 +1760,8 @@ function mouseMove(x, y, prevX, prevY) {
         let distX = x - prevX;
         let distY = prevY - y;
 
-        joystick.update(distX * 0.5, distY);
+        // joystick.update(distX * 0.5, distY);
+        joystick.update(distX * 0.5, 0);
     }
 }
 
@@ -2280,13 +2354,19 @@ function drawStartPage() {
 
     ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
 
-    for (let i = 1; i < 4; ++i) {
-        let key = 'text' + i;
-        ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, startPage[key].x, startPage[key].y, startPage[key].w, startPage[key].h);
-    }
+    // for (let i = 1; i < 4; ++i) {
+    //     let key = 'text' + i;
+    //     ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, startPage[key].x, startPage[key].y, startPage[key].w, startPage[key].h);
+    // }
+
+    TXT.draw('text1_1');
+    TXT.draw('text1_2');
+
+    TXT.draw('text2_1');
+    TXT.draw('text2_2');
 
     drawRotate(startPage.duck, 'splash_duck', a, 0, 0, 0);
-    drawRotate(startPage.hourglass, 'splash_hourglass', 0, 0, 0, sine * 180);
+    // drawRotate(startPage.hourglass, 'splash_hourglass', 0, 0, 0, sine * 180);
     drawRotate(startPage.rock, 'splash_rock', 0, a, 0, 0);
     
     
@@ -2317,10 +2397,10 @@ function update() {
         timer.tick(delta);
         let tmpT = Math.floor(timer.timer / 24);
 
-        if (tmpT % 10 == 0 && level > tmpT) {
+        if (tmpT % 3 == 0 && level > tmpT) {
             level = tmpT - 1;
             parallaxInfo.tile.moveSpeed += speedInc;
-            console.log(parallaxInfo.tile.moveSpeed);
+            // console.log(parallaxInfo.tile.moveSpeed);
         }
 
         updateBGTiles(parallaxInfo.tile.moveSpeed);

@@ -299,10 +299,10 @@ function main(w, h) {
     addCoins();
     addCoins();
 
-    let joystickX = w * 0.20;
+    let joystickX = w * 0.15;
     let joystickY = h * 0.75;
     
-    joystick = new Joystick(joystickX, joystickY, 150 * scaleX);
+    joystick = new Joystick(joystickX, joystickY, 150 * 0.90 * scaleX);
     var url_string = location.href; 
     var url = new URL(url_string);
     var isOn = url.searchParams.get("on");
@@ -325,7 +325,7 @@ function playAllAudio() {
             AM.audio[k].img.volume = 0;
             AM.audio[k].img.currentTime = 0;
             AM.audio[k].img.play();
-            // AM.audio[k].img.pause();
+            AM.audio[k].img.pause();
             
         }
     }
@@ -349,7 +349,8 @@ function mouseMove(x, y, prevX, prevY) {
         let distX = x - prevX;
         let distY = prevY - y;
 
-        joystick.update(distX * 0.5, distY);
+        joystick.update(distX * 0.5, 0);
+        // joystick.update(distX * 0.5, distY);
     }
 }
 
