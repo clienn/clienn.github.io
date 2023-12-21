@@ -74,7 +74,7 @@ var jump = 0;
 var score = 0;
 
 
-var gameDuration = 90;
+var gameDuration = 25;
 
 var startScreenTimerAnimT = 0;
 var startScreenHandAnimT = 0;
@@ -354,10 +354,10 @@ function main(w, h) {
     addGarbage();
     addGarbage();
 
-    let joystickX = w * 0.20;
+    let joystickX = w * 0.15;
     let joystickY = h * 0.75;
     
-    joystick = new Joystick(joystickX, joystickY, 150 * scaleX);
+    joystick = new Joystick(joystickX, joystickY, 150 * 0.90 * scaleX);
     var url_string = location.href; 
     var url = new URL(url_string);
     var isOn = url.searchParams.get("on");
@@ -370,7 +370,7 @@ function main(w, h) {
 function moveUp(d) {
     let val = eelHead.y - d;
 
-    if (val > canvas.height * 0.4 && val < eelLowestPosY) {
+    if (val > canvas.height * 0.25 && val < eelLowestPosY) {
         eelHead.y = val;
         eelNeck.y -= d * 2;
         eel_hitbox.y -= d;
@@ -709,7 +709,7 @@ function playAllAudio() {
             AM.audio[k].img.volume = 0;
             AM.audio[k].img.currentTime = 0;
             AM.audio[k].img.play();
-            // AM.audio[k].img.pause();
+            AM.audio[k].img.pause();
         }
     }
     
@@ -1647,7 +1647,8 @@ function update() {
         }
     }
 
-    if (HUD.health <= 0 || HUD.health == 100) {
+    // if (HUD.health <= 0 || HUD.health == 100) {
+    if (HUD.health <= 0) {
         gameover = true;
         HUD.updateGameoverBattery();
     }

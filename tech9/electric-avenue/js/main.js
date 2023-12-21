@@ -74,7 +74,7 @@ var jump = 0;
 var score = 0;
 
 
-var gameDuration = 90;
+var gameDuration = 25;
 
 var startScreenTimerAnimT = 0;
 var startScreenHandAnimT = 0;
@@ -370,7 +370,7 @@ function main(w, h) {
 function moveUp(d) {
     let val = eelHead.y - d;
 
-    if (val > canvas.height * 0.4 && val < eelLowestPosY) {
+    if (val > canvas.height * 0.25 && val < eelLowestPosY) {
         eelHead.y = val;
         eelNeck.y -= d * 2;
         eel_hitbox.y -= d;
@@ -1647,7 +1647,8 @@ function update() {
         }
     }
 
-    if (HUD.health <= 0 || HUD.health == 100) {
+    // if (HUD.health <= 0 || HUD.health == 100) {
+    if (HUD.health <= 0) {
         gameover = true;
         HUD.updateGameoverBattery();
     }
