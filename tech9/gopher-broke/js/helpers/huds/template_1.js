@@ -4,6 +4,11 @@ class Template_1 {
         this.txt = new Text(ctx, w, h); 
         this.txt.setScale(sx, sy); 
 
+        this.sx = sx;
+        this.sy = sy;
+
+        this.canvasWidth = w;
+
         this.carrotIDX = 0;
         this.gopherIDX = 0;
         
@@ -43,8 +48,8 @@ class Template_1 {
         this.lose.x = w / 2 - this.lose.w / 2;
         this.win.x = w / 2 - this.win.w / 2;
 
-        this.lose.y = h / 2 - this.lose.h / 2;
-        this.win.y = h / 2 - this.win.h / 2;
+        this.lose.y = h / 2 - this.lose.h / 2 - 100 * sy;
+        this.win.y = h / 2 - this.win.h / 2 - 100 * sy;
 
         let gopherW = this.gopher.w;
         let gopherH = this.gopher.h;
@@ -78,6 +83,15 @@ class Template_1 {
         // gameover
         this.txt.addText('complete', 'Complete!', 'bold', 30, 'Montserrat', w / 2, 35 * sy, 180, 35, '#fff', true);
         this.txt.addText('reset', 'Tap to play again.', 'bold', 30, 'Montserrat', w / 2, h / 2, 500, 40, '#fff', true);
+
+        let y = this.win.y + this.win.h - 70 * sy;
+        this.txt.addText('scorelabel', 'You scored:', 'bold', 30, 'Montserrat', w / 2, y, 170, 30, '#fff', true);
+        
+    }
+
+    updateFinalScore(score) {
+        let y = this.win.y + this.win.h - 70 * this.sy;
+        this.txt.addText('total', score, 'bold', 30, 'Montserrat', this.canvasWidth / 2, y + 45 * this.sy, 55, 40, '#fff', true);
     }
 
     draw(ctx) {
@@ -126,6 +140,9 @@ class Template_1 {
         } else {
             this.lose.draw(ctx);
         }
+
+        this.txt.draw('scorelabel');
+        this.txt.draw('total');
         
         // this.txt.draw('reset');
     }

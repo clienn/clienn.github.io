@@ -83,7 +83,7 @@ var TXT = null;
 var jumpSpeed = 20;
 var jumpHeight = 100;
 var jump = 0;
-var score = 0;
+var score = 30;
 
 var carrots = [];
 
@@ -134,8 +134,10 @@ var startPage = {
         h: 230,
     },
     hand: {
-        x: 475,
+        x: 865 - 20,
         y: 280,
+        // x: 475,
+        // y: 280,
         w: 128,
         h: 130,
     },
@@ -146,8 +148,10 @@ var startPage = {
         h: 150,
     },
     gopher: {
-        x: 815,
-        y: 265,
+        x: 475 - 40,
+        y: 280,
+        // x: 815,
+        // y: 265,
         w: 165,
         h: 165,
     },
@@ -158,15 +162,18 @@ var startPage = {
         h: 150,
     },
     halo: {
-        x: 840,
+        x: 500 - 40,
+        // x: 840,
         y: 280,
-        ox: 840,
+        ox: 500 - 40,
+        // ox: 840,
         oy: 280,
         w: 110,
         h: 40,
     },
     star: {
-        x: 840,
+        x: 500 - 40,
+        // x: 840,
         y: 280,
         ox: 840,
         oy: 280,
@@ -178,6 +185,12 @@ var startPage = {
         y: 351,
         w: 34,
         h: 39,
+    },
+    carrot: {
+        x: 1253 - 20,
+        y: 300,
+        w: 65,
+        h: 115,
     }
 }
 
@@ -227,30 +240,32 @@ function main(w, h) {
     scaleX = w / 1792;
     scaleY = h / 922;
 
-    startPage.gopher.x += 100;
-    startPage.star.x += 100;
-    startPage.halo.x += 100;
+    // startPage.gopher.x += 100;
+    // startPage.star.x += 100;
+    // startPage.halo.x += 100;
 
     initStartPage();
 
-    let adjX = (w / 2 - 605 * scaleX / 2) - startPage.hand.x;
-    startPage.hand.x += adjX; 
-    startPage.gopher.x += adjX; 
-    startPage.star.x += adjX;
-    startPage.halo.x += adjX;
-    startPage.halo.ox = startPage.halo.x;
+    // let adjX = (w / 2 - 605 * scaleX / 2) - startPage.hand.x;
+    // startPage.hand.x += adjX; 
+    // startPage.gopher.x += adjX; 
+    // startPage.star.x += adjX;
+    // startPage.halo.x += adjX;
+    // startPage.halo.ox = startPage.halo.x;
 
     TXT = new Text(ctx, w, h); 
     TXT.setScale(scaleX, scaleY);
     
     TXT.addText('points', '+1.00', 'bold', 20, 'Montserrat', 0, 0, 80, 30, '#10aad7', true); 
     jumpHeight *= scaleY;
+    let y = startPage.hand.y + startPage.hand.h + 30 * scaleY;
+    TXT.addText('instruction1', 'Tap where the gopher', 'normal', 20, 'Montserrat', startPage.hand.x - 90 * scaleX, y, 330, 30, '#003057', false);
+    TXT.addText('instruction1_2', 'disappears.', 'normal', 20, 'Montserrat', startPage.hand.x, y + 30 * scaleY, 170, 30, '#003057', false);
 
-    TXT.addText('instruction1', 'Tap where the gopher', 'normal', 20, 'Montserrat', startPage.hand.x - 90 * scaleX, startPage.hand.y + 150 * scaleY, 330, 30, '#003057', false);
-    TXT.addText('instruction1_2', 'disappears.', 'normal', 20, 'Montserrat', startPage.hand.x, startPage.hand.y + 180 * scaleY, 170, 30, '#003057', false);
+    TXT.addText('instruction2', 'Watch the gopher as he', 'normal', 20, 'Montserrat', startPage.gopher.x - 70 * scaleX, y, 330, 30, '#003057', false);
+    TXT.addText('instruction2_2', 'moves around.', 'normal', 20, 'Montserrat', startPage.gopher.x, y + 30 * scaleY, 200, 30, '#003057', false);
 
-    TXT.addText('instruction2', 'Watch the gopher as he', 'normal', 20, 'Montserrat', startPage.gopher.x - 70 * scaleX, startPage.hand.y + 150 * scaleY, 330, 30, '#003057', false);
-    TXT.addText('instruction2_2', 'moves around.', 'normal', 20, 'Montserrat', startPage.gopher.x, startPage.hand.y + 180 * scaleY, 200, 30, '#003057', false);
+    TXT.addText('instruction3', 'Save the carrots!', 'normal', 20, 'Montserrat', startPage.carrot.x - 90 * scaleX, y, 240, 30, '#003057', false);
 
     timer = new Timer(0, 0, 0, '#fff');
     timer.setTimer(gameDuration);
@@ -299,9 +314,9 @@ function main(w, h) {
 
     controls();
 
-    AM.audio.bg.img.volume = 0.2;
-    AM.audio.bg.img.loop = true;
-    AM.audio.bg.img.play();
+    // AM.audio.bg.img.volume = 0.2;
+    // AM.audio.bg.img.loop = true;
+    // AM.audio.bg.img.play();
 
     shuffleArr(randomSpeeches.miss);
     shuffleArr(randomSpeeches.caught);
@@ -391,6 +406,7 @@ function controls() {
                             setAnimStars(7);
                             gopher_hide.t = 0;
                             speechID = 'caught';
+                            score += 10;
                         } else {
                             chatID = 2;
                             playLaugh();
@@ -398,6 +414,9 @@ function controls() {
                                 HUD.remainingCarrots[HUD.carrotIDX] = 0;
                                 HUD.carrotIDX++;
                             }
+
+                            score -= 15;
+                            if (score < 0) score = 0;
 
                             // let dx = mx - (gopher_hide.x + gopher_hide.w / 2);
                             // let dy = my - (gopher_hide.y + gopher_hide.h / 2);
@@ -534,7 +553,8 @@ function drawGopher() {
             gopher.drawTo(ctx, AM.images.gopher_dig.img, gopher_hide.x, gopher_hide.y);
         } else {
             gopher.clipX = 0;
-            gopher.draw(ctx, AM.images.gopher.img);
+            // gopher.draw(ctx, AM.images.gopher.img);
+            gopher.drawScale(ctx, AM.images.gopher.img, 1.25, gopher_hide.x, gopher_hide.y);
         }
         
     } else if (gopher_hide.goto != null || gopher_hide.moveDestinations.length > 0) {
@@ -581,7 +601,7 @@ function drawGopher() {
             updateGopherHP();
 
             if (gopher_hide.t2 < 0.5) {
-                startT = 1;
+                startT = 3;
             }
             
         }
@@ -628,9 +648,11 @@ function updateGopherHP() {
             if (HUD.carrotIDX == 3) {
                 gameover = true;
                 HUD.isWin = false;
+                HUD.updateFinalScore(score);
             } else if (HUD.gopherIDX == 3) {
                 gameover = true;
                 HUD.isWin = true;
+                HUD.updateFinalScore(score);
             } else {
                 moveGopher();
             }
@@ -826,6 +848,7 @@ function update() {
             if (timer.timer <= 0) {
                 gameover = true;
                 HUD.isWin = false;
+                HUD.updateFinalScore(score);
             }
         } else {
             startT -= 1 * delta;
@@ -881,6 +904,26 @@ function startPageAnimations() {
     ctx.drawImage(AM.images.gopher.img, 0, 0, AM.images.gopher.cw, AM.images.gopher.ch, startPage.gopher.x, startPage.gopher.y, startPage.gopher.w, startPage.gopher.h);
     TXT.draw('instruction2');
     TXT.draw('instruction2_2');
+
+    let carrotRotation = Math.sin(startScreenHandAnimT) * 15;
+    ctx.save();
+    // Untransformed draw position
+    const position = {x: startPage.carrot.x, y: startPage.carrot.y};
+    // In degrees
+    const rotation = { x: 0, y: 0, z: carrotRotation };
+    // Rotation relative to here (this is the center of the image)
+    // const rotPt = { x: this.w / 2, y: this.h / 2 };
+    const rotPt = { x: startPage.carrot.w / 2, y: startPage.carrot.h / 2 };
+
+    ctx.setTransform(new DOMMatrix()
+        .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+        .rotateSelf(rotation.x, rotation.y, rotation.z)
+    );
+    
+    ctx.drawImage(AM.images.carrot.img, 0, 0, AM.images.carrot.cw, AM.images.carrot.ch, -rotPt.x, -rotPt.y, startPage.carrot.w, startPage.carrot.h);
+    ctx.restore();
+    // ctx.drawImage(AM.images.carrot.img, 0, 0, AM.images.carrot.cw, AM.images.carrot.ch, startPage.carrot.x, startPage.carrot.y, startPage.carrot.w, startPage.carrot.h);
+    TXT.draw('instruction3');
     //
     drawStunHalo(1);
     drawStunHalo(-1);
@@ -894,6 +937,8 @@ function startPageAnimations() {
     ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 2.5, startPage.star.y + starx2, startPage.star.w, startPage.star.h);
     ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 1.5, startPage.star.y + starx1, startPage.star.w, startPage.star.h);
 
+
+    
     // ctx.beginPath();
     // ctx.arc(1250, 350, 30, 0, 2 * Math.PI);
     // ctx.stroke();
