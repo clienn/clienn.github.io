@@ -1638,7 +1638,7 @@ function update() {
     HUD.txt.texts['time'].str = zeroPad(Math.floor(timer.timer / 24), 2);
 
     if (delta < 1) {
-        HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24));
+        HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24) / gameDuration * 100);
         timer.tick(delta);
 
         if (timer.timer <= 0) {
