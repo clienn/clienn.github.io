@@ -474,11 +474,6 @@ const clips = [
     
 ];
 
-var projectileRanges = {
-    x: [200, 300],
-    y: [350, 400]
-}
-
 var radius = 28;
 var dradius = radius * 2;
         
@@ -819,6 +814,19 @@ var TXT = null;
 
 var maxDifficultyRange = 50;
 
+var projectileRanges = {
+    // x: [200, 300],
+    // y: [350, 400]
+    x: [340, 350],
+    y: [430, 450]
+}
+
+var soundGroup = {
+    score: [],
+    scoreClones: 10,
+    scoreCounter: 0
+}
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
@@ -831,12 +839,12 @@ function main(w, h) {
 
     let cols = [0, 1, 2, 3];
     shuffleArr(cols);
-    difficulty[cols[0]] = Math.floor(Math.random() * maxDifficultyRange) / 100 + 0.2 * scaleX;
-    difficulty[cols[1]] = Math.floor(Math.random() * maxDifficultyRange) / 100 + 0.2 * scaleX;
-    difficulty[cols[2]] = Math.floor(Math.random() * maxDifficultyRange) / 100 + 0.2 * scaleX;
-    difficulty[cols[3]] = Math.floor(Math.random() * maxDifficultyRange) / 100 + 0.2 * scaleX;
+    difficulty[cols[0]] = Math.floor(Math.random() * maxDifficultyRange) / 100 + 1.2 * scaleX;
+    difficulty[cols[1]] = Math.floor(Math.random() * maxDifficultyRange) / 100 + 1.2 * scaleX;
+    difficulty[cols[2]] = Math.floor(Math.random() * maxDifficultyRange) / 100 + 1.2 * scaleX;
+    difficulty[cols[3]] = Math.floor(Math.random() * maxDifficultyRange) / 100 + 1.2 * scaleX;
     // 980 452
-
+    // console.log(difficulty)
     
     projDimX *= scaleX;
     projDimY *= scaleX;
@@ -909,10 +917,11 @@ function main(w, h) {
         scoreNAdjY = 2;
 
         projectileRanges = {
-            x: [300, 500],
-            y: [400, 500]
+            // x: [300, 500],
+            // y: [400, 500]
+            x: [350, 400],
+            y: [350, 400]
         }
-        
     }
 
     timer = new Timer(w / 2, 0, 50, '#fb2121');
@@ -1028,27 +1037,27 @@ function main(w, h) {
     projectiles[0] = new Spirte(canons.black.left.upper.w - 100 * scaleX, canons.black.left.upper.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
     // projectiles[0].clipX = clips[c].clipX;
     // projectiles[0].clipY = clips[c].clipY;
-    projectiles[0].init(projectileRanges);
+    projectiles[0].init(projectileRanges, scaleX);
 
     c = Math.floor(Math.random() * clips.length);
     projectiles[1] = new Spirte(canons.black.left.upper.w - 100 * scaleX, canons.black.left.lower.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
     // projectiles[1].clipX = clips[c].clipX;
     // projectiles[1].clipY = clips[c].clipY;
-    projectiles[1].init(projectileRanges);
+    projectiles[1].init(projectileRanges, scaleX);
 
     c = Math.floor(Math.random() * clips.length);
     projectiles[2] = new Spirte(canons.black.right.upper.x, canons.black.left.upper.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
     // projectiles[2].clipX = clips[c].clipX;
     // projectiles[2].clipY = clips[c].clipY;
     projectiles[2].direction = -1;
-    projectiles[2].init(projectileRanges);
+    projectiles[2].init(projectileRanges, scaleX);
 
     c = Math.floor(Math.random() * clips.length);
     projectiles[3] = new Spirte(canons.black.right.upper.x, canons.black.left.lower.y, clips[c].w, clips[c].h, clips[c].clipW, clips[c].clipH, c);
     // projectiles[3].clipX = clips[c].clipX;
     // projectiles[3].clipY = clips[c].clipY;
     projectiles[3].direction = -1;
-    projectiles[3].init(projectileRanges);
+    projectiles[3].init(projectileRanges, scaleX);
 
     projectiles[0].zRotate = 0;
     projectiles[1].zRotate = 0;
@@ -1078,6 +1087,13 @@ function main(w, h) {
     TXT.addText('instruction2', "Don't poke the", 'normal', 20, 'Montserrat', startPageInfo.startmine.x + leftAdj, startPageInfo.hand.y + 140 * scaleY, 170, 30, '#0a1010', false); 
     centerX = 170 / 2 - 170 / 2;
     TXT.addText('instruction2_2', 'pokey objects!', 'normal', 20, 'Montserrat', startPageInfo.startmine.x + centerX * scaleX + leftAdj, startPageInfo.hand.y + 175 * scaleY, 170, 30, '#0a1010', false); 
+    
+
+    for (let i = 0; i < soundGroup.scoreClones; ++i) {
+        soundGroup.score.push(AM.audio.score.img.cloneNode());
+    }
+    
+    
     gameCycle();
 }
 
@@ -1416,7 +1432,7 @@ function moveClouds() {
             if (mul == 0) {
                 cloudMovements[i - 1] = -rngSpeed;
                 bgInfo[key].x = canvas.width;
-                console.log('test', )
+                // console.log('test', )
             } else {
                 cloudMovements[i - 1] = rngSpeed;
                 bgInfo[key].x = -bgInfo[key].w;
@@ -1762,7 +1778,7 @@ function isBtnClicked(mx, my, btn) {
 function updateLevel() {
     if (score >= levelScore) {
         levelScore = ++level * LEVEL_UP_THRESHOLD;
-        updateDifficulty();
+        // updateDifficulty();
         // console.log('level up');
     }
 }
@@ -1777,8 +1793,8 @@ function updateDifficulty() {
 
     if (cols.length > 0) {
         let rng = Math.floor(Math.random() * cols.length);
-        difficulty[rng] += 0.2 * scaleX;
-        difficultyAdj[rng] += 0.2 * scaleX;
+        difficulty[rng] += 1.2 * scaleX;
+        difficultyAdj[rng] += 1.2 * scaleX;
         if (difficultyAdj[rng] > 2) difficultyAdj[rng] = 2;
         // console.log('test', difficulty[rng])
     }
@@ -1877,7 +1893,7 @@ function updateSprite(idx) {
 function resetProjectile(range) {
     for (let k in range) {
         let idx = range[k];
-        projectiles[idx].init(projectileRanges);
+        projectiles[idx].init(projectileRanges, scaleX);
         updateSprite(idx);
     }
 }
@@ -1955,14 +1971,22 @@ function splat(mx, my) {
             kaboomInfo.y = projectiles[i].y;
             score += SPLAT_POINTS;
             if (volumeOn) {
+                // playScore();
                 // AM.audio.score.img.pause();
                 // AM.audio.score.img.currentTime = 0;
                 setTimeout(() => {
                     // AM.audio.score.img.pause();
-                    AM.audio.score.img.currentTime = 0; 
-                    AM.audio.score.img.volume = 0.5; 
-                    AM.audio.score.img.play();
-                }, 0)
+                    // AM.audio.score.img.currentTime = 0; 
+                    // AM.audio.score.img.volume = 0.5; 
+                    // AM.audio.score.img.play();
+                    let c = soundGroup.scoreCounter;
+
+                    soundGroup.score[c].currentTime = 0; 
+                    soundGroup.score[c].volume = 0.5; 
+                    soundGroup.score[c].play();
+
+                    soundGroup.scoreCounter = (soundGroup.scoreCounter + 1) % soundGroup.scoreClones;
+                }, 0);
                 // AM.audio.score.img.play();
             }
         }
@@ -1972,6 +1996,29 @@ function splat(mx, my) {
     }
     
 }
+
+// makes playing audio return a promise
+// function playAudio(audio){
+//     return new Promise(res=>{
+//       audio.currentTime = 0; 
+//       audio.volume = 0.5; 
+//       audio.play();
+//       audio.onended = res;
+//     });
+//   }
+  
+//   // how to call
+//   async function playScore() {
+//     let c = soundGroup.scoreCounter;
+
+//     // soundGroup.score[c].currentTime = 0; 
+//     // soundGroup.score[c].volume = 0.5; 
+//     // soundGroup.score[c].play();
+
+//     soundGroup.scoreCounter = (soundGroup.scoreCounter + 1) % soundGroup.scoreClones;
+//     await playAudio(soundGroup.score[c]);
+//     // code that will run after audio finishes...
+//   }
 
 function isSplatted(p1, p2) {
     // let dx = (p1.x + p1.w / 2) - p2.x;
@@ -2003,7 +2050,7 @@ function circleCollision(p1x, p1y, r1, p2x, p2y, r2) {
   }
 
 function rescale(obj) {
-    console.log(obj.x, obj.y, obj.w, obj.h);
+    // console.log(obj.x, obj.y, obj.w, obj.h);
     obj.x *= scaleX;
     obj.y *= scaleY;
     obj.w *= scaleX;
@@ -2014,7 +2061,7 @@ function rescale(obj) {
     obj.ow = obj.w;
     obj.oh = obj.h;
 
-    console.log(obj.x, obj.y, obj.w, obj.h);
+    // console.log(obj.x, obj.y, obj.w, obj.h);
 }
 
 function isPortrait() {
@@ -2105,14 +2152,18 @@ function gameCycle() {
                     if (difficulty[i] > 0) {
                         // projectiles[i].draw(ctx, AM.images.projectile.img);
                         projectiles[i].dive(ctx, AM.images[projectiles[i].id].img);
-                        let r = projectiles[i].update(delta * difficulty[i], g, projectileRanges);
+                        // let r = projectiles[i].update(delta * difficulty[i], g, projectileRanges, canvas.height);
+                        let r = projectiles[i].update(delta, g, projectileRanges, canvas.height);
                         
                         if (r) {
                             // difficulty[i] = Math.floor(Math.random() * 100) / 100 + 0.2 + difficultyAdj[i];
-                            difficulty[i] = Math.floor(Math.random() * maxDifficultyRange) / 100 + 0.2 * scaleX;
+                            difficulty[i] = Math.floor(Math.random() * maxDifficultyRange) / 100 + 1.2 * scaleX;
+                            // console.log(difficulty[i]);
                             // difficulty[i] += 0.2;
                             updateSprite(i);
                             initAnimateCanon(i);
+
+                            projectiles[i].vy = -Math.floor(Math.random() * 300 + 300) * scaleX;
 
                             if (i < 6) {
                                 generateFloater(i);

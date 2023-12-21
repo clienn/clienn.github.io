@@ -98,21 +98,22 @@ class Spirte {
         ctx.restore();
     }
 
-    update(delta, g, projectileRanges) {
+    update(delta, g, projectileRanges, canvasH) {
         // delta *= 0.2;
-        this.vy = (2 * this.fx) / this.x;
+        // this.vy = (2 * this.fx) / this.x;
 
-        this.fy += (this.vy + g);
+        // this.fy += (this.vy + g);
+        this.vy += g * 60 * delta;
 
         this.x += this.fx * delta;
-        this.y += this.fy * delta;
+        // this.y += this.fy * delta;
+        this.y += this.vy * delta;
         this.prevX = this.x;
         this.prevY = this.y;
 
         // this.fy += g;
 
-        if (this.y > 1000) {
-            
+        if (this.y > canvasH) {
             this.init(projectileRanges);
             return 1;
         }
@@ -137,13 +138,13 @@ class Spirte {
         this.y += this.vy * delta;
     }
 
-    init(ranges) {
+    init(ranges, scale) {
         this.x = this.ox;
         this.y = this.oy;
         this.prevY = this.oy;
         this.fx = (Math.random() * ranges.x[0] + ranges.x[1]) * this.direction;
         this.fy = -(Math.random() * ranges.y[0] + ranges.y[1]);
         this.vx = 0;
-        this.vy = 0;
+        this.vy = -Math.floor(Math.random() * 300 + 300) * scale;
     }
 }
