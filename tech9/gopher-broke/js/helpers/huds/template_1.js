@@ -19,14 +19,19 @@ class Template_1 {
 
         this.volumeOn = true;
 
-        let volumeAdjX = 2;
-        let volumeAdjY = 45;
+        let volumeAdjX = 7;
+        let volumeAdjY = 25;
 
-        this.volume = new StaticSprite(volumeAdjX, volumeAdjY, 35 * 1.5, 35 * 1.5, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
-        this.mute = new StaticSprite(volumeAdjX, volumeAdjY, 35 * 1.5, 35 * 1.5, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
+        this.volume = new StaticSprite(volumeAdjX, volumeAdjY, 55 * 1.5, 55 * 1.5, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
+        this.mute = new StaticSprite(volumeAdjX, volumeAdjY, 55 * 1.5, 55 * 1.5, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
 
-        this.timecircle = new StaticSprite(this.volume.w + volumeAdjX, 20, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.timecircle.cw, AM.images.timecircle.ch, 'timecircle');
-        this.stopwatch = new StaticSprite(this.volume.w + volumeAdjX, 20, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
+        volumeAdjX += 10 * sx;
+        volumeAdjY -= 7 * sy;
+
+        this.timecircle = new StaticSprite(this.volume.w + volumeAdjX, volumeAdjY, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.timecircle.cw, AM.images.timecircle.ch, 'timecircle');
+        // this.timecircle = new StaticSprite(this.volume.w + volumeAdjX, 20, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.timecircle.cw, AM.images.timecircle.ch, 'timecircle');
+        this.stopwatch = new StaticSprite(this.volume.w + volumeAdjX, volumeAdjY, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
+        // this.stopwatch = new StaticSprite(this.volume.w + volumeAdjX, 20, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
 
         this.gopher = new StaticSprite(0, 0, 75 * 1.5, 75 * 1.5, 0, 0, AM.images.gopher.cw, AM.images.gopher.ch, 'gopher');
         this.carrot_score = new StaticSprite(0, 0, 65 * 1.5, 75 * 1.5, 0, 0, AM.images.carrot_score.cw, AM.images.carrot_score.ch, 'carrot_score');
@@ -72,7 +77,8 @@ class Template_1 {
         let paddingX = 50 * sx;
         let paddingY = 22 * sy;
 
-        this.timeProgressBar = new ProgressBar(this.timecircle.w / 2 + paddingX, this.timecircle.h / 2 - 30 * sx / 2 + paddingY, 150 * sx, 35 * sy);
+        // this.timeProgressBar = new ProgressBar(this.timecircle.w / 2 + paddingX, this.timecircle.h / 2 - 30 * sx / 2 + paddingY, 150 * sx, 35 * sy);
+        this.timeProgressBar = new ProgressBar(this.timecircle.x + this.timecircle.w / 2, this.timecircle.y + this.timecircle.h / 2 - 35 / 2 * sy, 150 * sx, 35 * sy);
         this.timeProgressBar.progress = 100;
 
 

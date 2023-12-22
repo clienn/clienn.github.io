@@ -7,17 +7,19 @@ class Template_1 {
 
         this.volumeOn = true;
 
-        let volumePosX = 20;
-        let volumePosY = 35;
+        let volumePosX = 7;
+        let volumePosY = 25;
 
-        this.volume = new StaticSprite(volumePosX, volumePosY, 55, 55, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
-        this.mute = new StaticSprite(volumePosX, volumePosY, 55, 55, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
+        this.volume = new StaticSprite(volumePosX, volumePosY, 55 * 1.5, 55 * 1.5, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
+        this.mute = new StaticSprite(volumePosX, volumePosY, 55 * 1.5, 55 * 1.5, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
 
         let paddingX = 20 * sx + this.volume.w;
         let paddingY = 10 * sy;
 
-        this.timecircle = new StaticSprite(10 + paddingX, 10, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.timecircle.cw, AM.images.timecircle.ch, 'timecircle');
-        this.stopwatch = new StaticSprite(10 + paddingX, 10, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
+        this.timecircle = new StaticSprite(this.volume.x + this.volume.w + 10, this.volume.y + this.volume.h / 2 - 90 / 2, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.timecircle.cw, AM.images.timecircle.ch, 'timecircle');
+        // this.timecircle = new StaticSprite(10 + paddingX, 10, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.timecircle.cw, AM.images.timecircle.ch, 'timecircle');
+        this.stopwatch = new StaticSprite(this.volume.x + this.volume.w + 10, this.volume.y + this.volume.h / 2 - 90 / 2, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
+        // this.stopwatch = new StaticSprite(10 + paddingX, 10, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
 
         this.life = new StaticSprite(0, 10, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.life.cw, AM.images.life.ch, 'life');
         this.coin0 = new StaticSprite(0, 0, 60, 60, 0, 0, AM.images.coin_0.cw, AM.images.coin_0.ch, 'coin_0');
@@ -43,7 +45,8 @@ class Template_1 {
         
         
 
-        this.timeProgressBar = new ProgressBar(this.timecircle.w / 2 + paddingX / 1.5, this.timecircle.h / 2 - 30 * sx / 2 + paddingY, 200 * sx, 45 * sy);
+        this.timeProgressBar = new ProgressBar(this.timecircle.x + this.timecircle.w / 2, this.timecircle.y + this.timecircle.h / 2 - 45 / 2 * scaleY, 200 * sx, 45 * sy);
+        // this.timeProgressBar = new ProgressBar(this.timecircle.w / 2 + paddingX / 1.5, this.timecircle.h / 2 - 30 * sx / 2 + paddingY, 200 * sx, 45 * sy);
         this.timeProgressBar.progress = 100;
 
         let scorebarWidth = 200 * sx + 70 * sy;

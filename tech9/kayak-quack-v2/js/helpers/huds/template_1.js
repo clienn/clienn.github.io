@@ -25,11 +25,11 @@ class Template_1 {
         // this.stopwatch = new StaticSprite(50, 20, 60 * multiplier, 60 * multiplier, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
         this.duck = new StaticSprite(duckX, 20, duckW, AM.images.duck.ch * 2 * sy, 0, 0, 46.83, AM.images.duck.ch, 'duck');
 
-        let volumePosX = 10;
-        let volumePosY = 10;
+        let volumePosX = 7;
+        let volumePosY = 25;
 
-        this.volume = new StaticSprite(volumePosX, volumePosY, 55, 55, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
-        this.mute = new StaticSprite(volumePosX, volumePosY, 55, 55, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
+        this.volume = new StaticSprite(volumePosX, volumePosY, 55 * 1.5, 55 * 1.5, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
+        this.mute = new StaticSprite(volumePosX, volumePosY, 55 * 1.5, 55 * 1.5, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
 
         let adjY = 120;
 

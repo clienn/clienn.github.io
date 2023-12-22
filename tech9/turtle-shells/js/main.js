@@ -385,10 +385,10 @@ var shineInfo = {
 }
 // 35 * scaleX, volumeInfo.y + 50 * scaleY, volumeInfo.w * 2, volumeInfo.h * 2
 var volumeInfo = {
-    x: 15,
+    x: 7,
     y: 25,
-    w: 25 * 2,
-    h: 25 * 2,
+    w: 55 * 1.5,
+    h: 55 * 1.5,
     cw: 46,
     ch: 46,
 }
@@ -822,7 +822,7 @@ function main(w, h) {
     // TXT.addText(TEXT_ID.FINALSCORE, '11', 'bold', 20, 'Montserrat', w / 2, (320 + 145) * scaleY, 65, 60, '#fff', true); 
     TXT.addText(TEXT_ID.RESETMSG, 'Tap to play again.', 'bold', 20, 'Montserrat', w / 2, h / 2, 600, 100, '#fff', true); 
     TXT.addText(TEXT_ID.TOPTIMER, '09', (isMobile ? 'normal' : 'bold'), 20, 'Montserrat', 
-        topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2, 29 * scaleY, 40, 40, '#000', true); 
+        topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2, topHUDInfo.timer.progress.y, 40, 40, '#000', true); 
 
     // TXT.addText(canvas, TEXT_ID.SCOREX, 'x', 'normal', topHUD.score.fontS, 'Montserrat', 
     //     w / 2, topHUDInfo.score.y + (scoreAdjY + 2) * scaleY, 20, topHUD.score.fontH, '#fff', true); 
@@ -872,6 +872,7 @@ function main(w, h) {
 
     timeProgressBar = new ProgressBar(topHUDInfo.timer.progress.x, 30 * scaleY, pbW, pbH);
     timeProgressBar.progress = 100;
+    timeProgressBar.y = topHUDInfo.timer.progress.y;
     
     pbW = 200 * scaleX;
     pbH = 75 * scaleY;
@@ -1352,14 +1353,19 @@ function initTopHUD() {
     topHUDInfo.timer.progress.h *= scaleX;
     
     // topHUDInfo.timer.progress.x = topHUDInfo.w / 2 - topHUDInfo.timer.w / 2 + volumeAdjX * 2;
-    topHUDInfo.timer.progress.x = volumeAdjX * 1.75;
+    // topHUDInfo.timer.progress.x = volumeAdjX * 1.75;
 
-    topHUDInfo.timer.x = topHUDInfo.timer.progress.x - topHUD.timer.timecircle.w / 2;
-    topHUDInfo.timer.y = topHUDInfo.h / 2 - topHUD.timer.timecircle.h / 2;
+    topHUDInfo.timer.x = volumeInfo.x + volumeInfo.w + 10 * scaleX;
+    topHUDInfo.timer.progress.x = topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2;
+    // topHUDInfo.timer.x = topHUDInfo.timer.progress.x - topHUD.timer.timecircle.w / 2;
+    // topHUDInfo.timer.y = topHUDInfo.h / 2 - topHUD.timer.timecircle.h / 2;
+    topHUDInfo.timer.y = volumeInfo.y + volumeInfo.h / 2 - topHUD.timer.timecircle.h / 2 - 3 * scaleY;
 
-    topHUDInfo.timer.progress.y = (topHUDInfo.h / 2 - topHUDInfo.timer.progress.h / 2);
+    topHUDInfo.timer.progress.y = topHUDInfo.timer.y + (topHUD.timer.timecircle.h / 2 - topHUDInfo.timer.progress.h);
+    // topHUDInfo.timer.progress.y = (topHUDInfo.h / 2 - topHUDInfo.timer.progress.h / 2);
     topHUDInfo.timer.text.x = topHUDInfo.timer.x + topHUDInfo.timer.text.rectSize * scaleX / 2;
-    topHUDInfo.timer.text.y += topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2;
+    // topHUDInfo.timer.text.y += topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2;
+    topHUDInfo.timer.text.y += topHUDInfo.timer.progress.y;
     
     topHUDInfo.score.w *= scaleX;
     topHUDInfo.score.h *= scaleY;
@@ -1576,7 +1582,7 @@ function reduceHP() {
         gameover = true;
         TXT.addText(TEXT_ID.FINALSCORE, zeroPad(score, 2), 'bold', 20, 'Montserrat', canvas.width / 2, shineInfo.y + shineInfo.h * 0.8, 65, 60, '#fff', true); 
         msg = 'Complete!';
-        submitScore();
+        // submitScore();
     }
 }
 
@@ -1703,7 +1709,7 @@ function update() {
                 // alert('You scored: ' + score + ' out of ' + rounds + '.');
                 gameover = true;
                 TXT.addText(TEXT_ID.FINALSCORE, zeroPad(score, 2), 'bold', 20, 'Montserrat', canvas.width / 2, shineInfo.y + shineInfo.h * 0.8, 65, 60, '#fff', true);
-                submitScore();
+                // submitScore();
             }
         }
     } else if (showTarget) {
@@ -1928,7 +1934,8 @@ function drawProgress() {
     // let w =
     // const { x, y, h, max } = topHUDInfo.timer.progress;
     const { x, max } = topHUDInfo.timer.progress;
-    let y = 35 * scaleY;
+    let y = topHUDInfo.timer.progress.y;
+    // let y = 35 * scaleY;
     let h = 35 * scaleY;
     // let p = showTarget ? max * scaleX : (max * scaleX * (timer.timer / (9.0 * 24)));
     let p = showTarget ? w : (w * (timer.timer / (9.0 * 24)));

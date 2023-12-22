@@ -23,8 +23,8 @@ class Template_1 {
         this.complete = new StaticSprite(0, 50 + adjY, AM.images.complete.cw * multiplier2, AM.images.complete.ch * multiplier2, 0, 0, AM.images.complete.cw, AM.images.complete.ch, 'complete');
         this.yourscore = new StaticSprite(0, 200 + adjY, AM.images.yourscore.cw * multiplier2, AM.images.yourscore.ch * multiplier2, 0, 0, AM.images.yourscore.cw, AM.images.yourscore.ch, 'yourscore');
 
-        this.volume = new StaticSprite(25, 25, 55, 55, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
-        this.mute = new StaticSprite(25, 25, 55, 55, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
+        this.volume = new StaticSprite(7, 25, 55 * 1.5, 55 * 1.5, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
+        this.mute = new StaticSprite(7, 25, 55 * 1.5, 55 * 1.5, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
 
         this.initBattery();
         this.initBattery2();

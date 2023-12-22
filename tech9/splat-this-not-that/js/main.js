@@ -265,10 +265,10 @@ var images = {
 }
 
 var volumeInfo = {
-    x: 15,
-    y: 20,
-    w: 30 * 2,
-    h: 30 * 2,
+    x: 7,
+    y: 5,
+    w: 55 * 1.5,
+    h: 55 * 1.5,
     cw: 46,
     ch: 46,
 }
@@ -315,6 +315,26 @@ var ouchInfo = {
     // h: 49 * 3,
     cw: 192.167,
     ch: 145,
+   
+    // cw: 48.125,
+    // ch: 49,
+    // cw: 70,
+    // ch: 28,
+}
+
+var objectBoomInfo = {
+    x: 0,
+    y: 0,
+    // w: 192.167 * 1.5,
+    // h: 145 * 1.5,
+    w: 68 * 3,
+    h: 64 * 3,
+    // w: 48.125 * 3,
+    // h: 49 * 3,
+    // cw: 192.167,
+    // ch: 145,
+    cw: 68,
+    ch: 64,
     // cw: 48.125,
     // ch: 49,
     // cw: 70,
@@ -808,7 +828,7 @@ var projSpriteInfo = {
 var projDimX = 85;
 var projDimY = 85;
 
-var ouchSpriteKey = 'boom';
+var ouchSpriteKey = 'objectboom';
 
 var TXT = null;
 
@@ -826,6 +846,19 @@ var soundGroup = {
     scoreClones: 10,
     scoreCounter: 0
 }
+
+const scoreTextInfo = {
+    w: 88 * 2.5,
+    h: 88 * 2.5,
+    cw: 88,
+    ch: 88,
+}
+
+var scoreTextFrame = 0;
+var isObjectCollided = false;
+
+var ouchAnimations = [];
+var currOuchIdx = 0
 
 function main(w, h) {
     canvas.width = w;
@@ -866,6 +899,16 @@ function main(w, h) {
     //         y: [50, 700]
     //     }
     // }
+
+    for (let i = 0; i < 5; ++i) {
+        ouchAnimations[i] = {
+            ouchT: 0,
+            ouchT2: 0,
+            x: 0,
+            y: 0,
+            ouchSpriteKey: 'boom'
+        }
+    }
     
 
     initStartPage();
@@ -947,14 +990,16 @@ function main(w, h) {
 
     
 
-    rescaleSize(compassInfo, scaleX, scaleY);
-    rescaleSize(shineInfo, scaleX, scaleY);
-    rescaleSize(completeInfo, scaleX, scaleY);
+    rescaleSize(compassInfo, scaleX, scaleX);
+    rescaleSize(shineInfo, scaleX, scaleX);
+    rescaleSize(completeInfo, scaleX, scaleX);
+    rescaleSize(scoreTextInfo, scaleX, scaleX);
     rescaleAll(trophyInfo, scaleX, scaleY);
     rescaleAll(waterInfo, scaleX, scaleY);
     rescaleAll(kaboomInfo, scaleX, scaleY);
     rescaleAll(explosionStarInfo, scaleX, scaleY);
     rescaleAll(ouchInfo, scaleX, scaleY);
+    rescaleAll(objectBoomInfo, scaleX, scaleY);
 
     rescaleAll(volumeInfo, scaleX, scaleY);
 
@@ -993,7 +1038,7 @@ function main(w, h) {
     let pbH = 45 * scaleY;
 
     // timeProgressBar = new ProgressBar(topHUDInfo.timer.progress.x * scaleX, 30 * scaleY, pbW, pbH);
-    timeProgressBar = new ProgressBar(topHUDInfo.timer.x + topHUDInfo.timer.w / 3, 30 * scaleY, pbW, pbH);
+    timeProgressBar = new ProgressBar(topHUDInfo.timer.x + topHUDInfo.timer.w / 3, volumeInfo.y + volumeInfo.h / 2 - 2 * scaleY, pbW, pbH);
     timeProgressBar.progress = 100;
 
     pbW = 150 * scaleX;
@@ -1013,8 +1058,10 @@ function main(w, h) {
     textList.scoreN.obj.ty = 28 * scaleY;
 
     // textList.topTimer.obj.tx = topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2 - (textList.topTimer.desc.w - 5) / 2 * scaleX;
-    textList.topTimer.obj.tx = 45 * scaleX + volumeInfo.x + volumeInfo.w;
-    textList.topTimer.obj.ty = topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2 - textList.topTimer.desc.h / 2 * scaleY;
+    textList.topTimer.obj.tx = topHUDInfo.timer.x + topHUDInfo.timer.w / 2 - 37 * scaleX;
+    // textList.topTimer.obj.tx = 45 * scaleX + volumeInfo.x + volumeInfo.w;
+    textList.topTimer.obj.ty = volumeInfo.y + volumeInfo.h / 2;
+    // textList.topTimer.obj.ty = topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2 - textList.topTimer.desc.h / 2 * scaleY;
 
     textList.scoreLabel.obj.tx = w / 2 - textList.scoreLabel.desc.w * scaleX / 2 - 13 * scaleX;
     textList.scoreLabel.obj.ty = 450 * scaleY;
@@ -1183,6 +1230,16 @@ function drawExplosionStar(x, y) {
     ouchT2 = 0;
     ouchInfo.x = x;
     ouchInfo.y = y;
+
+    ouchAnimations[currOuchIdx] = {
+        ouchT: 1,
+        ouchT2: 0,
+        x: x,
+        y: y,
+        ouchSpriteKey: 'objectboom'
+    };
+
+    currOuchIdx = (currOuchIdx + 1) % ouchAnimations.length;
 }
 
 function initAnimateCanon(idx) {
@@ -1271,9 +1328,11 @@ function initTopHUD() {
     // topHUDInfo.timer.x = topHUDInfo.timer.progress.x - topHUD.timer.timecircle.w / 2;
     topHUDInfo.timer.x = volumeAdjX;
     // topHUDInfo.timer.x = 30;
-    topHUDInfo.timer.y = topHUDInfo.h / 2 - topHUD.timer.timecircle.h / 2;
+    topHUDInfo.timer.y = volumeInfo.y + 15 * scaleY;
+    // topHUDInfo.timer.y = topHUDInfo.h / 2 - topHUD.timer.timecircle.h / 2;
 
-    topHUDInfo.timer.progress.y = (topHUDInfo.h / 2 - topHUDInfo.timer.progress.h / 2);
+    // topHUDInfo.timer.progress.y = (topHUDInfo.h / 2 - topHUDInfo.timer.progress.h / 2);
+    topHUDInfo.timer.progress.y = topHUDInfo.timer.y + (topHUDInfo.timer.h / 2 - topHUDInfo.timer.progress.h / 2);
     // topHUDInfo.timer.text.x = topHUDInfo.timer.x + topHUDInfo.timer.text.rectSize * scaleX / 2;
     topHUDInfo.timer.text.x = topHUDInfo.timer.x + topHUDInfo.timer.text.rectSize * scaleX / 2;
     topHUDInfo.timer.text.y += topHUDInfo.timer.y + topHUD.timer.timecircle.h / 2;
@@ -1544,7 +1603,8 @@ function controls() {
                 
                 if (isBtnClicked(mx, my, {
                     x: volumeInfo.x,
-                    y: volumeInfo.y + topHUDInfo.timer.y,
+                    // y: volumeInfo.y + topHUDInfo.timer.y,
+                    y: volumeInfo.y,
                     w: volumeInfo.w,
                     h: volumeInfo.h
                 })) {
@@ -1824,6 +1884,8 @@ function checkProjectileCollisions() {
                 if ((projectiles[i].currFrame < 31 && projectiles[j].currFrame > 30) || (projectiles[i].currFrame > 30 && projectiles[j].currFrame < 31)) {
                     // console.log('collision detected');
                     drawExplosionStar(projectiles[i].x, projectiles[i].y);
+                    // ouchSpriteKey = 'objectboom';
+
                     if (volumeOn) {
                         // AM.audio.boom.img.pause();
                         // AM.audio.boom.img.currentTime = 0;
@@ -1960,6 +2022,16 @@ function splat(mx, my) {
             ouchT = 1;
             ouchT2 = 0;
 
+            ouchAnimations[currOuchIdx] = {
+                ouchT: 1,
+                ouchT2: 0,
+                x: projectiles[i].x,
+                y: projectiles[i].y,
+                ouchSpriteKey: ouchSpriteKey
+            }
+
+            currOuchIdx = (currOuchIdx + 1) % ouchAnimations.length;
+
             ouchInfo.x = projectiles[i].x;
             ouchInfo.y = projectiles[i].y;
         } else {
@@ -1970,6 +2042,8 @@ function splat(mx, my) {
             kaboomInfo.x = projectiles[i].x;
             kaboomInfo.y = projectiles[i].y;
             score += SPLAT_POINTS;
+
+            scoreTextFrame = Math.floor(Math.random() * 10);
             if (volumeOn) {
                 // playScore();
                 // AM.audio.score.img.pause();
@@ -2098,10 +2172,17 @@ function update() {
         if (kaboomT <= 0) kaboomT = 0;
     }
 
-    if (ouchT > 0) {
-        ouchT -= 1 * delta;
-        if (ouchT <= 0) ouchT = 0;
+    for(let i = 0; i < ouchAnimations.length; ++i) {
+        if (ouchAnimations[i].ouchT > 0) {
+            ouchAnimations[i].ouchT -= 1 * delta;
+            if (ouchAnimations[i].ouchT <= 0) ouchAnimations[i].ouchT = 0;
+        }
     }
+
+    // if (ouchT > 0) {
+    //     ouchT -= 1 * delta;
+    //     if (ouchT <= 0) ouchT = 0;
+    // }
 }
 
 function gameCycle() {
@@ -2188,16 +2269,41 @@ function gameCycle() {
                     let frame = Math.floor(kaboomT2) % 10;
                     // ctx.drawImage(AM.images.scoreboom.img, 0, 0, kaboomInfo.cw, kaboomInfo.ch, kaboomInfo.x - adjx2, kaboomInfo.y - adjx2, kaboomInfo.w + adjx, kaboomInfo.h + adjx);
                     ctx.drawImage(AM.images.scoreboom.img, frame * kaboomInfo.cw, 0, kaboomInfo.cw, kaboomInfo.ch, kaboomInfo.x, kaboomInfo.y, kaboomInfo.w, kaboomInfo.h);
-                    
+                    ctx.drawImage(AM.images.scoretext.img, scoreTextFrame * scoreTextInfo.cw, 0, scoreTextInfo.cw, scoreTextInfo.ch, kaboomInfo.x + (kaboomInfo.w / 2 - scoreTextInfo.w / 2), kaboomInfo.y, scoreTextInfo.w, scoreTextInfo.h);
                 }
 
-                if (ouchT) {
-                    ouchT2 += 10 * delta;
+                // if (ouchT) {
+                //     ouchT2 += 10 * delta;
                     
-                    let frame = Math.floor(ouchT2) % 6;
-                    // ctx.drawImage(AM.images.ouch.img, 0, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
                     
-                    ctx.drawImage(AM.images[ouchSpriteKey].img, frame * ouchInfo.cw, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
+                //     // ctx.drawImage(AM.images.ouch.img, 0, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
+                //     if (ouchSpriteKey != 'objectboom') {
+                //         let frame = Math.floor(ouchT2) % 6;
+                //         ctx.drawImage(AM.images[ouchSpriteKey].img, frame * ouchInfo.cw, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
+                //     } else {
+                //         let frame = Math.floor(ouchT2) % 7;
+                //         ctx.drawImage(AM.images[ouchSpriteKey].img, frame * objectBoomInfo.cw, 0, objectBoomInfo.cw, objectBoomInfo.ch, ouchInfo.x, ouchInfo.y, objectBoomInfo.w, objectBoomInfo.h);
+                //         if (frame == 6) ouchT = 0;
+                //     }
+                    
+                // }
+
+                for (let i = 0; i < ouchAnimations.length; ++i) {
+                    if (ouchAnimations[i].ouchT) {
+                        ouchAnimations[i].ouchT2 += 10 * delta;
+                        
+                        
+                        // ctx.drawImage(AM.images.ouch.img, 0, 0, ouchInfo.cw, ouchInfo.ch, ouchInfo.x, ouchInfo.y, ouchInfo.w, ouchInfo.h);
+                        if (ouchAnimations[i].ouchSpriteKey != 'objectboom') {
+                            let frame = Math.floor(ouchAnimations[i].ouchT2) % 6;
+                            ctx.drawImage(AM.images[ouchAnimations[i].ouchSpriteKey].img, frame * ouchInfo.cw, 0, ouchInfo.cw, ouchInfo.ch, ouchAnimations[i].x, ouchAnimations[i].y, ouchInfo.w, ouchInfo.h);
+                        } else {
+                            let frame = Math.floor(ouchAnimations[i].ouchT2) % 7;
+                            ctx.drawImage(AM.images[ouchAnimations[i].ouchSpriteKey].img, frame * objectBoomInfo.cw, 0, objectBoomInfo.cw, objectBoomInfo.ch, ouchAnimations[i].x, ouchAnimations[i].y, objectBoomInfo.w, objectBoomInfo.h);
+                            if (frame == 6) ouchAnimations[i].ouchT = 0;
+                        }
+                        
+                    }
                 }
 
                 // canons

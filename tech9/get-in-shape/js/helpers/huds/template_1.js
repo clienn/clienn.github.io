@@ -6,11 +6,11 @@ class Template_1 {
         this.w = w;
 
         this.volumeOn = true;
-        this.volume = new StaticSprite(15, 25, 55, 55, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
-        this.mute = new StaticSprite(15, 25, 55, 55, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
+        this.volume = new StaticSprite(7, 25, 55 * 1.5, 55 * 1.5, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
+        this.mute = new StaticSprite(7, 25, 55 * 1.5, 55 * 1.5, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
         // this.timecircle = new StaticSprite(10, 10, 60, 60, 0, 0, AM.images.timecircle.cw, AM.images.timecircle.ch, 'timecircle');
         // this.stopwatch = new StaticSprite(10, 10, 60, 60, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
-        this.hourglass = new StaticSprite(this.volume.x + this.volume.w + 10, 10, 60, 80, 0, 0, AM.images.hourglass.cw, AM.images.hourglass.ch, 'hourglass');
+        this.hourglass = new StaticSprite(this.volume.x + this.volume.w + 10, this.volume.y + this.volume.h / 2 - 90 / 2, 60, 80, 0, 0, AM.images.hourglass.cw, AM.images.hourglass.ch, 'hourglass');
 
         // this.life = new StaticSprite(0, 10, 60, 60, 0, 0, AM.images.life.cw, AM.images.life.ch, 'life');
         this.star = new StaticSprite(0, 0, 60, 60, 0, 0, AM.images.star.cw, AM.images.star.ch, 'star');
@@ -35,7 +35,7 @@ class Template_1 {
         rescaleAll(this.volume, sx, sy);
         rescaleAll(this.mute, sx, sy);
         
-        let paddingX = 10 * sx;
+        let paddingX = 15 * sx;
         let paddingY = 10 * sy;
 
         this.complete.x = w / 2 - this.complete.w / 2;
@@ -44,7 +44,8 @@ class Template_1 {
 
         
         
-        this.timeProgressBar = new ProgressBar(this.hourglass.x + paddingX * 2, this.hourglass.h / 2 - 30 * sx / 2 + paddingY, 160 * sx, 35 * sy);
+        this.timeProgressBar = new ProgressBar(this.hourglass.x + paddingX * 2, this.hourglass.y + this.hourglass.h / 2 - 45 * sy / 2 + paddingY, 160 * sx, 35 * sy);
+        // this.timeProgressBar = new ProgressBar(this.hourglass.x + paddingX * 2, this.hourglass.h / 2 - 30 * sx / 2 + paddingY, 160 * sx, 35 * sy);
         this.timeProgressBar.progress = 100;
 
         this.scoreBar = new ProgressBar(w / 2 - 50 * sx / 2 - 70 * sy, paddingY, 50 * sx, 70 * sy, '#00ABC8');

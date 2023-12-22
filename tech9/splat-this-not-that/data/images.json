@@ -92,6 +92,20 @@
             "ch": 49
         },
         {
+            "id": "scoretext",
+            "src": "score_text_sprite",
+            "ext": "png",
+            "cw": 88,
+            "ch": 88
+        },
+        {
+            "id": "objectboom",
+            "src": "object_collision_sprite",
+            "ext": "png",
+            "cw": 68,
+            "ch": 64
+        },
+        {
             "id": "ouch",
             "src": "ouch_sprite",
             "ext": "png",

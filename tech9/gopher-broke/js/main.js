@@ -195,34 +195,19 @@ var startPage = {
 }
 
 const randomSpeeches = {
-    miss: [
-        "Missed me!",
-        "I'm over here!",
-        "A swing and a miss!", 
-        "Outsmarted by a gopher!", 
-        "Lost your mojo?", 
-        "Close!", 
-        "Nope!"
-    ],
-
-    caught: [
-        "Aaaah!!!", 
-        "Ouch! That hurt.", 
-        "You got me!", 
-        "Hey, you hit me on the head!", 
-        "Take it easy!", 
-        "Easy there, friend!", 
-        "That'll leave a mark!", 
-        "Don't like gophers, I see!", 
-        "C'mon now!"
-    ],
-    missPos: 0,
-    caughtPos: 0
+    miss: [1, 2, 3, 4, 5, 6, 7, 8],
+    hit: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    missPos: -1,
+    hitPos: -1,
+    currKey: '',
+    info: { x: 0, y: 0, w: 0, h: 0 }
 }
 
 var stunT = 0
 var digT = 0
 var stunAnimStars = [];
+
+var currSpeechKey = '';
 
 /*
  * GAME INITIATLIZATIONS AND CONTROLS
@@ -297,8 +282,6 @@ function main(w, h) {
     bg = new StaticSprite(px, py, w - px * 2, h - py * 1.50, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 'bg');
     soil = new StaticSprite(w / 2 - 366 / 2 * scaleX, bg.y + bg.h - 28 * scaleY, 366 * scaleX, 56 * scaleY, 0, 0, AM.images.soil.cw, AM.images.soil.ch, 'soil');
 
-    
-
     let padLeft = 55 * scaleX;
     let padDist = 90 * scaleX;
     addCarrot(soil.x + padLeft, soil.y - carrotInfo.h / 2);
@@ -318,10 +301,75 @@ function main(w, h) {
     // AM.audio.bg.img.loop = true;
     // AM.audio.bg.img.play();
 
+    rescaleSpeeches(randomSpeeches.miss.length);
+    rescaleSpeeches(randomSpeeches.hit.length);
+
     shuffleArr(randomSpeeches.miss);
-    shuffleArr(randomSpeeches.caught);
+    shuffleArr(randomSpeeches.hit);
 
     gameCycle();
+}
+
+function setSpeech(id, scale) {
+    let posKey = id + 'Pos';
+    let pos = randomSpeeches[posKey];
+
+    let divisions = {
+        h: canvas.width / 3,
+        v: canvas.height / 2,
+    }
+
+    let direction = 1;
+    if (gopher_hide.x < divisions.h) {
+        direction = 4;
+    } else if (gopher_hide.x < divisions.h * 2) {
+        if (gopher_hide.y < divisions.v) {
+            direction = 3;
+        } else {
+            direction = 1;
+        }
+    } else {
+        direction = 1;
+    }
+    
+    let key = id + '_' + randomSpeeches[id][pos] + '_' + direction;
+    randomSpeeches.currKey = key;
+
+    let w = AM.images[key].cw * scaleX * scale;
+    let h = AM.images[key].ch * scaleX * scale;
+    let pad = 10 * scaleY;
+
+    if (direction == 3) {
+        randomSpeeches.info.x = gopher_hide.x + gopher_hide.w / 2 - w / 2;
+        randomSpeeches.info.y = gopher_hide.y - pad * scaleY;
+        randomSpeeches.info.y -= h;
+    } else if (direction == 4) {
+        randomSpeeches.info.x = gopher_hide.x + gopher_hide.w + pad * scaleX;
+        randomSpeeches.info.y = gopher_hide.y + (gopher_hide.h / 2 - h / 2);
+    } else if (direction == 1) {
+        randomSpeeches.info.x = gopher_hide.x + gopher_hide.w / 2 - w / 2;
+        randomSpeeches.info.y = gopher_hide.y + gopher_hide.h + pad * scaleY;
+    } else {
+        randomSpeeches.info.x = gopher_hide.x - pad * scaleX;
+        randomSpeeches.info.y = gopher_hide.y + (gopher_hide.h / 2 - h / 2);
+    }
+
+    // randomSpeeches.info.y -= h;
+    randomSpeeches.info.w = w;
+    randomSpeeches.info.h = h;
+
+    // ctx.drawImage(AM.images[key].img, gopher.x, gopher.y);
+}
+
+function rescaleSpeeches(k, len) {
+    for (let i = 1; i <= len; ++i) {
+        let key = k + '_' + i + '_';
+        for (let j = 1; j <= 4; ++j) {
+            key += j;
+            AM.images[key].w *= scaleX;
+            AM.images[key].h *= scaleX;
+        }
+    }
 }
 
 function muteAllAudio(flag) {
@@ -407,9 +455,14 @@ function controls() {
                             gopher_hide.t = 0;
                             speechID = 'caught';
                             score += 10;
+
+                            randomSpeeches.hitPos = (randomSpeeches.hitPos + 1) % randomSpeeches.hit.length;
+                            setSpeech('hit', 2);
                         } else {
                             chatID = 2;
                             playLaugh();
+                            randomSpeeches.missPos = (randomSpeeches.missPos + 1) % randomSpeeches.miss.length;
+                            setSpeech('miss', 2);
                             if (HUD.carrotIDX < HUD.remainingCarrots.length) {
                                 HUD.remainingCarrots[HUD.carrotIDX] = 0;
                                 HUD.carrotIDX++;
@@ -450,27 +503,6 @@ function controls() {
     
                         chats[chatID].x = gopher_hide.x + gopher_hide.w / 3;
                         chats[chatID].y = gopher_hide.y - chats[chatID].h - 10;
-
-                        let rng = 0;
-
-                        if (speechID == 'miss') {
-                            randomSpeeches.missPos = (randomSpeeches.missPos + 1) % randomSpeeches[speechID].length;
-                            rng = randomSpeeches.missPos;
-
-                            // if (rng == randomSpeeches[speechID].length - 1) {
-                            //     shuffleArr(randomSpeeches[speechID]);
-                            //     randomSpeeches.missPos = -1;
-                            // }
-                        } else {
-                            randomSpeeches.caughtPos = (randomSpeeches.caughtPos + 1) % randomSpeeches[speechID].length;
-                            rng = randomSpeeches.caughtPos;
-
-                            // if (rng == randomSpeeches[speechID].length - 1) {
-                            //     shuffleArr(randomSpeeches[speechID]);
-                            //     randomSpeeches.caughtPos = -1;
-                            // }
-                        }
-                        console.log(randomSpeeches[speechID][rng]);
                     }
                 }
                 
@@ -625,8 +657,14 @@ function damageGopher(dmg) {
     hpT = 0;
 }
 
+function showSpeech() {
+    const { x, y, w, h } = randomSpeeches.info;
+    ctx.drawImage(AM.images[randomSpeeches.currKey].img, x, y, w, h);
+}
+
 function drawChat() {
-    chats[chatID].draw(ctx);
+    // chats[chatID].draw(ctx);
+    showSpeech();
 }
 
 function updateGopherHP() {
