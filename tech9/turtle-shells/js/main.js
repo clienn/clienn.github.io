@@ -428,6 +428,15 @@ var sorts = {
     bubble: () => {
         let hasSwap = false;
         let arr = generateSwaps();
+
+        // for (let i = 0; i < arr.length; ++i) {
+        //     if (arr[i] == target) {
+        //         let tmp = arr[i];
+        //         arr[i] = arr[arr.length - 1];
+        //         arr[arr.length - 1] = tmp;
+        //         break;
+        //     }
+        // }
         
         while (!hasSwap) {
             swaps.length = 0;
@@ -448,6 +457,10 @@ var sorts = {
             shuffleArr(arr);
             // arr.length = 0;
         }
+        
+
+
+
         // console.log(swaps);
         // swaps.push([0, 9]);
         // swaps.push([1, 3]);
@@ -680,6 +693,22 @@ var timeProgressBar = null;
 var scoreProgressBar = null;
 
 var gameT = gameDuration;
+var turtleSpeechKey = '';
+var turtleSpeechInfo = {
+    key: '',
+    x: 0,
+    y: 0,
+    w: 0,
+    h: 0,
+    isCorrect: false,
+    failedKeys: [1, 2, 3, 4, 5, 6, 7],
+    successKeys: [1, 2, 3, 4, 5, 6, 7],
+    failedIdx: 0,
+    successIdx: 0,
+}
+
+var selectedTurtlePos = -1;
+var showUnhappyT = 0;
 
 function main(w, h) {
     canvas.width = w;
@@ -829,7 +858,7 @@ function main(w, h) {
 
     let scoreLabelY = isMobile ? 30 * scaleY : 37 * scaleY;
     TXT.addText(TEXT_ID.SCOREX, 'x', 'normal', topHUD.score.fontS, 'Montserrat', 
-        w / 2 + 30 * scaleX, 45 * scaleY, 20, 40, '#fff', true);
+        w / 2 + 30 * scaleX, 42 * scaleY, 20, 40, '#fff', true);
 
     // TXT.addText(canvas, TEXT_ID.SCORE, '00', (isMobile ? 'normal' : 'bold'), topHUD.score.fontS, 'Montserrat', 
     //     w / 2 + 50 * scaleX, topHUDInfo.score.y + scoreAdjY * scaleY, topHUD.score.fontW, topHUD.score.fontH, '#fff', true);
@@ -840,7 +869,7 @@ function main(w, h) {
     let scoreY = isMobile ? 23 * scaleY : 33 * scaleY;
 
     TXT.addText(TEXT_ID.SCORE, '00', 'bold', 20, 'Montserrat', 
-        w / 2 + 120 * scaleX, 43 * scaleY, scoreW, scoreH, '#fff', true);
+        w / 2 + 120 * scaleX, 35 * scaleY, scoreW, scoreH, '#fff', true);
     // 
     // console.log(TXT.texts[TEXT_ID.SCORE].w);
     shineInfo.w *= 1.5;
@@ -939,6 +968,16 @@ function main(w, h) {
                     }
                 } else if (startTimer && swaps.length == 0 && showAnswerT == 0) {
                     let p = clickBucket(mx, my);
+                    console.log(p)
+                    for (let i = 0; i < turtles.length; ++i) {
+                        if (p == turtles[i].pos) {
+                            selectedTurtlePos = i;
+                            break;
+                        }
+                    }
+
+                    // console.log(clickBucket(turtles[target].x, turtles[target].y));
+                    
                     if (p == turtles[target].pos) {
                         // alert('you win');
                         // msg = 'Correct!';
@@ -969,6 +1008,9 @@ function main(w, h) {
                         turtles[target].activateSpriteAnimation = true;
                         turtles[target].clipX = 0;
                         turtles[target].clipAnimT = 0;
+
+                        turtleSpeechKey = getSpeech(1, p);
+                        console.log(turtleSpeechKey);
                         
                     } else {
                         // alert('you lose');
@@ -989,10 +1031,15 @@ function main(w, h) {
                                 AM.audio.wrong.img.play();
                             }, 0)
                         }
+
+                        
+                        turtleSpeechKey = getSpeech(0, clickBucket(turtles[target].x, turtles[target].y));
+                        console.log(turtleSpeechKey);
                     }
 
                     // showAnswer = true;
                     showAnswerT = 5;
+                    showUnhappyT = 0;
                     answerIdx = target;
                     startTimer = false;
                     
@@ -1063,7 +1110,67 @@ function main(w, h) {
 
     init();
 
+    shuffleArr(turtleSpeechInfo.failedKeys);
+    shuffleArr(turtleSpeechInfo.successKeys);
+
     gameCycle();
+}
+
+function getSpeech(status, pos) {
+    let rng = 0;
+    let key = 'speech_'
+
+    if (status) { // success
+        // rng = Math.floor(Math.random() * 6) + 1;
+        rng = turtleSpeechInfo.successKeys[turtleSpeechInfo.successIdx];
+        turtleSpeechInfo.successIdx = (turtleSpeechInfo.successIdx + 1) % 7;
+        key += 'success_' + rng;
+        turtleSpeechInfo.isCorrect = true;
+    } else {
+        // rng = Math.floor(Math.random() * 7) + 1;
+        rng = turtleSpeechInfo.failedKeys[turtleSpeechInfo.failedIdx];
+        turtleSpeechInfo.failedIdx = (turtleSpeechInfo.failedIdx + 1) % 7;
+        key += 'failed_' + rng;
+        turtleSpeechInfo.isCorrect = false;
+    }
+
+    let alignment = 2;
+    if (turtles.length > 6) {
+        if (pos == 0) {
+            alignment = 1;
+        } else if (pos > 5) {
+            alignment = 3;
+        }
+    }
+    // alignment = 3;
+    key += '_' + alignment;
+
+    turtleSpeechInfo.key = key;
+    turtleSpeechInfo.w = AM.images[key].cw * 1.75 * scaleX;
+    turtleSpeechInfo.h = AM.images[key].ch * 1.75 * scaleX;
+    
+
+    if (alignment == 1) {
+        turtleSpeechInfo.x = turtles[target].x + turtles[target].w / 2 - 35 * scaleX;
+    } else if (alignment == 2) {
+        turtleSpeechInfo.x = turtles[target].x + turtles[target].w / 2 - turtleSpeechInfo.w / 2 + 7 * scaleX;
+    } else if (alignment == 3) {
+        turtleSpeechInfo.x = turtles[target].x + turtles[target].w / 2 - turtleSpeechInfo.w + 50 * scaleX;
+    }
+
+    turtleSpeechInfo.y = turtles[target].y - turtleSpeechInfo.h;
+    
+    return key;
+}
+
+function drawSpeech() {
+    if (turtleSpeechInfo.isCorrect) {
+        turtleSpeechInfo.y = turtles[target].y - turtleSpeechInfo.h;
+    }
+
+    const { x, y, w, h, key } = turtleSpeechInfo;
+    
+    ctx.drawImage(AM.images[key].img, x, y, w, h);
 }
 
 function muteAllAudio(flag) {
@@ -1281,6 +1388,8 @@ function init() {
     pulseT = 0;
 
     showAnswerT = 0;
+    showUnhappyT = 0;
+    selectedTurtlePos = -1;
     answerIdx = -1;
 
     target = Math.floor(Math.random() * turtles.length);
@@ -1379,6 +1488,7 @@ function initTopHUD() {
 
     topHUDInfo.score.fontX += topHUDInfo.score.x + (topHUDInfo.w - topHUDInfo.score.pw) / 2 + 10 * scaleX;
     topHUDInfo.score.fontY += topHUDInfo.score.y + topHUDInfo.score.h / 2;
+    // topHUDInfo.score.fontY += topHUDInfo.timer.y;
     topHUDInfo.score.fontXadj *= scaleX;
 
     topHUDInfo.life.w *= scaleX;
@@ -1410,23 +1520,33 @@ function drawTurtle() {
     for (let i = 0; i < turtles.length; ++i) {
         if ((showTarget && i == target && showAnswerT == 0) || answerIdx == i) {
             if (answerIdx > -1) {
-                if (msg == TEXT_ID.WRONG || msg == TEXT_ID.TOOSLOW || msg > 17) {
-                    ctx.save();
+                // if (msg == TEXT_ID.WRONG || msg == TEXT_ID.TOOSLOW || msg > 17) {
+                if (!turtleSpeechInfo.isCorrect) {
+                    if (msg != TEXT_ID.TOOSLOW) {
+                        let j = selectedTurtlePos;
+                        ctx.save();
 
-                    // move to the center of the canvas
-                    ctx.translate(turtles[i].ox + turtles[i].w / 2, turtles[i].oy + turtles[i].h / 2);
-                    
-                    turtles[i].degrees = Math.sin(showAnswerT * 20) * 15;
-                    // rotate the canvas to the specified degrees
-                    ctx.rotate(turtles[i].degrees * Math.PI/180);
+                        // move to the center of the canvas
+                        ctx.translate(turtles[j].ox + turtles[j].w / 2, turtles[j].oy + turtles[j].h / 2);
+                        
+                        turtles[j].degrees = Math.sin(showAnswerT * 20) * 15;
+                        // rotate the canvas to the specified degrees
+                        ctx.rotate(turtles[j].degrees * Math.PI/180);
 
-                    // draw the image
-                    turtles[i].x = -0.5 * turtles[i].w;
-                    turtles[i].y = -0.5 * turtles[i].h;
-                    turtles[i].draw(ctx, AM.images.shell.img);
+                        // draw the image
+                        turtles[j].x = -0.5 * turtles[j].w;
+                        turtles[j].y = -0.5 * turtles[j].h;
+                        turtles[j].draw(ctx, AM.images.shell.img);
 
-                    // we’re done with the rotating so restore the unrotated context
-                    ctx.restore();
+                        // we’re done with the rotating so restore the unrotated context
+                        ctx.restore();
+                    }
+
+                    let frame = Math.floor(showUnhappyT * 5);
+                    if (frame > 6) frame = 6;
+
+                    turtles[i].dynamicDraw2(ctx, AM.images.turtleunhappy.img, AM.images.turtleunhappy.cw * frame, 0, 
+                        AM.images.turtleunhappy.cw, AM.images.turtleunhappy.ch);
                 } else {
                     turtles[i].y -= turtles[i].jump;
                     turtles[i].jump -= 9.8 * delta * 5;
@@ -1455,7 +1575,8 @@ function drawTurtle() {
                 
             }
         } else {
-            turtles[i].draw(ctx, AM.images.shell.img);
+            if (i != selectedTurtlePos)
+                turtles[i].draw(ctx, AM.images.shell.img);
         }
     }
 }
@@ -1465,7 +1586,7 @@ function shellSwap(i, j) {
     let p2 = turtles[j].pos;
 
     turtles[i].goto(p2, 0);
-    turtles[j].goto(p1, turtleInfo.bucketSize /2);
+    turtles[j].goto(p1, turtleInfo.bucketSize / 2);
 }
 
 function updateTurtleInitialPos() {
@@ -1661,6 +1782,7 @@ function update() {
                 // msg = 'Too slow!';
                 // msg = 'tooslow';
                 msg = TEXT_ID.TOOSLOW;
+                getSpeech(0, clickBucket(turtles[target].x, turtles[target].y));
                 reduceHP();
 
                 if (volumeOn) {
@@ -1678,6 +1800,7 @@ function update() {
             showAnswerT = 5;
             answerIdx = target;
             startTimer = false;
+            showUnhappyT = 0;
             // turtles[answerIdx].jump = jumpHeight;
         }
 
@@ -1693,13 +1816,18 @@ function update() {
     } else if (showAnswerT > 0) {
         if (msg) {
             // TM.draw(textList[msg].obj);
-            TXT.draw(msg);
-            
+            // TXT.draw(msg);
+            drawSpeech();
         }
+
+        
         
         showAnswerT -= 1 * delta;
+        showUnhappyT += 1 * delta;
         if (showAnswerT <= 0) {
             showAnswerT = 0;
+            showUnhappyT = 0;
+            selectedTurtlePos = -1;
             turtles[answerIdx].jump = 0;
             turtles[answerIdx].y = turtles[answerIdx].oy;
 
@@ -1715,13 +1843,13 @@ function update() {
     } else if (showTarget) {
         timer.draw(ctx);
         timer.tick(delta);
-
         
             // drawMessage(msg);
 
         if (timer.timer <= 0) {
             timer.setTimer(9);
             showTarget = false;
+            selectedTurtlePos = -1;
             startTimer = true;
             msg = '';
             sorts.bubble();
@@ -1742,7 +1870,10 @@ function nextRound() {
     startTimer = false;
     answerIdx = -1;
     showAnswerT = 0;
+    showUnhappyT = 0;
+    selectedTurtlePos = -1;
     target = Math.floor(Math.random() * turtles.length);
+    // target = turtles.length - 1;
     // timeProgressBar.update(delta, 100);
     
     if (turtles.length < 8) {

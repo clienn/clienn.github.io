@@ -68,6 +68,10 @@ class Spirte {
         // ctx.stroke();
     }
 
+    dynamicDraw2(ctx, img, clipX, clipY, cw, ch) {
+        ctx.drawImage(img, clipX, clipY, cw, ch, this.x, this.y, this.w, this.h);
+    }
+
     setBucketSize(n) {
         this.bucketSize = n;
         this.halfBucketSize = n / 2;
