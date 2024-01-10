@@ -285,6 +285,12 @@ var speedInc = 10;
 var joystick = null;
 const onMobile = isMobile();
 
+var collisionSide = {
+    top: false,
+    right: false,
+    left: false
+};
+
 // pool - 606px
 // rect - 12px, 6px
 // total width - 926px
@@ -378,12 +384,8 @@ function main(w, h) {
     testRect.w = kayakHitBox.w;
     testRect.h = kayakHitBox.h;
 
-    // setFishInfo(scaleX, scaleY, 2.5);
     initStartPage();
 
-    // rescaleSize(eelInfo.head, scaleX, scaleY);
-
-    initTerrain(1.5, 1.5);
     initWaterObjects(1, 1);
     initDuck(1.5, 1.5);
 
@@ -499,33 +501,7 @@ function initTileGroup() {
 
             for (let j = start; j < end; ++j) {
                 let col = j % 3;
-                // let rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w - waterObjHolder[j].w)) + waterObjContainer[i][col].x;
-                // let rngX = 0;
-
-                // if (
-                //     (i == 5 && col == 0) || 
-                //     (i == 6 && col == 0) || 
-                //     (i == 6 && col == 1) 
-                // ) {
-                //     // console.log(i, col);
-                //     rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w / 2 - waterObjHolder[j].w)) + waterObjContainer[i][col].x;
-                // } else if (
-                //     (i == 5 && col == 2) || 
-                //     (i == 5 && col == 1) || 
-                //     (i == 3 && col == 2) || 
-                //     (i == 3 && col == 1) || 
-                //     (i == 3 && col == 0) ||
-                //     (i == 2 && col == 2) || 
-                //     (i == 2 && col == 1) || 
-                //     (i == 2 && col == 0) 
-                // ) {
-                //     // console.log(i, col);
-                //     rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w / 2 - waterObjHolder[j].w));
-                //     rngX = waterObjContainer[i][col].x + waterObjContainer[i][col].w / 2 + rngX;
-                // } else {
-                //     rngX = Math.floor(Math.random() * (waterObjContainer[i][col].w - waterObjHolder[j].w)) + waterObjContainer[i][col].x;
-                // }
-                // waterObjHolder[j].x = rngX;
+                
                 let rngX = waterObjContainer[i][col].x;
                 if (
                     (i == 3 && col == 0) ||
@@ -633,39 +609,6 @@ function moveTileGroup(idx) {
         morphWaterObj(j, next);
 
         let col = j % 3;
-        // let rngX = 0;
-
-
-        // if (idx == 6 && j == 0) {
-        //     rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w)) + waterObjContainer[next][col].x;
-        // } else {
-        //     rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w - waterObjHolder[j].w)) + waterObjContainer[next][col].x;
-        // }
-        // console.log(idx, col, j);
-        // if (
-        //     (idx == 5 && col == 0) || 
-        //     (idx == 6 && col == 0) || 
-        //     (idx == 6 && col == 1) 
-        // ) {
-        //     // console.log(idx, col);
-        //     rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w)) + waterObjContainer[next][col].x;
-        // } else if (
-        //     (idx == 5 && col == 2) || 
-        //     (idx == 5 && col == 1) || 
-        //     (idx == 3 && col == 2) || 
-        //     (idx == 3 && col == 1) || 
-        //     (idx == 3 && col == 0) ||
-        //     (idx == 2 && col == 2) || 
-        //     (idx == 2 && col == 1) || 
-        //     (idx == 2 && col == 0) 
-        // ) {
-        //     // console.log(idx, col, j);
-        //     // rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w)) + waterObjContainer[next][col].x + waterObjContainer[next][col].w / 2;
-        //     rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w / 2 - waterObjHolder[j].w));
-        //     rngX = waterObjContainer[next][col].x + waterObjContainer[next][col].w / 2 + rngX;
-        // } else {
-        //     rngX = Math.floor(Math.random() * (waterObjContainer[next][col].w - waterObjHolder[j].w)) + waterObjContainer[next][col].x;
-        // }
 
         let rngX = waterObjContainer[next][col].x;
         if (
@@ -847,9 +790,11 @@ function initWaterObjContainer() {
 }
 
 function updateWaterObjContainerPos(speed) {
-    for (let i = 0; i < bgInfo.rows; ++i) {
-        for (let j = 0; j < waterObjContainer[i].length; ++j) {
-            waterObjContainer[i][j].y += speed * delta;
+    if (!isKayakStuck()) {
+        for (let i = 0; i < bgInfo.rows; ++i) {
+            for (let j = 0; j < waterObjContainer[i].length; ++j) {
+                waterObjContainer[i][j].y += speed * delta;
+            }
         }
     }
 }
@@ -1082,15 +1027,23 @@ function initBGWalls() {
 }
 
 function updateBGWallsPos(speed) {
-    for (let i = 0; i < bgInfo.rows; ++i) {
-        for (let j = 0; j < bgWalls[i].length; ++j) {
-            bgWalls[i][j].y += speed * delta;
-
-            if (checkAngledCollisions(kayakHitBox, bgWalls[i][j])) {
-                // console.log('hit');
-                playCry();
-                gameover = true;
-                updateFinalScore();
+    if (!isKayakStuck()) {
+        for (let i = 0; i < bgInfo.rows; ++i) {
+            for (let j = 0; j < bgWalls[i].length; ++j) {
+                bgWalls[i][j].y += speed * delta;
+            
+                if (checkAngledCollisions(kayakHitBox, bgWalls[i][j])) {
+                    const { x, y, w, h } = kayakHitBox;
+                    
+                    collisionSide.top = checkAngledCollisions({ x, y, w, h: 1 }, bgWalls[i][j]);
+                    collisionSide.right = checkAngledCollisions({ x: x + w, y, w: w / 2, h }, bgWalls[i][j]);
+                    collisionSide.left = checkAngledCollisions({ x, y, w: w / 2, h }, bgWalls[i][j]);
+                    
+                    // playCry();
+                    // gameover = true;
+                    // updateFinalScore();
+                    
+                }
             }
         }
     }
@@ -1149,9 +1102,20 @@ function drawBGTiles() {
     }
 }
 
+function isKayakStuck() {
+    const { top, right, left } = collisionSide;
+    if (top || right || left) {
+        return true;
+    }
+    return false;
+}
+
 function updateBGTiles(speed) {
     for (let i = 0; i < bgInfo.rows; ++i) {
-        bgTilesPosY[i] += speed * delta;
+        if (!isKayakStuck()) {
+            bgTilesPosY[i] += speed * delta;
+        }
+        
         if (bgTilesPosY[i] > canvas.height) {
             let idx = (i + 1) % bgInfo.rows;
             bgTilesPosY[i] = bgTilesPosY[idx] - bgInfo.h;
@@ -1246,69 +1210,6 @@ function addLily(rng) {
 
     waterObjects.push(lily);
     // waterObjectRows[rngY] = waterObjects.length - 1;
-}
-
-function addBunny(posY, id) {
-    let cw = 37;
-    let ch = 41;
-    // let id = Math.floor(Math.random() * 2);
-
-    let x = 0;
-    if (id) {
-        x = canvas.width + bunnyInfo.w;
-    }
-
-    let bunny = new Sprite(x, posY * parallaxInfo.tile.h, bunnyInfo.w, bunnyInfo.h, cw, ch);
-    bunny.clipX = bunnyInfo.clipX[0];
-    bunny.clipY = (5 * ch) + 5;
-    let direction = Math.floor(Math.random() * 2) ? 1 : -1;
-    bunny.vy = parallaxInfo.tile.moveSpeed;
-    bunny.setDirection(direction);
-    bunny.setRandomSpeed(100, 50);
-
-    bunny.id = id;
-
-    bunnies.push(bunny);
-}
-
-function drawBunnies() {
-    for (let i = 0; i < bunnies.length; ++i) {
-        bunnies[i].swim(ctx, AM.images.bunny.img);
-        bunnies[i].updatePos(delta, 1);
-
-        bunnies[i].t += 10 * delta;
-        let frame = Math.floor(bunnies[i].t) % 8;
-        bunnies[i].clipX = bunnyInfo.clipX[frame];
-
-        if (bunnies[i].id == 0) {
-            if (
-                (bunnies[i].facing == 1 && bunnies[i].x >= parallaxInfo.water.x - bunnies[i].w) || 
-                (bunnies[i].facing == -1 && bunnies[i].x <= -bunnies[i].w * 2)
-            ) {
-                bunnies[i].setDirection(bunnies[i].facing * -1);
-                bunnies[i].setRandomSpeed(100, 50);
-    
-                if (bunnies[i].x < 0) {
-                    let rngY = Math.floor(Math.random() * parallaxInfo.tile.rows);
-                    bunnies[i].y = rngY * parallaxInfo.tile.h;
-                }
-            }
-        } else {
-            if (
-                (bunnies[i].facing == 1 && bunnies[i].x >= canvas.width + bunnies[i].w * 2) || 
-                (bunnies[i].facing == -1 && bunnies[i].x <= parallaxInfo.water.x + parallaxInfo.water.w)
-            ) {
-                bunnies[i].setDirection(bunnies[i].facing * -1);
-                bunnies[i].setRandomSpeed(100, 50);
-    
-                if (bunnies[i].x > canvas.width) {
-                    let rngY = Math.floor(Math.random() * parallaxInfo.tile.rows);
-                    bunnies[i].y = rngY * parallaxInfo.tile.h;
-                }
-            }
-        }
-        
-    }
 }
 
 function addPlank(id, direction, rngY) {
@@ -1544,60 +1445,6 @@ function initWaterObjects(widthPercent, heightPercent) {
     // }
 }
 
-// function drawWaterObject() {
-//     let idx = 1;
-//     let id = plankInfo[idx].id;
-//     waterObjectSprite.dynamicDraw(ctx, parallaxInfo.water.x, parallaxInfo.tile.yPos[0], plankInfo[idx].w, plankInfo[idx].h, AM.images[id].cw, AM.images[id].ch, id);
-// }
-
-function initTerrain(widthPercent, heightPercent) {
-    for (let i = 1; i < terrainCount; ++i) {
-        let id = terrainInfo[i].id;
-        terrainInfo[i].w = AM.images[id].cw * widthPercent * scaleX;
-        terrainInfo[i].h = AM.images[id].ch * heightPercent * scaleY;
-        terrainInfo[i].adjX = parallaxInfo.tile.w / 2 - terrainInfo[i].w / 2;
-        terrainInfo[i].adjY = parallaxInfo.tile.h / 2 - terrainInfo[i].h / 2;
-    }
-
-    let rows = parallaxInfo.tile.rows;
-    let cols = parallaxInfo.tile.cols * 2;
-
-    for (let i = 0; i < rows; ++i) {
-        terrain[i] = [];
-        for (let j = 0; j < cols; ++j) {
-            terrain[i][j] = terrainInfo[0];
-        }
-        generateTerrain(i);
-    }
-}
-
-function generateTerrain(i) {
-    for (let j = 0; j < terrain[i].length; ++j) {
-        let hasTerrain = Math.floor(Math.random() * 100);
-        terrain[i][j] = 0;
-        if (hasTerrain < terrainChancePercentage) { // initial chance
-            let rng = Math.floor(Math.random() * terrainCount);
-            terrain[i][j] = rng;
-        }
-    }
-}
-
-function drawTerrain(r, c) {
-    for (let i = 0; i < 2; ++i) {
-        c += i * parallaxInfo.tile.cols;
-        let idx = terrain[r][c];
-    
-        if (idx) {
-            let id = terrainInfo[idx].id;
-            let adjX = terrainInfo[idx].adjX;
-            let adjY = terrainInfo[idx].adjY;
-            terrainSprite.dynamicDraw(ctx, c * parallaxInfo.tile.w + adjX + (parallaxInfo.water.w) * i, parallaxInfo.tile.yPos[r] + adjY, terrainInfo[idx].w, terrainInfo[idx].h, AM.images[id].cw, AM.images[id].ch, id);
-        }
-    }
-    
-    
-}
-
 function transformPoint(rect, cx, cy, rotationDegrees) {
     var radians = rotationDegrees * (Math.PI / 180);
     
@@ -1656,6 +1503,23 @@ function drawKayak() {
 
     updateHitBox();
 
+    if (isKayakStuck()) {
+        collisionSide.top = collisionSide.right = collisionSide.left = false;
+
+        for (let i = 0; i < bgInfo.rows; ++i) {
+            for (let j = 0; j < bgWalls[i].length; ++j) {
+                if (checkAngledCollisions(kayakHitBox, bgWalls[i][j])) {
+                    const { x, y, w, h } = kayakHitBox;
+                    
+                    collisionSide.top = checkAngledCollisions({ x, y, w, h: 1 }, bgWalls[i][j]);
+                    collisionSide.right = checkAngledCollisions({ x: x + w, y, w: w / 2, h }, bgWalls[i][j]);
+                    collisionSide.left = checkAngledCollisions({ x, y, w: w / 2, h }, bgWalls[i][j]);
+                    
+                }
+            }
+        }
+    }
+
     // ctx.beginPath();
     // ctx.rect(kayakHitBox.x, kayakHitBox.y, kayakHitBox.w, kayakHitBox.h);
     // ctx.stroke();
@@ -1677,43 +1541,6 @@ function updateHitBox() {
     // ctx.stroke();
 }
 
-
-function parallaxBG() {
-    ctx.save();
-    
-    ctx.fillStyle = '#65D5FD';
-    ctx.fillRect(parallaxInfo.water.x, parallaxInfo.water.y, parallaxInfo.water.w, parallaxInfo.water.h);
-
-    ctx.fillStyle = '#C88043';
-    ctx.fillRect(parallaxInfo.borders[1].x, parallaxInfo.borders[1].y, parallaxInfo.borders[1].w, parallaxInfo.borders[1].h);
-    ctx.fillRect(parallaxInfo.borders[1].x + parallaxInfo.borders[1].gap, parallaxInfo.borders[1].y, parallaxInfo.borders[1].w, parallaxInfo.borders[1].h);
-
-    ctx.fillStyle = '#F0A86B';
-    ctx.fillRect(parallaxInfo.borders[2].x, parallaxInfo.borders[2].y, parallaxInfo.borders[2].w, parallaxInfo.borders[2].h);
-    ctx.fillRect(parallaxInfo.borders[2].x + parallaxInfo.borders[2].gap, parallaxInfo.borders[2].y, parallaxInfo.borders[2].w, parallaxInfo.borders[2].h);
-   
-    
-    // land tiles
-    for (let i = 0; i < parallaxInfo.tile.rows; ++i) {
-        for (let j = 0; j < parallaxInfo.tile.cols; ++j) {
-            let n = i ^ (j & 1);
-            ctx.fillStyle = (n & 1) ? '#97DE54' : '#8FDA47'; 
-
-            let x = j * parallaxInfo.tile.w;
-            let y =  parallaxInfo.tile.yPos[i];
-            
-            
-
-            ctx.fillRect(x, y, parallaxInfo.tile.w, parallaxInfo.tile.h);
-
-            ctx.fillRect(x + parallaxInfo.tile.tileGap, y, parallaxInfo.tile.w, parallaxInfo.tile.h);
-
-            drawTerrain(i, j);
-        }
-        
-    }
-    ctx.restore();
-}
 
 function updateParallax() {
     let v = parallaxInfo.tile.moveSpeed * delta;
@@ -1753,6 +1580,14 @@ function mouseMove(x, y, prevX, prevY) {
     if (joystick.active) {
         let dist = x - mouseMoveOrigin.x;
         kayak.x = kayak.ox + dist;
+        // if (!collisionSide.right && !collisionSide.left) {
+        //     kayak.x = kayak.ox + dist;
+        // } else if (collisionSide.left && dist > 0) {
+        //     kayak.x = kayak.ox + dist;
+        // } else if (collisionSide.right && dist < 0) {
+        //     kayak.x = kayak.ox + dist;
+        // }
+       
         kayak.updateBounds(kayakBounds, kayakHitBox);
 
         setKayakRotation(prevX, x, dist);
@@ -2080,24 +1915,6 @@ function initStartPage() {
     
 }
 
-function setFishInfo(sx, sy, sizePercentage) {
-    // for (let i = 1; i < 7; ++i) {
-    //     let key = 'sfish_' + i;
-
-    //     if (AM.images[key].frames) AM.images[key].cw = AM.images[key].cw / AM.images[key].frames;
-    //     // console.log(AM.images[key].frames, AM.images[key].cw)
-    //     // let cw = (AM.images[key].frames ? (AM.images[key].cw / AM.images[key].frames) : AM.images[key].cw);
-
-    //     fishInfo[i] = {
-    //         x: 0,
-    //         y: 0,
-    //         w: AM.images[key].cw * sizePercentage * sx,
-    //         h: AM.images[key].ch * sizePercentage * sy,
-    //         frames: AM.images[key].frames
-    //     };
-    // }
-}
-
 // *********************************** GAME INITIATLIZATIONS AND CONTROLS END ******************************************************** //
 
 
@@ -2113,30 +1930,7 @@ function setFishInfo(sx, sy, sizePercentage) {
  * PHYSICS
  */
 
-// function getRotatedRect(rect, degrees) {
-//     const radiant = degrees * Math.PI / 180;
-//     cos = Math.cos(radiant);
-//     sin = Math.sin(radiant);
-
-//     return [
-//         { x: rect.x * cos - rect.y * sin, y: rect.x * sin + rect.y * cos }, 
-//         { x: (rect.x + rect.w) * cos - rect.y * sin, y: (rect.x + rect.w) * sin + rect.y * cos }, 
-//         { x: (rect.x + rect.w) * cos - (rect.y + rect.h) * sin, y: (rect.x + rect.w) * sin + (rect.y + rect.h) * cos }, 
-//         { x: rect.x * cos - (rect.y + rect.h) * sin, y: rect.x * sin + (rect.y + rect.h) * cos }
-//     ];
-
-//     // return {
-//     //     x: x * cos - y * sin,
-//     //     y: x * sin + y * cos,
-//     // }
-// }
-
 function checkAngledCollisions(obj1, obj2) {
-    // return doPolygonsIntersect(
-    //     [{ x: obj1.x, y: obj1.y }, { x: obj1.x + obj1.w, y: obj1.y }, { x: obj1.x + obj1.w, y: obj1.y + obj1.h }, { x: obj1.x, y: obj1.y + obj1.h }],
-    //     [{ x: obj2.x, y: obj2.y }, { x: obj2.x + obj2.w, y: obj2.y }, { x: obj2.x + obj2.w, y: obj2.y + obj2.h }, { x: obj2.x, y: obj2.y + obj2.h }]
-    // );
-    
     return doPolygonsIntersect(
         getRotatedRect(obj1, kayak.degrees),
         getRotatedRect(obj2, obj2.degrees)
@@ -2271,59 +2065,6 @@ function playScore() {
 /*
  * GAME UPDATES AND CYCLES
  */
-// function drawStartPage() {
-//     // ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
-//     ctx.drawImage(AM.images.bg.img, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 0, 0, canvas.width, canvas.height);
-//     ctx.drawImage(AM.images.title.img, 0, 0, AM.images.title.cw, AM.images.title.ch, startPage.title.x, startPage.title.y, startPage.title.w, startPage.title.h);
-//     ctx.drawImage(AM.images.sub_title.img, 0, 0, AM.images.sub_title.cw, AM.images.sub_title.ch, startPage.sub_title.x, startPage.sub_title.y, startPage.sub_title.w, startPage.sub_title.h);
-    
-//     for (let i = 1; i < 4; ++i) {
-//         let key = 'text' + i;
-//         ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, startPage[key].x, startPage[key].y, startPage[key].w, startPage[key].h);
-//     }
-
-//     let id = 2;
-//     let key = 'sfish_' + id;
-//     let fw = 102.9 * scaleX;
-//     let fh = 81 * scaleY;
-//     let frame = Math.floor(T) % 10;
-//     ctx.drawImage(AM.images[key].img, 102.9 * frame, 0, 102.9, AM.images[key].ch, startPage['text1'].x - fw * 1.1, startPage['text1'].y - fh * 0.15, fw, fh);
-    
-//     id = 9;
-//     key = 'garbage_' + id;
-//     let x = startPage['text2'].x - garbageInfo[id].w;
-//     let y = startPage['text1'].y - garbageInfo[id].h * 0.25;
-//     ctx.save();
-//     // Untransformed draw position
-//     const position = {x: x, y: y};
-//     // In degrees
-//     const rotation = { x: 0, y: 0, z: Math.sin(T) * 15};
-//     // Rotation relative to here (this is the center of the image)
-//     const rotPt = { x: garbageInfo[id].w / 2, y: garbageInfo[id].h / 2 };
-
-//     ctx.setTransform(new DOMMatrix()
-//         .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
-//         .rotateSelf(rotation.x, rotation.y, rotation.z)
-//     );
-    
-//     // ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
-//     ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, -rotPt.x, -rotPt.y, garbageInfo[id].w, garbageInfo[id].h);
-//     ctx.restore();
-    
-    
-//     HUD.drawMiniBattery(ctx);
-
-//     let startBtnW = AM.images.start.cw * 2 * scaleX;
-//     let startBtnH = AM.images.start.ch * 2 * scaleY;
-
-//     ctx.drawImage(AM.images.start.img, 0, 0, AM.images.start.cw, AM.images.start.ch, canvas.width / 2 - startBtnW / 2, canvas.height - startBtnH * 2, startBtnW, startBtnH);
-
-//     if (delta < 1) {
-//         T += 10 * delta;
-//         HUD.decayMiniBattery(delta);
-//     }
-    
-// }
 
 function drawRotate(obj, key, ax, ay, yRot, zRot) {
     ctx.save();
@@ -2435,13 +2176,6 @@ function gameCycle() {
             drawBGTiles();
             // drawBGWalls();
             // drawWaterObjContainer();
-              
-            // parallaxBG();
-            // drawBunnies();
-            // drawTerrain();
-            // drawWaterObject(plankInfo, 1, 0);
-            // drawWaterObjects();
-            // drawWaterObject(duckInfo, 1, 3);
 
             drawKayak();
 
