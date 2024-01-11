@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Parcel Sandbox</title>
+    <meta charset="UTF-8">
+    <style>html, body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: linear-gradient(104deg, #0075FF 0%, #FF00F5 100%);
+      }
+      .centered {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        /* bring your own prefixes */
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        transition: opacity 0.4s linear;
+        pointer-events: none;
+      }
+
+      .show {
+        opacity: 1;
+      }
+
+      .hide {
+        opacity: 0;
+      }</style>
+  </head>
+
+  <body>
+    <div id="app">
+      <!-- <h1>Canvas Advanced API Example</h1> -->
+      <canvas id="rive-canvas"></canvas>
+    </div>
+
+    <svg width="160" height="160" id="correct" class="centered" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="160" height="160" rx="24" fill="#C7F8FA"></rect>
+    <path d="M48 78L70 106L112 46" stroke="#00ABC8" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+
+    <svg width="160" height="160" id="incorrect" class="centered" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="160" height="160" rx="24" fill="#FFE2E2"></rect>
+    <path d="M48 112L112 48" stroke="#F65050" stroke-width="24" stroke-linecap="round"></path>
+    <path d="M112 112L48 48" stroke="#F65050" stroke-width="24" stroke-linecap="round"></path>
+    </svg>
+      
+
+    <script src="main.c39d6dcf.js"></script>
+    <!-- <script type="module">
+      import main from "./main.ts"
+      // main();
+    </script> -->
+    
+  </body>
+</html>
