@@ -3,7 +3,9 @@ class StaticSprite {
         this.x = x;
         this.y = y;
         this.w = w;
+        this.ow = w;
         this.h = h;
+        this.oh = h;
 
         this.ox = x;
         this.oy = y;

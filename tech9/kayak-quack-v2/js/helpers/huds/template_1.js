@@ -2,7 +2,7 @@ class Template_1 {
     constructor(ctx, w, h, sx, sy) {
         this.isMuted = true;
         this.txt = new Text(ctx, w, h); 
-        this.txt.setScale(sx, sy); 
+        this.txt.setScale(sx, sx); 
 
         this.w = w;
         this.h = h;
@@ -25,11 +25,11 @@ class Template_1 {
         // this.stopwatch = new StaticSprite(50, 20, 60 * multiplier, 60 * multiplier, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
         this.duck = new StaticSprite(duckX, 20, duckW, AM.images.duck.ch * 2 * sy, 0, 0, 46.83, AM.images.duck.ch, 'duck');
 
-        let volumePosX = 7;
-        let volumePosY = 25;
+        let volumePosX = 34;
+        let volumePosY = 45;
 
-        this.volume = new StaticSprite(volumePosX, volumePosY, 55 * 1.5, 55 * 1.5, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
-        this.mute = new StaticSprite(volumePosX, volumePosY, 55 * 1.5, 55 * 1.5, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
+        this.volume = new StaticSprite(volumePosX, volumePosY, 55 * 1.80, 55 * 1.80, 0, 0, AM.images.volume.cw, AM.images.volume.ch, 'volume');
+        this.mute = new StaticSprite(volumePosX, volumePosY, 55 * 1.80, 55 * 1.80, 0, 0, AM.images.mute.cw, AM.images.mute.ch, 'mute');
 
         let adjY = 120;
 
@@ -38,11 +38,98 @@ class Template_1 {
 
         // rescaleAll(this.timecircle, sx, sy);
         // rescaleAll(this.stopwatch, sx, sy);
+        let score_rect_w = AM.images.score_rect.cw * 2;
+        let score_rect_h = AM.images.score_rect.ch * 2;
+    
+        this.score_rect = new StaticSprite(0, 0, score_rect_w, score_rect_h, 0, 0, AM.images.score_rect.cw, AM.images.score_rect.ch, 'score_rect');
+        rescaleSize(this.score_rect, sx, sx);
+        // this.score_rect.x = w - (this.score_rect.w + 20 * sx);
+        this.score_rect.x = w / 2 - this.score_rect.w / 2;
+        this.score_rect.y = 35 * sy;
+
+        let numbers_w = AM.images.numbers_white.cw * 2.7;
+        let numbers_h = AM.images.numbers_white.ch * 2.4;
+        this.numbers = [];
+        this.numbers[0] = new StaticSprite(0, 0, numbers_w, numbers_h, 0, 0, AM.images.numbers_white.cw, AM.images.numbers_white.ch, 'numbers_white');
+        rescaleSize(this.numbers[0], sx, sx);
+        this.numbers[0].x = this.score_rect.x + this.score_rect.w - this.numbers[0].w * 1.75;
+        this.numbers[0].y = this.score_rect.y + this.score_rect.h / 2 - this.numbers[0].h / 2 - 3 * sy;
+
+        this.numbers[1] = new StaticSprite(0, 0, numbers_w, numbers_h, 0, 0, AM.images.numbers_white.cw, AM.images.numbers_white.ch, 'numbers_white');
+        rescaleSize(this.numbers[1], sx, sx);
+        this.numbers[1].x = this.numbers[0].x + this.numbers[0].w - this.numbers[0].w * 0.43;
+        this.numbers[1].y = this.score_rect.y + this.score_rect.h / 2 - this.numbers[1].h / 2 - 3 * sy;
+
+        numbers_w = AM.images.endscore.cw * 1.25;
+        numbers_h = AM.images.endscore.ch * 1.25;
+        this.endscore = [];
+        this.endscore[0] = new StaticSprite(0, 0, numbers_w, numbers_h, 0, 0, AM.images.endscore.cw, AM.images.endscore.ch, 'endscore');
+        this.endscore[1] = new StaticSprite(0, 0, numbers_w, numbers_h, 0, 0, AM.images.endscore.cw, AM.images.endscore.ch, 'endscore');
+        rescaleSize(this.endscore[0], sx, sx);
+        rescaleSize(this.endscore[1], sx, sx);
         
-        rescaleAll(this.volume, sx, sy);
-        rescaleAll(this.mute, sx, sy);
-        rescaleAll(this.complete, sx, sy);
-        rescaleAll(this.yourscore, sx, sy);
+        // rescalePos(this.score_rect, sx, sy);
+
+        let watch_w = AM.images.watch.cw * 2.20;
+        let watch_h = AM.images.watch.ch * 2.20;
+    
+        this.watch = new StaticSprite(0, 0, watch_w, watch_h, 0, 0, AM.images.watch.cw, AM.images.watch.ch, 'watch');
+        rescaleSize(this.watch, sx, sx);
+
+        let progressbar_w = AM.images.progressbar.cw * 3;
+        let progressbar_h = AM.images.progressbar.ch * 2.5;
+    
+        this.progressbar = new StaticSprite(0, 0, progressbar_w, progressbar_h, 0, 0, AM.images.progressbar.cw, AM.images.progressbar.ch, 'progressbar');
+        rescaleSize(this.progressbar, sx, sx);
+
+        let timerprogress_w = AM.images.timeprogress.cw * 3;
+        let timerprogress_h = AM.images.timeprogress.ch * 2.5;
+    
+        this.timeprogress = new StaticSprite(0, 0, timerprogress_w, timerprogress_h, 0, 0, AM.images.timeprogress.cw, AM.images.timeprogress.ch, 'timeprogress');
+        rescaleSize(this.timeprogress, sx, sx);
+        
+
+        rescaleSize(this.volume, sx, sx);
+        rescalePos(this.volume, sx, sy);
+
+        rescaleSize(this.mute, sx, sx);
+        rescalePos(this.mute, sx, sy);
+
+        rescaleSize(this.complete, sx, sx);
+        rescalePos(this.complete, sx, sy);
+
+        rescaleSize(this.yourscore, sx, sx);
+        rescalePos(this.yourscore, sx, sy);
+
+        // this.watch.x = w / 2 - (this.watch.w / 2 + this.progressbar.w) / 2;
+        this.watch.x = this.volume.x + this.volume.w + 50 * scaleX;
+        this.watch.y = 35 * sy;
+
+        this.progressbar.x = this.watch.x + this.watch.w / 2;
+        this.progressbar.y = this.watch.y + this.watch.h / 2 - this.progressbar.h / 2 + 10 * sy;
+
+        this.timeprogress.w = this.timeprogress.w - this.watch.w / 2;
+
+        this.timeprogress.ow = this.timeprogress.w;
+        this.timeprogress.oh = this.timeprogress.h;
+
+        this.timeprogress.x = this.progressbar.x + this.watch.w / 2 - 5 * sx;
+        this.timeprogress.y = this.progressbar.y + this.progressbar.h / 2 - this.timeprogress.h / 2;
+
+        numbers_w = AM.images.numbers_black.cw * 2;
+        numbers_h = AM.images.numbers_black.ch * 2;
+        this.timernumbers = [];
+        this.timernumbers[0] = new StaticSprite(0, 0, numbers_w, numbers_h, 0, 0, AM.images.numbers_black.cw, AM.images.numbers_black.ch, 'numbers_black');
+        rescaleSize(this.timernumbers[0], sx, sx);
+        this.timernumbers[0].x = this.watch.x + this.watch.w / 2 - (this.timernumbers[0].w * 2 - this.timernumbers[0].w * 0.46) / 2;
+        this.timernumbers[0].y = this.watch.y + this.watch.h / 2 - this.timernumbers[0].h / 2 + 9 * sx;
+
+        this.timernumbers[1] = new StaticSprite(0, 0, numbers_w, numbers_h, 0, 0, AM.images.numbers_black.cw, AM.images.numbers_black.ch, 'numbers_black');
+        rescaleSize(this.timernumbers[1], sx, sx);
+        this.timernumbers[1].x = this.timernumbers[0].x + this.timernumbers[0].w - this.timernumbers[0].w * 0.45;
+        this.timernumbers[1].y = this.timernumbers[0].y;
+
+        
 
         let paddingX = 50 * sx;
         let paddingY = 22 * sy;
@@ -67,7 +154,9 @@ class Template_1 {
         // console.log(this.timeProgressBar.w, this.timeProgressBar.w + this.timeProgressBar.h / 2, this.txt.texts['time'].w);
 
         // gameover
-        this.txt.addText('score', 'x 00', 'bold', 30, 'Montserrat', this.duck.x + this.duck.w * 2, this.duck.y + (10) * sy, 120, 50, '#fff', true);
+        // this.txt.addText('score', '00', 'bold', 30, 'Montserrat', this.duck.x + this.duck.w * 2, this.duck.y + (10) * sy, 80, 48, '#fff', true);
+        this.updateGameScore('00');
+
         this.txt.addText('reset', 'Tap to play again.', 'bold', 30, 'Montserrat', w / 2, h * 0.65, 500, 40, '#fff', true);
 
         // this.txt.addText('score2', '05', 'bold', 30, 'Montserrat', w / 2 - 10 * sx, this.yourscore.y + this.yourscore.h - 40 * sy, 130, 85, '#fff', true);
@@ -76,6 +165,46 @@ class Template_1 {
         this.yourscore.x = w / 2 - this.yourscore.w / 2;
         // this.updateGameoverBattery(-70);
         // this.txt.texts['score'].str = this.health + '%';
+
+        
+
+        this.updateScoreSprite('00');
+        this.updateTimerSprite('00');
+
+        
+    }
+
+    updateGameScore(score) {
+        let w = 70;
+        let h = 50;
+        this.txt.addText('score', score, 'bold', 30, 'Montserrat',  this.score_rect.x + this.score_rect.w - 70 * this.sx, 
+            this.score_rect.y + this.score_rect.h / 2 - h * this.sx / 2, w, h, '#fff', true);
+    }
+
+    updateGameoverScore(splashInfo, score) {
+
+        this.endscore[0].clipX = this.endscore[0].clipW * score[0];
+        this.endscore[1].clipX = this.endscore[1].clipW * score[1];
+
+        this.endscore[0].x = this.w / 2 - this.endscore[0].w;
+        this.endscore[0].y = 200 * splashInfo.sx + splashInfo.y;
+
+        this.endscore[1].x = this.endscore[0].x + this.endscore[1].w * 0.85;
+        this.endscore[1].y = this.endscore[0].y;
+        
+    }
+
+    updateScoreSprite(score) {
+        this.numbers[0].clipX = this.numbers[0].clipW * score[0];
+        this.numbers[1].clipX = this.numbers[1].clipW * score[1];
+    }
+
+    updateTimerSprite(time, gameDuration) {
+        let timer = parseInt(time);
+        let percentage = timer / gameDuration;
+        this.timeprogress.w = this.timeprogress.ow * percentage;
+        this.timernumbers[0].clipX = this.timernumbers[0].clipW * time[0];
+        this.timernumbers[1].clipX = this.timernumbers[1].clipW * time[1];
     }
 
     updateScore(score) {
@@ -83,11 +212,20 @@ class Template_1 {
     }
 
     draw(ctx) {
-        this.timeProgressBar.draw(ctx);
+        // this.timeProgressBar.draw(ctx);
         
         // this.timecircle.draw(ctx);
         // this.stopwatch.draw(ctx);
-        this.duck.draw(ctx);
+        this.score_rect.draw(ctx);
+        this.numbers[0].draw(ctx);
+        this.numbers[1].draw(ctx);
+
+        this.progressbar.draw(ctx);
+        this.timeprogress.draw(ctx);
+        this.watch.draw(ctx);
+        this.timernumbers[0].draw(ctx);
+        this.timernumbers[1].draw(ctx);
+        // this.duck.draw(ctx);
         
         if (this.volumeOn) {
             this.volume.draw(ctx);
@@ -102,21 +240,24 @@ class Template_1 {
         // ctx.strokeRect(this.timeProgressBar.x, this.timeProgressBar.y, this.timeProgressBar.w + this.timeProgressBar.h, this.timeProgressBar.h);
         
         
-        this.txt.draw('time');
-        this.txt.draw('score');
+        // this.txt.draw('time');
+        // this.txt.draw('score');
     }
 
-    gameover(ctx) {
-        ctx.save();
-        ctx.globalAlpha = 0.5;
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.restore();
+    gameover(ctx, splashInfo) {
+        // ctx.save();
+        // ctx.globalAlpha = 0.5;
+        // ctx.fillStyle = '#000';
+        // ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // ctx.restore();
 
-        this.complete.draw(ctx);
-        this.yourscore.draw(ctx);
-        
-        this.txt.draw('score2');
+        // this.complete.draw(ctx);
+        // this.yourscore.draw(ctx);
+
+        ctx.drawImage(AM.images.endscreen.img, 0, 0, AM.images.endscreen.cw, AM.images.endscreen.ch, splashInfo.x, splashInfo.y, splashInfo.w, splashInfo.h);
+        this.endscore[0].draw(ctx);
+        this.endscore[1].draw(ctx);
+        // this.txt.draw('score2');
         // this.txt.draw('reset');
     }
 }

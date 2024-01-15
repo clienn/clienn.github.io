@@ -64,8 +64,8 @@ class Joystick {
                 this.maxVx = x;
             }
 
-            // this.prevMx = this.mx;
-            // this.prevMy = this.my;
+            this.prevMx = this.mx;
+            this.prevMy = this.my;
 
             this.mx += x;
             if (this.mx > this.moveLimit) {

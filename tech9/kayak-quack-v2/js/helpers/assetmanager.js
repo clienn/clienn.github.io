@@ -65,12 +65,18 @@ class AssetManager {
             // console.log()
             
             obj.img.src = url;
+            
 
             if (type == 1) {
                 // obj.img.preload = 'auto';
             //     // obj.img.autoplay = (/iPad|iPhone|iPod/).test(navigator.userAgent);
                 obj.img.autoplay = "";
                 // obj.img.muted=true;
+                // console.log(xmlHTTP.response);
+
+                audioContext.decodeAudioData(xmlHTTP.response, function(buffer) {
+                    obj.buffer = buffer;
+                });
                 
             }
             
@@ -123,7 +129,8 @@ class AssetManager {
         this.audio[id] = {
             img: new Audio(),
             completedPercentage: 0,
-            totalsize: 0
+            totalsize: 0,
+            buffer: null
         }
         // this.audio[id].img.autoplay = true;
         this.load(this.audio[id], url, callback, 1);

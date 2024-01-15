@@ -2,10 +2,31 @@
     "data": [
         {
             "id": "intro",
-            "src": "intro",
+            "src": "splash/intro",
             "ext": "png",
-            "cw": 927,
-            "ch": 429
+            "cw": 1864,
+            "ch": 861
+        },
+        {
+            "id": "endscreen",
+            "src": "hud/endscreen",
+            "ext": "png",
+            "cw": 1864,
+            "ch": 861
+        },
+        {
+            "id": "duck_anim",
+            "src": "splash/duck_anim",
+            "ext": "png",
+            "cw": 56,
+            "ch": 48
+        },
+        {
+            "id": "log_anim",
+            "src": "splash/log_anim",
+            "ext": "png",
+            "cw": 64,
+            "ch": 64
         },
         {
             "id": "bg",
@@ -13,6 +34,69 @@
             "ext": "png",
             "cw": 927,
             "ch": 428
+        },
+        {
+            "id": "watch",
+            "src": "hud/watch",
+            "ext": "png",
+            "cw": 45,
+            "ch": 53
+        },
+        {
+            "id": "progressbar",
+            "src": "hud/progress_bar",
+            "ext": "png",
+            "cw": 101,
+            "ch": 21
+        },
+        {
+            "id": "timeprogress",
+            "src": "hud/timeprogress",
+            "ext": "png",
+            "cw": 97,
+            "ch": 17
+        },
+        {
+            "id": "score_rect",
+            "src": "hud/score_rect",
+            "ext": "png",
+            "cw": 128,
+            "ch": 46
+        },
+        {
+            "id": "duckscore",
+            "src": "hud/duck",
+            "ext": "png",
+            "cw": 40,
+            "ch": 40
+        },
+        {
+            "id": "endscore",
+            "src": "hud/numbers/endscore",
+            "ext": "png",
+            "cw": 80,
+            "ch": 80
+        },
+        {
+            "id": "numbers_white",
+            "src": "hud/numbers/white",
+            "ext": "png",
+            "cw": 24,
+            "ch": 25
+        },
+        {
+            "id": "numbers_black",
+            "src": "hud/numbers/black",
+            "ext": "png",
+            "cw": 24,
+            "ch": 24
+        },
+        {
+            "id": "numbers_red",
+            "src": "hud/numbers/red",
+            "ext": "png",
+            "cw": 24,
+            "ch": 24
         },
         {
             "id": "splash_duck",

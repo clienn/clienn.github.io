@@ -1,6 +1,9 @@
 // asset manager
 var AM = null;
 
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+const audioContext = new AudioContext();
+
 function parseAssets(path, callback) {
     fetch(path)
         .then(function (response) {
@@ -63,6 +66,10 @@ function isBtnClicked(mx, my, btn) {
 function rescaleSize(obj, scaleX, scaleY) {
     obj.w *= scaleX;
     obj.h *= scaleY;
+}
+function rescalePos(obj, scaleX, scaleY) {
+    obj.x *= scaleX;
+    obj.y *= scaleY;
 }
 
 function rescaleAll(obj, scaleX, scaleY) {

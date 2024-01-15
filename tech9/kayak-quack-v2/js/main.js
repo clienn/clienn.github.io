@@ -42,10 +42,11 @@ var garbageDropSpeed = 500;
 // physics
 var forceD = 0;
 var friction = 0.98;
-var F = 750;
+var F = 750 * 0.5;
 var T = 0;
 var G = 9.8;
 var kaboomT = 0;
+var kayakReturnRotF = 50;
 
 
 // HUD
@@ -291,6 +292,31 @@ var collisionSide = {
     left: false
 };
 
+const splashInfo = {
+    x: 0,
+    y: 0,
+    w: 1864,
+    h: 861,
+    sx: 1,
+    sy: 1,
+};
+
+var tracks = {};
+
+var soundGroups = {
+    score: [],
+    cry: [],
+    scoreIdx: 0,
+    cryIdx: 0,
+}
+
+var startButtonInfo = {
+    x: 0,
+    y: 0,
+    w: 192 * 2,
+    h: 60 * 2,
+}
+
 // pool - 606px
 // rect - 12px, 6px
 // total width - 926px
@@ -311,6 +337,18 @@ function main(w, h) {
     scaleX = w / 1792;
     scaleY = h / 922;
 
+    splashInfo.sx = w / splashInfo.w;
+    splashInfo.sy = h / splashInfo.h;
+    splashInfo.w *= splashInfo.sx;
+    splashInfo.h *= splashInfo.sx;
+
+    splashInfo.x = w / 2 - splashInfo.w / 2;
+    splashInfo.y = Math.abs(h / 2 - splashInfo.h / 2);
+
+    rescaleSize(startButtonInfo, scaleX, scaleX);
+    startButtonInfo.x = w / 2 - startButtonInfo.w / 2;
+    startButtonInfo.y = splashInfo.y + splashInfo.h - 230 * splashInfo.sx;
+
     speedInc *= scaleY;
 
     bgInfo.w = w;
@@ -321,10 +359,13 @@ function main(w, h) {
     initBGWalls();
     initWaterObjContainer();
 
+    // console.log(waterObjContainer.length)
+
     // console.log(12 / scaleX)
 
     G *= scaleY;
     F *= scaleX;
+    kayakReturnRotF *= scaleX;
     
     // console.log(TXT.texts);
     parallaxInfo.water.w *= scaleX;
@@ -343,10 +384,10 @@ function main(w, h) {
     parallaxInfo.borders[2].gap = parallaxInfo.borders[1].gap - parallaxInfo.borders[2].w - parallaxInfo.borders[1].w;
 
     parallaxInfo.tile.w *= scaleX;
-    parallaxInfo.tile.h *= scaleY;
+    parallaxInfo.tile.h *= scaleX;
     parallaxInfo.tile.startY = h - parallaxInfo.tile.rows * parallaxInfo.tile.h;
     parallaxInfo.tile.tileGap = parallaxInfo.water.x + parallaxInfo.water.w;
-    parallaxInfo.tile.moveSpeed *= scaleY;
+    parallaxInfo.tile.moveSpeed *= scaleX;
 
     // for (let i = 0; i < parallaxInfo.tile.rows; ++i) {
     //     parallaxInfo.tile.yPos[i] = parallaxInfo.tile.startY + i * parallaxInfo.tile.h;
@@ -357,7 +398,7 @@ function main(w, h) {
         parallaxInfo.tile.yPos[i] = bgTilesPosY[0] + i * containerH;
     }
 
-    for (let i = 0; i < 9; ++i) {
+    for (let i = 0; i < 24; ++i) {
         waterObjHolder[i] = new Sprite(0, 0, 0, 0, 0, 0);
         waterObjHolder[i].id = -1;
     }
@@ -468,29 +509,32 @@ function main(w, h) {
     
     joystick = new Joystick(joystickX, joystickY, 150 * 0.9 * scaleX);
 
-    var url_string = location.href; 
-    var url = new URL(url_string);
-    var isOn = url.searchParams.get("on");
-    if (isOn == null) isOn = 1;
-    joystick.on = parseInt(isOn);
+    // var url_string = location.href; 
+    // var url = new URL(url_string);
+    // var isOn = url.searchParams.get("on");
+    // if (isOn == null) isOn = 1;
+    // joystick.on = parseInt(isOn);
+
+    joystick.on = true;
 
     gameCycle();
 }
 
 function initTileGroup() {
-    let arr = [1, 2, 3, 0];
-    shuffleArr(arr);
+    let arr = [1, 2, 3, 4, 5, 6, 7, 8];
+    // let arr = [1, 2, 3, 0];
+    // shuffleArr(arr);
 
-    for (let i = 0; i < 4; ++i) {
-        arr.push(0);
-    }
+    // for (let i = 0; i < 4; ++i) {
+    //     arr.push(0);
+    // }
 
-    arr = arr.reverse();
+    // arr = arr.reverse();
     
     bgTileGroup = arr;
 
     for (let i = 0; i < waterObjHolder.length; ++i) {
-        morphWaterObj(i, -1);
+        morphWaterObj(i, -1);        
     }
 
     for (let i = 0; i < bgTileGroup.length; ++i) {
@@ -592,21 +636,25 @@ function drawWaterObj(idx) {
 }
 
 function moveTileGroup(idx) {
-    let next = (idx + 13) % 8;
-    // let next = (Math.floor(idx / 3) + 1) % 8;
-    let group = bgTileGroup[idx];
+    // let next = (idx + 13) % 8;
+    // // let next = (Math.floor(idx / 3) + 1) % 8;
+    // let group = bgTileGroup[idx];
 
-    bgTileGroup[next] = group;
-    bgTileGroup[idx] = 0;
+    // bgTileGroup[next] = group;
+    // bgTileGroup[idx] = 0;
 
-    let start = (group - 1) * 3;
-    let end = group * 3;
+    // let start = (group - 1) * 3;
+    // let end = group * 3;
 
     // let start = idx * 3;
     // let end = (idx + 1) * 3;
+
+    let start = idx * 3;
+    let end = start + 3;
+    let next = idx;
     
     for (let j = start; j < end; ++j) {
-        morphWaterObj(j, next);
+        morphWaterObj(j, 0);
 
         let col = j % 3;
 
@@ -713,6 +761,10 @@ function morphWaterObj(i, row) {
         waterObjHolder[i].morph(rng, w, h, cw, ch);
         waterObjHolder[i].key = key;
         waterObjHolder[i].clipX = 0;
+
+        let idx = Math.floor(i / 3);
+        let mul = i % 3;
+        // waterObjHolder[i].y = bgTilesPosY[idx] * mul + containerH / 2 - waterObjHolder[i].h / 2 + col * containerH;
         // console.log(key, rng, w, h, cw, ch);
         if (!AM.images[waterObjHolder[i].key]) console.log(key)
     } else {
@@ -722,7 +774,7 @@ function morphWaterObj(i, row) {
 }
 
 function updateWaterObjContainer(idx) {
-    let adjH = 140 * scaleY;
+    let adjH = 140 * scaleX;
     let h = 140;
 
     if (idx == 0) {
@@ -902,6 +954,7 @@ function updateBGWall(idx) {
     } else if (idx == 7) {
         bgWalls[idx] = [
             // left
+            // { x: 0, y: bgTilesPosY[7], w: 270, h: 507, degrees: 0 },
             { x: 270, y: bgTilesPosY[7], w: 10, h: 107, degrees: 0 },
             { x: 270, y: bgTilesPosY[7] + distY, w: 15, h: 107, degrees: 0 },
             { x: 260, y: bgTilesPosY[7] + distY * 2, w: 15, h: 107, degrees: 0 },
@@ -1003,6 +1056,7 @@ function initBGWalls() {
         ],
         [
             // left
+            // { x: 0, y: bgTilesPosY[7], w: 270, h: 507, degrees: 0 },
             { x: 270, y: bgTilesPosY[7], w: 10, h: 107, degrees: 0 },
             { x: 270, y: bgTilesPosY[7] + distY, w: 15, h: 107, degrees: 0 },
             { x: 260, y: bgTilesPosY[7] + distY * 2, w: 15, h: 107, degrees: 0 },
@@ -1031,14 +1085,15 @@ function updateBGWallsPos(speed) {
         for (let i = 0; i < bgInfo.rows; ++i) {
             for (let j = 0; j < bgWalls[i].length; ++j) {
                 bgWalls[i][j].y += speed * delta;
-            
+                
                 if (checkAngledCollisions(kayakHitBox, bgWalls[i][j])) {
                     const { x, y, w, h } = kayakHitBox;
                     
                     collisionSide.top = checkAngledCollisions({ x, y, w, h: 1 }, bgWalls[i][j]);
                     collisionSide.right = checkAngledCollisions({ x: x + w, y, w: w / 2, h }, bgWalls[i][j]);
                     collisionSide.left = checkAngledCollisions({ x, y, w: w / 2, h }, bgWalls[i][j]);
-                    
+                    collisionSide.bottom = checkAngledCollisions({ x, y: y + h, w, h: 1 }, bgWalls[i][j]);
+                    // console.log('collide')
                     // playCry();
                     // gameover = true;
                     // updateFinalScore();
@@ -1103,7 +1158,10 @@ function drawBGTiles() {
 }
 
 function isKayakStuck() {
-    const { top, right, left } = collisionSide;
+    const { top, right, left, bottom } = collisionSide;
+    
+    if (bottom) return false;
+
     if (top || right || left) {
         return true;
     }
@@ -1425,17 +1483,17 @@ function initDuck(widthPercent, heightPercent) {
     let id = duckInfo[i].id;
     duckInfo[i].w = AM.images[id].cw * widthPercent * scaleX;
     // duckInfo[i].w = 46.83 * widthPercent * scaleX;
-    duckInfo[i].h = AM.images[id].ch * heightPercent * scaleY;
+    duckInfo[i].h = AM.images[id].ch * heightPercent * scaleX;
 }
 
 function initWaterObjects(widthPercent, heightPercent) {
     let id = plankInfo[1].id;
     plankInfo[1].w = AM.images[id].cw * widthPercent * scaleX;
-    plankInfo[1].h = AM.images[id].ch * heightPercent * scaleY;
+    plankInfo[1].h = AM.images[id].ch * heightPercent * scaleX;
 
     id = plankInfo[2].id;
     plankInfo[2].w = AM.images[id].cw * 0.35 * widthPercent * scaleX;
-    plankInfo[2].h = AM.images[id].ch * 0.35 * heightPercent * scaleY;
+    plankInfo[2].h = AM.images[id].ch * 0.35 * heightPercent * scaleX;
     // for (let i = 1; i <= 2; ++i) {
     //     let id = plankInfo[i].id;
     //     plankInfo[i].w = AM.images[id].cw * widthPercent * scaleX;
@@ -1503,22 +1561,22 @@ function drawKayak() {
 
     updateHitBox();
 
-    if (isKayakStuck()) {
-        collisionSide.top = collisionSide.right = collisionSide.left = false;
+    // if (isKayakStuck()) {
+    //     collisionSide.top = collisionSide.right = collisionSide.left = false;
 
-        for (let i = 0; i < bgInfo.rows; ++i) {
-            for (let j = 0; j < bgWalls[i].length; ++j) {
-                if (checkAngledCollisions(kayakHitBox, bgWalls[i][j])) {
-                    const { x, y, w, h } = kayakHitBox;
+    //     for (let i = 0; i < bgInfo.rows; ++i) {
+    //         for (let j = 0; j < bgWalls[i].length; ++j) {
+    //             if (checkAngledCollisions(kayakHitBox, bgWalls[i][j])) {
+    //                 const { x, y, w, h } = kayakHitBox;
                     
-                    collisionSide.top = checkAngledCollisions({ x, y, w, h: 1 }, bgWalls[i][j]);
-                    collisionSide.right = checkAngledCollisions({ x: x + w, y, w: w / 2, h }, bgWalls[i][j]);
-                    collisionSide.left = checkAngledCollisions({ x, y, w: w / 2, h }, bgWalls[i][j]);
+    //                 collisionSide.top = checkAngledCollisions({ x, y, w, h: 1 }, bgWalls[i][j]);
+    //                 collisionSide.right = checkAngledCollisions({ x: x + w, y, w: w / 2, h }, bgWalls[i][j]);
+    //                 collisionSide.left = checkAngledCollisions({ x, y, w: w / 2, h }, bgWalls[i][j]);
                     
-                }
-            }
-        }
-    }
+    //             }
+    //         }
+    //     }
+    // }
 
     // ctx.beginPath();
     // ctx.rect(kayakHitBox.x, kayakHitBox.y, kayakHitBox.w, kayakHitBox.h);
@@ -1565,6 +1623,37 @@ function muteAllAudio(flag) {
     }
 }
 
+function initAllAudio() {
+    if (audioContext.state === "suspended") {
+        audioContext.resume();
+    }
+
+    for (let i = 0; i < 5; ++i) {
+        soundGroups.score.push(AM.audio.score.img.cloneNode());
+        soundGroups.cry.push(AM.audio.cry.img.cloneNode());
+    }
+
+    for (let i = 0; i < 5; ++i) {
+        const track = audioContext.createMediaElementSource(soundGroups.score[i]);
+        track.connect(audioContext.destination);
+    }
+
+    for (let i = 0; i < 5; ++i) {
+        const track = audioContext.createMediaElementSource(soundGroups.cry[i]);
+        track.connect(audioContext.destination);
+    }
+
+    for (let k in AM.audio) {
+        // tracks.push(audioContext.createMediaElementSource(AM.audio[k].img));
+        if (k != 'score' && k != 'cry') {
+            tracks[k] = audioContext.createMediaElementSource(AM.audio[k].img);
+            tracks[k].connect(audioContext.destination);
+        }
+    }
+
+    // playAllAudio();
+}
+
 function playAllAudio() {
     for (let k in AM.audio) {
         if (k != 'bg') {
@@ -1578,32 +1667,70 @@ function playAllAudio() {
 
 function mouseMove(x, y, prevX, prevY) {
     if (joystick.active) {
-        let dist = x - mouseMoveOrigin.x;
-        kayak.x = kayak.ox + dist;
-        // if (!collisionSide.right && !collisionSide.left) {
+        // let dist = x - mouseMoveOrigin.x;
+        let dist = x - prevX;
+        // let dist = joystick.mx - joystick.prevMx;
+        // kayak.x = kayak.ox + dist;
+        // if (!collisionSide.top && !collisionSide.right && !collisionSide.left) {
         //     kayak.x = kayak.ox + dist;
         // } else if (collisionSide.left && dist > 0) {
         //     kayak.x = kayak.ox + dist;
+        //     kayak.vx = F;
         // } else if (collisionSide.right && dist < 0) {
         //     kayak.x = kayak.ox + dist;
         // }
-       
-        kayak.updateBounds(kayakBounds, kayakHitBox);
+        // 
+        
+        
 
-        setKayakRotation(prevX, x, dist);
+
+        
+       
+       
+        // kayak.updateBounds(kayakBounds, kayakHitBox);
+
+        // setKayakRotation(prevX, x, dist);
+
+        // if (isKayakStuck()) {
+        //     collisionSide.top = collisionSide.right = collisionSide.left = false;
+    
+        //     for (let i = 0; i < bgInfo.rows; ++i) {
+        //         for (let j = 0; j < bgWalls[i].length; ++j) {
+        //             if (checkAngledCollisions(kayakHitBox, bgWalls[i][j])) {
+        //                 const { x, y, w, h } = kayakHitBox;
+                        
+        //                 collisionSide.top = checkAngledCollisions({ x, y, w, h: 1 }, bgWalls[i][j]);
+        //                 collisionSide.right = checkAngledCollisions({ x: x + w, y, w: w / 2, h }, bgWalls[i][j]);
+        //                 collisionSide.left = checkAngledCollisions({ x, y, w: w / 2, h }, bgWalls[i][j]);
+                        
+        //             }
+        //         }
+        //     }
+        // }
 
         let distX = x - prevX;
         let distY = prevY - y;
 
         // joystick.update(distX * 0.5, distY);
         joystick.update(distX * 0.5, 0);
+        let percent = joystick.mx / joystick.moveLimit;
+        kayak.zRotate = 30 * percent;
+
+        let p = Math.abs(percent);
+
+        if (dist < 0) {
+            kayak.vx = -F * p;
+        } else if (dist > 0) {
+            kayak.vx = F * p;
+        }
     }
 }
 
 function mouseUp() {
     kayak.updateOriginalPos();
-    kayak.zRotate = 0;
+    // kayak.zRotate = 0;
     joystick.touchUp();
+    kayak.vx = 0;
 }
 
 function controls() {
@@ -1736,15 +1863,22 @@ function controls() {
         // e.preventDefault();
         // var touch = evt.touches[0] || evt.changedTouches[0];
         // let x = touch.pageX;
+        var x = e.changedTouches[event.changedTouches.length-1].pageX;
+        var y = e.changedTouches[event.changedTouches.length-1].pageY;
 
         if (!gameStart) {
-            AM.audio.bg.img.volume = 0.2;
-            AM.audio.bg.img.loop = true;
-            AM.audio.bg.img.play();
+            if (isBtnClicked(x, y, startButtonInfo)) {
+                AM.audio.bg.img.volume = 0.2;
+                AM.audio.bg.img.loop = true;
+                AM.audio.bg.img.play();
 
-            gameStart = true;
-            // HUD.health = 100;
-            playAllAudio();
+                gameStart = true;
+                // HUD.health = 100;
+                // playAllAudio();
+                initAllAudio();
+            }
+            
+
         } 
 
         if (gameover) {
@@ -1781,7 +1915,11 @@ function controls() {
                     mDown = true;
                     mouseMoveOrigin.x = mx;
 
-                    joystick.active = true;
+                    // joystick.active = true;
+
+                    if (isBtnClicked(mx, my, joystick.hitbox) || !joystick.on) {
+                        joystick.active = true;
+                    }
                 // }
 
             }
@@ -1815,18 +1953,23 @@ function controls() {
     
     canvas.addEventListener('mouseup', e => {
         // mouseupE();
+        let mx = e.offsetX;
+        let my = e.offsetY;
         
         if (!gameStart) {
-            // if (AM.audio.bg.img.paused) {
-                AM.audio.bg.img.volume = 0.2;
-                AM.audio.bg.img.loop = true;
-                AM.audio.bg.img.play();
-                // console.log('test')
-            // }
-            
+            if (isBtnClicked(mx, my, startButtonInfo)) {
+                initAllAudio();
+                // if (AM.audio.bg.img.paused) {
+                    AM.audio.bg.img.volume = 0.2;
+                    AM.audio.bg.img.loop = true;
+                    AM.audio.bg.img.play();
+                    // console.log('test')
+                // }
+                
 
-            gameStart = true;
-            HUD.health = 100;
+                gameStart = true;
+                HUD.health = 100;
+            }
         }
 
         if (mDown) {
@@ -2014,12 +2157,18 @@ function setPoints(points, color) {
 }
 
 function updateScore() {
-    HUD.txt.texts['score'].str = 'x ' + zeroPad(score, 2);
+    let scoreTxt = zeroPad(score, 2);
+    // HUD.txt.texts['score'].str = scoreTxt;
+    HUD.updateScoreSprite(scoreTxt)
+
+    // HUD.updateGameScore(scoreTxt);
 }
 
 function updateFinalScore() {
     // HUD.txt.texts['score2'].str = zeroPad(score, 2);
-    HUD.updateScore(zeroPad(score, 2));
+    let scoreTxt = zeroPad(score, 2);
+    // HUD.updateScore(scoreTxt);
+    HUD.updateGameoverScore(splashInfo, scoreTxt);
 }
 
 // *********************************** TEXT DISPLAYS END ******************************************************** //
@@ -2030,12 +2179,19 @@ function updateFinalScore() {
  */
 function playCry() {
     if (HUD.volumeOn) {
-        setTimeout(() => {
-            AM.audio.cry.img.currentTime = 0;
-            AM.audio.cry.img.volume = 0.2;
-            AM.audio.cry.img.play();
-        }, 0);
-        
+        // setTimeout(() => {
+        //     AM.audio.cry.img.currentTime = 0;
+        //     AM.audio.cry.img.volume = 0.2;
+        //     AM.audio.cry.img.play();
+        // }, 0);
+        // var source = audioContext.createMediaElementSource(AM.audio.cry.img); // creates a sound source
+        // source.connect(audioContext.destination);       // connect the source to the context's destination (the speakers)
+        var { cry, cryIdx } = soundGroups;
+        cry[cryIdx].currentTime = 0;
+        cry[cryIdx].volume = 0.5;
+        cry[cryIdx].play();
+
+        cryIdx = (cryIdx + 1) % cry.length;
     }
 }
 
@@ -2049,12 +2205,30 @@ function playCry() {
 
 function playScore() {
     if (HUD.volumeOn) {
-        setTimeout(() => {
-            AM.audio.score.img.currentTime = 0;
-            AM.audio.score.img.volume = 0.5;
-            AM.audio.score.img.play();
-        }, 0);
         
+        // setTimeout(() => {
+        //     AM.audio.score.img.currentTime = 0;
+        //     AM.audio.score.img.volume = 0.5;
+        //     AM.audio.score.img.play();
+        // }, 0);
+        // audioContext.createMediaElementSource(AM.audio[k].img);
+    //     tracks[k].connect(audioContext.destination);
+        // var source = audioContext.createBufferSource(); // creates a sound source
+        // source.buffer = AM.audio.score.buffer;                    // tell the source which sound to play
+        // source.connect(audioContext.destination);       // connect the source to the context's destination (the speakers)
+        // source.noteOn(0);
+
+        // var source = audioContext.createMediaElementSource(AM.audio.score.img); // creates a sound source
+        // source.connect(audioContext.destination);       // connect the source to the context's destination (the speakers)
+        // AM.audio.score.img.currentTime = 0;
+        // AM.audio.score.img.play();
+        var { score, scoreIdx } = soundGroups;
+        score[scoreIdx].currentTime = 0;
+        score[scoreIdx].volume = 0.5;
+        score[scoreIdx].play();
+
+        scoreIdx = (scoreIdx + 1) % score.length;
+
     }
 }
 
@@ -2087,30 +2261,52 @@ function drawRotate(obj, key, ax, ay, yRot, zRot) {
 }
 
 function drawStartPage() {
+    // startPage.duck.t += 1 * delta;
     startPage.duck.t += 3 * delta;
     let sine = Math.sin(startPage.duck.t);
-    let a = sine * startPage.duck.dist;
-    let duckRot = 0;
-    if (a < 0) duckRot = 180;
+    let a = sine * 5 * scaleY;
+    // let duckRot = 0;
+    // if (a < 0) duckRot = 180;
+    let frame = Math.floor(startPage.duck.t * 2) % 6;
 
-    ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
+    // ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, splashInfo.x, splashInfo.y, splashInfo.w, splashInfo.h);
+
+    let w = AM.images.duck_anim.cw * 2 * scaleX;
+    let h = AM.images.duck_anim.ch * 2 * scaleX;
+    // let x = 1060 * scaleX;
+    let x = 620 * scaleX;
+    let y = splashInfo.y + 300 * splashInfo.sx;
+
+    ctx.drawImage(AM.images.duck_anim.img, frame * AM.images.duck_anim.cw, 0, AM.images.duck_anim.cw, AM.images.duck_anim.ch, x, y, w, h);
 
     // for (let i = 1; i < 4; ++i) {
     //     let key = 'text' + i;
     //     ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, startPage[key].x, startPage[key].y, startPage[key].w, startPage[key].h);
     // }
 
-    TXT.draw('text1_1');
-    TXT.draw('text1_2');
+    // TXT.draw('text1_1');
+    // TXT.draw('text1_2');
 
-    TXT.draw('text2_1');
-    TXT.draw('text2_2');
+    // TXT.draw('text2_1');
+    // TXT.draw('text2_2');
 
-    drawRotate(startPage.duck, 'splash_duck', a, 0, 0, 0);
-    // drawRotate(startPage.hourglass, 'splash_hourglass', 0, 0, 0, sine * 180);
-    drawRotate(startPage.rock, 'splash_rock', 0, a, 0, 0);
+    // drawRotate(startPage.duck, 'splash_duck', a, 0, 0, 0);
+    // // drawRotate(startPage.hourglass, 'splash_hourglass', 0, 0, 0, sine * 180);
+
+    w = AM.images.log_anim.cw * 2 * scaleX;
+    h = AM.images.log_anim.ch * 2 * scaleX;
+    x = 1040 * scaleX;
+    y = y - 5 * scaleY;
+
+    frame = Math.floor(startPage.duck.t * 2) % 10;
+    // drawRotate(startPage.rock, 'splash_rock', 0, 0, 0, 0);
+
+    ctx.drawImage(AM.images.log_anim.img, frame * AM.images.log_anim.cw, 0, AM.images.log_anim.cw, AM.images.log_anim.ch, x, y, w, h);
     
-    
+    // ctx.beginPath();
+    // ctx.rect(startButtonInfo.x, startButtonInfo.y, startButtonInfo.w, startButtonInfo.h);
+    // ctx.stroke();
     // ctx.drawImage(AM.images.splash_hourglass.img, 0, 0, AM.images.splash_hourglass.cw, AM.images.splash_hourglass.ch, startPage.hourglass.x, startPage.hourglass.y, startPage.hourglass.w, startPage.hourglass.h);
     // ctx.drawImage(AM.images.splash_rock.img, 0, 0, AM.images.splash_rock.cw, AM.images.splash_rock.ch, startPage.rock.x, startPage.rock.y, startPage.rock.w, startPage.rock.h);
 
@@ -2132,7 +2328,8 @@ function update() {
 
     // divingFish.update(delta);
     // divingFish.sineMovement(delta);
-    HUD.txt.texts['time'].str = 'TIME: ' + zeroPad(Math.floor(timer.timer / 24), 2);
+    // HUD.txt.texts['time'].str = 'TIME: ' + zeroPad(Math.floor(timer.timer / 24), 2);
+    HUD.updateTimerSprite(zeroPad(Math.floor(timer.timer / 24), 2), gameDuration);
 
     if (delta < 1) {
         timer.tick(delta);
@@ -2155,11 +2352,57 @@ function update() {
         }
     }
     
+    if (isKayakStuck()) {
+        collisionSide.top = collisionSide.right = collisionSide.left = collisionSide.bottom = false;
 
-    if (!mDown) {
+        for (let i = 0; i < bgInfo.rows; ++i) {
+            for (let j = 0; j < bgWalls[i].length; ++j) {
+                if (checkAngledCollisions(kayakHitBox, bgWalls[i][j])) {
+                    const { x, y, w, h } = kayakHitBox;
+                    
+                    collisionSide.top = checkAngledCollisions({ x, y, w, h: 1 }, bgWalls[i][j]);
+                    collisionSide.right = checkAngledCollisions({ x: x + w, y, w: w / 2, h }, bgWalls[i][j]);
+                    collisionSide.left = checkAngledCollisions({ x, y, w: w / 2, h }, bgWalls[i][j]);
+                    collisionSide.bottom = checkAngledCollisions({ x, y: y + h, w, h: 1 }, bgWalls[i][j]);
+                    
+                }
+            }
+        }
+    }
+
+    if (isKayakStuck()) {
+        if (collisionSide.left && kayak.vx < 0) {
+            kayak.vx = 0;
+        } else if (collisionSide.right && kayak.vx > 0) {
+            kayak.vx = 0;
+        }
+    }
+
+    if (!joystick.active) {
+        if (kayak.zRotate) {
+            if (kayak.zRotate > 0) {
+                kayak.zRotate -= kayakReturnRotF * delta;
+                if (kayak.zRotate < 0) {
+                    kayak.zRotate = 0;
+                }
+            } else {
+                kayak.zRotate += kayakReturnRotF * delta;
+                if (kayak.zRotate > 0) {
+                    kayak.zRotate = 0;
+                }
+            }
+            
+        }   
+    }
+
+
+
+    // if (!mDown) {
         kayak.update(delta, 1);
         kayak.updateBounds(kayakBounds, kayakHitBox);
-    }
+    // }
+
+    
     
 }
 
@@ -2183,8 +2426,8 @@ function gameCycle() {
             
             HUD.draw(ctx);
 
-            if (onMobile)
-                joystick.draw(ctx);
+            // if (onMobile)
+            joystick.draw(ctx);
 
             update();
 
@@ -2197,7 +2440,7 @@ function gameCycle() {
         
     } else {
 
-        HUD.gameover(ctx);
+        HUD.gameover(ctx, splashInfo);
         // HUD.updateGameoverBattery(-0.01 * delta);
     }
 
