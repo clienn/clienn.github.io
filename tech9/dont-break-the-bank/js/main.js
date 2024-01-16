@@ -8,6 +8,8 @@ var instrucions = document.getElementById("game-instructions");
 var last = 0;
 var delta = 0;
 
+const gameDuration = 90;
+
 // game start
 var startGame = false; // orientation prep
 var gameStart = false; // start game
@@ -42,13 +44,13 @@ var pigInfo = {
 }
 
 var moneyInfo = {
-    w: 75 * 1.35,
-    h: 50 * 1.35,
+    w: 128 * 1,
+    h: 129 * 1,
 }
 
 var coinInfo = {
-    w: 75 * 1.35,
-    h: 75 * 1.35,
+    w: 80 * 1.35,
+    h: 80 * 1.35,
 }
 
 var glueInfo = {
@@ -62,13 +64,13 @@ var hammerInfo = {
 }
 
 var ballInfo = {
-    w: 30 * 1.15,
-    h: 30 * 1.15,
+    w: 81.25 * 1.15,
+    h: 91 * 1.15,
 }
 
 var kaboomInfo = {
-    w: 70 * 1.15,
-    h: 30 * 1.15,
+    w: 70 * 1.5,
+    h: 30 * 1.5,
 }
 
 // srpite containers
@@ -159,21 +161,22 @@ var startPage = {
         h: 150,
     },
     startcoin: {
-        x: 740,
+        x: 460,
         y: 345,
         w: 57 * 2,
         h: 57 * 2,
     },
     startball: {
         // x: 1072,
-        x: 1052,
+        x: 880,
+        // x: 920,
         y: 350,
         w: 90,
         h: 90,
     },
     starthammer: {
         // x: 1022,
-        x: 1002,
+        x: 880,
         y: 330,
         ox: 1022,
         oy: 330,
@@ -203,6 +206,24 @@ var mouseMoveOrigin = {
 var joystick = null;
 const onMobile = isMobile();
 
+const splashInfo = {
+    x: 0,
+    y: 0,
+    w: 1864,
+    h: 861,
+    sx: 1,
+    sy: 1,
+};
+
+var startButtonInfo = {
+    x: 0,
+    y: 0,
+    w: 192 * 2,
+    h: 60 * 2,
+}
+
+const onTablet = isTablet();
+
 // #313350
 
 /*
@@ -217,6 +238,33 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    if (onTablet) {
+        splashInfo.w = AM.images.intro.cw;
+        splashInfo.h = AM.images.intro.ch;
+    }
+
+    splashInfo.sx = w / splashInfo.w;
+    splashInfo.sy = h / splashInfo.h;
+    splashInfo.w *= splashInfo.sx;
+    splashInfo.h *= splashInfo.sx;
+
+    splashInfo.x = w / 2 - splashInfo.w / 2;
+    splashInfo.y = Math.abs(h / 2 - splashInfo.h / 2);
+
+    if (onMobile && !onTablet) {
+        splashInfo.y = 0;
+    }
+
+    rescaleSize(startButtonInfo, scaleX, scaleX);
+    startButtonInfo.x = w / 2 - startButtonInfo.w / 2;
+    if (onTablet) {
+        startButtonInfo.y = splashInfo.y + splashInfo.h - 730 * splashInfo.sx;
+
+    } else {
+        startButtonInfo.y = splashInfo.y + splashInfo.h - 230 * splashInfo.sx;
+    }
+
     // if (isMobile()) {
     //     F = 15;
     // }
@@ -260,7 +308,7 @@ function main(w, h) {
     TXT.addText('text3_2', 'and one hammer hit.', 'normal', 20, 'Montserrat', x + center, y + 50 * scaleY, 225, 35, '#fff', false); 
 
     timer = new Timer(0, 0, 0, '#fff');
-    timer.setTimer(90);
+    timer.setTimer(gameDuration);
     
     
     rescaleSize(pigInfo, scaleX, scaleX);
@@ -286,7 +334,7 @@ function main(w, h) {
     dropPadding = (w - moneyLimit * moneyInfo.w) / 2;
 
     // HUD = new Sprite(0, 0, 45, 45, AM.images.timecircle.cw, AM.images.timecircle.ch);
-    HUD = new Template_1(ctx, w, h, scaleX, scaleY);
+    HUD = new Template_1(ctx, w, h, scaleX, scaleY, splashInfo);
 
     controls();
 
@@ -303,11 +351,12 @@ function main(w, h) {
     let joystickY = h * 0.75;
     
     joystick = new Joystick(joystickX, joystickY, 150 * 0.90 * scaleX);
-    var url_string = location.href; 
-    var url = new URL(url_string);
-    var isOn = url.searchParams.get("on");
-    if (isOn == null) isOn = 1;
-    joystick.on = parseInt(isOn);
+    // var url_string = location.href; 
+    // var url = new URL(url_string);
+    // var isOn = url.searchParams.get("on");
+    // if (isOn == null) isOn = 1;
+    // joystick.on = parseInt(isOn);
+    joystick.on = true;
 
     gameCycle();
 }
@@ -577,19 +626,22 @@ function controls() {
         // e.preventDefault();
         // var touch = evt.touches[0] || evt.changedTouches[0];
         // let x = touch.pageX;
+        var x = e.changedTouches[event.changedTouches.length-1].pageX;
+        var y = e.changedTouches[event.changedTouches.length-1].pageY;
 
         if (!gameStart) {
-            AM.audio.bg.img.volume = 0.4;
-            AM.audio.bg.img.loop = true;
-            AM.audio.bg.img.play();
+            if (isBtnClicked(x, y, startButtonInfo)) {
+                AM.audio.bg.img.volume = 0.4;
+                AM.audio.bg.img.loop = true;
+                AM.audio.bg.img.play();
 
-            // playScore();
-            // playKaboom();
-            // playGlue();
+                // playScore();
+                // playKaboom();
+                // playGlue();
 
-            gameStart = true;
-            playAllAudio();
-            
+                gameStart = true;
+                playAllAudio();
+            }
         } 
         
     });
@@ -602,8 +654,9 @@ function controls() {
         if (!mDown) {
             mDown = true;
             mouseMoveOrigin.x = mx;
-
-            joystick.active = true;
+            if (isBtnClicked(mx, my, joystick.hitbox) || !joystick.on) {
+                joystick.active = true;
+            }
         }
 
         if (isBtnClicked(mx, my, {
@@ -698,13 +751,16 @@ function controls() {
     
     canvas.addEventListener('mouseup', e => {
         let mx = e.offsetX;
+        let my = e.offsetY;
         // mouseupE();
         if (!gameStart) {
-            AM.audio.bg.img.volume = 0.4;
-            AM.audio.bg.img.loop = true;
-            AM.audio.bg.img.play();
+            if (isBtnClicked(mx, my, startButtonInfo)) {
+                AM.audio.bg.img.volume = 0.4;
+                AM.audio.bg.img.loop = true;
+                AM.audio.bg.img.play();
 
-            gameStart = true;
+                gameStart = true;
+            }
         }
 
         if (mDown) {
@@ -736,7 +792,7 @@ function initStartPage() {
         startPage[k].x *= scaleX;
         startPage[k].y *= scaleY;
         startPage[k].w *= scaleX;
-        startPage[k].h *= scaleY;
+        startPage[k].h *= scaleX;
     }
 
     startPage.title.x = canvas.width / 2 - startPage.title.w / 2;
@@ -843,12 +899,14 @@ function drawPigBreak() {
 
 function addBall() {
     if (balls.length < ballsLimit) {
-        let ball = new Sprite(Math.floor(Math.random() * canvas.width), -ballInfo.h * 3, ballInfo.w, ballInfo.h, AM.images.ball_1.cw, AM.images.ball_1.ch);
+        let ball = new Sprite(Math.floor(Math.random() * canvas.width), -ballInfo.h * 3, ballInfo.w, ballInfo.h, AM.images.marbles.cw, AM.images.marbles.ch);
         ball.dropSpeed = 20;
 
-        let rng = Math.floor(Math.random() * 3) + 1;
-        ball.w *= rng; 
-        ball.h *= rng; 
+        let frame = Math.floor(Math.random() * 8);
+        ball.clipX = AM.images.marbles.cw * frame;
+        // let rng = Math.floor(Math.random() * 3) + 1;
+        // ball.w *= rng; 
+        // ball.h *= rng; 
 
         let d = Math.floor(Math.random() * 2);
         let xSpeed = Math.floor(Math.random() * 200 + 50);
@@ -867,7 +925,7 @@ function addBall() {
 
 function drawBall() {
     for (let i = 0; i < balls.length; ++i) {
-        balls[i].draw(ctx, AM.images['ball_' + balls[i].id].img);
+        balls[i].draw(ctx, AM.images.marbles.img);
     }
 }
 
@@ -889,6 +947,9 @@ function addMoney() {
 function drawMoney() {
     for (let i = 0; i < moneyList.length; ++i) {
         moneyList[i].draw(ctx, AM.images.money.img);
+        moneyList[i].t += 2 * delta;
+        let frame = Math.floor(moneyList[i].t) % 8;
+        moneyList[i].clipX = frame * AM.images.money.cw;
     }
 }
 
@@ -902,7 +963,7 @@ function resetMoney(i) {
 
 function addCoins() {
     if (coins.length < coinLimit) {
-        let id = 'coin_' + (Math.floor(Math.random() * 6) + 1);
+        let id = 'coin_' + (Math.floor(Math.random() * 3) + 1);
         let coin = new Sprite(coins.length * coinInfo.w, 0, coinInfo.w, coinInfo.w, AM.images[id].cw, AM.images[id].ch);
         coin.id = id;
         
@@ -1165,7 +1226,8 @@ function collisionUpdate() {
         }
     }
 
-    HUD.txt.texts['score'].str = (score < 10 ? '0' : '') + score.toFixed(2);
+    // HUD.txt.texts['score'].str = (score < 10 ? '0' : '') + score.toFixed(2);
+    HUD.updateScoreSprite((score < 10 ? '0' : '') + score.toFixed(2));
 
     for (let i = 0; i < balls.length; ++i) {
         if (checkCollision(pig, balls[i])) {
@@ -1378,7 +1440,7 @@ function reset() {
     glues.length = 0;
     hammers.length = 0;
 
-    timer.setTimer(90);
+    timer.setTimer(gameDuration);
 }
 
 function gamoverUpdate() {
@@ -1421,7 +1483,9 @@ function update() {
         }
     }
 
-    HUD.txt.texts['time'].str = zeroPad(Math.floor(timer.timer / 24), 2);
+    // HUD.txt.texts['time'].str = zeroPad(Math.floor(timer.timer / 24), 2);
+
+    HUD.updateTimerSprite(zeroPad(Math.floor(timer.timer / 24), 2), gameDuration);
 
     if (health < 0) {
         health = 0;
@@ -1431,7 +1495,7 @@ function update() {
     }
 
     if (delta < 1) {
-        HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24));
+        // HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24));
         HUD.lifebar.update(delta, health);
         // HUD.timeProgressBar.progress = Math.floor(timer.timer / 24) / 90 * 100;
         // console.log(HUD.timeProgressBar.progress, timer.timer, delta);
@@ -1446,84 +1510,105 @@ function update() {
     }
 
     if (gameover) {
-        HUD.txt.texts['total'].str = '$' + (score < 10 ? '0' : '') + score.toFixed(2);
+        // HUD.txt.texts['total'].str = '$' + (score < 10 ? '0' : '') + score.toFixed(2);
+        HUD.updateGameoverScore(splashInfo, (score < 10 ? '0' : '') + score.toFixed(2));
     }
 }
 
 function startPageAnimations() {
 
-    ctx.drawImage(AM.images.title.img, 0, 0, AM.images.title.cw, AM.images.title.ch, startPage.title.x, startPage.title.y, startPage.title.w, startPage.title.h);
+    ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, splashInfo.x, splashInfo.y, splashInfo.w, splashInfo.h);
+    // ctx.drawImage(AM.images.title.img, 0, 0, AM.images.title.cw, AM.images.title.ch, startPage.title.x, startPage.title.y, startPage.title.w, startPage.title.h);
     
-    // for (let i = 1; i < 5; ++i) {
-    //     let key = 'text' + i;
-    //     ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, startPage[key].x, startPage[key].y, startPage[key].w, startPage[key].h);
-    // }
+    // // for (let i = 1; i < 5; ++i) {
+    // //     let key = 'text' + i;
+    // //     ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, startPage[key].x, startPage[key].y, startPage[key].w, startPage[key].h);
+    // // }
    
-    TXT.draw('text1_1');
-    TXT.draw('text1_2');
+    // TXT.draw('text1_1');
+    // TXT.draw('text1_2');
 
-    TXT.draw('text2_1');
-    TXT.draw('text2_2');
+    // TXT.draw('text2_1');
+    // TXT.draw('text2_2');
 
-    TXT.draw('text3_1');
-    TXT.draw('text3_2');
+    // TXT.draw('text3_1');
+    // TXT.draw('text3_2');
+    let hy = onTablet ? 860 : 330;
+    let y = splashInfo.y + hy * splashInfo.sx;
 
-    let handx = Math.sin(startScreenHandAnimT) * 20;
+    let frame = Math.floor(startScreenHandAnimT) % 9;
+    let w = AM.images.splash_hammer_marble.cw * 2.5 * scaleX;
+    let midX = canvas.width / 2 - w / 2
 
+    w = AM.images.splash_coin.cw * 1.5 * scaleX;
+    let h = AM.images.splash_coin.ch * 1.5 * scaleX;
+    let x = midX - 420 * scaleX;
+    ctx.drawImage(AM.images.splash_coin.img, frame * AM.images.splash_coin.cw, 0, AM.images.splash_coin.cw, AM.images.splash_coin.ch, x, y, w, h);
+
+    frame = Math.floor(startScreenHandAnimT) % 10;
+    w = AM.images.splash_hammer_marble.cw * 2.5 * scaleX;
+    h = AM.images.splash_hammer_marble.ch * 2.5 * scaleX;
+    ctx.drawImage(AM.images.splash_hammer_marble.img, frame * AM.images.splash_hammer_marble.cw, 0, AM.images.splash_hammer_marble.cw, AM.images.splash_hammer_marble.ch, midX, y - 40 * splashInfo.sx, w, h);
+
+    frame = Math.floor(startScreenHandAnimT) % 10;
+    w = AM.images.splash_pig.cw * 1.5 * scaleX;
+    h = AM.images.splash_pig.ch * 1.5 * scaleX;
+    x = midX + 460 * scaleX;
+    ctx.drawImage(AM.images.splash_pig.img, frame * AM.images.splash_pig.cw, 0, AM.images.splash_pig.cw, AM.images.splash_pig.ch, x, y, w, h);
     // ctx.drawImage(AM.images.hand.img, 0, 0, AM.images.hand.cw, AM.images.hand.ch, startPage.hand.x + handx, startPage.hand.y, startPage.hand.w, startPage.hand.h);
 
     // Untransformed draw position
-    const position = {x: startPage.startcoin.x, y: startPage.startcoin.y};
-    // In degrees
-    const rotation = { x: 0, y: startScreenHandAnimT * 10, z: 0};
-    // Rotation relative to here (this is the center of the image)
-    const rotPt = { x: startPage.startcoin.w / 2, y: startPage.startcoin.h / 2 };
+    // const position = {x: startPage.startcoin.x, y: y};
+    // // In degrees
+    // const rotation = { x: 0, y: startScreenHandAnimT * 10, z: 0};
+    // // Rotation relative to here (this is the center of the image)
+    // const rotPt = { x: startPage.startcoin.w / 2, y: startPage.startcoin.h / 2 };
 
-    ctx.save();
-    ctx.setTransform(new DOMMatrix()
-        .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
-        .rotateSelf(rotation.x, rotation.y, rotation.z)
-    );
-    ctx.drawImage(AM.images.startcoin.img, 0, 0, AM.images.startcoin.cw, AM.images.startcoin.ch, -rotPt.x, -rotPt.y, startPage.startcoin.w, startPage.startcoin.h);
-    ctx.restore();
+    // ctx.save();
+    // ctx.setTransform(new DOMMatrix()
+    //     .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+    //     .rotateSelf(rotation.x, rotation.y, rotation.z)
+    // );
+    // ctx.drawImage(AM.images.startcoin.img, 0, 0, AM.images.startcoin.cw, AM.images.startcoin.ch, -rotPt.x, -rotPt.y, startPage.startcoin.w, startPage.startcoin.h);
+    // ctx.restore();
 
     
     
     
-    ctx.drawImage(AM.images.startball.img, 0, 0, AM.images.startball.cw, AM.images.startball.ch, startPage.startball.x, startPage.startball.y, startPage.startball.w, startPage.startball.h);
+    // ctx.drawImage(AM.images.startball.img, 0, 0, AM.images.startball.cw, AM.images.startball.ch, startPage.startball.x, y, startPage.startball.w, startPage.startball.h);
     
-    //
-    ctx.save();
+    // //
+    // ctx.save();
 
-    // move to the center of the canvas
-    ctx.translate(startPage.starthammer.ox + startPage.starthammer.w / 2, startPage.starthammer.oy + startPage.starthammer.h / 2);
+    // // move to the center of the canvas
+    // ctx.translate(startPage.starthammer.ox + startPage.starthammer.w / 2, y - 35 * scaleX + startPage.starthammer.h / 2);
     
-    let hammerDegrees = Math.sin(startScreenHandAnimT * 0.20) * 45;
-    // rotate the canvas to the specified degrees
-    ctx.rotate(hammerDegrees * Math.PI/180);
+    // let hammerDegrees = Math.sin(startScreenHandAnimT * 0.20) * 45;
+    // // rotate the canvas to the specified degrees
+    // ctx.rotate(hammerDegrees * Math.PI/180);
 
-    // draw the image
-    startPage.starthammer.x = -0.5 * startPage.starthammer.w;
-    startPage.starthammer.y = -0.5 * startPage.starthammer.h;
+    // // draw the image
+    // startPage.starthammer.x = -0.5 * startPage.starthammer.w;
+    // startPage.starthammer.y = -0.5 * startPage.starthammer.h;
 
-    ctx.drawImage(AM.images.starthammer.img, 0, 0, AM.images.starthammer.cw, AM.images.starthammer.ch, startPage.starthammer.x, startPage.starthammer.y, startPage.starthammer.w, startPage.starthammer.h);
-    // we’re done with the rotating so restore the unrotated context
-    ctx.restore();
+    // ctx.drawImage(AM.images.starthammer.img, 0, 0, AM.images.starthammer.cw, AM.images.starthammer.ch, startPage.starthammer.x, startPage.starthammer.y, startPage.starthammer.w, startPage.starthammer.h);
+    // // we’re done with the rotating so restore the unrotated context
+    // ctx.restore();
     
-    //
+    // //
 
-    let pigpulse = Math.sin(startScreenHandAnimT) * 5;
-    let pigw = startPage.startpig.w + pigpulse;
-    let pigh = startPage.startpig.h + pigpulse;
-    let pigx = startPage.startpig.x - pigpulse / 2;
-    let pigy = startPage.startpig.y - pigpulse / 2;
+    // let pigpulse = Math.sin(startScreenHandAnimT) * 5;
+    // let pigw = startPage.startpig.w + pigpulse;
+    // let pigh = startPage.startpig.h + pigpulse;
+    // let pigx = startPage.startpig.x - pigpulse / 2;
+    // let pigy = startPage.startpig.y - pigpulse / 2;
 
-    ctx.drawImage(AM.images.startpig.img, 0, 0, AM.images.startpig.cw, AM.images.startpig.ch, pigx, pigy, pigw, pigh);
-    ctx.drawImage(AM.images.beginbutton.img, 0, 0, AM.images.beginbutton.cw, AM.images.beginbutton.ch, startPage.beginbutton.x, startPage.beginbutton.y, startPage.beginbutton.w, startPage.beginbutton.h);
+    // ctx.drawImage(AM.images.startpig.img, 0, 0, AM.images.startpig.cw, AM.images.startpig.ch, pigx, y, pigw, pigh);
+    // ctx.drawImage(AM.images.beginbutton.img, 0, 0, AM.images.beginbutton.cw, AM.images.beginbutton.ch, startPage.beginbutton.x, startPage.beginbutton.y, startPage.beginbutton.w, startPage.beginbutton.h);
 
     if (delta < 1) {
         // startScreenTimerAnimT += 15 * delta;
-        startScreenHandAnimT += 10 * delta;
+        startScreenHandAnimT += 7 * delta;
     }
 }
 
@@ -1550,8 +1635,8 @@ function gameCycle() {
             drawMoney();
             drawBall();
 
-            if (onMobile)
-                joystick.draw(ctx);
+            // if (onMobile)
+            joystick.draw(ctx);
 
             update();
         } else {
@@ -1560,7 +1645,7 @@ function gameCycle() {
             // ctx.beginPath();
             // ctx.rect(btnBegin.x, btnBegin.y, btnBegin.w, btnBegin.h);
             // ctx.stroke();
-            ctx.drawImage(AM.images.startrect.img, 0, 0, AM.images.startrect.cw, AM.images.startrect.ch, 0, 0, canvas.width, canvas.height);
+            // ctx.drawImage(AM.images.startrect.img, 0, 0, AM.images.startrect.cw, AM.images.startrect.ch, 0, 0, canvas.width, canvas.height);
 
             startPageAnimations();
         }
@@ -1589,7 +1674,7 @@ function gameCycle() {
             
             // HUD.draw(ctx);
             
-            HUD.gameover(ctx);
+            HUD.gameover(ctx, splashInfo, delta);
         }
         
     }

@@ -1,8 +1,38 @@
 // asset manager
 var AM = null;
+const isPremium = 1;
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioContext = new AudioContext();
+
+const tabletResolutions = [
+    { w: 1366, h: 1024 },
+    { w: 1280, h: 800 },
+    { w: 1024, h: 600 },
+    { w: 1024, h: 768 },
+    { w: 1024, h: 768 },
+    { w: 2048, h: 1536 },
+    { w: 2048, h: 1536 },
+    { w: 2048, h: 1536 },
+    { w: 1024, h: 768 },
+    { w: 2048, h: 1536 },
+    { w: 2048, h: 1536 },
+    { w: 2048, h: 1536 },
+    { w: 2732, h: 2048 },
+    { w: 2048, h: 1536 },
+    { w: 1280, h: 800 },
+    { w: 1280, h: 800 },
+    { w: 1024, h: 600 },
+    { w: 1024, h: 600 },
+    { w: 800, h: 480 },
+    { w: 768, h: 1024 },
+    { w: 1024, h: 600 },
+    { w: 1024, h: 600 },
+    { w: 1280, h: 800 },
+    { w: 768, h: 1280 },
+    { w: 1280, h: 800 },
+    { w: 1280, h: 800 }
+];
 
 function parseAssets(path, callback) {
     fetch(path)
@@ -17,6 +47,27 @@ function parseAssets(path, callback) {
         .catch(function (err) {
             console.log('error: ' + err);
         });
+}
+
+function gcd(a, b) {
+    if (b) {
+        return gcd(b, a % b);
+    } else {
+        return Math.abs(a);
+    }
+  }
+
+function isTablet() {
+    let w = document.documentElement.clientWidth;
+    let h = document.documentElement.clientHeight;
+
+    if (isMobile()) {
+        if (w >= 1024 || h >= 1024) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 function isMobile() {
@@ -67,6 +118,7 @@ function rescaleSize(obj, scaleX, scaleY) {
     obj.w *= scaleX;
     obj.h *= scaleY;
 }
+
 function rescalePos(obj, scaleX, scaleY) {
     obj.x *= scaleX;
     obj.y *= scaleY;

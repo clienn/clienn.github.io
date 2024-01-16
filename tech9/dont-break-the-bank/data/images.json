@@ -1,13 +1,124 @@
 {
     "data": [
         {
-            "id": "bg",
-            "src": "bg3",
+            "id": "intro",
+            "src": "intro",
             "ext": "png",
-            "cw": 952,
-            "ch": 429
+            "cw": 1864,
+            "ch": 861
         },
-        
+        {
+            "id": "bg",
+            "src": "bg",
+            "ext": "png",
+            "cw": 1864,
+            "ch": 861
+        },
+        {
+            "id": "splash_coin",
+            "src": "splash/coin",
+            "ext": "png",
+            "cw": 48,
+            "ch": 48
+        },
+        {
+            "id": "splash_pig",
+            "src": "splash/pig",
+            "ext": "png",
+            "cw": 64,
+            "ch": 48
+        },
+        {
+            "id": "splash_hammer_marble",
+            "src": "splash/hammer_marble",
+            "ext": "png",
+            "cw": 48,
+            "ch": 48
+        },
+        {
+            "id": "endscreen",
+            "src": "hud/endscreen",
+            "ext": "png",
+            "cw": 1864,
+            "ch": 861
+        },
+        {
+            "id": "endscreen_buttons",
+            "src": "hud/endscreen_buttons",
+            "ext": "png",
+            "cw": 428,
+            "ch": 329
+        },
+        {
+            "id": "premium_endscreen_buttons",
+            "src": "hud/premium_endscreen_buttons",
+            "ext": "png",
+            "cw": 379,
+            "ch": 213
+        },
+        {
+            "id": "intersect",
+            "src": "hud/intersect",
+            "ext": "png",
+            "cw": 287,
+            "ch": 289
+        },
+        {
+            "id": "watch",
+            "src": "hud/watch",
+            "ext": "png",
+            "cw": 45,
+            "ch": 53
+        },
+        {
+            "id": "progressbar",
+            "src": "hud/progress_bar",
+            "ext": "png",
+            "cw": 101,
+            "ch": 21
+        },
+        {
+            "id": "timeprogress",
+            "src": "hud/timeprogress",
+            "ext": "png",
+            "cw": 97,
+            "ch": 17
+        },
+        {
+            "id": "score_rect",
+            "src": "hud/score_rect",
+            "ext": "png",
+            "cw": 176,
+            "ch": 46
+        },
+        {
+            "id": "endscore",
+            "src": "hud/numbers/endscore",
+            "ext": "png",
+            "cw": 80,
+            "ch": 80
+        },
+        {
+            "id": "numbers_white",
+            "src": "hud/numbers/white",
+            "ext": "png",
+            "cw": 48,
+            "ch": 48
+        },
+        {
+            "id": "numbers_black",
+            "src": "hud/numbers/black",
+            "ext": "png",
+            "cw": 24,
+            "ch": 24
+        },
+        {
+            "id": "numbers_red",
+            "src": "hud/numbers/red",
+            "ext": "png",
+            "cw": 24,
+            "ch": 24
+        },
         {
             "id": "pig_1",
             "src": "pig/pig_1",
@@ -124,8 +235,8 @@
             "id": "money",
             "src": "money",
             "ext": "png",
-            "cw": 113,
-            "ch": 113
+            "cw": 128,
+            "ch": 129
         },
         {
             "id": "stopwatch",
@@ -152,22 +263,22 @@
             "id": "coin_1",
             "src": "coins/coin_1",
             "ext": "png",
-            "cw": 82,
-            "ch": 82
+            "cw": 80,
+            "ch": 80
         },
         {
             "id": "coin_2",
             "src": "coins/coin_2",
             "ext": "png",
-            "cw": 82,
-            "ch": 82
+            "cw": 80,
+            "ch": 80
         },
         {
             "id": "coin_3",
             "src": "coins/coin_3",
             "ext": "png",
-            "cw": 82,
-            "ch": 82
+            "cw": 80,
+            "ch": 80
         },
         {
             "id": "coin_4",
@@ -231,6 +342,13 @@
             "ext": "png",
             "cw": 175,
             "ch": 152
+        },
+        {
+            "id": "marbles",
+            "src": "balls/marbles",
+            "ext": "png",
+            "cw": "81.25",
+            "ch": 91
         },
         {
             "id": "ball_1",

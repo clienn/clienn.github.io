@@ -1,0 +1,487 @@
+{
+    "data": [
+        {
+            "id": "intro",
+            "src": "tab/intro",
+            "ext": "png",
+            "cw": 2732,
+            "ch": 2048
+        },
+        {
+            "id": "bg",
+            "src": "tab/bg",
+            "ext": "png",
+            "cw": 2732,
+            "ch": 2048
+        },
+        {
+            "id": "splash_coin",
+            "src": "splash/coin",
+            "ext": "png",
+            "cw": 48,
+            "ch": 48
+        },
+        {
+            "id": "splash_pig",
+            "src": "splash/pig",
+            "ext": "png",
+            "cw": 64,
+            "ch": 48
+        },
+        {
+            "id": "splash_hammer_marble",
+            "src": "splash/hammer_marble",
+            "ext": "png",
+            "cw": 48,
+            "ch": 48
+        },
+        {
+            "id": "endscreen",
+            "src": "hud/tab/endscreen",
+            "ext": "png",
+            "cw": 2732,
+            "ch": 2048
+        },
+        {
+            "id": "endscreen_buttons",
+            "src": "hud/endscreen_buttons",
+            "ext": "png",
+            "cw": 428,
+            "ch": 329
+        },
+        {
+            "id": "premium_endscreen_buttons",
+            "src": "hud/premium_endscreen_buttons",
+            "ext": "png",
+            "cw": 379,
+            "ch": 213
+        },
+        {
+            "id": "intersect",
+            "src": "hud/intersect",
+            "ext": "png",
+            "cw": 287,
+            "ch": 289
+        },
+        {
+            "id": "watch",
+            "src": "hud/watch",
+            "ext": "png",
+            "cw": 45,
+            "ch": 53
+        },
+        {
+            "id": "progressbar",
+            "src": "hud/progress_bar",
+            "ext": "png",
+            "cw": 101,
+            "ch": 21
+        },
+        {
+            "id": "timeprogress",
+            "src": "hud/timeprogress",
+            "ext": "png",
+            "cw": 97,
+            "ch": 17
+        },
+        {
+            "id": "score_rect",
+            "src": "hud/score_rect",
+            "ext": "png",
+            "cw": 176,
+            "ch": 46
+        },
+        {
+            "id": "endscore",
+            "src": "hud/numbers/endscore",
+            "ext": "png",
+            "cw": 80,
+            "ch": 80
+        },
+        {
+            "id": "numbers_white",
+            "src": "hud/numbers/white",
+            "ext": "png",
+            "cw": 48,
+            "ch": 48
+        },
+        {
+            "id": "numbers_black",
+            "src": "hud/numbers/black",
+            "ext": "png",
+            "cw": 24,
+            "ch": 24
+        },
+        {
+            "id": "numbers_red",
+            "src": "hud/numbers/red",
+            "ext": "png",
+            "cw": 24,
+            "ch": 24
+        },
+        {
+            "id": "pig_1",
+            "src": "pig/pig_1",
+            "ext": "png",
+            "cw": 191,
+            "ch": 142
+        },
+        {
+            "id": "pig_2",
+            "src": "pig/pig_2",
+            "ext": "png",
+            "cw": 191,
+            "ch": 142
+        },
+        {
+            "id": "pig_3",
+            "src": "pig/pig_3",
+            "ext": "png",
+            "cw": 192,
+            "ch": 142
+        },
+        {
+            "id": "pig_4",
+            "src": "pig/pig_4",
+            "ext": "png",
+            "cw": 191,
+            "ch": 142
+        },
+        {
+            "id": "pig_5",
+            "src": "pig/pig_5",
+            "ext": "png",
+            "cw": 191,
+            "ch": 142
+        },
+        {
+            "id": "pigbreak_0",
+            "src": "pig/break/0",
+            "ext": "png",
+            "cw": 454,
+            "ch": 321
+        },
+        {
+            "id": "pigbreak_1",
+            "src": "pig/break/1",
+            "ext": "png",
+            "cw": 454,
+            "ch": 321
+        },
+        {
+            "id": "pigbreak_2",
+            "src": "pig/break/2",
+            "ext": "png",
+            "cw": 454,
+            "ch": 321
+        },
+        {
+            "id": "pigbreak_3",
+            "src": "pig/break/3",
+            "ext": "png",
+            "cw": 454,
+            "ch": 321
+        },
+        {
+            "id": "pigbreak_4",
+            "src": "pig/break/4",
+            "ext": "png",
+            "cw": 513,
+            "ch": 417
+        },
+        {
+            "id": "smoke",
+            "src": "pig/break/smoke",
+            "ext": "png",
+            "cw": 576,
+            "ch": 577
+        },
+        {
+            "id": "break",
+            "src": "pig/break/break",
+            "ext": "png",
+            "cw": 192,
+            "ch": 145
+        },
+        {
+            "id": "piggybankbroke",
+            "src": "piggybankbroke",
+            "ext": "png",
+            "cw": 513,
+            "ch": 362
+        },
+        {
+            "id": "pigscore",
+            "src": "pigscore",
+            "ext": "png",
+            "cw": 128,
+            "ch": 104
+        },
+        {
+            "id": "shine",
+            "src": "shine",
+            "ext": "png",
+            "cw": 352,
+            "ch": 290
+        },
+        {
+            "id": "life",
+            "src": "life",
+            "ext": "png",
+            "cw": 48,
+            "ch": 48
+        },
+        {
+            "id": "money",
+            "src": "money",
+            "ext": "png",
+            "cw": 128,
+            "ch": 129
+        },
+        {
+            "id": "stopwatch",
+            "src": "hud/stopwatch",
+            "ext": "png",
+            "cw": 43,
+            "ch": 45
+        },
+        {
+            "id": "timecircle",
+            "src": "hud/timecircle",
+            "ext": "png",
+            "cw": 45,
+            "ch": 45
+        },
+        {
+            "id": "coin_0",
+            "src": "coins/coin_0",
+            "ext": "png",
+            "cw": 39,
+            "ch": 41
+        },
+        {
+            "id": "coin_1",
+            "src": "coins/coin_1",
+            "ext": "png",
+            "cw": 80,
+            "ch": 80
+        },
+        {
+            "id": "coin_2",
+            "src": "coins/coin_2",
+            "ext": "png",
+            "cw": 80,
+            "ch": 80
+        },
+        {
+            "id": "coin_3",
+            "src": "coins/coin_3",
+            "ext": "png",
+            "cw": 80,
+            "ch": 80
+        },
+        {
+            "id": "coin_4",
+            "src": "coins/coin_4",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        },
+        {
+            "id": "coin_5",
+            "src": "coins/coin_5",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        },
+        {
+            "id": "coin_6",
+            "src": "coins/coin_6",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        },
+        {
+            "id": "glue_0",
+            "src": "glue_0",
+            "ext": "png",
+            "cw": 80,
+            "ch": 83
+        },
+        {
+            "id": "glue_1",
+            "src": "glue_1",
+            "ext": "png",
+            "cw": 73,
+            "ch": 73
+        },
+        {
+            "id": "glue_2",
+            "src": "glue_2",
+            "ext": "png",
+            "cw": 73,
+            "ch": 73
+        },
+        {
+            "id": "hammer",
+            "src": "hammer2",
+            "ext": "png",
+            "cw": 1887,
+            "ch": 3764
+        },
+        {
+            "id": "kaboom",
+            "src": "kaboom",
+            "ext": "png",
+            "cw": 108,
+            "ch": 28
+        },
+        {
+            "id": "kaboomstar",
+            "src": "kaboomstar",
+            "ext": "png",
+            "cw": 175,
+            "ch": 152
+        },
+        {
+            "id": "marbles",
+            "src": "balls/marbles",
+            "ext": "png",
+            "cw": "81.25",
+            "ch": 91
+        },
+        {
+            "id": "ball_1",
+            "src": "balls/1",
+            "ext": "png",
+            "cw": 293,
+            "ch": 293
+        },
+        {
+            "id": "ball_2",
+            "src": "balls/2",
+            "ext": "png",
+            "cw": 293,
+            "ch": 293
+        },
+        {
+            "id": "ball_3",
+            "src": "balls/3",
+            "ext": "png",
+            "cw": 293,
+            "ch": 293
+        },
+        {
+            "id": "ball_4",
+            "src": "balls/4",
+            "ext": "png",
+            "cw": 293,
+            "ch": 293
+        },
+        {
+            "id": "ball_5",
+            "src": "balls/5",
+            "ext": "png",
+            "cw": 293,
+            "ch": 293
+        },
+        {
+            "id": "startrect",
+            "src": "startrect",
+            "ext": "png",
+            "cw": 927,
+            "ch": 429
+        },
+        {
+            "id": "title",
+            "src": "title",
+            "ext": "png",
+            "cw": 255,
+            "ch": 89
+        },
+        {
+            "id": "text1",
+            "src": "text1",
+            "ext": "png",
+            "cw": 108,
+            "ch": 29
+        },
+        {
+            "id": "text2",
+            "src": "text2",
+            "ext": "png",
+            "cw": 124,
+            "ch": 25
+        },
+        {
+            "id": "text3",
+            "src": "text3",
+            "ext": "png",
+            "cw": 121,
+            "ch": 27
+        },
+        {
+            "id": "text4",
+            "src": "text4",
+            "ext": "png",
+            "cw": 127,
+            "ch": 40
+        },
+        {
+            "id": "hand",
+            "src": "hand",
+            "ext": "png",
+            "cw": 57,
+            "ch": 57
+        },
+        {
+            "id": "startcoin",
+            "src": "startcoin",
+            "ext": "png",
+            "cw": 57,
+            "ch": 57
+        },
+        {
+            "id": "starthammer",
+            "src": "starthammer",
+            "ext": "png",
+            "cw": 80,
+            "ch": 80
+        },
+        {
+            "id": "startball",
+            "src": "startball",
+            "ext": "png",
+            "cw": 45,
+            "ch": 45
+        },
+        {
+            "id": "startpig",
+            "src": "startpig",
+            "ext": "png",
+            "cw": 67,
+            "ch": 57
+        },
+        {
+            "id": "beginbutton",
+            "src": "beginbutton",
+            "ext": "png",
+            "cw": 213,
+            "ch": 49
+        },
+        {
+            "id": "volume",
+            "src": "volume",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        },
+        {
+            "id": "mute",
+            "src": "mute",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        }
+    ]
+}

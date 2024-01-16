@@ -15,6 +15,20 @@
             "ch": 861
         },
         {
+            "id": "endscreen_buttons",
+            "src": "hud/endscreen_buttons",
+            "ext": "png",
+            "cw": 428,
+            "ch": 329
+        },
+        {
+            "id": "premium_endscreen_buttons",
+            "src": "hud/premium_endscreen_buttons",
+            "ext": "png",
+            "cw": 379,
+            "ch": 213
+        },
+        {
             "id": "duck_anim",
             "src": "splash/duck_anim",
             "ext": "png",
@@ -211,18 +225,25 @@
             "ch": 77
         },
         {
+            "id": "plank3",
+            "src": "environment/planks/3",
+            "ext": "png",
+            "cw": 797,
+            "ch": 212
+        },
+        {
             "id": "plank1",
             "src": "environment/planks/1",
             "ext": "png",
-            "cw": 242,
-            "ch": 83
+            "cw": 239,
+            "ch": 59
         },
         {
             "id": "plank2",
             "src": "environment/planks/2",
             "ext": "png",
-            "cw": 797,
-            "ch": 212
+            "cw": 239,
+            "ch": 59
         },
         {
             "id": "lily1",
@@ -272,6 +293,13 @@
             "ext": "png",
             "cw": 45,
             "ch": 45
+        },
+        {
+            "id": "intersect",
+            "src": "hud/intersect",
+            "ext": "png",
+            "cw": 287,
+            "ch": 289
         },
         {
             "id": "volume",

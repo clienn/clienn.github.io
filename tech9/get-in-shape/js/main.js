@@ -39,7 +39,7 @@ var portal = {
         portal.w *= scaleX;
         portal.h *= scaleX;
         portal.gridDimX = portal.gridDim * scaleX;
-        portal.gridDimY = portal.gridDim * scaleY;
+        portal.gridDimY = portal.gridDim * scaleX;
         
         shuffleArr(portal.rng);
         portal.sx = (portal.w) / 2 - (portal.gridDimX * 3) / 2;
@@ -275,6 +275,24 @@ var startPageInfo = {
     
 }
 
+const splashInfo = {
+    x: 0,
+    y: 0,
+    w: 1864,
+    h: 861,
+    sx: 1,
+    sy: 1,
+};
+
+var startButtonInfo = {
+    x: 0,
+    y: 0,
+    w: 192 * 2,
+    h: 60 * 2,
+}
+
+const onTablet = isTablet();
+const onMobile = isMobile();
 
 
 function main(w, h) {
@@ -286,6 +304,32 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    if (onTablet) {
+        splashInfo.w = AM.images.intro.cw;
+        splashInfo.h = AM.images.intro.ch;
+    }
+
+    splashInfo.sx = w / splashInfo.w;
+    splashInfo.sy = h / splashInfo.h;
+    splashInfo.w *= splashInfo.sx;
+    splashInfo.h *= splashInfo.sx;
+
+    splashInfo.x = w / 2 - splashInfo.w / 2;
+    splashInfo.y = Math.abs(h / 2 - splashInfo.h / 2);
+
+    if (onMobile && !onTablet) {
+        splashInfo.y = 0;
+    }
+
+    rescaleSize(startButtonInfo, scaleX, scaleX);
+    startButtonInfo.x = w / 2 - startButtonInfo.w / 2;
+    if (onTablet) {
+        startButtonInfo.y = splashInfo.y + splashInfo.h - 730 * splashInfo.sx;
+
+    } else {
+        startButtonInfo.y = splashInfo.y + splashInfo.h - 230 * splashInfo.sx;
+    }
 
     initStartPage(2);
 
@@ -312,7 +356,7 @@ function main(w, h) {
     TXT.addText('text3_1', 'Watch out for shifting', 'bold', 20, 'Montserrat', x, y, 220, 30, '#fff', false); 
     TXT.addText('text3_2', 'shapes!', 'bold', 20, 'Montserrat', x + center, y + 30 * scaleY, 70, 30, '#fff', false); 
 
-    HUD = new Template_1(ctx, w, h, scaleX, scaleY);
+    HUD = new Template_1(ctx, w, h, scaleX, scaleY, splashInfo);
 
     timer = new Timer(0, 0, 0, '#fff');
     timer.setTimer(gameDuration);
@@ -321,10 +365,10 @@ function main(w, h) {
     textPos.y = 50;
 
     containerRectDimX *= scaleX;
-    containerRectDimY *= scaleY;
+    containerRectDimY *= scaleX;
     
     containerShapeW *= scaleX;
-    containerShapeH *= scaleY;
+    containerShapeH *= scaleX;
 
     
 
@@ -378,7 +422,7 @@ function main(w, h) {
     // console.log(shapes[0].x, shapes[0].y)
 
     shapeDimX *= scaleX;
-    shapeDimY *= scaleY;
+    shapeDimY *= scaleX;
 
     // for (let i = 0; i < 8; ++i) {
     //     // let rng = Math.floor(Math.random() * 5);
@@ -393,7 +437,7 @@ function main(w, h) {
         // let rng = Math.floor(Math.random() * 5);
         let pos = portal.getPos(i);
         let id = 'shapes';
-        let shape = new Sprite(pos.x, pos.y, AM.images[id].cw * scaleX, AM.images[id].ch * scaleY, AM.images[id].cw, AM.images[id].ch);
+        let shape = new Sprite(pos.x, pos.y, AM.images[id].cw * scaleX, AM.images[id].ch * scaleX, AM.images[id].cw, AM.images[id].ch);
         shape.id = id;
         shape.key = i;
         shapes.push(shape);
@@ -628,12 +672,13 @@ function mouseupE() {
             // AM.audio.bg.img.volume = 0.2;
             // AM.audio.bg.img.loop = true;
             // AM.audio.bg.img.play();
-    
-            gameStart = true;
+            if (isBtnClicked(mouseX, mouseY, startButtonInfo)) {
+                gameStart = true;
 
-            AM.audio.bg.img.volume = 0.05;
-            AM.audio.bg.img.loop = true;
-            AM.audio.bg.img.play();
+                AM.audio.bg.img.volume = 0.05;
+                AM.audio.bg.img.loop = true;
+                AM.audio.bg.img.play();
+            }
         } else if (isDraggable) {
             
             let id = shapesContainer[hoveredContainerID];
@@ -645,7 +690,8 @@ function mouseupE() {
                 // score += 10 * portal.duration + portal.bonus;
                 score += Math.max(1, 1 + portal.bonus);
                 let scoreFormat = zeroPad(Math.floor(score), 2);
-                HUD.txt.texts['score'].str = scoreFormat;
+                // HUD.txt.texts['score'].str = scoreFormat;
+                HUD.updateScoreSprite(scoreFormat);
                 // HUD.txt.texts['total'].str = scoreFormat;
 
                 TXT.texts['points'].color = '#4ED20E';
@@ -670,7 +716,8 @@ function mouseupE() {
                     score = score < 0 ? 0 : score;
 
                     let scoreFormat = zeroPad(Math.floor(score), 2);
-                    HUD.txt.texts['score'].str = scoreFormat;
+                    // HUD.txt.texts['score'].str = scoreFormat;
+                    HUD.updateScoreSprite(scoreFormat);
                     // HUD.txt.texts['total'].str = scoreFormat;
 
                     TXT.texts['points'].color = '#fb2121';
@@ -871,49 +918,76 @@ function update() {
         if (timer.timer <= 0) {
             if (dragID == -1) {
                 gameover = true;
-                HUD.updateFinalScore(score);
+                // HUD.updateFinalScore(score);
+                HUD.updateGameoverScore(splashInfo, zeroPad(Math.floor(score), 2));
             }
         } else {
-            HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24) / gameDuration * 100);
+            // HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24) / gameDuration * 100);
+            HUD.updateTimerSprite(zeroPad(Math.floor(timer.timer / 24), 2), gameDuration);
             timer.tick(delta);
         }
     }
 }
 
+function animateFrame(t, frames) {
+    let frame = Math.floor(t) % frames;
+    return frame;
+}
+
 function drawStartPage() {
-    ctx.drawImage(AM.images.bg.img, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 0, 0, canvas.width, canvas.height);
-    // ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
-    ctx.drawImage(AM.images.title.img, 0, 0, AM.images.title.cw, AM.images.title.ch, 
-        startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
+    // ctx.drawImage(AM.images.bg.img, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, splashInfo.x, splashInfo.y, splashInfo.w, splashInfo.h);
+    // ctx.drawImage(AM.images.title.img, 0, 0, AM.images.title.cw, AM.images.title.ch, 
+    //     startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
     
+    let frame = animateFrame(startPageInfo.t * 0.5, 15);
+    let x = 392 * scaleX;
+    let hy = onTablet ? 840 : 300;
+    let y = splashInfo.y + hy * splashInfo.sx;
+    // let y = splashInfo.y + 300 * splashInfo.sx;
+    let w = AM.images.score_anim.cw * 2 * scaleX;
+    let h = AM.images.score_anim.ch * 2 * scaleX;
+    ctx.drawImage(AM.images.score_anim.img, frame * AM.images.score_anim.cw, 0, AM.images.score_anim.cw, AM.images.score_anim.ch, x, y, w, h);
+
+    frame = animateFrame(startPageInfo.t * 0.5, 13);
+    x = 850 * scaleX;
+    w = AM.images.portal_anim.cw * 2 * scaleX;
+    h = AM.images.portal_anim.ch * 2 * scaleX;
+    ctx.drawImage(AM.images.portal_anim.img, frame * AM.images.portal_anim.cw, 0, AM.images.portal_anim.cw, AM.images.portal_anim.ch, x, y, w, h);
+
+    frame = animateFrame(startPageInfo.t * 0.15, 12);
+    x = 1298 * scaleX;
+    w = AM.images.shape_anim.cw * 2 * scaleX;
+    h = AM.images.shape_anim.ch * 2 * scaleX;
+    ctx.drawImage(AM.images.shape_anim.img, frame * AM.images.shape_anim.cw, 0, AM.images.shape_anim.cw, AM.images.shape_anim.ch, x, y, w, h);
     
-    let a = Math.sin(startPageInfo.t2) * 20 * scaleX;
-    let b = a / 2;
+    // let a = Math.sin(startPageInfo.t2) * 20 * scaleX;
+    // let b = a / 2;
 
-    ctx.drawImage(AM.images.img1.img, 0, 0, AM.images.img1.cw, AM.images.img1.ch, 
-        startPageInfo.img1.x - b, startPageInfo.img1.y - b, startPageInfo.img1.w + a, startPageInfo.img1.h + a);
+    // ctx.drawImage(AM.images.img1.img, 0, 0, AM.images.img1.cw, AM.images.img1.ch, 
+    //     startPageInfo.img1.x - b, startPageInfo.img1.y - b, startPageInfo.img1.w + a, startPageInfo.img1.h + a);
 
-    ctx.drawImage(AM.images.img2.img, 0, 0, AM.images.img2.cw, AM.images.img2.ch, 
-        startPageInfo.img2.x, startPageInfo.img2.y, startPageInfo.img2.w, startPageInfo.img2.h);
+    // ctx.drawImage(AM.images.img2.img, 0, 0, AM.images.img2.cw, AM.images.img2.ch, 
+    //     startPageInfo.img2.x, startPageInfo.img2.y, startPageInfo.img2.w, startPageInfo.img2.h);
 
-    ctx.save();
-    // Untransformed draw position
-    const position = {x: startPageInfo.img3.x, y: startPageInfo.img3.y};
-    // In degrees
-    const rotation = { x: 0, y: 0, z: Math.sin(startPageInfo.t2) * 180};
-    // Rotation relative to here (this is the center of the image)
-    const rotPt = { x: startPageInfo.img3.w / 2, y: startPageInfo.img3.h / 2 };
+    // ctx.save();
+    // // Untransformed draw position
+    // const position = {x: startPageInfo.img3.x, y: startPageInfo.img3.y};
+    // // In degrees
+    // const rotation = { x: 0, y: 0, z: Math.sin(startPageInfo.t2) * 180};
+    // // Rotation relative to here (this is the center of the image)
+    // const rotPt = { x: startPageInfo.img3.w / 2, y: startPageInfo.img3.h / 2 };
 
-    ctx.setTransform(new DOMMatrix()
-        .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
-        .rotateSelf(rotation.x, rotation.y, rotation.z)
-    );
+    // ctx.setTransform(new DOMMatrix()
+    //     .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+    //     .rotateSelf(rotation.x, rotation.y, rotation.z)
+    // );
     
     // ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
     // ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, -rotPt.x, -rotPt.y, garbageInfo[id].w, garbageInfo[id].h);
-    ctx.drawImage(AM.images.img3.img, 0, 0, AM.images.img3.cw, AM.images.img3.ch, 
-        -rotPt.x, -rotPt.y, startPageInfo.img3.w, startPageInfo.img3.h);
-    ctx.restore();
+    // ctx.drawImage(AM.images.img3.img, 0, 0, AM.images.img3.cw, AM.images.img3.ch, 
+    //     -rotPt.x, -rotPt.y, startPageInfo.img3.w, startPageInfo.img3.h);
+    // ctx.restore();
 
     // for (let i = 1; i < 4; ++i) {
     //     let key = 'text' + i;
@@ -921,41 +995,46 @@ function drawStartPage() {
     //         startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
     // }
 
-    TXT.draw('text1_1');
-    TXT.draw('text1_2');
+    // TXT.draw('text1_1');
+    // TXT.draw('text1_2');
 
-    TXT.draw('text2_1');
-    TXT.draw('text2_2');
+    // TXT.draw('text2_1');
+    // TXT.draw('text2_2');
 
-    TXT.draw('text3_1');
-    TXT.draw('text3_2');
+    // TXT.draw('text3_1');
+    // TXT.draw('text3_2');
 
-    ctx.beginPath();
-    ctx.fillStyle = '#11A5CC';
-    ctx.ellipse(startPageInfo.img2.tx, startPageInfo.img2.ty, startPageInfo.img2.tw, startPageInfo.img2.th, 0, 0, 2 * Math.PI);
+    // ctx.beginPath();
+    // ctx.fillStyle = '#11A5CC';
+    // ctx.ellipse(startPageInfo.img2.tx, startPageInfo.img2.ty, startPageInfo.img2.tw, startPageInfo.img2.th, 0, 0, 2 * Math.PI);
     
+
     ctx.fill();
     if (delta < 1) {
-        startPageInfo.t += 15 * delta;
-        var radians = Math.PI / 180 * startPageInfo.t;
+        startPageInfo.t += 10 * delta;
+        // var radians = Math.PI / 180 * startPageInfo.t;
 
-        ctx.save();
-        ctx.globalAlpha = 0.95;
-        ctx.beginPath();
-        ctx.moveTo(startPageInfo.img2.tx, startPageInfo.img2.ty);
-        ctx.fillStyle = '#fff';
-        ctx.ellipse(startPageInfo.img2.tx, startPageInfo.img2.ty, startPageInfo.img2.tw, startPageInfo.img2.th, 0, radians, Math.PI + Math.PI / 2);
-        ctx.closePath();
+        // ctx.save();
+        // ctx.globalAlpha = 0.95;
+        // ctx.beginPath();
+        // ctx.moveTo(startPageInfo.img2.tx, startPageInfo.img2.ty);
+        // ctx.fillStyle = '#fff';
+        // ctx.ellipse(startPageInfo.img2.tx, startPageInfo.img2.ty, startPageInfo.img2.tw, startPageInfo.img2.th, 0, radians, Math.PI + Math.PI / 2);
+        // ctx.closePath();
         
-        ctx.fill();
-        ctx.restore();
+        // ctx.fill();
+        // ctx.restore();
 
         startPageInfo.t += 10 * delta;
-        startPageInfo.t2 += 1 * delta;
+        // startPageInfo.t2 += 1 * delta;
     }
 
-    ctx.drawImage(AM.images.start.img, 0, 0, AM.images.start.cw, AM.images.start.ch, 
-        startPageInfo.start.x, startPageInfo.start.y, startPageInfo.start.w, startPageInfo.start.h);
+    // ctx.beginPath();
+    // ctx.rect(startButtonInfo.x, startButtonInfo.y, startButtonInfo.w, startButtonInfo.h);
+    // ctx.stroke();
+
+    // ctx.drawImage(AM.images.start.img, 0, 0, AM.images.start.cw, AM.images.start.ch, 
+    //     startPageInfo.start.x, startPageInfo.start.y, startPageInfo.start.w, startPageInfo.start.h);
 }
 
 function gameCycle() {
@@ -1020,7 +1099,7 @@ function gameCycle() {
     } else {
         // HUD.draw(ctx);
         
-        HUD.gameover(ctx);
+        HUD.gameover(ctx, splashInfo, delta);
     }
 
     requestAnimationFrame(gameCycle);

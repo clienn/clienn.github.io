@@ -1,0 +1,361 @@
+{
+    "data": [
+        {
+            "id": "bg",
+            "src": "tab/bg",
+            "ext": "png",
+            "cw": 2732,
+            "ch": 2048
+        },
+        {
+            "id": "intro",
+            "src": "tab/intro",
+            "ext": "png",
+            "cw": 2732,
+            "ch": 2048
+        },
+        {
+            "id": "endscreen",
+            "src": "huds/tab/endscreen",
+            "ext": "png",
+            "cw": 2732,
+            "ch": 2048
+        },
+        {
+            "id": "endscreen_buttons",
+            "src": "huds/endscreen_buttons",
+            "ext": "png",
+            "cw": 428,
+            "ch": 329
+        },
+        {
+            "id": "premium_endscreen_buttons",
+            "src": "huds/premium_endscreen_buttons",
+            "ext": "png",
+            "cw": 379,
+            "ch": 213
+        },
+        {
+            "id": "intersect",
+            "src": "huds/intersect",
+            "ext": "png",
+            "cw": 287,
+            "ch": 289
+        },
+        {
+            "id": "watch",
+            "src": "huds/watch",
+            "ext": "png",
+            "cw": 45,
+            "ch": 53
+        },
+        {
+            "id": "progressbar",
+            "src": "huds/progress_bar",
+            "ext": "png",
+            "cw": 101,
+            "ch": 21
+        },
+        {
+            "id": "timeprogress",
+            "src": "huds/timeprogress",
+            "ext": "png",
+            "cw": 97,
+            "ch": 17
+        },
+        {
+            "id": "score_rect",
+            "src": "huds/score_rect",
+            "ext": "png",
+            "cw": 128,
+            "ch": 46
+        },
+        {
+            "id": "endscore",
+            "src": "huds/numbers/endscore",
+            "ext": "png",
+            "cw": 80,
+            "ch": 80
+        },
+        {
+            "id": "numbers_white",
+            "src": "huds/numbers/white",
+            "ext": "png",
+            "cw": 24,
+            "ch": 25
+        },
+        {
+            "id": "numbers_black",
+            "src": "huds/numbers/black",
+            "ext": "png",
+            "cw": 24,
+            "ch": 24
+        },
+        {
+            "id": "numbers_red",
+            "src": "huds/numbers/red",
+            "ext": "png",
+            "cw": 24,
+            "ch": 24
+        },
+        {
+            "id": "score_anim",
+            "src": "score_anim",
+            "ext": "png",
+            "cw": "50.34",
+            "ch": 48
+        },
+        {
+            "id": "portal_anim",
+            "src": "portal_anim",
+            "ext": "png",
+            "cw": 48,
+            "ch": 48
+        },
+        {
+            "id": "shape_anim",
+            "src": "shape_anim",
+            "ext": "png",
+            "cw": 48,
+            "ch": 48
+        },
+        {
+            "id": "title",
+            "src": "huds/startpage/title",
+            "ext": "png",
+            "cw": 410,
+            "ch": 30
+        },
+        {
+            "id": "start",
+            "src": "huds/startpage/start",
+            "ext": "png",
+            "cw": 212,
+            "ch": 48
+        },
+        {
+            "id": "img1",
+            "src": "huds/startpage/img1",
+            "ext": "png",
+            "cw": 66,
+            "ch": 64
+        },
+        {
+            "id": "img2",
+            "src": "huds/startpage/img2",
+            "ext": "png",
+            "cw": 64,
+            "ch": 64
+        },
+        {
+            "id": "img3",
+            "src": "huds/startpage/img3",
+            "ext": "png",
+            "cw": 64,
+            "ch": 64
+        },
+        {
+            "id": "text1",
+            "src": "huds/startpage/text1",
+            "ext": "png",
+            "cw": 152,
+            "ch": 28
+        },
+        {
+            "id": "text2",
+            "src": "huds/startpage/text2",
+            "ext": "png",
+            "cw": 146,
+            "ch": 25
+        },
+        {
+            "id": "text3",
+            "src": "huds/startpage/text3",
+            "ext": "png",
+            "cw": 122,
+            "ch": 28
+        },
+        {
+            "id": "portal",
+            "src": "rings",
+            "ext": "png",
+            "cw": 401,
+            "ch": 401
+        },
+        {
+            "id": "shapes",
+            "src": "shapes/shapes_sprite",
+            "ext": "png",
+            "cw": "80.091",
+            "ch": 81
+        },
+        {
+            "id": "container_1",
+            "src": "shapes/container_1",
+            "ext": "png",
+            "cw": 48,
+            "ch": 48
+        },
+        {
+            "id": "container_2",
+            "src": "shapes/container_2",
+            "ext": "png",
+            "cw": 58,
+            "ch": 22
+        },
+        {
+            "id": "container_3",
+            "src": "shapes/container_3",
+            "ext": "png",
+            "cw": 61,
+            "ch": 58
+        },
+        {
+            "id": "container_4",
+            "src": "shapes/container_4",
+            "ext": "png",
+            "cw": 44,
+            "ch": 48
+        },
+        {
+            "id": "container_5",
+            "src": "shapes/container_5",
+            "ext": "png",
+            "cw": 52,
+            "ch": 52
+        },
+        {
+            "id": "container_6",
+            "src": "shapes/container_6",
+            "ext": "png",
+            "cw": 42,
+            "ch": 59
+        },
+        {
+            "id": "container_7",
+            "src": "shapes/container_7",
+            "ext": "png",
+            "cw": 52,
+            "ch": 49
+        },
+        {
+            "id": "container_8",
+            "src": "shapes/container_8",
+            "ext": "png",
+            "cw": 42,
+            "ch": 53
+        },
+        {
+            "id": "shape_1",
+            "src": "shapes/shape_1",
+            "ext": "png",
+            "cw": 45,
+            "ch": 45
+        },
+        {
+            "id": "shape_2",
+            "src": "shapes/shape_2",
+            "ext": "png",
+            "cw": 55,
+            "ch": 19
+        },
+        {
+            "id": "shape_3",
+            "src": "shapes/shape_3",
+            "ext": "png",
+            "cw": 51,
+            "ch": 49
+        },
+        {
+            "id": "shape_4",
+            "src": "shapes/shape_4",
+            "ext": "png",
+            "cw": 41,
+            "ch": 45
+        },
+        {
+            "id": "shape_5",
+            "src": "shapes/shape_5",
+            "ext": "png",
+            "cw": 49,
+            "ch": 49
+        },
+        {
+            "id": "shape_6",
+            "src": "shapes/shape_6",
+            "ext": "png",
+            "cw": 38,
+            "ch": 54
+        },
+        {
+            "id": "shape_7",
+            "src": "shapes/shape_7",
+            "ext": "png",
+            "cw": 49,
+            "ch": 45
+        },
+        {
+            "id": "shape_8",
+            "src": "shapes/shape_8",
+            "ext": "png",
+            "cw": 39,
+            "ch": 49
+        },
+        {
+            "id": "hourglass",
+            "src": "huds/hourglass",
+            "ext": "png",
+            "cw": 30,
+            "ch": 51
+        },
+        {
+            "id": "star",
+            "src": "huds/star",
+            "ext": "png",
+            "cw": 34,
+            "ch": 35
+        },
+        {
+            "id": "emptystar",
+            "src": "huds/emptystar",
+            "ext": "png",
+            "cw": 36,
+            "ch": 37
+        },
+        {
+            "id": "shine",
+            "src": "huds/shine",
+            "ext": "png",
+            "cw": 209,
+            "ch": 209
+        },
+        {
+            "id": "rays",
+            "src": "huds/rays",
+            "ext": "png",
+            "cw": 137,
+            "ch": 137
+        },
+        {
+            "id": "complete",
+            "src": "huds/complete",
+            "ext": "png",
+            "cw": 185,
+            "ch": 25
+        },
+        {
+            "id": "volume",
+            "src": "huds/volume",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        },
+        {
+            "id": "mute",
+            "src": "huds/mute",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        }
+    ]
+}

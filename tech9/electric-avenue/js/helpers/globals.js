@@ -1,6 +1,11 @@
 // asset manager
 var AM = null;
 
+const isPremium = 1;
+
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+const audioContext = new AudioContext();
+
 function parseAssets(path, callback) {
     fetch(path)
         .then(function (response) {
@@ -14,6 +19,19 @@ function parseAssets(path, callback) {
         .catch(function (err) {
             console.log('error: ' + err);
         });
+}
+
+function isTablet() {
+    let w = document.documentElement.clientWidth;
+    let h = document.documentElement.clientHeight;
+
+    if (isMobile()) {
+        if (w >= 1024 || h >= 1024) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 function isMobile() {
@@ -63,6 +81,11 @@ function isBtnClicked(mx, my, btn) {
 function rescaleSize(obj, scaleX, scaleY) {
     obj.w *= scaleX;
     obj.h *= scaleY;
+}
+
+function rescalePos(obj, scaleX, scaleY) {
+    obj.x *= scaleX;
+    obj.y *= scaleY;
 }
 
 function rescaleAll(obj, scaleX, scaleY) {

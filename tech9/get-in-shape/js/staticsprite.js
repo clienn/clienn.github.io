@@ -5,6 +5,11 @@ class StaticSprite {
         this.w = w;
         this.h = h;
 
+        this.ox = x;
+        this.oy = y;
+        this.ow = w;
+        this.oh = h;
+
         this.clipX = clipX;
         this.clipY = clipY;
         this.clipW = clipW;

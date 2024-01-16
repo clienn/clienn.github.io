@@ -1,0 +1,333 @@
+{
+    "data": [
+        {
+            "id": "intro",
+            "src": "splash/tab/intro",
+            "ext": "png",
+            "cw": 2732,
+            "ch": 2048
+        },
+        {
+            "id": "endscreen",
+            "src": "hud/tab/endscreen",
+            "ext": "png",
+            "cw": 2732,
+            "ch": 2048
+        },
+        {
+            "id": "endscreen_buttons",
+            "src": "hud/endscreen_buttons",
+            "ext": "png",
+            "cw": 428,
+            "ch": 329
+        },
+        {
+            "id": "premium_endscreen_buttons",
+            "src": "hud/premium_endscreen_buttons",
+            "ext": "png",
+            "cw": 379,
+            "ch": 213
+        },
+        {
+            "id": "duck_anim",
+            "src": "splash/duck_anim",
+            "ext": "png",
+            "cw": 56,
+            "ch": 48
+        },
+        {
+            "id": "log_anim",
+            "src": "splash/log_anim",
+            "ext": "png",
+            "cw": 64,
+            "ch": 64
+        },
+        {
+            "id": "bg",
+            "src": "environment/bg",
+            "ext": "png",
+            "cw": 927,
+            "ch": 428
+        },
+        {
+            "id": "watch",
+            "src": "hud/watch",
+            "ext": "png",
+            "cw": 45,
+            "ch": 53
+        },
+        {
+            "id": "progressbar",
+            "src": "hud/progress_bar",
+            "ext": "png",
+            "cw": 101,
+            "ch": 21
+        },
+        {
+            "id": "timeprogress",
+            "src": "hud/timeprogress",
+            "ext": "png",
+            "cw": 97,
+            "ch": 17
+        },
+        {
+            "id": "score_rect",
+            "src": "hud/score_rect",
+            "ext": "png",
+            "cw": 128,
+            "ch": 46
+        },
+        {
+            "id": "duckscore",
+            "src": "hud/duck",
+            "ext": "png",
+            "cw": 40,
+            "ch": 40
+        },
+        {
+            "id": "endscore",
+            "src": "hud/numbers/endscore",
+            "ext": "png",
+            "cw": 80,
+            "ch": 80
+        },
+        {
+            "id": "numbers_white",
+            "src": "hud/numbers/white",
+            "ext": "png",
+            "cw": 24,
+            "ch": 25
+        },
+        {
+            "id": "numbers_black",
+            "src": "hud/numbers/black",
+            "ext": "png",
+            "cw": 24,
+            "ch": 24
+        },
+        {
+            "id": "numbers_red",
+            "src": "hud/numbers/red",
+            "ext": "png",
+            "cw": 24,
+            "ch": 24
+        },
+        {
+            "id": "splash_duck",
+            "src": "splash/duck",
+            "ext": "png",
+            "cw": 76,
+            "ch": 65
+        },
+        {
+            "id": "splash_hourglass",
+            "src": "splash/hourglass",
+            "ext": "png",
+            "cw": 65,
+            "ch": 65
+        },
+        {
+            "id": "splash_rock",
+            "src": "splash/rock",
+            "ext": "png",
+            "cw": 65,
+            "ch": 65
+        },
+        {
+            "id": "text1",
+            "src": "splash/text1",
+            "ext": "png",
+            "cw": 157,
+            "ch": 27
+        },
+        {
+            "id": "text2",
+            "src": "splash/text2",
+            "ext": "png",
+            "cw": 159,
+            "ch": 25
+        },
+        {
+            "id": "text3",
+            "src": "splash/text3",
+            "ext": "png",
+            "cw": 153,
+            "ch": 27
+        },
+        {
+            "id": "kayak",
+            "src": "kayak_sprite",
+            "ext": "png",
+            "cw": "129.125",
+            "ch": 187
+        },
+        {
+            "id": "duck",
+            "src": "duck_sprite",
+            "ext": "png",
+            "cw": "46.83",
+            "ch": 40
+        },
+        {
+            "id": "bunny",
+            "src": "environment/bunny",
+            "ext": "png",
+            "cw": 321,
+            "ch": 327
+        },
+        {
+            "id": "tree1",
+            "src": "environment/trees/1",
+            "ext": "png",
+            "cw": 63,
+            "ch": 74
+        },
+        {
+            "id": "tree2",
+            "src": "environment/trees/2",
+            "ext": "png",
+            "cw": 32,
+            "ch": 32
+        },
+        {
+            "id": "stone1",
+            "src": "environment/stones/land/1",
+            "ext": "png",
+            "cw": 36,
+            "ch": 25
+        },
+        {
+            "id": "stone2",
+            "src": "environment/stones/land/2",
+            "ext": "png",
+            "cw": 22,
+            "ch": 21
+        },
+        {
+            "id": "wstone1",
+            "src": "environment/stones/water/1",
+            "ext": "png",
+            "cw": 420,
+            "ch": 257
+        },
+        {
+            "id": "wstone2",
+            "src": "environment/stones/water/2",
+            "ext": "png",
+            "cw": 506,
+            "ch": 257
+        },
+        {
+            "id": "wstone3",
+            "src": "environment/stones/water/3",
+            "ext": "png",
+            "cw": 88,
+            "ch": 77
+        },
+        {
+            "id": "plank3",
+            "src": "environment/planks/3",
+            "ext": "png",
+            "cw": 797,
+            "ch": 212
+        },
+        {
+            "id": "plank1",
+            "src": "environment/planks/1",
+            "ext": "png",
+            "cw": 239,
+            "ch": 59
+        },
+        {
+            "id": "plank2",
+            "src": "environment/planks/2",
+            "ext": "png",
+            "cw": 239,
+            "ch": 59
+        },
+        {
+            "id": "lily1",
+            "src": "environment/lilies/1",
+            "ext": "png",
+            "cw": 100,
+            "ch": 99
+        },
+        {
+            "id": "lily2",
+            "src": "environment/lilies/2",
+            "ext": "png",
+            "cw": 99,
+            "ch": 99
+        },
+        {
+            "id": "lily3",
+            "src": "environment/lilies/3",
+            "ext": "png",
+            "cw": 257,
+            "ch": 257
+        },
+        {
+            "id": "log1",
+            "src": "environment/logs/1",
+            "ext": "png",
+            "cw": 468,
+            "ch": 257
+        },
+        {
+            "id": "log2",
+            "src": "environment/logs/2",
+            "ext": "png",
+            "cw": 468,
+            "ch": 257
+        },
+        {
+            "id": "stopwatch",
+            "src": "hud/stopwatch",
+            "ext": "png",
+            "cw": 43,
+            "ch": 45
+        },
+        {
+            "id": "timecircle",
+            "src": "hud/timecircle",
+            "ext": "png",
+            "cw": 45,
+            "ch": 45
+        },
+        {
+            "id": "intersect",
+            "src": "hud/intersect",
+            "ext": "png",
+            "cw": 287,
+            "ch": 289
+        },
+        {
+            "id": "volume",
+            "src": "hud/volume",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        },
+        {
+            "id": "mute",
+            "src": "hud/mute",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        },
+        {
+            "id": "complete",
+            "src": "hud/complete2",
+            "ext": "png",
+            "cw": 185,
+            "ch": 25
+        },
+        {
+            "id": "yourscore",
+            "src": "hud/yourscore2",
+            "ext": "png",
+            "cw": 209,
+            "ch": 210
+        }
+    ]
+}

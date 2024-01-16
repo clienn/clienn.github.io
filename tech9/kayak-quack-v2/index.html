@@ -115,7 +115,12 @@
                         }, 2000);
                     });
 
-                    AM.initImageAssets('data/images.json');
+                    if (isTablet()) {
+                        AM.initImageAssets('data/tablet/images.json');
+                    } else {
+                        AM.initImageAssets('data/images.json');
+                    }
+
                     AM.initAudioAssets('data/audio.json');
                 }, 1000);
 

@@ -201,6 +201,27 @@ var joystick = null;
 var onMobile = isMobile();
 
 const startingBatteryLife = 20;
+
+const splashInfo = {
+    x: 0,
+    y: 0,
+    w: 1864,
+    h: 861,
+    sx: 1,
+    sy: 1,
+};
+
+var startButtonInfo = {
+    x: 0,
+    y: 0,
+    w: 192 * 2,
+    h: 60 * 2,
+};
+
+const onTablet = isTablet();
+
+// w: 2732,
+//     h: 2048,
 /*
  * GAME INITIATLIZATIONS AND CONTROLS
  */
@@ -214,6 +235,33 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    if (onTablet) {
+        splashInfo.w = AM.images.intro.cw;
+        splashInfo.h = AM.images.intro.ch;
+    }
+
+    splashInfo.sx = w / splashInfo.w;
+    splashInfo.sy = h / splashInfo.h;
+    splashInfo.w *= splashInfo.sx;
+    splashInfo.h *= splashInfo.sx;
+
+    splashInfo.x = w / 2 - splashInfo.w / 2;
+    splashInfo.y = Math.abs(h / 2 - splashInfo.h / 2);
+
+    if (onMobile && !onTablet) {
+        splashInfo.y = 0;
+    }
+
+    rescaleSize(startButtonInfo, scaleX, scaleX);
+    startButtonInfo.x = w / 2 - startButtonInfo.w / 2;
+    if (onTablet) {
+        startButtonInfo.y = splashInfo.y + splashInfo.h - 730 * splashInfo.sx;
+
+    } else {
+        startButtonInfo.y = splashInfo.y + splashInfo.h - 230 * splashInfo.sx;
+
+    }
 
     eelMoveUpSpeed *= scaleY;
 
@@ -291,7 +339,7 @@ function main(w, h) {
 
 
     // HUD = new Sprite(0, 0, 45, 45, AM.images.timecircle.cw, AM.images.timecircle.ch);
-    HUD = new Template_1(ctx, w, h, scaleX, scaleY);
+    HUD = new Template_1(ctx, w, h, scaleX, scaleY, splashInfo);
     
     controls();
 
@@ -358,11 +406,13 @@ function main(w, h) {
     let joystickY = h * 0.75;
     
     joystick = new Joystick(joystickX, joystickY, 150 * 0.90 * scaleX);
-    var url_string = location.href; 
-    var url = new URL(url_string);
-    var isOn = url.searchParams.get("on");
-    if (isOn == null) isOn = 1;
-    joystick.on = parseInt(isOn);
+    // var url_string = location.href; 
+    // var url = new URL(url_string);
+    // var isOn = url.searchParams.get("on");
+    // if (isOn == null) isOn = 1;
+    // joystick.on = parseInt(isOn);
+
+    joystick.on = true;
     
     gameCycle();
 }
@@ -886,20 +936,24 @@ function controls() {
         // e.preventDefault();
         // var touch = evt.touches[0] || evt.changedTouches[0];
         // let x = touch.pageX;
+        var x = e.changedTouches[event.changedTouches.length-1].pageX;
+        var y = e.changedTouches[event.changedTouches.length-1].pageY;
 
         if (!gameStart) {
-            AM.audio.bg.img.volume = 0.5;
-            AM.audio.bg.img.loop = true;
-            AM.audio.bg.img.play();
+            if (isBtnClicked(x, y, startButtonInfo)) {
+                AM.audio.bg.img.volume = 0.5;
+                AM.audio.bg.img.loop = true;
+                AM.audio.bg.img.play();
 
-            playAllAudio();
+                playAllAudio();
 
-            // playScore();
-            // playKaboom();
-            // playGlue();
+                // playScore();
+                // playKaboom();
+                // playGlue();
 
-            gameStart = true;
-            HUD.health = startingBatteryLife;
+                gameStart = true;
+                HUD.health = startingBatteryLife;
+            }
         } 
 
         if (gameover) {
@@ -950,7 +1004,10 @@ function controls() {
                 mDown = true;
                 mouseMoveOrigin.x = mx;
                 prevPosY = mouseMoveOrigin.y = my;
-                joystick.active = true;
+
+                if (isBtnClicked(mx, my, joystick.hitbox) || !joystick.on) {
+                    joystick.active = true;
+                }
                 // if (isBtnClicked(mx, my, joystick.hitbox)) {
                     
                 // }
@@ -995,18 +1052,23 @@ function controls() {
     
     canvas.addEventListener('mouseup', e => {
         // mouseupE();
+
+        let mx = e.offsetX;
+        let my = e.offsetY;
         
         if (!gameStart) {
-            // if (AM.audio.bg.img.paused) {
-                AM.audio.bg.img.volume = 0.5;
-                AM.audio.bg.img.loop = true;
-                AM.audio.bg.img.play();
-                // console.log('test')
-            // }
-            
+            if (isBtnClicked(mx, my, startButtonInfo)) {
+                // if (AM.audio.bg.img.paused) {
+                    AM.audio.bg.img.volume = 0.5;
+                    AM.audio.bg.img.loop = true;
+                    AM.audio.bg.img.play();
+                    // console.log('test')
+                // }
+                
 
-            gameStart = true;
-            HUD.health = startingBatteryLife;
+                gameStart = true;
+                HUD.health = startingBatteryLife;
+            }
         }
 
         if (mDown) {
@@ -1457,51 +1519,60 @@ function drawRotate(obj, key, ax, ay, yRot, zRot) {
 
 function drawStartPage() {
     // ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
-    ctx.drawImage(AM.images.bg.img, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 0, 0, canvas.width, canvas.height);
-    ctx.drawImage(AM.images.title.img, 0, 0, AM.images.title.cw, AM.images.title.ch, startPage.title.x, startPage.title.y, startPage.title.w, startPage.title.h);
-    ctx.drawImage(AM.images.sub_title.img, 0, 0, AM.images.sub_title.cw, AM.images.sub_title.ch, startPage.sub_title.x, startPage.sub_title.y, startPage.sub_title.w, startPage.sub_title.h);
+    ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, splashInfo.x, splashInfo.y, splashInfo.w, splashInfo.h);
+    // ctx.drawImage(AM.images.bg.img, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 0, 0, canvas.width, canvas.height);
+    // ctx.drawImage(AM.images.title.img, 0, 0, AM.images.title.cw, AM.images.title.ch, startPage.title.x, startPage.title.y, startPage.title.w, startPage.title.h);
+    // ctx.drawImage(AM.images.sub_title.img, 0, 0, AM.images.sub_title.cw, AM.images.sub_title.ch, startPage.sub_title.x, startPage.sub_title.y, startPage.sub_title.w, startPage.sub_title.h);
     
     // for (let i = 1; i < 4; ++i) {
     //     let key = 'text' + i;
     //     ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, startPage[key].x, startPage[key].y, startPage[key].w, startPage[key].h);
     // }
 
-    TXT.draw('instruction1');
-    TXT.draw('instruction1_2');
-    TXT.draw('instruction2');
-    TXT.draw('instruction2_2');
+    // TXT.draw('instruction1');
+    // TXT.draw('instruction1_2');
+    // TXT.draw('instruction2');
+    // TXT.draw('instruction2_2');
 
     let id = 2;
-    let key = 'sfish_' + id;
-    let fw = 102.9 * 1.5 * scaleX;
-    let fh = 81 * 1.5 * scaleX;
+    // let key = 'sfish_' + id;
+    let key = 'introfish';
+    // let fw = 102.9 * 1.5 * scaleX;
+    // let fh = 81 * 1.5 * scaleX;
+    let fw = 123.5 * 1.35 * scaleX;
+    let fh = 96 * 1.35 * scaleX;
     let frame = Math.floor(T) % 10;
 
-    ctx.save();
-    // Untransformed draw position
-    const position2 = {x: startPage['text1'].x - fw * 1.1, y: startPage['text1'].y - fh * 0.20};
-    // In degrees
-    const rotation2= { x: 0, y: Math.sin(T * 1.5) * 15, z: 0};
-    // Rotation relative to here (this is the center of the image)
-    const rotPt2 = { x: fw / 2, y: fh / 2 };
+    let x = 1060 * scaleX;
+    let fishX = 600 * scaleX;
+    let hy = onTablet ? 820 : 280;
+    let y = splashInfo.y + hy * splashInfo.sx;
+    // let y = splashInfo.y + 280 * splashInfo.sx;
 
-    ctx.setTransform(new DOMMatrix()
-        .translateSelf(position2.x + rotPt2.x, position2.y + rotPt2.y)
-        .rotateSelf(rotation2.x, rotation2.y, rotation2.z)
-    );
+    // ctx.save();
+    // // Untransformed draw position
+    // const position2 = {x: fishX, y: y};
+    // // In degrees
+    // const rotation2= { x: 0, y: Math.sin(T * 1.5) * 15, z: 0};
+    // // Rotation relative to here (this is the center of the image)
+    // const rotPt2 = { x: fw / 2, y: fh / 2 };
+
+    // ctx.setTransform(new DOMMatrix()
+    //     .translateSelf(position2.x + rotPt2.x, position2.y + rotPt2.y)
+    //     .rotateSelf(rotation2.x, rotation2.y, rotation2.z)
+    // );
     
-    // ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
-    // ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, -rotPt.x, -rotPt.y, garbageInfo[id].w, garbageInfo[id].h);
-    ctx.drawImage(AM.images[key].img, 102.9 * frame, 0, 102.9, AM.images[key].ch,  -rotPt2.x, -rotPt2.y, fw, fh);
-    ctx.restore();
+    // // ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, -rotPt.x, -rotPt.y, this.w, this.h);
+    // // ctx.drawImage(AM.images[key].img, 0, 0, AM.images[key].cw, AM.images[key].ch, -rotPt.x, -rotPt.y, garbageInfo[id].w, garbageInfo[id].h);
+    // // ctx.drawImage(AM.images[key].img, 0, AM.images[key].cw, fw, AM.images[key].ch,  -rotPt2.x, -rotPt2.y, fw, fh);
+    // ctx.restore();
     
 
-    
+    ctx.drawImage(AM.images.introfish.img, frame * AM.images.introfish.cw, 0, AM.images.introfish.cw, AM.images.introfish.ch, fishX, y, fw, fh);
     
     id = 9;
     key = 'garbage_' + id;
-    let x = startPage['text2'].x - garbageInfo[id].w;
-    let y = startPage['text1'].y - garbageInfo[id].h * 0.25;
+    
     ctx.save();
     // Untransformed draw position
     const position = {x: x, y: y};
@@ -1522,14 +1593,14 @@ function drawStartPage() {
     
     // HUD.drawMiniBattery(ctx);
 
-    let startBtnW = AM.images.start.cw * 2 * scaleX;
-    let startBtnH = AM.images.start.ch * 2 * scaleY;
+    // let startBtnW = AM.images.start.cw * 2 * scaleX;
+    // let startBtnH = AM.images.start.ch * 2 * scaleY;
 
-    ctx.drawImage(AM.images.start.img, 0, 0, AM.images.start.cw, AM.images.start.ch, canvas.width / 2 - startBtnW / 2, canvas.height - startBtnH * 2, startBtnW, startBtnH);
+    // ctx.drawImage(AM.images.start.img, 0, 0, AM.images.start.cw, AM.images.start.ch, canvas.width / 2 - startBtnW / 2, canvas.height - startBtnH * 2, startBtnW, startBtnH);
 
     if (delta < 1) {
         T += 10 * delta;
-        HUD.decayMiniBattery(delta);
+        // HUD.decayMiniBattery(delta);
     }
     
 }
@@ -1636,6 +1707,7 @@ function update() {
     // divingFish.update(delta);
     // divingFish.sineMovement(delta);
     HUD.txt.texts['time'].str = zeroPad(Math.floor(timer.timer / 24), 2);
+    HUD.updateTimerSprite(zeroPad(Math.floor(timer.timer / 24), 2), gameDuration);
 
     if (delta < 1) {
         HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24) / gameDuration * 100);
@@ -1643,14 +1715,16 @@ function update() {
 
         if (timer.timer <= 0) {
             gameover = true;
-            HUD.updateGameoverBattery();
+            // HUD.updateGameoverBattery();
+            HUD.updateGameoverScore(splashInfo);
         }
     }
 
     // if (HUD.health <= 0 || HUD.health == 100) {
     if (HUD.health <= 0) {
         gameover = true;
-        HUD.updateGameoverBattery();
+        // HUD.updateGameoverBattery();
+        HUD.updateGameoverScore(splashInfo);
     }
 
     if (eelExpressionT > 0) {
@@ -1698,8 +1772,8 @@ function gameCycle() {
 
             showPoints(1);
 
-            if (onMobile)
-                joystick.draw(ctx);
+            // if (onMobile)
+            joystick.draw(ctx);
 
             // divingFish.dive(ctx, AM.images['fish_4'].img);
             
@@ -1714,7 +1788,7 @@ function gameCycle() {
         // drawBG(ctx, 'bg');
         // HUD.draw(ctx);
         
-        HUD.gameover(ctx);
+        HUD.gameover(ctx, splashInfo, delta);
         // HUD.updateGameoverBattery(-0.01 * delta);
     }
 

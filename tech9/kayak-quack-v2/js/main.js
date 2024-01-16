@@ -192,6 +192,7 @@ var waterObjectSprite = null;
 const plankInfo = {
     1: { id: 'plank1' },
     2: { id: 'plank2' },
+    3: { id: 'plank3' },
 }
 
 const duckInfo = {
@@ -317,6 +318,8 @@ var startButtonInfo = {
     h: 60 * 2,
 }
 
+const onTablet = isTablet();
+
 // pool - 606px
 // rect - 12px, 6px
 // total width - 926px
@@ -337,6 +340,11 @@ function main(w, h) {
     scaleX = w / 1792;
     scaleY = h / 922;
 
+    if (onTablet) {
+        splashInfo.w = AM.images.intro.cw;
+        splashInfo.h = AM.images.intro.ch;
+    }
+
     splashInfo.sx = w / splashInfo.w;
     splashInfo.sy = h / splashInfo.h;
     splashInfo.w *= splashInfo.sx;
@@ -345,13 +353,33 @@ function main(w, h) {
     splashInfo.x = w / 2 - splashInfo.w / 2;
     splashInfo.y = Math.abs(h / 2 - splashInfo.h / 2);
 
+    if (onMobile && !onTablet) {
+        splashInfo.y = 0;
+    }
+
     rescaleSize(startButtonInfo, scaleX, scaleX);
     startButtonInfo.x = w / 2 - startButtonInfo.w / 2;
-    startButtonInfo.y = splashInfo.y + splashInfo.h - 230 * splashInfo.sx;
+    if (onTablet) {
+        startButtonInfo.y = splashInfo.y + splashInfo.h - 730 * splashInfo.sx;
+
+    } else {
+        startButtonInfo.y = splashInfo.y + splashInfo.h - 230 * splashInfo.sx;
+    }
+    
+    // if (is_tablet) {
+    //     // 
+    //     splashInfo.y = 260 * scaleX;
+    // }
+
+    // if (onMobile) {
+    //     splashInfo.y = 260 * scaleX;
+    // }
+    
 
     speedInc *= scaleY;
 
     bgInfo.w = w;
+    // bgInfo.w = AM.images.bg.cw * scaleX;
     bgInfo.h *= scaleX;
     // bgInfo.h *= scaleY;
 
@@ -432,7 +460,7 @@ function main(w, h) {
 
     terrainSprite = new StaticSprite(0, 0, 0, 0, 0, 0, 0, 0, ''); // blank sprite
     waterObjectSprite = new StaticSprite(0, 0, 0, 0, 0, 0, 0, 0, ''); // blank sprite
-
+    
     // duck 
 
     // kayakBounds.left = parallaxInfo.water.x;
@@ -464,7 +492,7 @@ function main(w, h) {
     timer = new Timer(0, 0, 0, '#fff');
     timer.setTimer(gameDuration);
 
-    HUD = new Template_1(ctx, w, h, scaleX, scaleY);
+    HUD = new Template_1(ctx, w, h, scaleX, scaleY, splashInfo);
     
     controls();
 
@@ -658,8 +686,15 @@ function moveTileGroup(idx) {
 
         let col = j % 3;
 
+
+
         let rngX = waterObjContainer[next][col].x;
-        if (
+
+        if (waterObjHolder[j].key == 'plank1') { // right
+            rngX += waterObjContainer[next][col].w - waterObjHolder[j].w * 0.85;
+        } else if (waterObjHolder[j].key == 'plank2') { // left
+            rngX -= waterObjHolder[j].w * 0.15;
+        } else if (
             (next == 3 && col == 0) ||
             (next == 3 && col == 1) ||
             (next == 5 && col == 0) ||
@@ -685,7 +720,7 @@ function moveTileGroup(idx) {
 }
 
 function morphWaterObj(i, row) {
-    let rng = Math.floor(Math.random() * 12) - 1;
+    let rng = Math.floor(Math.random() * 13) - 1;
     // if (row == 5) {
     //     rng = 7;
     // }
@@ -738,7 +773,7 @@ function morphWaterObj(i, row) {
             waterObjHolder[i].setRandomSpeed(100, 50);
     
         } else if (rng < 7) {
-            key = 'wstone' + (rng - 3);
+            key = 'wstone' + ((rng - 3) % 2 + 1);
             w = wstoneInfo.w;
             h = wstoneInfo.h;
             cw = AM.images[key].cw;
@@ -1146,7 +1181,8 @@ function drawBGTiles() {
     for (let i = 0; i < bgInfo.rows; ++i) {
         if ((bgTilesPosY[i] >= 0 && bgTilesPosY[i] <= canvas.height) || 
             (bgTilesPosY[i] + bgInfo.h >= 0 && bgTilesPosY[i] + bgInfo.h <= canvas.height)) {
-            ctx.drawImage(AM.images.bg.img, 0, i * AM.images.bg.ch, AM.images.bg.cw, AM.images.bg.ch, 0, bgTilesPosY[i], canvas.width, bgInfo.h);
+            // ctx.drawImage(AM.images.bg.img, 0, i * AM.images.bg.ch, AM.images.bg.cw, AM.images.bg.ch, 0, bgTilesPosY[i], canvas.width, bgInfo.h);
+            ctx.drawImage(AM.images.bg.img, 0, i * AM.images.bg.ch, AM.images.bg.cw, AM.images.bg.ch, 0, bgTilesPosY[i], bgInfo.w, bgInfo.h);
             // ctx.beginPath();
             // ctx.rect(0, bgTilesPosY[i], canvas.width, bgInfo.h);
             // ctx.stroke();
@@ -1159,7 +1195,7 @@ function drawBGTiles() {
 
 function isKayakStuck() {
     const { top, right, left, bottom } = collisionSide;
-    
+
     if (bottom) return false;
 
     if (top || right || left) {
@@ -1492,8 +1528,12 @@ function initWaterObjects(widthPercent, heightPercent) {
     plankInfo[1].h = AM.images[id].ch * heightPercent * scaleX;
 
     id = plankInfo[2].id;
-    plankInfo[2].w = AM.images[id].cw * 0.35 * widthPercent * scaleX;
-    plankInfo[2].h = AM.images[id].ch * 0.35 * heightPercent * scaleX;
+    plankInfo[2].w = AM.images[id].cw * widthPercent * scaleX;
+    plankInfo[2].h = AM.images[id].ch * heightPercent * scaleX;
+
+    id = plankInfo[3].id;
+    plankInfo[3].w = AM.images[id].cw * widthPercent * scaleX * 0.25;
+    plankInfo[3].h = AM.images[id].ch * heightPercent * scaleX * 0.25;
     // for (let i = 1; i <= 2; ++i) {
     //     let id = plankInfo[i].id;
     //     plankInfo[i].w = AM.images[id].cw * widthPercent * scaleX;
@@ -2271,12 +2311,14 @@ function drawStartPage() {
 
     // ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
     ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, splashInfo.x, splashInfo.y, splashInfo.w, splashInfo.h);
+    // ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, splashInfo.x, 0, canvas.width, canvas.height);
 
     let w = AM.images.duck_anim.cw * 2 * scaleX;
     let h = AM.images.duck_anim.ch * 2 * scaleX;
     // let x = 1060 * scaleX;
     let x = 620 * scaleX;
-    let y = splashInfo.y + 300 * splashInfo.sx;
+    let hy = onTablet ? 840 : 300;
+    let y = splashInfo.y + hy * splashInfo.sx;
 
     ctx.drawImage(AM.images.duck_anim.img, frame * AM.images.duck_anim.cw, 0, AM.images.duck_anim.cw, AM.images.duck_anim.ch, x, y, w, h);
 
@@ -2440,7 +2482,7 @@ function gameCycle() {
         
     } else {
 
-        HUD.gameover(ctx, splashInfo);
+        HUD.gameover(ctx, splashInfo, delta);
         // HUD.updateGameoverBattery(-0.01 * delta);
     }
 
