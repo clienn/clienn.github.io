@@ -2304,7 +2304,8 @@ function drawStartPage() {
     ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, splashInfo.x, splashInfo.y, splashInfo.w, splashInfo.h);
 
     let mid = canvas.width / 2;
-    let x = mid - 265 * scaleX;
+    // let x = mid - 265 * scaleX;
+    let x = mid + 170 * scaleX;
     let hy = onTablet ? 840 : 310;
     let y = splashInfo.y + hy * splashInfo.sx;
     
@@ -2319,7 +2320,9 @@ function drawStartPage() {
                 
     // ctx.drawImage(AM.images.hand.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, mid, y, startPageInfo.hand.w, startPageInfo.hand.h);
 
-    x = mid + 170 * scaleX;
+    
+    // x = mid + 170 * scaleX;
+    x = mid - 265 * scaleX;
     frame = Math.floor(startScreenHandAnimT * 1) % 8;
 
     ctx.drawImage(AM.images.soft.img, frame * AM.images.soft.cw, 0, AM.images.soft.cw, AM.images.soft.ch, 
