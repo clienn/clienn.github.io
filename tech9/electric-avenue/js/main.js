@@ -495,8 +495,9 @@ function addGarbage() {
     let rng = Math.floor(Math.random() * 9) + 1;
     let key = 'garbage_' + rng;
 
-    let w = garbageInfo[rng].w * ((Math.floor(Math.random() * 50) + 50) / 100);
-    let h = garbageInfo[rng].h * ((Math.floor(Math.random() * 50) + 50) / 100);
+    let scaleRng = ((Math.floor(Math.random() * 50) + 50) / 100);
+    let w = garbageInfo[rng].w * scaleRng;
+    let h = garbageInfo[rng].h * scaleRng;
 
     let rngX = Math.floor(Math.random() * canvas.width);
     let rngY = Math.floor(Math.random() * garbageInfo[rng].h * 5) + garbageInfo[rng].h;
@@ -1262,7 +1263,7 @@ function setGarbageInfo(sx, sy, sizePercentage) {
             x: 0,
             y: 0,
             w: AM.images[key].cw * sizePercentage * sx,
-            h: AM.images[key].ch * sizePercentage * sy,
+            h: AM.images[key].ch * sizePercentage * sx,
         };
     }
 }
@@ -1388,8 +1389,9 @@ function mutateFish(fish) {
 function mutateGarbage(trash) {
     let rng = Math.floor(Math.random() * 9) + 1;
     let key = 'garbage_' + rng;
-    let w = garbageInfo[rng].w * ((Math.floor(Math.random() * 50) + 50) / 100);
-    let h = garbageInfo[rng].h * ((Math.floor(Math.random() * 50) + 50) / 100);
+    let scaleRng = ((Math.floor(Math.random() * 50) + 50) / 100);
+    let w = garbageInfo[rng].w * scaleRng;
+    let h = garbageInfo[rng].h * scaleRng;
     trash.morph(rng, w, h, AM.images[key].cw, AM.images[key].ch);
     trash.vy = Math.floor(Math.random() * garbageDropSpeed) + 20;
 }

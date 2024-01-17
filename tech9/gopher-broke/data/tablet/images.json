@@ -107,10 +107,38 @@
         },
         {
             "id": "bg",
-            "src": "bg",
+            "src": "tab/bg",
             "ext": "png",
-            "cw": 865,
-            "ch": 333
+            "cw": 2732,
+            "ch": 2048
+        },
+        {
+            "id": "gopher_score",
+            "src": "hud/gopher_score",
+            "ext": "png",
+            "cw": 129,
+            "ch": 129
+        },
+        {
+            "id": "gopher_check",
+            "src": "hud/gopher_check",
+            "ext": "png",
+            "cw": 129,
+            "ch": 129
+        },
+        {
+            "id": "carrot_score",
+            "src": "hud/carrot_score",
+            "ext": "png",
+            "cw": 129,
+            "ch": 129
+        },
+        {
+            "id": "carrot_x",
+            "src": "hud/carrot_x",
+            "ext": "png",
+            "cw": 129,
+            "ch": 129
         },
         {
             "id": "bg_rect",
@@ -671,20 +699,6 @@
             "ext": "png",
             "cw": 63,
             "ch": 132
-        },
-        {
-            "id": "carrot_score",
-            "src": "carrot_score",
-            "ext": "png",
-            "cw": 40,
-            "ch": 49
-        },
-        {
-            "id": "carrot_score_x",
-            "src": "carrot_score_x",
-            "ext": "png",
-            "cw": 40,
-            "ch": 49
         },
         {
             "id": "chat_1",

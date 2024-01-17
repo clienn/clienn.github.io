@@ -61,10 +61,14 @@ function isTablet() {
     let w = document.documentElement.clientWidth;
     let h = document.documentElement.clientHeight;
 
-    if (isMobile()) {
-        if (w >= 1024 || h >= 1024) {
-            return true;
-        }
+    // if (isMobile()) {
+    //     if (w >= 1024 || h >= 1024) {
+    //         return true;
+    //     }
+    // }
+
+    if (w >= 1024 || h >= 1024) {
+        return true;
     }
 
     return false;

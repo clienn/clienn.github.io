@@ -37,9 +37,11 @@ class Template_1 {
         // // this.timecircle = new StaticSprite(this.volume.w + volumeAdjX, 20, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.timecircle.cw, AM.images.timecircle.ch, 'timecircle');
         // this.stopwatch = new StaticSprite(this.volume.w + volumeAdjX, volumeAdjY, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
         // // this.stopwatch = new StaticSprite(this.volume.w + volumeAdjX, 20, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
-
-        this.gopher = new StaticSprite(0, 0, 75 * 1.5, 75 * 1.5, 0, 0, AM.images.gopher.cw, AM.images.gopher.ch, 'gopher');
-        this.carrot_score = new StaticSprite(0, 0, 65 * 1.5, 75 * 1.5, 0, 0, AM.images.carrot_score.cw, AM.images.carrot_score.ch, 'carrot_score');
+        let mul = isTablet() ? 1 : 1.5;
+        let w2 = AM.images.gopher_score.cw * sx * mul;
+        let h2 = AM.images.gopher_score.ch * sx * mul;
+        this.gopher = new StaticSprite(0, 0, w2, h2, 0, 0, AM.images.gopher_score.cw, AM.images.gopher_score.ch, 'gopher_score');
+        this.carrot_score = new StaticSprite(0, 0, w2, h2, 0, 0, AM.images.carrot_score.cw, AM.images.carrot_score.ch, 'carrot_score');
         
         this.lose = new StaticSprite(0, 0, AM.images.lose.cw * 1.5, AM.images.lose.ch * 1.5, 0, 0, AM.images.lose.cw, AM.images.lose.ch, 'lose');
         this.win = new StaticSprite(0, 0, AM.images.win.cw * 1.5, AM.images.win.ch * 1.5, 0, 0, AM.images.win.cw, AM.images.win.ch, 'win');
@@ -67,20 +69,20 @@ class Template_1 {
 
         let gopherW = this.gopher.w;
         let gopherH = this.gopher.h;
+        let pad = 5 * sx;
 
         this.gopherPos = [
-            [w / 2 - gopherW / 2 - gopherW, 20 * sy, gopherW, gopherH],
-            [w / 2 - gopherW / 2, 20 * sy, gopherW, gopherH],
+            [w / 2 - gopherW / 2 - gopherW - pad * 2, 20 * sy, gopherW, gopherH],
+            [w / 2 - gopherW / 2 - pad, 20 * sy, gopherW, gopherH],
             [w / 2 - gopherW / 2 + gopherW, 20 * sy, gopherW, gopherH]
         ];
 
-        let carroScorePad = 60 * sx;
-        let carroScoreDist = 60 * sx;
-
+        let carroScorePad = 30 * sx;
+        let carroScoreDist = 5 * sx;
         this.carrotScorerPos = [
-            [w - carroScorePad - carroScoreDist * 3, 20 * sy, this.carrot_score.w, this.carrot_score.h],
-            [w - carroScorePad - carroScoreDist * 2, 20 * sy, this.carrot_score.w, this.carrot_score.h],
-            [w - carroScorePad - carroScoreDist, 20 * sy, this.carrot_score.w, this.carrot_score.h]
+            [w - carroScorePad - this.carrot_score.w * 3 - carroScoreDist * 2, 20 * sy, this.carrot_score.w, this.carrot_score.h],
+            [w - carroScorePad - this.carrot_score.w * 2 - carroScoreDist, 20 * sy, this.carrot_score.w, this.carrot_score.h],
+            [w - carroScorePad - this.carrot_score.w, 20 * sy, this.carrot_score.w, this.carrot_score.h]
         ];
         
         let paddingX = 50 * sx;
@@ -288,9 +290,9 @@ class Template_1 {
 
         for (let i = 0; i < this.gopherPos.length; ++i) {
             if (this.remainingGophers[i]) {
-                this.gopher.dynamicDraw(ctx, this.gopherPos[i][0], this.gopherPos[i][1], this.gopherPos[i][2], this.gopherPos[i][3], AM.images.gopher.cw, AM.images.gopher.ch, 'gopher');
+                this.gopher.dynamicDraw(ctx, this.gopherPos[i][0], this.gopherPos[i][1], this.gopherPos[i][2], this.gopherPos[i][3], AM.images.gopher_score.cw, AM.images.gopher_score.ch, 'gopher_score');
             } else {
-                this.gopher.dynamicDraw(ctx, this.gopherPos[i][0], this.gopherPos[i][1], this.gopherPos[i][2], this.gopherPos[i][3], AM.images.gopher_x.cw, AM.images.gopher_x.ch, 'gopher_x');
+                this.gopher.dynamicDraw(ctx, this.gopherPos[i][0], this.gopherPos[i][1], this.gopherPos[i][2], this.gopherPos[i][3], AM.images.gopher_check.cw, AM.images.gopher_check.ch, 'gopher_check');
             }
             
         }
@@ -299,7 +301,7 @@ class Template_1 {
             if (this.remainingCarrots[i]) {
                 this.carrot_score.dynamicDraw(ctx, this.carrotScorerPos[i][0], this.carrotScorerPos[i][1], this.carrotScorerPos[i][2], this.carrotScorerPos[i][3], AM.images.carrot_score.cw, AM.images.carrot_score.ch, 'carrot_score');
             } else {
-                this.carrot_score.dynamicDraw(ctx, this.carrotScorerPos[i][0], this.carrotScorerPos[i][1], this.carrotScorerPos[i][2], this.carrotScorerPos[i][3], AM.images.carrot_score_x.cw, AM.images.carrot_score_x.ch, 'carrot_score_x');
+                this.carrot_score.dynamicDraw(ctx, this.carrotScorerPos[i][0], this.carrotScorerPos[i][1], this.carrotScorerPos[i][2], this.carrotScorerPos[i][3], AM.images.carrot_x.cw, AM.images.carrot_x.ch, 'carrot_x');
             }
         }
         

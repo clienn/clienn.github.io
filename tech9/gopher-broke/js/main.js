@@ -328,7 +328,8 @@ function main(w, h) {
 
     px = 60 * scaleX;
     py = 150 * scaleY;
-    bg = new StaticSprite(px, py, w - px * 2, h - py * 1.50, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 'bg');
+    bg = new StaticSprite(0, 0, splashInfo.w, splashInfo.h, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 'bg');
+    // bg = new StaticSprite(px, py, w - px * 2, h - py * 1.50, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 'bg');
     soil = new StaticSprite(w / 2 - 366 / 2 * scaleX, bg.y + bg.h - 28 * scaleY, 366 * scaleX, 56 * scaleY, 0, 0, AM.images.soil.cw, AM.images.soil.ch, 'soil');
 
     let padLeft = 55 * scaleX;
@@ -678,6 +679,11 @@ function drawGopher() {
         // gopher.clipX = AM.images.gopher.cw;
         gopher_hide.clipX = AM.images.gopher.cw;
         gopher_hide.draw(ctx, AM.images.gopher.img);
+
+        digT += 10 * delta;
+        let frame = Math.floor(digT) % 6;
+        gopher.clipX = frame * AM.images.gopher.cw;
+        gopher.drawTo(ctx, AM.images.gopher_dig.img, gopher_hide.x, gopher_hide.y);
         // console.log(gopher_hide.clipX)
     } else if (gopher_hide.t2 > shuffleDuration) {
         if (chatID > -1) {
@@ -1143,7 +1149,7 @@ function gameCycle() {
             ctx.fill();
             ctx.restore();
 
-            bg_rect.draw(ctx);
+            // bg_rect.draw(ctx);
             bg.draw(ctx);
 
             // gopher_hide.draw(ctx, AM.images.gopher_hide.img);
