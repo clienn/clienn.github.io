@@ -2733,12 +2733,17 @@ function main() {
           var tileInstance = file.artboardByName("artboard");
           var tileMachine = new rive.StateMachineInstance(tile.stateMachineByName("State Machine"), tileInstance);
           var tapTrigger = void 0;
+          var color = void 0;
           for (var i_1 = 0, l = tileMachine.inputCount(); i_1 < l; i_1++) {
             var input = tileMachine.input(i_1);
             // console.log(input.name)
             switch (input.name) {
               case "Tap":
                 tapTrigger = input.asTrigger();
+                break;
+              case "Color":
+                color = input;
+                color.asNumber().value = colorRng;
                 break;
               default:
                 break;
@@ -2758,7 +2763,8 @@ function main() {
             machine: tileMachine,
             anim: anim,
             anim2: anim2,
-            tapTrigger: tapTrigger
+            tapTrigger: tapTrigger,
+            color: color
           };
           tileMachine.advance(0);
           blockInstance.artboard.advance(0);
@@ -2872,7 +2878,8 @@ function main() {
             anim2 = blockInstance.anim2,
             tapTrigger = blockInstance.tapTrigger,
             x_1 = blockInstance.x,
-            y_1 = blockInstance.y;
+            y_1 = blockInstance.y,
+            color = blockInstance.color;
           renderer.save();
           if (tileAnim[idx].t > 0) {
             if (tileAnim[idx].type == 1) {
@@ -2899,6 +2906,7 @@ function main() {
           }
           var textRun = artboard.textRun("Count");
           textRun.text = tileNums[idx].toString();
+          // color.asNumber().value = colorRng;
           // console.log(textRun.text)
           renderer.translate(x_1, y_1);
           renderer.align(rive.Fit.contain, rive.Alignment.center, {
@@ -2975,7 +2983,7 @@ function main() {
       renderer.restore();
       rive.requestAnimationFrame(renderLoop);
     }
-    var rive, canvas, scaleX, scaleY, padX, padY, dim, bgWidth, fontbytes, renderer, bytes, file, artboardG, buttonMachine, buttonMachineColor, i, l, input, timerBytes, timerFile, artboardTimer, timerInfo, timerMachine, gameDuration, timerT, timerMachineProgress, timerMachineUrgent, i, l, input, bytes2, file2, artboardBG, bgAnim, bgAnimBuoyA, bgAnimPop, bgAnimPlane, bgMachine, progressDuration, balloonRotationT, progressT, bgMachineProgress, bgMachineTileSide, bgMachineBalloonX, bgMachineBalloonRotation, bgMachineColor, bgMachineTap, bgMachinePop, balloonDirection, balloonX, balloonRotation, i, l, input, colorRng, tileNums, tileNumsT, currTile, currNum, topNum, isCorrect, tileAnim, lastTime, tile, tiles, mDown;
+    var rive, canvas, scaleX, scaleY, padX, padY, dim, bgWidth, fontbytes, renderer, bytes, file, artboardG, buttonMachine, colorRng, buttonMachineColor, i, l, input, timerBytes, timerFile, artboardTimer, timerInfo, timerMachine, gameDuration, timerT, timerMachineProgress, timerMachineUrgent, i, l, input, bytes2, file2, artboardBG, bgAnim, bgAnimBuoyA, bgAnimPop, bgAnimPlane, bgMachine, progressDuration, balloonRotationT, progressT, bgMachineProgress, bgMachineTileSide, bgMachineBalloonX, bgMachineBalloonRotation, bgMachineColor, bgMachineTap, bgMachinePop, balloonDirection, balloonX, balloonRotation, i, l, input, tileNums, tileNumsT, currTile, currNum, topNum, isCorrect, tileAnim, lastTime, tile, tiles, mDown;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
@@ -3020,14 +3028,18 @@ function main() {
           file = _a.sent();
           artboardG = file.defaultArtboard();
           buttonMachine = new rive.StateMachineInstance(artboardG.stateMachineByName("State Machine"), artboardG);
+          colorRng = Math.floor(Math.random() * 6);
           for (i = 0, l = buttonMachine.inputCount(); i < l; i++) {
             input = buttonMachine.input(i);
             // console.log(input.name, input.type)
             // console.log(input, input.name, input.type, input.asNumber().value)
             if (input.name == "Color") {
               buttonMachineColor = input;
+              // buttonMachineColor.asNumber().value = colorRng;
             }
+            // buttonMachineColor.asNumber().value = colorRng;
           }
+
           return [4 /*yield*/, fetch(new Request("Timer.riv"))];
         case 7:
           return [4 /*yield*/, _a.sent().arrayBuffer()];
@@ -3120,9 +3132,7 @@ function main() {
             }
           }
 
-          colorRng = Math.floor(Math.random() * 6);
           bgMachineColor.asNumber().value = colorRng;
-          buttonMachineColor.asNumber().value = colorRng;
           tileNums = [];
           tileNumsT = [];
           currTile = -1;
@@ -3189,7 +3199,7 @@ function main() {
     });
   });
 }
-
+// export default main;
 main();
 },{"@rive-app/canvas-advanced":"node_modules/@rive-app/canvas-advanced/canvas_advanced.mjs"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -3216,7 +3226,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54938" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54357" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
