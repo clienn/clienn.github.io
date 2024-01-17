@@ -209,6 +209,27 @@ var stunAnimStars = [];
 
 var currSpeechKey = '';
 
+const splashInfo = {
+    x: 0,
+    y: 0,
+    w: 1864,
+    h: 861,
+    sx: 1,
+    sy: 1,
+};
+
+var startButtonInfo = {
+    x: 0,
+    y: 0,
+    w: 192 * 2,
+    h: 60 * 2,
+}
+
+const onTablet = isTablet();
+const onMobile = isMobile();
+
+var tracks = {};
+
 /*
  * GAME INITIATLIZATIONS AND CONTROLS
  */
@@ -224,6 +245,32 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    if (onTablet) {
+        splashInfo.w = AM.images.intro.cw;
+        splashInfo.h = AM.images.intro.ch;
+    }
+
+    splashInfo.sx = w / splashInfo.w;
+    splashInfo.sy = h / splashInfo.h;
+    splashInfo.w *= splashInfo.sx;
+    splashInfo.h *= splashInfo.sx;
+
+    splashInfo.x = w / 2 - splashInfo.w / 2;
+    splashInfo.y = Math.abs(h / 2 - splashInfo.h / 2);
+
+    if (onMobile && !onTablet) {
+        splashInfo.y = 0;
+    }
+
+    rescaleSize(startButtonInfo, scaleX, scaleX);
+    startButtonInfo.x = w / 2 - startButtonInfo.w / 2;
+    if (onTablet) {
+        startButtonInfo.y = splashInfo.y + splashInfo.h - 730 * splashInfo.sx;
+
+    } else {
+        startButtonInfo.y = splashInfo.y + splashInfo.h - 230 * splashInfo.sx;
+    }
 
     // startPage.gopher.x += 100;
     // startPage.star.x += 100;
@@ -262,13 +309,15 @@ function main(w, h) {
     chats.push(new StaticSprite(0, 0, AM.images.chat_2.cw, AM.images.chat_2.ch, 0, 0, AM.images.chat_2.cw, AM.images.chat_2.ch, 'chat_2'));
     chats.push(new StaticSprite(0, 0, AM.images.chat_3.cw, AM.images.chat_3.ch, 0, 0, AM.images.chat_3.cw, AM.images.chat_3.ch, 'chat_3'));
     
-    rescaleSize(carrotInfo, scaleX, scaleY);
-    rescaleSize(gopherInfo, scaleX, scaleY);
-    rescaleSize(gopherHideInfo, scaleX, scaleY);
-    rescaleSize(gopherStunInfo, scaleX, scaleY);
+    rescaleSize(carrotInfo, scaleX, scaleX);
+    rescaleSize(gopherInfo, scaleX, scaleX);
+    rescaleSize(gopherHideInfo, scaleX, scaleX);
+    rescaleSize(gopherStunInfo, scaleX, scaleX);
 
     // HUD = new Sprite(0, 0, 45, 45, AM.images.timecircle.cw, AM.images.timecircle.ch);
-    HUD = new Template_1(ctx, w, h, scaleX, scaleY);
+    HUD = new Template_1(ctx, w, h, scaleX, scaleY, splashInfo);
+    HUD.updateTimerSprite(zeroPad(gameDuration, 2), gameDuration);
+
     destPadX = 35 * scaleX;
     destPadY = 125 * scaleY;
 
@@ -379,6 +428,20 @@ function muteAllAudio(flag) {
     
 }
 
+function initAllAudio() {
+    if (audioContext.state === "suspended") {
+        audioContext.resume();
+    }
+
+    for (let k in AM.audio) {
+        tracks[k] = audioContext.createMediaElementSource(AM.audio[k].img);
+        tracks[k].connect(audioContext.destination);
+    }
+
+    // playAllAudio();
+}
+
+
 function playAllAudio() {
     for (let k in AM.audio) {
         if (k != 'bg') {
@@ -389,6 +452,12 @@ function playAllAudio() {
         }
     }
     
+}
+
+function submitScore() {
+    let timeSpent = gameDuration - Math.floor(timer.timer / 24);
+    let result = {'game_score': score.toFixed(2), 'activity_id': serverData.id, 'time_spent': timeSpent};
+    Vue.prototype.$postData(result, true);
 }
 
 function controls() {
@@ -416,7 +485,12 @@ function controls() {
         let my = e.offsetY;
         if (!mDown) {
             mDown = true;
-            if (gameStart) {
+
+            if (gameover) {
+                if (isBtnClicked(mx, my, HUD.endscreenButtons)) {
+                    submitScore();
+                }
+            } else if (gameStart) {
                 if (isBtnClicked(mx, my, {
                     x: HUD.volume.x,
                     y: HUD.volume.y,
@@ -427,7 +501,7 @@ function controls() {
                     HUD.volumeOn = !HUD.volumeOn; 
                     // console.log('test', HUD.volumeOn)
                     if (HUD.volumeOn) {
-                        AM.audio.bg.img.currentTime = 0;
+                        // AM.audio.bg.img.currentTime = 0;
                         AM.audio.bg.img.play();
                     } else {
                         AM.audio.bg.img.pause();
@@ -519,17 +593,28 @@ function controls() {
     
     canvas.addEventListener('mouseup', e => {
         // mouseupE();
+        let mx = e.offsetX;
+        let my = e.offsetY;
+
         if (!gameStart) {
-            if (AM.audio.bg.img.paused) {
+            if (isBtnClicked(mx, my, startButtonInfo)) {
+                initAllAudio();
+
+                gameStart = true;
+
                 AM.audio.bg.img.volume = 0.2;
                 AM.audio.bg.img.loop = true;
                 AM.audio.bg.img.play();
-                console.log('test')
-            }
-            
 
-            gameStart = true;
-            playAllAudio();
+                // playAllAudio();
+            }
+
+            // if (AM.audio.bg.img.paused) {
+            //     AM.audio.bg.img.volume = 0.2;
+            //     AM.audio.bg.img.loop = true;
+            //     AM.audio.bg.img.play();
+            //     console.log('test')
+            // }
             
         }
 
@@ -549,11 +634,11 @@ function initStartPage() {
         startPage[k].x *= scaleX;
         startPage[k].y *= scaleY;
         startPage[k].w *= scaleX;
-        startPage[k].h *= scaleY;
+        startPage[k].h *= scaleX;
     }
 
     startPage.halo.ox *= scaleX;
-    startPage.halo.oy *= scaleY;
+    startPage.halo.oy *= scaleX;
 }
 // *********************************** GAME INITIATLIZATIONS AND CONTROLS END ******************************************************** //
 
@@ -686,11 +771,13 @@ function updateGopherHP() {
             if (HUD.carrotIDX == 3) {
                 gameover = true;
                 HUD.isWin = false;
-                HUD.updateFinalScore(score);
+                // HUD.updateFinalScore(score);
+                HUD.updateGameoverScore(splashInfo, zeroPad(score, 2));
             } else if (HUD.gopherIDX == 3) {
                 gameover = true;
                 HUD.isWin = true;
-                HUD.updateFinalScore(score);
+                // HUD.updateFinalScore(score);
+                HUD.updateGameoverScore(splashInfo, zeroPad(score, 2));
             } else {
                 moveGopher();
             }
@@ -875,9 +962,10 @@ function update() {
         if (startT == 0) {
             gopher_hide.update(1, delta);
     
-            HUD.txt.texts['time'].str = zeroPad(Math.floor(timer.timer / 24), 2);
+            // HUD.txt.texts['time'].str = zeroPad(Math.floor(timer.timer / 24), 2);
+            HUD.updateTimerSprite(zeroPad(Math.floor(timer.timer / 24), 2), gameDuration);
     
-            HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24) / gameDuration * 100);
+            // HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24) / gameDuration * 100);
     
             if (gopher_hide.goto == null && gopher_hide.moveDestinations.length == 0) {
                 timer.tick(delta);
@@ -886,7 +974,8 @@ function update() {
             if (timer.timer <= 0) {
                 gameover = true;
                 HUD.isWin = false;
-                HUD.updateFinalScore(score);
+                // HUD.updateFinalScore(score);
+                HUD.updateGameoverScore(splashInfo, zeroPad(score, 2));
             }
         } else {
             startT -= 1 * delta;
@@ -918,35 +1007,47 @@ function drawStunHalo(d) {
 }
 
 function startPageAnimations() {
-    ctx.beginPath();
-    ctx.fillStyle = '#F8E7CD';
-    // ctx.fillStyle = '#f00';
-    ctx.rect(startPage.coverAll.x, startPage.coverAll.y, startPage.coverAll.w, startPage.coverAll.h);
-    // ctx.rect(startPage.handcover.x, startPage.handcover.y, startPage.handcover.w, startPage.handcover.h);
-    // ctx.rect(startPage.gophercover.x, startPage.gophercover.y, startPage.gophercover.w, startPage.gophercover.h);
+    ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, splashInfo.x, splashInfo.y, splashInfo.w, splashInfo.h);
+
+    let mid = canvas.width / 2 - startPage.hand.w / 2;
+    let x = startPage.hand.x - 480 * scaleX;
+    let hy = onTablet ? 780 : 250;
+    let y = splashInfo.y + hy * splashInfo.sx;
+    // ctx.beginPath();
+    // ctx.fillStyle = '#F8E7CD';
+    // // ctx.fillStyle = '#f00';
+    // ctx.rect(startPage.coverAll.x, startPage.coverAll.y, startPage.coverAll.w, startPage.coverAll.h);
+    // // ctx.rect(startPage.handcover.x, startPage.handcover.y, startPage.handcover.w, startPage.handcover.h);
+    // // ctx.rect(startPage.gophercover.x, startPage.gophercover.y, startPage.gophercover.w, startPage.gophercover.h);
 
     
 
-    // ctx.rect(740, 280, 310, 150);
-    // ctx.rect(1100, 280, 310, 150);
-    ctx.fill();
+    // // ctx.rect(740, 280, 310, 150);
+    // // ctx.rect(1100, 280, 310, 150);
+    // ctx.fill();
 
     let handx = Math.sin(startScreenHandAnimT) * 20;
     let frame = Math.floor(startScreenHandAnimT) % 8;
                 
     // ctx.drawImage(images.hand.obj.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
-    ctx.drawImage(AM.images.hand.img, frame * AM.images.hand.cw, 0, AM.images.hand.cw, AM.images.hand.ch, startPage.hand.x, startPage.hand.y, startPage.hand.w, startPage.hand.h);
-    TXT.draw('instruction1');
-    TXT.draw('instruction1_2');
+    ctx.drawImage(AM.images.hand.img, frame * AM.images.hand.cw, 0, AM.images.hand.cw, AM.images.hand.ch, startPage.hand.x, y, startPage.hand.w, startPage.hand.h);
+    // TXT.draw('instruction1');
+    // TXT.draw('instruction1_2');
 
-    ctx.drawImage(AM.images.gopher.img, 0, 0, AM.images.gopher.cw, AM.images.gopher.ch, startPage.gopher.x, startPage.gopher.y, startPage.gopher.w, startPage.gopher.h);
-    TXT.draw('instruction2');
-    TXT.draw('instruction2_2');
+    let w = AM.images.gopher_intro.cw * 1.25 * scaleX;
+    let h = AM.images.gopher_intro.ch * 1.25 * scaleX;
+    frame = Math.floor(startScreenHandAnimT) % 19;
 
+    ctx.drawImage(AM.images.gopher_intro.img, frame * AM.images.gopher_intro.cw, 0, AM.images.gopher_intro.cw, AM.images.gopher_intro.ch, x, y, w, h);
+    // TXT.draw('instruction2');
+    // TXT.draw('instruction2_2');
+
+    x = mid + 480 * scaleX;
+    y += 30 * splashInfo.sx;
     let carrotRotation = Math.sin(startScreenHandAnimT) * 15;
     ctx.save();
     // Untransformed draw position
-    const position = {x: startPage.carrot.x, y: startPage.carrot.y};
+    const position = {x: x, y: y };
     // In degrees
     const rotation = { x: 0, y: 0, z: carrotRotation };
     // Rotation relative to here (this is the center of the image)
@@ -961,19 +1062,19 @@ function startPageAnimations() {
     ctx.drawImage(AM.images.carrot.img, 0, 0, AM.images.carrot.cw, AM.images.carrot.ch, -rotPt.x, -rotPt.y, startPage.carrot.w, startPage.carrot.h);
     ctx.restore();
     // ctx.drawImage(AM.images.carrot.img, 0, 0, AM.images.carrot.cw, AM.images.carrot.ch, startPage.carrot.x, startPage.carrot.y, startPage.carrot.w, startPage.carrot.h);
-    TXT.draw('instruction3');
+    // TXT.draw('instruction3');
     //
-    drawStunHalo(1);
-    drawStunHalo(-1);
+    // drawStunHalo(1);
+    // drawStunHalo(-1);
     //
 
-    let starx1 = Math.sin(startScreenHandAnimT) * 20 * scaleY;
-    let starx2 = Math.sin(startScreenHandAnimT * 1.5) * 10 * scaleY;
-    let starx3 = Math.sin(startScreenHandAnimT * 2) * 20 * scaleY;
-    ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 3.5, startPage.star.y + starx1, startPage.star.w, startPage.star.h);
-    ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 2, startPage.star.y + starx3, startPage.star.w, startPage.star.h);
-    ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 2.5, startPage.star.y + starx2, startPage.star.w, startPage.star.h);
-    ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 1.5, startPage.star.y + starx1, startPage.star.w, startPage.star.h);
+    // let starx1 = Math.sin(startScreenHandAnimT) * 20 * scaleY;
+    // let starx2 = Math.sin(startScreenHandAnimT * 1.5) * 10 * scaleY;
+    // let starx3 = Math.sin(startScreenHandAnimT * 2) * 20 * scaleY;
+    // ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 3.5, startPage.star.y + starx1, startPage.star.w, startPage.star.h);
+    // ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 2, startPage.star.y + starx3, startPage.star.w, startPage.star.h);
+    // ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 2.5, startPage.star.y + starx2, startPage.star.w, startPage.star.h);
+    // ctx.drawImage(AM.images.star.img, 0, 0, AM.images.star.cw, AM.images.star.ch, startPage.star.x + startPage.halo.w / 1.5, startPage.star.y + starx1, startPage.star.w, startPage.star.h);
 
 
     
@@ -1072,7 +1173,7 @@ function gameCycle() {
         // drawBG(ctx, 'bg');
         // HUD.draw(ctx);
         
-        HUD.gameover(ctx);
+        HUD.gameover(ctx, splashInfo, delta);
     }
 
     requestAnimationFrame(gameCycle);

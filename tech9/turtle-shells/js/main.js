@@ -627,25 +627,34 @@ var startPageInfo = {
         ch: 57,
     },
     turtle: {
-        // x: 817,
-        // y: 270,
-        // x: 475,
         x: 425,
         // y: 280,
         y: 261,
-        w: 120 * 1.2,
-        h: 121 * 1.2,
-        cw: 120,
-        ch: 121,
+        w: 128 * 1,
+        h: 128 * 1,
+        // x: 817,
+        // y: 270,
+        // x: 475,
+        // x: 425,
+        // // y: 280,
+        // y: 261,
+        // w: 120 * 1.2,
+        // h: 121 * 1.2,
+        // cw: 120,
+        // ch: 121,
     },
     shell: {
-        // x: 1183,
         x: 1233,
         y: 251,
-        w: 105 * 1.2,
-        h: 116 * 1.2,
-        cw: 105,
-        ch: 116,
+        w: 128 * 1,
+        h: 128 * 1,
+        // x: 1183,
+        // x: 1233,
+        // y: 251,
+        // w: 105 * 1.2,
+        // h: 116 * 1.2,
+        // cw: 105,
+        // ch: 116,
     },
     text1: {
         // x: 385,
@@ -710,6 +719,29 @@ var turtleSpeechInfo = {
 var selectedTurtlePos = -1;
 var showUnhappyT = 0;
 
+var HUD = null;
+
+const splashInfo = {
+    x: 0,
+    y: 0,
+    w: 1864,
+    h: 861,
+    sx: 1,
+    sy: 1,
+};
+
+var startButtonInfo = {
+    x: 0,
+    y: 0,
+    w: 192 * 2,
+    h: 60 * 2,
+}
+
+const onTablet = isTablet();
+const onMobile = isMobile();
+
+var tracks = {};
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
@@ -720,6 +752,32 @@ function main(w, h) {
     
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    if (onTablet) {
+        splashInfo.w = AM.images.intro.cw;
+        splashInfo.h = AM.images.intro.ch;
+    }
+
+    splashInfo.sx = w / splashInfo.w;
+    splashInfo.sy = h / splashInfo.h;
+    splashInfo.w *= splashInfo.sx;
+    splashInfo.h *= splashInfo.sx;
+
+    splashInfo.x = w / 2 - splashInfo.w / 2;
+    splashInfo.y = Math.abs(h / 2 - splashInfo.h / 2);
+
+    if (onMobile && !onTablet) {
+        splashInfo.y = 0;
+    }
+
+    rescaleSize(startButtonInfo, scaleX, scaleX);
+    startButtonInfo.x = w / 2 - startButtonInfo.w / 2;
+    if (onTablet) {
+        startButtonInfo.y = splashInfo.y + splashInfo.h - 730 * splashInfo.sx;
+
+    } else {
+        startButtonInfo.y = splashInfo.y + splashInfo.h - 230 * splashInfo.sx;
+    }
 
     let isMobile = detectMob();
     
@@ -780,29 +838,63 @@ function main(w, h) {
     btnBegin.x = w / 2 - btnBegin.w / 2;
     btnBegin.y = h - 235 * scaleY;
     
-    rescaleSize(turtleInfo);
-    rescaleSize(shellInfo);
-    rescaleAll(turtlehideInfo);
-    rescaleAll(turtlehappyInfo);
-    rescaleAll(seagullInfo);
-    rescaleAll(volumeInfo);
+    rescaleSize(turtleInfo, scaleX, scaleX);
+    rescaleSize(shellInfo, scaleX, scaleX);
+
+    rescalePos(turtlehideInfo, scaleX, scaleY);
+    rescaleSize(turtlehideInfo, scaleX, scaleX);
+
+    rescalePos(turtlehappyInfo, scaleX, scaleY);
+    rescaleSize(turtlehappyInfo, scaleX, scaleX);
+
+    rescalePos(seagullInfo, scaleX, scaleY);
+    rescaleSize(seagullInfo, scaleX, scaleX);
+
+    rescalePos(volumeInfo, scaleX, scaleY);
+    rescaleSize(volumeInfo, scaleX, scaleX);
 
     initTopHUD();
 
-    rescaleAll(bgInfo.water);
-    rescaleAll(bgInfo.sand);
-    rescaleAll(bgInfo.sand2);
+    rescalePos(bgInfo.water, scaleX, scaleX);
+    rescaleSize(bgInfo.water, scaleX, scaleX);
 
-    rescaleAll(bgInfo.umbrella);
-    rescaleAll(bgInfo.palm);
-    rescaleAll(bgInfo.palmshadow);
-    rescaleAll(bgInfo.kayak);
-    rescaleAll(bgInfo.cloudleft);
-    rescaleAll(bgInfo.cloudright);
-    rescaleAll(bgInfo.cloud1);
-    rescaleAll(bgInfo.cloud2);
-    rescaleAll(bgInfo.cloud3);
-    rescaleAll(shineInfo);
+    rescalePos(bgInfo.sand, scaleX, scaleY);
+    rescaleSize(bgInfo.sand, scaleX, scaleX);
+
+    rescalePos(bgInfo.sand2, scaleX, scaleY);
+    rescaleSize(bgInfo.sand2, scaleX, scaleX);
+
+    rescalePos(bgInfo.umbrella, scaleX, scaleY);
+    rescaleSize(bgInfo.umbrella, scaleX, scaleX);
+
+    rescalePos(bgInfo.palm, scaleX, scaleY);
+    rescaleSize(bgInfo.palm, scaleX, scaleX);
+
+    rescalePos(bgInfo.palmshadow, scaleX, scaleY);
+    rescaleSize(bgInfo.palmshadow, scaleX, scaleX);
+
+    rescalePos(bgInfo.kayak, scaleX, scaleY);
+    rescaleSize(bgInfo.kayak, scaleX, scaleX);
+
+    rescalePos(bgInfo.cloudleft, scaleX, scaleY);
+    rescaleSize(bgInfo.cloudleft, scaleX, scaleX);
+
+    rescalePos(bgInfo.cloudright, scaleX, scaleY);
+    rescaleSize(bgInfo.cloudright, scaleX, scaleX);
+
+    rescalePos(bgInfo.cloud1, scaleX, scaleY);
+    rescaleSize(bgInfo.cloud1, scaleX, scaleX);
+
+    rescalePos(bgInfo.cloud2, scaleX, scaleY);
+    rescaleSize(bgInfo.cloud2, scaleX, scaleX);
+
+    rescalePos(bgInfo.cloud3, scaleX, scaleY);
+    rescaleSize(bgInfo.cloud3, scaleX, scaleX);
+
+    rescalePos(shineInfo, scaleX, scaleY);
+    rescaleSize(shineInfo, scaleX, scaleX);
+
+    HUD = new Template_1(ctx, w, h, scaleX, scaleY, splashInfo);
 
 
     // startpage texts
@@ -881,7 +973,7 @@ function main(w, h) {
     bgInfo.palmshadow.x = w - bgInfo.palmshadow.w;
     bgInfo.palmshadow.y = h - (bgInfo.palmshadow.h);
     bgInfo.kayak.x = w - (bgInfo.kayak.w + 100 * scaleX);
-    bgInfo.kayak.y = h - (bgInfo.kayak.h + 300 * scaleY);
+    bgInfo.kayak.y = h - (bgInfo.kayak.h + 300 * scaleX);
     bgInfo.cloudright.x = w - bgInfo.cloudright.w;
 
     bgInfo.cloud1.x = w - bgInfo.cloud1.w;
@@ -892,9 +984,11 @@ function main(w, h) {
     bgInfo.cloud3.y = h / 2 - (150 * scaleY);
 
     
-    bgInfo.water.y = h / 2 + bgInfo.water.y * scaleY;
-    bgInfo.sand.y = h - 376 * scaleY;
-    bgInfo.sand2.y = h - 336 * scaleY;
+    bgInfo.sand.y = h - 376 * scaleX;
+    bgInfo.sand2.y = h - 336 * scaleX;
+    bgInfo.water.y = bgInfo.sand2.y + 25 * splashInfo.sx;
+    // bgInfo.water.y = h / 2 + bgInfo.water.y * scaleY;
+    
 
     let pbW = 150 * scaleX;
     let pbH = 45 * scaleY;
@@ -947,18 +1041,21 @@ function main(w, h) {
 
             if (gameover) {
                 // canReset = false;
+                if (isBtnClicked(mx, my, HUD.endscreenButtons)) {
+                    submitScore();
+                }
             } else if (gameStart) {
                 // turtles[2].move(-1);
                 // turtles[0].move(1);
                 // turtles[2].goto(-2);
                 if (isBtnClicked(mx, my, {
-                    x: volumeInfo.x,
-                    y: volumeInfo.y,
-                    w: volumeInfo.w,
-                    h: volumeInfo.h
+                    x: HUD.volume.x,
+                    y: HUD.volume.y,
+                    w: HUD.volume.w,
+                    h: HUD.volume.h
                 })) {
-                    volumeOn = !volumeOn; 
-                    if (volumeOn) {
+                    HUD.volumeOn = !HUD.volumeOn; 
+                    if (HUD.volumeOn) {
                         AM.audio.bg.img.currentTime = 0;
                         AM.audio.bg.img.play();
                         
@@ -968,98 +1065,104 @@ function main(w, h) {
                     }
                 } else if (startTimer && swaps.length == 0 && showAnswerT == 0) {
                     let p = clickBucket(mx, my);
-                    console.log(p)
-                    for (let i = 0; i < turtles.length; ++i) {
-                        if (p == turtles[i].pos) {
-                            selectedTurtlePos = i;
-                            break;
+                    if (p > -1 && p < turtles.length) {
+                        for (let i = 0; i < turtles.length; ++i) {
+                            if (p == turtles[i].pos) {
+                                selectedTurtlePos = i;
+                                break;
+                            }
                         }
-                    }
-
-                    // console.log(clickBucket(turtles[target].x, turtles[target].y));
-                    
-                    if (p == turtles[target].pos) {
-                        // alert('you win');
-                        // msg = 'Correct!';
-                        // msg = 'correct';
-
-                        // let msgs = [1, 11, 12, 13, 14, 15, 16, 17];
-                        let rng = Math.floor(Math.random() * 8) + 1;
-                        if (rng > 1) rng += 9;
-                        else rng = 11;
-
-                        // msg = TEXT_ID.CORRECT;
-                        msg = rng;
-                        score++;
-                        // if (!AM.audio.correct.img.paused) {
-                        //     AM.audio.correct.img.currentTime = 0;
-                        //     AM.audio.correct.img.play();
+    
+                        // console.log(clickBucket(turtles[target].x, turtles[target].y));
+                        
+                        if (p == turtles[target].pos) {
+                            // alert('you win');
+                            // msg = 'Correct!';
+                            // msg = 'correct';
+    
+                            // let msgs = [1, 11, 12, 13, 14, 15, 16, 17];
+                            let rng = Math.floor(Math.random() * 8) + 1;
+                            if (rng > 1) rng += 9;
+                            else rng = 11;
+    
+                            // msg = TEXT_ID.CORRECT;
+                            msg = rng;
+                            score++;
+                            // if (!AM.audio.correct.img.paused) {
+                            //     AM.audio.correct.img.currentTime = 0;
+                            //     AM.audio.correct.img.play();
+                            // }
+                            
+                            if (volumeOn) {
+                                setTimeout(() => {
+                                    AM.audio.correct.img.currentTime = 0;
+                                    AM.audio.correct.img.volume = 0.5;
+                                    AM.audio.correct.img.play();
+                                }, 0)
+                            }
+    
+                            turtles[target].jump = jumpHeight;
+                            turtles[target].activateSpriteAnimation = true;
+                            turtles[target].clipX = 0;
+                            turtles[target].clipAnimT = 0;
+    
+                            turtleSpeechKey = getSpeech(1, p);
+                            // console.log(turtleSpeechKey);
+    
+                            HUD.updateScoreSprite(zeroPad(score, 2));
+                        } else {
+                            // alert('you lose');
+                            // msg = 'wrong';
+                            let rng = Math.floor(Math.random() * 8) + 1;
+                            if (rng > 1) rng += 16;
+                            else rng = 18;
+    
+                            msg = rng;
+                            // msg = TEXT_ID.WRONG;
+                            // msg = 'Wrong!';
+                            reduceHP();
+    
+                            if (volumeOn) {
+                                setTimeout(() => {
+                                    AM.audio.wrong.img.currentTime = 0;
+                                    AM.audio.wrong.img.volume = 0.5;
+                                    AM.audio.wrong.img.play();
+                                }, 0)
+                            }
+    
+                            
+                            turtleSpeechKey = getSpeech(0, clickBucket(turtles[target].x, turtles[target].y));
+                            console.log(turtleSpeechKey);
+                        }
+    
+                        // showAnswer = true;
+                        showAnswerT = 5;
+                        showUnhappyT = 0;
+                        answerIdx = target;
+                        startTimer = false;
+                        
+    
+                        // if (rounds < totalRounds) {
+                        //     nextRound();
+                        // } else {
+                        //     // alert('You scored: ' + score + ' out of ' + rounds + '.');
+                        //     gameover = true;
                         // }
-                        
-                        if (volumeOn) {
-                            setTimeout(() => {
-                                AM.audio.correct.img.currentTime = 0;
-                                AM.audio.correct.img.volume = 0.5;
-                                AM.audio.correct.img.play();
-                            }, 0)
-                        }
-
-                        turtles[target].jump = jumpHeight;
-                        turtles[target].activateSpriteAnimation = true;
-                        turtles[target].clipX = 0;
-                        turtles[target].clipAnimT = 0;
-
-                        turtleSpeechKey = getSpeech(1, p);
-                        console.log(turtleSpeechKey);
-                        
-                    } else {
-                        // alert('you lose');
-                        // msg = 'wrong';
-                        let rng = Math.floor(Math.random() * 8) + 1;
-                        if (rng > 1) rng += 16;
-                        else rng = 18;
-
-                        msg = rng;
-                        // msg = TEXT_ID.WRONG;
-                        // msg = 'Wrong!';
-                        reduceHP();
-
-                        if (volumeOn) {
-                            setTimeout(() => {
-                                AM.audio.wrong.img.currentTime = 0;
-                                AM.audio.wrong.img.volume = 0.5;
-                                AM.audio.wrong.img.play();
-                            }, 0)
-                        }
-
-                        
-                        turtleSpeechKey = getSpeech(0, clickBucket(turtles[target].x, turtles[target].y));
-                        console.log(turtleSpeechKey);
                     }
-
-                    // showAnswer = true;
-                    showAnswerT = 5;
-                    showUnhappyT = 0;
-                    answerIdx = target;
-                    startTimer = false;
                     
-
-                    // if (rounds < totalRounds) {
-                    //     nextRound();
-                    // } else {
-                    //     // alert('You scored: ' + score + ' out of ' + rounds + '.');
-                    //     gameover = true;
-                    // }
                 }
             } else {
-                if (isBtnClicked(mx, my, btnBegin)) {
+                // if (isBtnClicked(mx, my, btnBegin)) {
+                if (isBtnClicked(mx, my, startButtonInfo)) {
+                    initAllAudio();
+                    
                     gameStart = true;
                     AM.audio.bg.img.volume = 0.08;
                     // AM.audio.bg.img.volume = 1;
                     AM.audio.bg.img.loop = true;
                     AM.audio.bg.img.play();
 
-                    playAllAudio();
+                    // playAllAudio();
                 }
             }
 
@@ -1180,6 +1283,19 @@ function muteAllAudio(flag) {
     for (let k in AM.audio) {
         AM.audio[k].img.muted = flag;
     } 
+}
+
+function initAllAudio() {
+    if (audioContext.state === "suspended") {
+        audioContext.resume();
+    }
+
+    for (let k in AM.audio) {
+        tracks[k] = audioContext.createMediaElementSource(AM.audio[k].img);
+        tracks[k].connect(audioContext.destination);
+    }
+
+    // playAllAudio();
 }
 
 function playAllAudio() {
@@ -1448,12 +1564,12 @@ function initTopHUD() {
         // topHUDInfo.timer.w = topHUD.timer.timecircle.w / 2 + 100 * scaleX;
     }
 
-    rescaleSize(topHUD.timer.timecircle);
-    rescaleSize(topHUD.timer.stopwatch);
-    rescaleSize(topHUD.score.turtleshine);
+    rescaleSize(topHUD.timer.timecircle, scaleX, scaleX);
+    rescaleSize(topHUD.timer.stopwatch, scaleX, scaleX);
+    rescaleSize(topHUD.score.turtleshine, scaleX, scaleX);
     // rescaleAll(topHUD.score.turtleshine);
     
-    rescaleSize(topHUDInfo);
+    rescaleSize(topHUDInfo, scaleX, scaleX);
     let volumeAdjX = volumeInfo.x + volumeInfo.w;
 
     console.log(volumeAdjX);
@@ -1492,7 +1608,7 @@ function initTopHUD() {
     topHUDInfo.score.fontXadj *= scaleX;
 
     topHUDInfo.life.w *= scaleX;
-    topHUDInfo.life.h *= scaleY;
+    topHUDInfo.life.h *= scaleX;
     topHUDInfo.life.pad = 20 * scaleX;
     let lifeW = topHUDInfo.life.pad * 2 + topHUDInfo.life.w * topHUDInfo.life.lives;
     sx = (canvas.width - topHUDInfo.w);
@@ -1625,17 +1741,17 @@ function loadAssets() {
     }
 }
 
-function rescaleSize(obj) {
-    obj.w *= scaleX;
-    obj.h *= scaleY;
-}
+// function rescaleSize(obj) {
+//     obj.w *= scaleX;
+//     obj.h *= scaleY;
+// }
 
-function rescaleAll(obj) {
-    obj.x *= scaleX;
-    obj.y *= scaleY;
-    obj.w *= scaleX;
-    obj.h *= scaleY;
-}
+// function rescaleAll(obj) {
+//     obj.x *= scaleX;
+//     obj.y *= scaleY;
+//     obj.w *= scaleX;
+//     obj.h *= scaleY;
+// }
 
 function detectMob() {
     const toMatch = [
@@ -1701,9 +1817,10 @@ function checkSwaps() {
 function reduceHP() {
     if (--lives < 1) {
         gameover = true;
-        TXT.addText(TEXT_ID.FINALSCORE, zeroPad(score, 2), 'bold', 20, 'Montserrat', canvas.width / 2, shineInfo.y + shineInfo.h * 0.8, 65, 60, '#fff', true); 
+        // TXT.addText(TEXT_ID.FINALSCORE, zeroPad(score, 2), 'bold', 20, 'Montserrat', canvas.width / 2, shineInfo.y + shineInfo.h * 0.8, 65, 60, '#fff', true); 
         msg = 'Complete!';
         // submitScore();
+        HUD.updateGameoverScore(splashInfo, zeroPad(score, 2));
     }
 }
 
@@ -1764,6 +1881,8 @@ function submitScore() {
 }
 
 function update() {
+    HUD.updateTimerSprite(zeroPad(Math.floor(gameT), 2), gameDuration);
+
     checkSwaps();
 
     for (let i = 0; i < turtles.length; ++i) {
@@ -1836,8 +1955,9 @@ function update() {
             } else {
                 // alert('You scored: ' + score + ' out of ' + rounds + '.');
                 gameover = true;
-                TXT.addText(TEXT_ID.FINALSCORE, zeroPad(score, 2), 'bold', 20, 'Montserrat', canvas.width / 2, shineInfo.y + shineInfo.h * 0.8, 65, 60, '#fff', true);
+                // TXT.addText(TEXT_ID.FINALSCORE, zeroPad(score, 2), 'bold', 20, 'Montserrat', canvas.width / 2, shineInfo.y + shineInfo.h * 0.8, 65, 60, '#fff', true);
                 // submitScore();
+                HUD.updateGameoverScore(splashInfo, zeroPad(score, 2));
             }
         }
     } else if (showTarget) {
@@ -1969,6 +2089,8 @@ function drawTopHUD() {
     TXT.texts[TEXT_ID.TOPTIMER].str = Math.floor(gameT);
     TXT.draw(TEXT_ID.TOPTIMER);
 
+    
+
     // ctx.fillText(timeText, topHUDInfo.timer.text.x, topHUDInfo.timer.text.y);
     // ctx.fillText('25', topHUD.timer.timecircle.w / 2 - 23 / 2, topHUD.timer.timecircle.h / 2 + 3);
 }
@@ -1977,7 +2099,7 @@ function drawLives() {
     const { x, y, w, h, pad } = topHUDInfo.life;
     
     for (let i = 0; i < lives; ++i) {
-        ctx.drawImage(AM.images.turtle.img, 0, 0, turtleInfo.cw, turtleInfo.ch, x + i * w + i * pad, y, w, h);
+        ctx.drawImage(AM.images.turtle.img, 0, 0, turtleInfo.cw, turtleInfo.ch, x + i * w + i * pad, HUD.score_rect.y, w, h);
     }
     
 }
@@ -2144,6 +2266,40 @@ function drawProgress() {
     // }
 }
 
+function drawStartPage() {
+    ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, splashInfo.x, splashInfo.y, splashInfo.w, splashInfo.h);
+
+    let mid = canvas.width / 2 - startPageInfo.hand.w / 2;
+    let x = startPageInfo.hand.x - 455 * scaleX;
+    let hy = onTablet ? 820 : 280;
+    let y = splashInfo.y + hy * splashInfo.sx;
+    
+    let n = Math.floor(startScreenHandAnimT * 0.75);
+    let frame = n % 12;
+
+    if (Math.floor(n / 12) & 1) {
+        frame = 11 - frame;
+    }
+
+    ctx.drawImage(AM.images.show_turtle.img, frame * AM.images.show_turtle.cw, 0, AM.images.show_turtle.cw, AM.images.show_turtle.ch, 
+        x, y, startPageInfo.turtle.w, startPageInfo.turtle.h);
+
+    frame = Math.floor(startScreenHandAnimT) % 8;
+                
+    ctx.drawImage(AM.images.hand.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, mid, y, startPageInfo.hand.w, startPageInfo.hand.h);
+
+    x = startPageInfo.hand.x + 440 * scaleX;
+    frame = Math.floor(startScreenHandAnimT * 5) % 10;
+
+    ctx.drawImage(AM.images.shake_turtle.img, frame * AM.images.shake_turtle.cw, 0, AM.images.shake_turtle.cw, AM.images.shake_turtle.ch, 
+        x, y, startPageInfo.shell.w, startPageInfo.shell.h);
+
+    if (delta < 1) {
+        // startTurtleBlinkT += 2 * delta;
+        startScreenHandAnimT += 5 * delta;
+    }
+}
+
 function gameCycle() {
     let now = Date.now();
     delta = (now - last) / 1000;
@@ -2159,14 +2315,15 @@ function gameCycle() {
                 drawSeagulls();
                 // hud
                 // drawProgress();
-                timeProgressBar.draw(ctx);
-                drawTopHUD();
 
-                scoreProgressBar.draw(ctx);
-                drawScoreHUD();
+                // timeProgressBar.draw(ctx);
+                // drawTopHUD();
+
+                // scoreProgressBar.draw(ctx);
+                // drawScoreHUD();
                 drawLives();
 
-                
+                HUD.draw(ctx);
 
                 // game
                 drawTurtle();
@@ -2174,161 +2331,164 @@ function gameCycle() {
 
                 
             } else {
-                let handx = Math.sin(startScreenHandAnimT) * 20;
+                drawStartPage();
+                // let handx = Math.sin(startScreenHandAnimT) * 20;
 
-                // ctx.drawImage(AM.images.splash.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
-                ctx.drawImage(AM.images.startbg.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
-                ctx.drawImage(AM.images.title.img, 0, 0, startPageInfo.title.cw, startPageInfo.title.ch, startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
+                // // ctx.drawImage(AM.images.splash.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+                // ctx.drawImage(AM.images.startbg.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+                // ctx.drawImage(AM.images.title.img, 0, 0, startPageInfo.title.cw, startPageInfo.title.ch, startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
                 
-                let frame = Math.floor(startScreenHandAnimT) % 8;
+                // let frame = Math.floor(startScreenHandAnimT) % 8;
                 
-                ctx.drawImage(AM.images.hand.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
-                // tap
-                // ctx.save();
+                // ctx.drawImage(AM.images.hand.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                // // tap
+                // // ctx.save();
+                // // // Untransformed draw position
+                // // var position = {x: startPageInfo.hand.x, y: startPageInfo.hand.y};
+                // // // In degrees
+                // // var rotation = { x: 0, y: Math.sin(startScreenHandAnimT) * 35, z: 0};
+                // // // Rotation relative to here (this is the center of the image)
+                // // var rotPt = { x: startPageInfo.hand.w / 2, y: startPageInfo.hand.h / 2 };
+
+                // // ctx.setTransform(new DOMMatrix()
+                // //     .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+                // //     .rotateSelf(rotation.x, rotation.y, rotation.z)
+                // // );
+                
+                // // ctx.drawImage(AM.images.hand.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, -rotPt.x, -rotPt.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                // // ctx.restore();
+                // //
+                // // ctx.drawImage(AM.images.hand.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x + handx, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                
+                // let t = Math.floor(startTurtleBlinkT);
+                // t = t % 8;
+                // let clipX = t * startPageInfo.turtle.cw;
+                
+
+                // ctx.drawImage(AM.images.turtlehappy.img, clipX, 0, startPageInfo.turtle.cw, startPageInfo.turtle.ch, startPageInfo.turtle.x, startPageInfo.turtle.y, startPageInfo.turtle.w, startPageInfo.turtle.h);
+                
+
                 // // Untransformed draw position
-                // var position = {x: startPageInfo.hand.x, y: startPageInfo.hand.y};
+                // position = {x: startPageInfo.shell.x, y: startPageInfo.shell.y};
                 // // In degrees
-                // var rotation = { x: 0, y: Math.sin(startScreenHandAnimT) * 35, z: 0};
+                // rotation = { x: 0, y: startScreenHandAnimT * 10, z: 0};
                 // // Rotation relative to here (this is the center of the image)
-                // var rotPt = { x: startPageInfo.hand.w / 2, y: startPageInfo.hand.h / 2 };
+                // rotPt = { x: startPageInfo.shell.w / 2, y: startPageInfo.shell.h / 2 };
 
+                // ctx.save();
                 // ctx.setTransform(new DOMMatrix()
                 //     .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
                 //     .rotateSelf(rotation.x, rotation.y, rotation.z)
                 // );
-                
-                // ctx.drawImage(AM.images.hand.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, -rotPt.x, -rotPt.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                // // ctx.drawImage(AM.images.startcoin.img, 0, 0, AM.images.startcoin.cw, AM.images.startcoin.ch, -rotPt.x, -rotPt.y, startPage.startcoin.w, startPage.startcoin.h);
+                // ctx.drawImage(AM.images.shell.img, 0, 0, startPageInfo.shell.cw, startPageInfo.shell.ch, -rotPt.x, -rotPt.y, startPageInfo.shell.w, startPageInfo.shell.h);
                 // ctx.restore();
-                //
-                // ctx.drawImage(AM.images.hand.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x + handx, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
-                
-                let t = Math.floor(startTurtleBlinkT);
-                t = t % 8;
-                let clipX = t * startPageInfo.turtle.cw;
-                
 
-                ctx.drawImage(AM.images.turtlehappy.img, clipX, 0, startPageInfo.turtle.cw, startPageInfo.turtle.ch, startPageInfo.turtle.x, startPageInfo.turtle.y, startPageInfo.turtle.w, startPageInfo.turtle.h);
-                
+                // // for (let i = 1; i < 4; ++i) {
+                // //     let key = 'text' + i;
+                // //     ctx.drawImage(AM.images[key].img, 0, 0, startPageInfo[key].cw, startPageInfo[key].ch, startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
+                // // }
 
-                // Untransformed draw position
-                position = {x: startPageInfo.shell.x, y: startPageInfo.shell.y};
-                // In degrees
-                rotation = { x: 0, y: startScreenHandAnimT * 10, z: 0};
-                // Rotation relative to here (this is the center of the image)
-                rotPt = { x: startPageInfo.shell.w / 2, y: startPageInfo.shell.h / 2 };
+                // TXT.draw('text1_1');
+                // TXT.draw('text1_2');
 
-                ctx.save();
-                ctx.setTransform(new DOMMatrix()
-                    .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
-                    .rotateSelf(rotation.x, rotation.y, rotation.z)
-                );
-                // ctx.drawImage(AM.images.startcoin.img, 0, 0, AM.images.startcoin.cw, AM.images.startcoin.ch, -rotPt.x, -rotPt.y, startPage.startcoin.w, startPage.startcoin.h);
-                ctx.drawImage(AM.images.shell.img, 0, 0, startPageInfo.shell.cw, startPageInfo.shell.ch, -rotPt.x, -rotPt.y, startPageInfo.shell.w, startPageInfo.shell.h);
-                ctx.restore();
+                // TXT.draw('text2_1');
+                // TXT.draw('text2_2');
 
-                // for (let i = 1; i < 4; ++i) {
-                //     let key = 'text' + i;
-                //     ctx.drawImage(AM.images[key].img, 0, 0, startPageInfo[key].cw, startPageInfo[key].ch, startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
+                // TXT.draw('text3_1');
+                // TXT.draw('text3_2');
+
+                // ctx.drawImage(AM.images.beginbutton.img, 0, 0, startPageInfo.beginbutton.cw, startPageInfo.beginbutton.ch, startPageInfo.beginbutton.x, startPageInfo.beginbutton.y, startPageInfo.beginbutton.w, startPageInfo.beginbutton.h);
+                // // TXT.draw(0);
+                // // ctx.drawImage(AM.images.turtleshine.img, 0, 0, topHUD.score.turtleshine.cw, 
+                // //     topHUD.score.turtleshine.ch, 0, 0, topHUD.score.turtleshine.w, topHUD.score.turtleshine.h);
+                // // ctx.beginPath();
+                // // ctx.rect(btnBegin.x, btnBegin.y, btnBegin.w, btnBegin.h);
+                // // ctx.stroke();
+
+                // // drawTextInBox('Testing', 'Montserrat', 0, 0, 500, 100);
+                // // TM.draw(tmpText);
+
+                // if (delta < 1) {
+                //     startTurtleBlinkT += 2 * delta;
+                //     startScreenHandAnimT += 5 * delta;
                 // }
-
-                TXT.draw('text1_1');
-                TXT.draw('text1_2');
-
-                TXT.draw('text2_1');
-                TXT.draw('text2_2');
-
-                TXT.draw('text3_1');
-                TXT.draw('text3_2');
-
-                ctx.drawImage(AM.images.beginbutton.img, 0, 0, startPageInfo.beginbutton.cw, startPageInfo.beginbutton.ch, startPageInfo.beginbutton.x, startPageInfo.beginbutton.y, startPageInfo.beginbutton.w, startPageInfo.beginbutton.h);
-                // TXT.draw(0);
-                // ctx.drawImage(AM.images.turtleshine.img, 0, 0, topHUD.score.turtleshine.cw, 
-                //     topHUD.score.turtleshine.ch, 0, 0, topHUD.score.turtleshine.w, topHUD.score.turtleshine.h);
-                // ctx.beginPath();
-                // ctx.rect(btnBegin.x, btnBegin.y, btnBegin.w, btnBegin.h);
-                // ctx.stroke();
-
-                // drawTextInBox('Testing', 'Montserrat', 0, 0, 500, 100);
-                // TM.draw(tmpText);
-
-                if (delta < 1) {
-                    startTurtleBlinkT += 2 * delta;
-                    startScreenHandAnimT += 5 * delta;
-                }
             }
         } else {
-            if (!fade) {
-                // bg
-                drawBGs();
-                drawSeagulls();
-                // hud
-                // drawProgress();
-                timeProgressBar.draw(ctx);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            HUD.gameover(ctx, splashInfo, delta);
+            // if (!fade) {
+            //     // bg
+            //     drawBGs();
+            //     drawSeagulls();
+            //     // hud
+            //     // drawProgress();
+            //     timeProgressBar.draw(ctx);
 
-                drawTopHUD();
-                scoreProgressBar.draw(ctx);
+            //     drawTopHUD();
+            //     scoreProgressBar.draw(ctx);
                 
-                drawScoreHUD();
-                drawLives();
+            //     drawScoreHUD();
+            //     drawLives();
 
-                // game
-                drawTurtle();
-                // update();
+            //     // game
+            //     drawTurtle();
+            //     // update();
 
-                ctx.save();
-                ctx.globalAlpha = 0.85;
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.restore();
-                // ctx.globalAlpha = 1.0;
+            //     ctx.save();
+            //     ctx.globalAlpha = 0.85;
+            //     ctx.fillStyle = '#000';
+            //     ctx.fillRect(0, 0, canvas.width, canvas.height);
+            //     ctx.restore();
+            //     // ctx.globalAlpha = 1.0;
 
-                pulseT += 2 * delta;
-                let w = Math.sin(pulseT) * (shineInfo.w + 10);
-                let h = Math.sin(pulseT) * (shineInfo.h + 10);
+            //     pulseT += 2 * delta;
+            //     let w = Math.sin(pulseT) * (shineInfo.w + 10);
+            //     let h = Math.sin(pulseT) * (shineInfo.h + 10);
 
-                if (w >= shineInfo.w) {
-                    w = shineInfo.w;
-                }
+            //     if (w >= shineInfo.w) {
+            //         w = shineInfo.w;
+            //     }
 
-                if (h >= shineInfo.h) {
-                    h = shineInfo.h;
-                }
+            //     if (h >= shineInfo.h) {
+            //         h = shineInfo.h;
+            //     }
 
-                if (w == shineInfo.w && h == shineInfo.h) {
-                    fade = true;
-                }
+            //     if (w == shineInfo.w && h == shineInfo.h) {
+            //         fade = true;
+            //     }
 
-                let x = shineInfo.x + (shineInfo.w / 2 - w / 2);
-                let y = shineInfo.y + (shineInfo.h / 2 - h / 2);
-                ctx.drawImage(AM.images.shine.img, 0, 0, shineInfo.cw, 
-                    shineInfo.ch, x, y, w, h);
+            //     let x = shineInfo.x + (shineInfo.w / 2 - w / 2);
+            //     let y = shineInfo.y + (shineInfo.h / 2 - h / 2);
+            //     ctx.drawImage(AM.images.shine.img, 0, 0, shineInfo.cw, 
+            //         shineInfo.ch, x, y, w, h);
                 
 
-                // ctx.drawImage(AM.images.shine.img, 0, 0, shineInfo.cw, 
-                //     shineInfo.ch, shineInfo.x, shineInfo.y, shineInfo.w, shineInfo.h);
+            //     // ctx.drawImage(AM.images.shine.img, 0, 0, shineInfo.cw, 
+            //     //     shineInfo.ch, shineInfo.x, shineInfo.y, shineInfo.w, shineInfo.h);
                 
-                x = shineInfo.x + (shineInfo.w / 2 - turtleInfo.w / 2);
-                y = shineInfo.y + (shineInfo.h / 2 - turtleInfo.h / 2 - 10 * scaleY);
-                ctx.drawImage(AM.images.turtle.img, 0, 0, turtleInfo.cw, 
-                    turtleInfo.ch, x, y, turtleInfo.w, turtleInfo.h);
+            //     x = shineInfo.x + (shineInfo.w / 2 - turtleInfo.w / 2);
+            //     y = shineInfo.y + (shineInfo.h / 2 - turtleInfo.h / 2 - 10 * scaleY);
+            //     ctx.drawImage(AM.images.turtle.img, 0, 0, turtleInfo.cw, 
+            //         turtleInfo.ch, x, y, turtleInfo.w, turtleInfo.h);
                 
             
 
-                // TM.draw(textList.complete.obj);
-                // TM.draw(textList.scoreLabel.obj);
-                // textList.finalScore.obj.str = zeroPad(score, 2);
-                // TM.draw(textList.finalScore.obj);
-                // TM.draw(textList.resetMsg.obj);
-                // score = 11;
-                TXT.draw(TEXT_ID.COMPLETE);
-                TXT.draw(TEXT_ID.SCORELABEL);
+            //     // TM.draw(textList.complete.obj);
+            //     // TM.draw(textList.scoreLabel.obj);
+            //     // textList.finalScore.obj.str = zeroPad(score, 2);
+            //     // TM.draw(textList.finalScore.obj);
+            //     // TM.draw(textList.resetMsg.obj);
+            //     // score = 11;
+            //     TXT.draw(TEXT_ID.COMPLETE);
+            //     TXT.draw(TEXT_ID.SCORELABEL);
 
-                // TXT.texts[TEXT_ID.FINALSCORE].str = zeroPad(score, 2);
-                // TXT.addText(TEXT_ID.FINALSCORE, '00', 'bold', 20, 'Montserrat', w / 2, (320 + 145) * scaleY, 65, 60, '#fff', true); 
+            //     // TXT.texts[TEXT_ID.FINALSCORE].str = zeroPad(score, 2);
+            //     // TXT.addText(TEXT_ID.FINALSCORE, '00', 'bold', 20, 'Montserrat', w / 2, (320 + 145) * scaleY, 65, 60, '#fff', true); 
 
-                TXT.draw(TEXT_ID.FINALSCORE);
-                // TXT.draw(TEXT_ID.RESETMSG);
-            }
+            //     TXT.draw(TEXT_ID.FINALSCORE);
+            //     // TXT.draw(TEXT_ID.RESETMSG);
+            // }
             
         }
     // } else {

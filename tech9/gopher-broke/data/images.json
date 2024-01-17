@@ -1,6 +1,111 @@
 {
     "data": [
         {
+            "id": "intro",
+            "src": "splash/intro",
+            "ext": "png",
+            "cw": 1864,
+            "ch": 861
+        },
+        {
+            "id": "endscreen",
+            "src": "hud/endscreen",
+            "ext": "png",
+            "cw": 1864,
+            "ch": 861
+        },
+        {
+            "id": "gopher_intro",
+            "src": "splash/gopher_intro",
+            "ext": "png",
+            "cw": 128,
+            "ch": 128
+        },
+        {
+            "id": "return_home",
+            "src": "hud/return_home",
+            "ext": "png",
+            "cw": 628,
+            "ch": 143
+        },
+        {
+            "id": "endscreen_buttons",
+            "src": "hud/endscreen_buttons",
+            "ext": "png",
+            "cw": 428,
+            "ch": 329
+        },
+        {
+            "id": "premium_endscreen_buttons",
+            "src": "hud/premium_endscreen_buttons",
+            "ext": "png",
+            "cw": 379,
+            "ch": 213
+        },
+        {
+            "id": "watch",
+            "src": "hud/watch",
+            "ext": "png",
+            "cw": 45,
+            "ch": 53
+        },
+        {
+            "id": "progressbar",
+            "src": "hud/progress_bar",
+            "ext": "png",
+            "cw": 101,
+            "ch": 21
+        },
+        {
+            "id": "timeprogress",
+            "src": "hud/timeprogress",
+            "ext": "png",
+            "cw": 97,
+            "ch": 17
+        },
+        {
+            "id": "score_rect",
+            "src": "hud/score_rect",
+            "ext": "png",
+            "cw": 128,
+            "ch": 46
+        },
+        {
+            "id": "intersect",
+            "src": "hud/intersect",
+            "ext": "png",
+            "cw": 287,
+            "ch": 289
+        },
+        {
+            "id": "endscore",
+            "src": "hud/numbers/endscore",
+            "ext": "png",
+            "cw": 80,
+            "ch": 80
+        },
+        {
+            "id": "numbers_white",
+            "src": "hud/numbers/white",
+            "ext": "png",
+            "cw": 24,
+            "ch": 25
+        },
+        {
+            "id": "numbers_black",
+            "src": "hud/numbers/black",
+            "ext": "png",
+            "cw": 24,
+            "ch": 24
+        },
+        {
+            "id": "numbers_red",
+            "src": "hud/numbers/red",
+            "ext": "png",
+            "cw": 24,
+            "ch": 24
+        },
+        {
             "id": "bg",
             "src": "bg",
             "ext": "png",
@@ -496,13 +601,6 @@
             "ext": "png",
             "cw": 266,
             "ch": 28
-        },
-        {
-            "id": "intro",
-            "src": "intro",
-            "ext": "png",
-            "cw": 926,
-            "ch": 428
         },
         {
             "id": "gopher",

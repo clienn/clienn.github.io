@@ -219,6 +219,7 @@ var startButtonInfo = {
 };
 
 const onTablet = isTablet();
+var tracks = {};
 
 // w: 2732,
 //     h: 2048,
@@ -753,6 +754,19 @@ function muteAllAudio(flag) {
     
 }
 
+function initAllAudio() {
+    if (audioContext.state === "suspended") {
+        audioContext.resume();
+    }
+
+    for (let k in AM.audio) {
+        tracks[k] = audioContext.createMediaElementSource(AM.audio[k].img);
+        tracks[k].connect(audioContext.destination);
+    }
+
+    // playAllAudio();
+}
+
 function playAllAudio() {
     for (let k in AM.audio) {
         if (k != 'bg') {
@@ -800,6 +814,13 @@ function mouseUp() {
     joystick.touchUp();
 }
 
+function submitScore() {
+    let timeSpent = gameDuration - Math.floor(timer.timer / 24);
+    // alert(HUD.health.toFixed(2) + ' ' + timeSpent);
+    let result = {'game_score': HUD.health.toFixed(2), 'activity_id': serverData.id, 'time_spent': timeSpent};
+    Vue.prototype.$postData(result, true);
+}
+
 function controls() {
     let mid = canvas.width / 2;
     let prevPos = 0;
@@ -827,6 +848,15 @@ function controls() {
 
         if (gameover) {
             // reset();
+            if (!mDown) {
+                mDown = true;
+                var x = e.changedTouches[event.changedTouches.length-1].pageX;
+                var y = e.changedTouches[event.changedTouches.length-1].pageY;
+
+                if (isBtnClicked(x, y, HUD.endscreenButtons)) {
+                    submitScore();
+                }
+            }
         } else {
             if (e.type == 'touchstart' || e.type == 'touchmove' || e.type == 'touchend' || e.type == 'touchcancel'){
                 var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
@@ -882,12 +912,14 @@ function controls() {
             //     eelHead.vx = 0;
             // }
 
-            if (mDown) {
-                mDown = false;
-                // eelHead.updateOriginalPos();
-                mouseUp();
-                eelHead.vx = 0;
-            }
+            
+        }
+
+        if (mDown) {
+            mDown = false;
+            // eelHead.updateOriginalPos();
+            mouseUp();
+            eelHead.vx = 0;
         }
     });
 
@@ -941,12 +973,13 @@ function controls() {
 
         if (!gameStart) {
             if (isBtnClicked(x, y, startButtonInfo)) {
+                initAllAudio();
+
                 AM.audio.bg.img.volume = 0.5;
                 AM.audio.bg.img.loop = true;
                 AM.audio.bg.img.play();
 
-                playAllAudio();
-
+                // playAllAudio();
                 // playScore();
                 // playKaboom();
                 // playGlue();
@@ -966,7 +999,14 @@ function controls() {
         // mousedownE(e.offsetX, e.offsetY);
         let mx = e.offsetX;
         let my = e.offsetY;
-        if (!mDown) {
+        if (gameover) {
+            if (!mDown) {
+                mDown = true;
+                if (isBtnClicked(mx, my, HUD.endscreenButtons)) {
+                    submitScore();
+                }
+            }
+        } else if (!mDown) {
             if (gameStart) {
                 if (isBtnClicked(mx, my, {
                     x: HUD.volume.x,
@@ -1058,6 +1098,8 @@ function controls() {
         
         if (!gameStart) {
             if (isBtnClicked(mx, my, startButtonInfo)) {
+                initAllAudio();
+
                 // if (AM.audio.bg.img.paused) {
                     AM.audio.bg.img.volume = 0.5;
                     AM.audio.bg.img.loop = true;
@@ -1716,7 +1758,7 @@ function update() {
         if (timer.timer <= 0) {
             gameover = true;
             // HUD.updateGameoverBattery();
-            HUD.updateGameoverScore(splashInfo);
+            // HUD.updateGameoverScore(splashInfo);
         }
     }
 
@@ -1724,7 +1766,7 @@ function update() {
     if (HUD.health <= 0) {
         gameover = true;
         // HUD.updateGameoverBattery();
-        HUD.updateGameoverScore(splashInfo);
+        // HUD.updateGameoverScore(splashInfo);
     }
 
     if (eelExpressionT > 0) {
@@ -1787,7 +1829,7 @@ function gameCycle() {
     } else {
         // drawBG(ctx, 'bg');
         // HUD.draw(ctx);
-        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         HUD.gameover(ctx, splashInfo, delta);
         // HUD.updateGameoverBattery(-0.01 * delta);
     }

@@ -1773,6 +1773,13 @@ function mouseUp() {
     kayak.vx = 0;
 }
 
+function submitScore() {
+    let timeSpent = gameDuration - Math.floor(timer.timer / 24);
+    // alert(HUD.health.toFixed(2) + ' ' + timeSpent);
+    let result = {'game_score': score.toFixed(2), 'activity_id': serverData.id, 'time_spent': timeSpent};
+    Vue.prototype.$postData(result, true);
+}
+
 function controls() {
     let mid = canvas.width / 2;
     let prevPos = 0;
@@ -1800,6 +1807,17 @@ function controls() {
 
         if (gameover) {
             // reset();
+            if (!mDown) {
+                mDown = true;
+
+                var x = e.changedTouches[event.changedTouches.length-1].pageX;
+                var y = e.changedTouches[event.changedTouches.length-1].pageY;
+
+                if (isBtnClicked(x, y, HUD.endscreenButtons)) {
+                    submitScore();
+                }
+            }
+            
         } else {
             if (e.type == 'touchstart' || e.type == 'touchmove' || e.type == 'touchend' || e.type == 'touchcancel'){
                 var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
@@ -1931,7 +1949,15 @@ function controls() {
         // mousedownE(e.offsetX, e.offsetY);
         let mx = e.offsetX;
         let my = e.offsetY;
-        if (!mDown) {
+        if (gameover) {
+            if (!mDown) {
+                mDown = true;
+                if (isBtnClicked(mx, my, HUD.endscreenButtons)) {
+                    submitScore();
+                }
+            }
+
+        } else if (!mDown) {
             if (gameStart) {
                 if (isBtnClicked(mx, my, {
                     x: HUD.volume.x,

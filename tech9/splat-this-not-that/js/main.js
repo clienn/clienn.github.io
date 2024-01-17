@@ -346,14 +346,14 @@ var volumeOn = true;
 var canons = {
     black: {
         left: {
-            upper: new Spirte(0, 310, 280, 235, 192.11, 145),
-            lower: new Spirte(0, 540, 280, 235, 192.11, 145),
+            upper: new Spirte(0, 310 - 50, 280, 235, 192.11, 145),
+            lower: new Spirte(0, 540 - 50, 280, 235, 192.11, 145),
             // upper: new Spirte(0, 310, 285, 225, 636, 504),
             // lower: new Spirte(0, 540, 285, 225, 636, 504),
         },
         right: {
-            upper: new Spirte(0, 320, 280, 235, 192.11, 145),
-            lower: new Spirte(0, 540, 280, 235, 192.11, 145),
+            upper: new Spirte(0, 320 - 50, 280, 235, 192.11, 145),
+            lower: new Spirte(0, 540 - 50, 280, 235, 192.11, 145),
             // upper: new Spirte(0, 320, 285, 225, 570, 451),
             // lower: new Spirte(0, 540, 285, 225, 570, 451),
         },
@@ -858,7 +858,32 @@ var scoreTextFrame = 0;
 var isObjectCollided = false;
 
 var ouchAnimations = [];
-var currOuchIdx = 0
+var currOuchIdx = 0;
+
+
+var HUD = null;
+
+const splashInfo = {
+    x: 0,
+    y: 0,
+    w: 1864,
+    h: 861,
+    sx: 1,
+    sy: 1,
+};
+
+var startButtonInfo = {
+    x: 0,
+    y: 0,
+    w: 192 * 2,
+    h: 60 * 2,
+}
+
+const onTablet = isTablet();
+const onMobile = isMobile();
+
+var tracks = {};
+var trackCounter = 0;
 
 function main(w, h) {
     canvas.width = w;
@@ -866,6 +891,32 @@ function main(w, h) {
 
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    if (onTablet) {
+        splashInfo.w = AM.images.intro.cw;
+        splashInfo.h = AM.images.intro.ch;
+    }
+
+    splashInfo.sx = w / splashInfo.w;
+    splashInfo.sy = h / splashInfo.h;
+    splashInfo.w *= splashInfo.sx;
+    splashInfo.h *= splashInfo.sx;
+
+    splashInfo.x = w / 2 - splashInfo.w / 2;
+    splashInfo.y = Math.abs(h / 2 - splashInfo.h / 2);
+
+    if (onMobile && !onTablet) {
+        splashInfo.y = 0;
+    }
+
+    rescaleSize(startButtonInfo, scaleX, scaleX);
+    startButtonInfo.x = w / 2 - startButtonInfo.w / 2;
+    if (onTablet) {
+        startButtonInfo.y = splashInfo.y + splashInfo.h - 730 * splashInfo.sx;
+
+    } else {
+        startButtonInfo.y = splashInfo.y + splashInfo.h - 230 * splashInfo.sx;
+    }
 
 
     maxDifficultyRange *= scaleX;
@@ -1070,9 +1121,15 @@ function main(w, h) {
     textList.resetMsg.obj.tx = w / 2 - textList.resetMsg.desc.w / 2 * scaleX - 20 * scaleX;
     textList.resetMsg.obj.ty = h / 2 - textList.resetMsg.desc.h / 2 * scaleY + 20 * scaleX;
 
-    rescaleAll(bgInfo.cloud1, scaleX, scaleY);
-    rescaleAll(bgInfo.cloud2, scaleX, scaleY);
-    rescaleAll(bgInfo.cloud3, scaleX, scaleY);
+    rescaleSize(bgInfo.cloud1, scaleX, scaleX);
+    rescalePos(bgInfo.cloud1, scaleX, scaleY);
+
+    rescaleSize(bgInfo.cloud2, scaleX, scaleX);
+    rescalePos(bgInfo.cloud2, scaleX, scaleY);
+
+    rescaleSize(bgInfo.cloud3, scaleX, scaleX);
+    rescalePos(bgInfo.cloud3, scaleX, scaleY);
+
     bgInfo.cloud1.x = w - bgInfo.cloud1.w;
     bgInfo.cloud1.y = 200 * scaleY;
     bgInfo.cloud2.x = bgInfo.cloud2.w / 2;
@@ -1115,6 +1172,8 @@ function main(w, h) {
     updateSprite(1);
     updateSprite(2);
     updateSprite(3);
+
+    HUD = new Template_1(ctx, w, h, scaleX, scaleY, splashInfo);
     
 
     // generateFloaters();
@@ -1138,6 +1197,11 @@ function main(w, h) {
 
     for (let i = 0; i < soundGroup.scoreClones; ++i) {
         soundGroup.score.push(AM.audio.score.img.cloneNode());
+    }
+    for (let i = 0; i < soundGroup.scoreClones; ++i) {
+        tracks[trackCounter] = audioContext.createMediaElementSource(soundGroup.score[i]);
+        tracks[trackCounter].connect(audioContext.destination);
+        trackCounter++;
     }
     
     
@@ -1353,7 +1417,7 @@ function initTopHUD() {
     topHUDInfo.score.fontXadj *= scaleX;
 
     topHUDInfo.life.w *= scaleX;
-    topHUDInfo.life.h *= scaleY;
+    topHUDInfo.life.h *= scaleX;
     topHUDInfo.life.pad = 20 * scaleX;
     let lifeW = topHUDInfo.life.pad * 2 + topHUDInfo.life.w * topHUDInfo.life.lives;
     sx = (canvas.width - topHUDInfo.w);
@@ -1554,6 +1618,10 @@ function muteAllAudio(flag) {
 
 function playAllAudio() {
     for (let k in AM.audio) {
+        tracks[trackCounter] = audioContext.createMediaElementSource(AM.audio[k].img);
+        tracks[trackCounter].connect(audioContext.destination);
+        trackCounter++;
+
         if (k != 'bg' && k != 'explosion') {
             AM.audio[k].img.volume = 0;
             AM.audio[k].img.currentTime = 0;
@@ -1565,6 +1633,11 @@ function playAllAudio() {
     
 }
 
+function submitScore() {
+    let timeSpent = maxTimer - Math.floor(timer.timer / 24);
+    let result = {'game_score': score.toFixed(2), 'activity_id': serverData.id, 'time_spent': timeSpent};
+    Vue.prototype.$postData(result, true);
+}
 
 function controls() {
     window.addEventListener('blur', () => {
@@ -1589,6 +1662,8 @@ function controls() {
             let mx = e.touches[0].clientX;
             let my = e.touches[0].clientY;
 
+            mDown = true;
+
             // if (gameStart) {
             //     splat(mx, my);
             //     updateLevel();
@@ -1599,17 +1674,15 @@ function controls() {
             // }
 
             // mDown = true;
-            if (gameStart) {
+            if (gameover) {
+                if (isBtnClicked(mx, my, HUD.endscreenButtons)) {
+                    submitScore();
+                }
+            } else if (gameStart) {
                 
-                if (isBtnClicked(mx, my, {
-                    x: volumeInfo.x,
-                    // y: volumeInfo.y + topHUDInfo.timer.y,
-                    y: volumeInfo.y,
-                    w: volumeInfo.w,
-                    h: volumeInfo.h
-                })) {
-                    volumeOn = !volumeOn; 
-                    if (volumeOn) {
+                if (isBtnClicked(mx, my, HUD.volume)) {
+                    HUD.volumeOn = !HUD.volumeOn;  
+                    if (HUD.volumeOn) {
                         AM.audio.bg.img.currentTime = 0;
                         AM.audio.bg.img.play();
 
@@ -1627,10 +1700,14 @@ function controls() {
                 }
                 
             } else {
-                if (isBtnClicked(mx, my, btnBegin)) {
+                // if (isBtnClicked(mx, my, btnBegin)) {
+                if (isBtnClicked(mx, my, startButtonInfo)) {
+                    if (audioContext.state === "suspended") {
+                        audioContext.resume();
+                    }
+
                     gameStart = true;
 
-                    
                     AM.audio.bg.img.volume = 0.5;
                     AM.audio.bg.img.loop = true;
                     // AM.audio.bg.img.play();
@@ -1648,7 +1725,7 @@ function controls() {
                 }
             }
 
-            mDown = true;
+            
         }
     });
 
@@ -1671,16 +1748,16 @@ function controls() {
         if (!mDown) {
             let mx = e.offsetX;
             let my = e.offsetY;
+            mDown = true;
 
-            if (gameStart) {
-                if (isBtnClicked(mx, my, {
-                    x: volumeInfo.x,
-                    y: volumeInfo.y + topHUDInfo.timer.y,
-                    w: volumeInfo.w,
-                    h: volumeInfo.h
-                })) {
-                    volumeOn = !volumeOn; 
-                    if (volumeOn) {
+            if (gameover) {
+                if (isBtnClicked(mx, my, HUD.endscreenButtons)) {
+                    submitScore();
+                }
+            } else if (gameStart) {
+                if (isBtnClicked(mx, my, HUD.volume)) {
+                    HUD.volumeOn = !HUD.volumeOn; 
+                    if (HUD.volumeOn) {
                         AM.audio.bg.img.currentTime = 0;
                         AM.audio.bg.img.play();
 
@@ -1701,7 +1778,12 @@ function controls() {
                     updateLevel();
                 }
             } else {
-                if (isBtnClicked(mx, my, btnBegin)) {
+                // if (isBtnClicked(mx, my, btnBegin)) {
+                if (isBtnClicked(mx, my, startButtonInfo)) {
+                    if (audioContext.state === "suspended") {
+                        audioContext.resume();
+                    }
+
                     gameStart = true;
 
                     AM.audio.bg.img.volume = 0.5;
@@ -1719,7 +1801,7 @@ function controls() {
                 }
             }
 
-            mDown = true;
+            
         }
     });
 
@@ -1794,6 +1876,21 @@ function init() {
     images.landLeft.y = landPosY;
     images.landRight.x = landPosX;
     images.landRight.y = landPosY + 10 * scaleX;
+
+    let adjY = onTablet ? 340 : 240;
+    let adjY2 = onTablet ? 325 : 230;
+
+    canons.black.left.upper.y = images.landLeft.y - canons.black.left.upper.h * 0.85;
+    canons.black.left.lower.y = canons.black.left.upper.y + adjY * splashInfo.sx;
+
+    canons.black.left.upper.oy = canons.black.left.upper.y
+    canons.black.left.lower.oy = canons.black.left.lower.y
+
+    canons.black.right.upper.y = images.landRight.y - canons.black.right.upper.h * 0.85;
+    canons.black.right.lower.y = canons.black.right.upper.y + adjY2 * splashInfo.sx;
+
+    canons.black.right.upper.oy = canons.black.right.upper.y;
+    canons.black.right.lower.oy = canons.black.right.lower.y;
 
     cannonCollisionBubble[0] = {
         x: canons.black.left.upper.x + canons.black.left.upper.w - dradius,
@@ -1903,6 +2000,7 @@ function checkProjectileCollisions() {
                     initAnimateCanon(j);
                     
                     score += PROJECTILE_COLLISION_MINUS;
+                    HUD.updateScoreSprite(zeroPad(score, 2));
                 }
             }
         }
@@ -1934,6 +2032,8 @@ function checkCanonCollisions() {
         score += CANON_COLLISION_MINUS;
         initAnimateCanon(3);
     }
+
+    HUD.updateScoreSprite(zeroPad(score, 2));
 }
 
 function updateSprite(idx) {
@@ -1970,6 +2070,7 @@ function isCollided(p1, p2) {
 function reduceHP() {
     if (--lives < 0) {
         gameover = true;
+        HUD.updateGameoverScore(splashInfo, zeroPad(score, 2));
     }
 }
 
@@ -2066,6 +2167,8 @@ function splat(mx, my) {
         }
         resetProjectile([i]);
         initAnimateCanon(i);
+
+        HUD.updateScoreSprite(zeroPad(score, 2));
         // break;
     }
     
@@ -2128,7 +2231,7 @@ function rescale(obj) {
     obj.x *= scaleX;
     obj.y *= scaleY;
     obj.w *= scaleX;
-    obj.h *= scaleY;
+    obj.h *= scaleX;
 
     obj.ox = obj.x;
     obj.oy = obj.y;
@@ -2157,12 +2260,15 @@ function update() {
     // placeholder
     // projectiles[0].vy += g * 50 * delta;
     timer.tick(delta);
-    let percent = timer.timer / (maxTimer * 24) * 100;
-    timeProgressBar.update(delta, percent);
+    // let percent = timer.timer / (maxTimer * 24) * 100;
+    // timeProgressBar.update(delta, percent);
+
+    HUD.updateTimerSprite(zeroPad(Math.floor(timer.timer / 24), 2), maxTimer);
 
     if (timer.timer <= 0) {
         canReset = true;
         gameover = true;
+        HUD.updateGameoverScore(splashInfo, zeroPad(score, 2));
     }
 
     moveClouds();
@@ -2183,6 +2289,37 @@ function update() {
     //     ouchT -= 1 * delta;
     //     if (ouchT <= 0) ouchT = 0;
     // }
+}
+
+function drawStartPage() {
+    ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, splashInfo.x, splashInfo.y, splashInfo.w, splashInfo.h);
+
+    let mid = canvas.width / 2;
+    let x = mid - 265 * scaleX;
+    let hy = onTablet ? 840 : 310;
+    let y = splashInfo.y + hy * splashInfo.sx;
+    
+    let frame = Math.floor(startScreenHandAnimT * 3) % 12;
+    let w = AM.images.sharp.cw * scaleX;
+    let h = AM.images.sharp.ch * scaleX;
+
+    ctx.drawImage(AM.images.sharp.img, frame * AM.images.sharp.cw, 0, AM.images.sharp.cw, AM.images.sharp.ch, 
+        x, y, w, h);
+
+    frame = Math.floor(startScreenHandAnimT) % 8;
+                
+    // ctx.drawImage(AM.images.hand.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, mid, y, startPageInfo.hand.w, startPageInfo.hand.h);
+
+    x = mid + 170 * scaleX;
+    frame = Math.floor(startScreenHandAnimT * 1) % 8;
+
+    ctx.drawImage(AM.images.soft.img, frame * AM.images.soft.cw, 0, AM.images.soft.cw, AM.images.soft.ch, 
+        x, y, w, h);
+
+    if (delta < 1) {
+        // startTurtleBlinkT += 2 * delta;
+        startScreenHandAnimT += 5 * delta;
+    }
 }
 
 function gameCycle() {
@@ -2206,19 +2343,19 @@ function gameCycle() {
 
                 drawClouds();
                 // drawProgress();
-                timeProgressBar.draw(ctx);
-                drawTopHUD();
-                
-                drawScoreHUD();
+                // timeProgressBar.draw(ctx);
+                // drawTopHUD();
+                HUD.draw(ctx);
+                // drawScoreHUD();
                 drawLives();
 
-                let volumeKey = 'mute';
-                if (volumeOn) {
-                    volumeKey = 'volume';
-                }
+                // let volumeKey = 'mute';
+                // if (volumeOn) {
+                //     volumeKey = 'volume';
+                // }
 
-                ctx.drawImage(AM.images[volumeKey].img, 0, 0, volumeInfo.cw, 
-                    volumeInfo.ch, volumeInfo.x, volumeInfo.y + topHUDInfo.timer.y, volumeInfo.w, volumeInfo.h);
+                // ctx.drawImage(AM.images[volumeKey].img, 0, 0, volumeInfo.cw, 
+                //     volumeInfo.ch, volumeInfo.x, volumeInfo.y + topHUDInfo.timer.y, volumeInfo.w, volumeInfo.h);
 
 
                 
@@ -2330,184 +2467,186 @@ function gameCycle() {
                 // displayScore();
                 update();
             } else {
-                let handx = Math.sin(startScreenHandAnimT) * 20;
-                let handy = Math.cos(startScreenHandAnimT) * 20;
-                // let handTapX = Math.cos(startScreenHandAnimT) * 2;
-                // let handTapY = Math.sin(startScreenHandAnimT) * 2;
-                // ctx.drawImage(AM.images.splash.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
-                ctx.drawImage(AM.images.sky.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
-                ctx.beginPath();
-                ctx.fillStyle = '#70D2ED';
-                ctx.rect(0, waterInfo.y, canvas.width, waterInfo.h);
-                ctx.fill();
-                drawClouds();
-
-                // lands
-                ctx.drawImage(AM.images.landLeft.img, 0, 0, 157, 206, images.landLeft.x, images.landLeft.y, images.landLeft.w, images.landLeft.h);
-                ctx.drawImage(AM.images.landRight.img, 0, 0, 157, 206, images.landRight.x, images.landRight.y, images.landRight.w, images.landRight.h);
-
-                // canons
-                canons.draw();
-
-                let frame = Math.floor(startScreenHandAnimT) % 8;
-                
-                ctx.drawImage(AM.images.title.img, 0, 0, startPageInfo.title.cw, startPageInfo.title.ch, startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
-                ctx.drawImage(AM.images.hand.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
-                // tap
-                // ctx.save();
-                // // Untransformed draw position
-                // const position = {x: startPageInfo.hand.x, y: startPageInfo.hand.y};
-                // // In degrees
-                // const rotation = { x: 0, y: Math.sin(startScreenHandAnimT) * 35, z: 0};
-                // // Rotation relative to here (this is the center of the image)
-                // const rotPt = { x: startPageInfo.hand.w / 2, y: startPageInfo.hand.h / 2 };
-
-                // ctx.setTransform(new DOMMatrix()
-                //     .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
-                //     .rotateSelf(rotation.x, rotation.y, rotation.z)
-                // );
-                
-                // ctx.drawImage(AM.images.hand.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, -rotPt.x, -rotPt.y, startPageInfo.hand.w, startPageInfo.hand.h);
-                // ctx.restore();
-                //
-                
-                // ctx.drawImage(AM.images.startballoon.img, 0, 0, startPageInfo.startballoon.cw, startPageInfo.startballoon.ch, startPageInfo.startballoon.x + handx, startPageInfo.startballoon.y + handy, startPageInfo.startballoon.w, startPageInfo.startballoon.h);
-                //
-                    ctx.save();
-
-                    // move to the center of the canvas
-                    ctx.translate(startPageInfo.startmine.ox + startPageInfo.startmine.w / 2, startPageInfo.startmine.oy + startPageInfo.startmine.h / 2);
-                    
-                    let degrees = Math.sin(startPulseT * 10) * 15;
-                    // rotate the canvas to the specified degrees
-                    ctx.rotate(degrees * Math.PI/180);
-
-                    // draw the image
-                    startPageInfo.startmine.x = -0.5 * startPageInfo.startmine.w;
-                    startPageInfo.startmine.y = -0.5 * startPageInfo.startmine.h;
-
-                    ctx.drawImage(AM.images.startmine.img, 0, 0, startPageInfo.startmine.cw, startPageInfo.startmine.ch, startPageInfo.startmine.x, startPageInfo.startmine.y, startPageInfo.startmine.w, startPageInfo.startmine.h);
-                    // we’re done with the rotating so restore the unrotated context
-                    ctx.restore();
-                //
-
-                
-
-                // for (let i = 1; i < 4; ++i) {
-                //     let key = 'text' + i;
-                //     ctx.drawImage(AM.images[key].img, 0, 0, startPageInfo[key].cw, startPageInfo[key].ch, startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
-                // }
-
-                TXT.draw('instruction1');
-                TXT.draw('instruction1_2');
-
-                TXT.draw('instruction2');
-                TXT.draw('instruction2_2');
-
-                ctx.drawImage(AM.images.beginbutton.img, 0, 0, startPageInfo.beginbutton.cw, startPageInfo.beginbutton.ch, startPageInfo.beginbutton.x, startPageInfo.beginbutton.y, startPageInfo.beginbutton.w, startPageInfo.beginbutton.h);
-                
-
+                drawStartPage();
+                // let handx = Math.sin(startScreenHandAnimT) * 20;
+                // let handy = Math.cos(startScreenHandAnimT) * 20;
+                // // let handTapX = Math.cos(startScreenHandAnimT) * 2;
+                // // let handTapY = Math.sin(startScreenHandAnimT) * 2;
+                // // ctx.drawImage(AM.images.splash.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+                // ctx.drawImage(AM.images.sky.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
                 // ctx.beginPath();
-                // ctx.rect(btnBegin.x, btnBegin.y, btnBegin.w, btnBegin.h);
-                // ctx.stroke();
+                // ctx.fillStyle = '#70D2ED';
+                // ctx.rect(0, waterInfo.y, canvas.width, waterInfo.h);
+                // ctx.fill();
+                // drawClouds();
 
-                if (delta < 1) {
-                    startPulseT += 2 * delta;
-                    startScreenHandAnimT += 5 * delta;
-                }
+                // // lands
+                // ctx.drawImage(AM.images.landLeft.img, 0, 0, 157, 206, images.landLeft.x, images.landLeft.y, images.landLeft.w, images.landLeft.h);
+                // ctx.drawImage(AM.images.landRight.img, 0, 0, 157, 206, images.landRight.x, images.landRight.y, images.landRight.w, images.landRight.h);
+
+                // // canons
+                // canons.draw();
+
+                // let frame = Math.floor(startScreenHandAnimT) % 8;
+                
+                // ctx.drawImage(AM.images.title.img, 0, 0, startPageInfo.title.cw, startPageInfo.title.ch, startPageInfo.title.x, startPageInfo.title.y, startPageInfo.title.w, startPageInfo.title.h);
+                // ctx.drawImage(AM.images.hand.img, frame * startPageInfo.hand.cw, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, startPageInfo.hand.x, startPageInfo.hand.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                // // tap
+                // // ctx.save();
+                // // // Untransformed draw position
+                // // const position = {x: startPageInfo.hand.x, y: startPageInfo.hand.y};
+                // // // In degrees
+                // // const rotation = { x: 0, y: Math.sin(startScreenHandAnimT) * 35, z: 0};
+                // // // Rotation relative to here (this is the center of the image)
+                // // const rotPt = { x: startPageInfo.hand.w / 2, y: startPageInfo.hand.h / 2 };
+
+                // // ctx.setTransform(new DOMMatrix()
+                // //     .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+                // //     .rotateSelf(rotation.x, rotation.y, rotation.z)
+                // // );
+                
+                // // ctx.drawImage(AM.images.hand.img, 0, 0, startPageInfo.hand.cw, startPageInfo.hand.ch, -rotPt.x, -rotPt.y, startPageInfo.hand.w, startPageInfo.hand.h);
+                // // ctx.restore();
+                // //
+                
+                // // ctx.drawImage(AM.images.startballoon.img, 0, 0, startPageInfo.startballoon.cw, startPageInfo.startballoon.ch, startPageInfo.startballoon.x + handx, startPageInfo.startballoon.y + handy, startPageInfo.startballoon.w, startPageInfo.startballoon.h);
+                // //
+                //     ctx.save();
+
+                //     // move to the center of the canvas
+                //     ctx.translate(startPageInfo.startmine.ox + startPageInfo.startmine.w / 2, startPageInfo.startmine.oy + startPageInfo.startmine.h / 2);
+                    
+                //     let degrees = Math.sin(startPulseT * 10) * 15;
+                //     // rotate the canvas to the specified degrees
+                //     ctx.rotate(degrees * Math.PI/180);
+
+                //     // draw the image
+                //     startPageInfo.startmine.x = -0.5 * startPageInfo.startmine.w;
+                //     startPageInfo.startmine.y = -0.5 * startPageInfo.startmine.h;
+
+                //     ctx.drawImage(AM.images.startmine.img, 0, 0, startPageInfo.startmine.cw, startPageInfo.startmine.ch, startPageInfo.startmine.x, startPageInfo.startmine.y, startPageInfo.startmine.w, startPageInfo.startmine.h);
+                //     // we’re done with the rotating so restore the unrotated context
+                //     ctx.restore();
+                // //
+
+                
+
+                // // for (let i = 1; i < 4; ++i) {
+                // //     let key = 'text' + i;
+                // //     ctx.drawImage(AM.images[key].img, 0, 0, startPageInfo[key].cw, startPageInfo[key].ch, startPageInfo[key].x, startPageInfo[key].y, startPageInfo[key].w, startPageInfo[key].h);
+                // // }
+
+                // TXT.draw('instruction1');
+                // TXT.draw('instruction1_2');
+
+                // TXT.draw('instruction2');
+                // TXT.draw('instruction2_2');
+
+                // ctx.drawImage(AM.images.beginbutton.img, 0, 0, startPageInfo.beginbutton.cw, startPageInfo.beginbutton.ch, startPageInfo.beginbutton.x, startPageInfo.beginbutton.y, startPageInfo.beginbutton.w, startPageInfo.beginbutton.h);
+                
+
+                // // ctx.beginPath();
+                // // ctx.rect(btnBegin.x, btnBegin.y, btnBegin.w, btnBegin.h);
+                // // ctx.stroke();
+
+                // if (delta < 1) {
+                //     startPulseT += 2 * delta;
+                //     startScreenHandAnimT += 5 * delta;
+                // }
             }
         } else {
-            if (!fade) {
-                // bg
-                // ctx.drawImage(AM.images.bg.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
-                ctx.drawImage(AM.images.sky.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
-                ctx.beginPath();
-                ctx.fillStyle = '#70D2ED';
-                ctx.rect(0, waterInfo.y, canvas.width, waterInfo.h);
-                ctx.fill();
-                drawClouds();
-                // drawProgress();
-                timeProgressBar.draw(ctx);
-                drawTopHUD();
-                drawScoreHUD();
-                drawLives();
+            HUD.gameover(ctx, splashInfo, delta);
+            // if (!fade) {
+            //     // bg
+            //     // ctx.drawImage(AM.images.bg.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
+            //     ctx.drawImage(AM.images.sky.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
+            //     ctx.beginPath();
+            //     ctx.fillStyle = '#70D2ED';
+            //     ctx.rect(0, waterInfo.y, canvas.width, waterInfo.h);
+            //     ctx.fill();
+            //     drawClouds();
+            //     // drawProgress();
+            //     timeProgressBar.draw(ctx);
+            //     drawTopHUD();
+            //     drawScoreHUD();
+            //     drawLives();
 
-                // lands
-                ctx.drawImage(AM.images.landLeft.img, 0, 0, 157, 206, images.landLeft.x, images.landLeft.y, images.landLeft.w, images.landLeft.h);
-                ctx.drawImage(AM.images.landRight.img, 0, 0, 157, 206, images.landRight.x, images.landRight.y, images.landRight.w, images.landRight.h);
+            //     // lands
+            //     ctx.drawImage(AM.images.landLeft.img, 0, 0, 157, 206, images.landLeft.x, images.landLeft.y, images.landLeft.w, images.landLeft.h);
+            //     ctx.drawImage(AM.images.landRight.img, 0, 0, 157, 206, images.landRight.x, images.landRight.y, images.landRight.w, images.landRight.h);
 
-                // canons
-                canons.draw();
+            //     // canons
+            //     canons.draw();
 
-                // game
-                // drawTurtle();
-                // update();
+            //     // game
+            //     // drawTurtle();
+            //     // update();
 
-                ctx.globalAlpha = 0.85;
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.globalAlpha = 1.0;
+            //     ctx.globalAlpha = 0.85;
+            //     ctx.fillStyle = '#000';
+            //     ctx.fillRect(0, 0, canvas.width, canvas.height);
+            //     ctx.globalAlpha = 1.0;
 
-                pulseT += 2 * delta;
-                let w = Math.sin(pulseT) * (shineInfo.w + 10);
-                let h = Math.sin(pulseT) * (shineInfo.h + 10);
+            //     pulseT += 2 * delta;
+            //     let w = Math.sin(pulseT) * (shineInfo.w + 10);
+            //     let h = Math.sin(pulseT) * (shineInfo.h + 10);
 
-                if (w >= shineInfo.w) {
-                    w = shineInfo.w;
-                }
+            //     if (w >= shineInfo.w) {
+            //         w = shineInfo.w;
+            //     }
 
-                if (h >= shineInfo.h) {
-                    h = shineInfo.h;
-                }
+            //     if (h >= shineInfo.h) {
+            //         h = shineInfo.h;
+            //     }
 
-                if (w == shineInfo.w && h == shineInfo.h) {
-                    fade = true;
-                }
+            //     if (w == shineInfo.w && h == shineInfo.h) {
+            //         fade = true;
+            //     }
 
-                let x = shineInfo.x + (shineInfo.w / 2 - w / 2);
-                let y = shineInfo.y + (shineInfo.h / 2 - h / 2) - 50 * scaleY;
-                ctx.drawImage(AM.images.shine.img, 0, 0, shineInfo.cw, 
-                    shineInfo.ch, x, y, w, h);
+            //     let x = shineInfo.x + (shineInfo.w / 2 - w / 2);
+            //     let y = shineInfo.y + (shineInfo.h / 2 - h / 2) - 50 * scaleY;
+            //     ctx.drawImage(AM.images.shine.img, 0, 0, shineInfo.cw, 
+            //         shineInfo.ch, x, y, w, h);
 
-                ctx.drawImage(AM.images.complete.img, 0, 0, completeInfo.cw, 
-                    completeInfo.ch, completeInfo.x, shineInfo.y, completeInfo.w, completeInfo.h);
+            //     ctx.drawImage(AM.images.complete.img, 0, 0, completeInfo.cw, 
+            //         completeInfo.ch, completeInfo.x, shineInfo.y, completeInfo.w, completeInfo.h);
                 
-                ctx.drawImage(AM.images.trophy.img, 0, 0, trophyInfo.cw, 
-                    trophyInfo.ch, trophyInfo.x, (shineInfo.y + shineInfo.h / 2) - trophyInfo.h, trophyInfo.w, trophyInfo.h);
-                // ctx.drawImage(AM.images.shine.img, 0, 0, shineInfo.cw, 
-                //     shineInfo.ch, shineInfo.x, shineInfo.y, shineInfo.w, shineInfo.h);
+            //     ctx.drawImage(AM.images.trophy.img, 0, 0, trophyInfo.cw, 
+            //         trophyInfo.ch, trophyInfo.x, (shineInfo.y + shineInfo.h / 2) - trophyInfo.h, trophyInfo.w, trophyInfo.h);
+            //     // ctx.drawImage(AM.images.shine.img, 0, 0, shineInfo.cw, 
+            //     //     shineInfo.ch, shineInfo.x, shineInfo.y, shineInfo.w, shineInfo.h);
                 
-                // x = shineInfo.x + (shineInfo.w / 2 - turtleInfo.w / 2);
-                // y = shineInfo.y + (shineInfo.h / 2 - turtleInfo.h / 2 - 10 * scaleY);
-                // ctx.drawImage(AM.images.turtle.img, 0, 0, turtleInfo.cw, 
-                //     turtleInfo.ch, x, y, turtleInfo.w, turtleInfo.h);
-                
-
-                // TM.draw(textList.complete.obj);
+            //     // x = shineInfo.x + (shineInfo.w / 2 - turtleInfo.w / 2);
+            //     // y = shineInfo.y + (shineInfo.h / 2 - turtleInfo.h / 2 - 10 * scaleY);
+            //     // ctx.drawImage(AM.images.turtle.img, 0, 0, turtleInfo.cw, 
+            //     //     turtleInfo.ch, x, y, turtleInfo.w, turtleInfo.h);
                 
 
-                // score = 11;
-                let adjX = 12;
-                let a = Math.floor(score / 10);
-                let b = score % 10;
-                let countOnes = (a == 1) + (b == 1);
-
-                // if (score > 9) adjX = 2;
-                if (countOnes == 1) adjX = 0;
-                else if (countOnes == 2) adjX = -4;
-                else if (score > 19 && score < 100) adjX = 5.5;
+            //     // TM.draw(textList.complete.obj);
                 
-                textList.finalScore.obj.tx = canvas.width / 2 - textList.finalScore.desc.w * scaleX / 2 - adjX * scaleX;
-                textList.finalScore.obj.ty = shineInfo.y + shineInfo.h / 2 + 60 * scaleY;
-                // textList.scoreLabel.obj.tx = shineInfo.y + shineInfo.h / 2 + 20 * scaleY;
-                textList.scoreLabel.obj.ty = shineInfo.y + shineInfo.h / 2 + 20 * scaleY;
-                
-                textList.finalScore.obj.str = zeroPad(score, 2);
 
-                TM.draw(textList.scoreLabel.obj);
-                TM.draw(textList.finalScore.obj);
-                // TM.draw(textList.resetMsg.obj);
-            }
+            //     // score = 11;
+            //     let adjX = 12;
+            //     let a = Math.floor(score / 10);
+            //     let b = score % 10;
+            //     let countOnes = (a == 1) + (b == 1);
+
+            //     // if (score > 9) adjX = 2;
+            //     if (countOnes == 1) adjX = 0;
+            //     else if (countOnes == 2) adjX = -4;
+            //     else if (score > 19 && score < 100) adjX = 5.5;
+                
+            //     textList.finalScore.obj.tx = canvas.width / 2 - textList.finalScore.desc.w * scaleX / 2 - adjX * scaleX;
+            //     textList.finalScore.obj.ty = shineInfo.y + shineInfo.h / 2 + 60 * scaleY;
+            //     // textList.scoreLabel.obj.tx = shineInfo.y + shineInfo.h / 2 + 20 * scaleY;
+            //     textList.scoreLabel.obj.ty = shineInfo.y + shineInfo.h / 2 + 20 * scaleY;
+                
+            //     textList.finalScore.obj.str = zeroPad(score, 2);
+
+            //     TM.draw(textList.scoreLabel.obj);
+            //     TM.draw(textList.finalScore.obj);
+            //     // TM.draw(textList.resetMsg.obj);
+            // }
         }
     }
 

@@ -224,6 +224,8 @@ var startButtonInfo = {
 
 const onTablet = isTablet();
 
+var tracks = {};
+
 // #313350
 
 /*
@@ -368,6 +370,19 @@ function muteAllAudio(flag) {
     
 }
 
+function initAllAudio() {
+    if (audioContext.state === "suspended") {
+        audioContext.resume();
+    }
+
+    for (let k in AM.audio) {
+        tracks[k] = audioContext.createMediaElementSource(AM.audio[k].img);
+        tracks[k].connect(audioContext.destination);
+    }
+
+    // playAllAudio();
+}
+
 function playAllAudio() {
     for (let k in AM.audio) {
         if (k != 'bg') {
@@ -408,7 +423,11 @@ function mouseUp() {
     joystick.touchUp();
 }
 
-
+function submitScore() {
+    let timeSpent = gameDuration - Math.floor(timer.timer / 24);
+    let result = {'game_score': score.toFixed(2), 'activity_id': serverData.id, 'time_spent': timeSpent};
+    Vue.prototype.$postData(result, true);
+}
 
 function controls() {
     let mid = canvas.width / 2;
@@ -436,41 +455,76 @@ function controls() {
 
         var x = 0, x1 = 0;
         
-        if (gameover && gameoverT <= 0) {
-            reset();
+        if (gameover) {
+            // reset();
+            
+            if (!mDown) {
+                mDown = true;
+                var x = e.changedTouches[event.changedTouches.length-1].pageX;
+                var y = e.changedTouches[event.changedTouches.length-1].pageY;
+                
+                if (isBtnClicked(x, y, HUD.endscreenButtons)) {
+                    submitScore();
+                }
+            }
         } else {
             if (e.type == 'touchstart' || e.type == 'touchmove' || e.type == 'touchend' || e.type == 'touchcancel'){
                 var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
                 var touch = evt.touches[0] || evt.changedTouches[0];
                 prevPos = touch.pageX;
                 prevPosY = touch.pageY;
+                
+                if (!gameStart) {
+                    if (!mDown) {
+                        mDown = true;
+                        console.log(gameStart, mDown)
+                        if (isBtnClicked(touch.pageX, touch.pageY, startButtonInfo)) {
+                            
+            
+                            // playScore();
+                            // playKaboom();
+                            // playGlue();
+            
+                            gameStart = true;
+                            initAllAudio();
+                            // playAllAudio();
 
-                if (isBtnClicked(touch.pageX, touch.pageY, {
-                    x: HUD.volume.x,
-                    y: HUD.volume.y,
-                    w: HUD.volume.w,
-                    h: HUD.volume.h
-                })) {
-                    HUD.volumeOn = !HUD.volumeOn; 
-                    if (HUD.volumeOn) {
-                        AM.audio.bg.img.currentTime = 0;
-                        AM.audio.bg.img.play();
-                    } else {
-                        AM.audio.bg.img.pause();
-                        // music.correct.obj.volume = 0;
+                            AM.audio.bg.img.volume = 0.4;
+                            AM.audio.bg.img.loop = true;
+                            AM.audio.bg.img.play();
+                            
+                        }
+                    }
+                } else {
+                    if (isBtnClicked(touch.pageX, touch.pageY, {
+                        x: HUD.volume.x,
+                        y: HUD.volume.y,
+                        w: HUD.volume.w,
+                        h: HUD.volume.h
+                    })) {
+                        HUD.volumeOn = !HUD.volumeOn; 
+                        if (HUD.volumeOn) {
+                            AM.audio.bg.img.currentTime = 0;
+                            AM.audio.bg.img.play();
+                        } else {
+                            AM.audio.bg.img.pause();
+                            // music.correct.obj.volume = 0;
+                        }
+                    }
+    
+                    if (!mDown) {
+                        mDown = true;
+                        
+                        mouseMoveOrigin.x = prevPos;
+    
+                        if (isBtnClicked(touch.pageX, touch.pageY, joystick.hitbox) || !joystick.on) {
+                            joystick.active = true;
+                        }
+                        // console.log(prevPos)
                     }
                 }
 
-                if (!mDown) {
-                    mDown = true;
-                    
-                    mouseMoveOrigin.x = prevPos;
-
-                    if (isBtnClicked(touch.pageX, touch.pageY, joystick.hitbox) || !joystick.on) {
-                        joystick.active = true;
-                    }
-                    // console.log(prevPos)
-                }
+                
                 
             }
 
@@ -542,13 +596,15 @@ function controls() {
             //     forceD = 0;
             // }
 
-            if (mDown) {
-                mDown = false;
-                // pig.updateOriginalPos();
-                mouseUp();
-                // mouseMoveOrigin.x = pig.x;
-                // console.log(x)
-            }
+            
+        }
+
+        if (mDown) {
+            mDown = false;
+            // pig.updateOriginalPos();
+            mouseUp();
+            // mouseMoveOrigin.x = pig.x;
+            // console.log(x)
         }
     });
 
@@ -629,20 +685,22 @@ function controls() {
         var x = e.changedTouches[event.changedTouches.length-1].pageX;
         var y = e.changedTouches[event.changedTouches.length-1].pageY;
 
-        if (!gameStart) {
-            if (isBtnClicked(x, y, startButtonInfo)) {
-                AM.audio.bg.img.volume = 0.4;
-                AM.audio.bg.img.loop = true;
-                AM.audio.bg.img.play();
+        // if (!gameStart) {
+        //     if (isBtnClicked(x, y, startButtonInfo)) {
+        //         AM.audio.bg.img.volume = 0.4;
+        //         AM.audio.bg.img.loop = true;
+        //         AM.audio.bg.img.play();
 
-                // playScore();
-                // playKaboom();
-                // playGlue();
+        //         // playScore();
+        //         // playKaboom();
+        //         // playGlue();
 
-                gameStart = true;
-                playAllAudio();
-            }
-        } 
+        //         gameStart = true;
+        //         // initAllAudio();
+        //         // playAllAudio();
+                
+        //     }
+        // } 
         
     });
 
@@ -653,10 +711,36 @@ function controls() {
 
         if (!mDown) {
             mDown = true;
-            mouseMoveOrigin.x = mx;
-            if (isBtnClicked(mx, my, joystick.hitbox) || !joystick.on) {
-                joystick.active = true;
+
+            if (!gameStart) {
+
+                if (isBtnClicked(mx, my, startButtonInfo)) {
+                    
+    
+                    // playScore();
+                    // playKaboom();
+                    // playGlue();
+    
+                    gameStart = true;
+                    initAllAudio();
+                    // playAllAudio();
+
+                    AM.audio.bg.img.volume = 0.4;
+                    AM.audio.bg.img.loop = true;
+                    AM.audio.bg.img.play();
+                    
+                }
+            } else if (gameover) {
+                if (isBtnClicked(mx, my, HUD.endscreenButtons)) {
+                    submitScore();
+                }
+            } else {
+                mouseMoveOrigin.x = mx;
+                if (isBtnClicked(mx, my, joystick.hitbox) || !joystick.on) {
+                    joystick.active = true;
+                }
             }
+            
         }
 
         if (isBtnClicked(mx, my, {
@@ -753,15 +837,15 @@ function controls() {
         let mx = e.offsetX;
         let my = e.offsetY;
         // mouseupE();
-        if (!gameStart) {
-            if (isBtnClicked(mx, my, startButtonInfo)) {
-                AM.audio.bg.img.volume = 0.4;
-                AM.audio.bg.img.loop = true;
-                AM.audio.bg.img.play();
+        // if (!gameStart) {
+        //     if (isBtnClicked(mx, my, startButtonInfo)) {
+        //         AM.audio.bg.img.volume = 0.4;
+        //         AM.audio.bg.img.loop = true;
+        //         AM.audio.bg.img.play();
 
-                gameStart = true;
-            }
-        }
+        //         gameStart = true;
+        //     }
+        // }
 
         if (mDown) {
             mDown = false;

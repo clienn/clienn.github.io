@@ -15,6 +15,13 @@
             "ch": 2048
         },
         {
+            "id": "return_home",
+            "src": "hud/return_home",
+            "ext": "png",
+            "cw": 628,
+            "ch": 143
+        },
+        {
             "id": "endscreen_buttons",
             "src": "hud/endscreen_buttons",
             "ext": "png",

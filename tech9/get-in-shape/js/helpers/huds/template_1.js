@@ -257,7 +257,8 @@ class Template_1 {
         this.intersect.y = this.splashInfo.y + 30 * sx + adjY;
         this.intersectT = 0;
 
-        let key = isPremium ? 'premium_endscreen_buttons' : 'endscreen_buttons';
+        // let key = isPremium ? 'premium_endscreen_buttons' : 'endscreen_buttons';
+        let key = 'return_home';
         let endscreenButtonsW = AM.images[key].cw * 1;
         let endscreenButtonsH = AM.images[key].ch * 1;
         this.endscreenButtons = new StaticSprite(0, 0, endscreenButtonsW, endscreenButtonsH, 0, 0, AM.images[key].cw, AM.images[key].ch, key);

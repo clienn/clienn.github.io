@@ -294,6 +294,7 @@ var startButtonInfo = {
 const onTablet = isTablet();
 const onMobile = isMobile();
 
+var tracks = {};
 
 function main(w, h) {
     canvas.width = w;
@@ -491,6 +492,26 @@ function main(w, h) {
     gameCycle();
 }
 
+function submitScore() {
+    let timeSpent = gameDuration - Math.floor(timer.timer / 24);
+    // alert(HUD.health.toFixed(2) + ' ' + timeSpent);
+    let result = {'game_score': score.toFixed(2), 'activity_id': serverData.id, 'time_spent': timeSpent};
+    Vue.prototype.$postData(result, true);
+}
+
+function initAllAudio() {
+    if (audioContext.state === "suspended") {
+        audioContext.resume();
+    }
+
+    for (let k in AM.audio) {
+        tracks[k] = audioContext.createMediaElementSource(AM.audio[k].img);
+        tracks[k].connect(audioContext.destination);
+    }
+
+    // playAllAudio();
+}
+
 function playAllAudio() {
     for (let k in AM.audio) {
         if (k != 'bg') {
@@ -595,11 +616,16 @@ function mousedownE(mx, my) {
     if (!mDown) {
         mouseX = mx;
         mouseY = my;
-        mDown = true;
     }
     
     if (gameover) {
         // canReset = true;
+        if (!mDown) {
+            mDown = true;
+            if (isBtnClicked(mx, my, HUD.endscreenButtons)) {
+                submitScore();
+            }
+        }
     } else if (!portal.isAnimating)  {
         for (let i = 0; i < nContainers; ++i) {
             if (!correctAnswers.includes(i)) {
@@ -617,6 +643,10 @@ function mousedownE(mx, my) {
                 }
             }
         }
+    }
+
+    if (!mDown) {
+        mDown = true;
     }
 }
 
@@ -654,7 +684,7 @@ function mouseupE() {
             }
             // console.log('test')
 
-            playAllAudio();
+            // playAllAudio();
         }
         mDown = false;
     }
@@ -673,6 +703,8 @@ function mouseupE() {
             // AM.audio.bg.img.loop = true;
             // AM.audio.bg.img.play();
             if (isBtnClicked(mouseX, mouseY, startButtonInfo)) {
+                initAllAudio();
+
                 gameStart = true;
 
                 AM.audio.bg.img.volume = 0.05;
