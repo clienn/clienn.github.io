@@ -1622,13 +1622,13 @@ function playAllAudio() {
         tracks[trackCounter].connect(audioContext.destination);
         trackCounter++;
 
-        if (k != 'bg' && k != 'explosion') {
-            AM.audio[k].img.volume = 0;
-            AM.audio[k].img.currentTime = 0;
-            AM.audio[k].img.play();
-            // AM.audio[k].img.pause();
+        // if (k != 'bg' && k != 'explosion') {
+        //     AM.audio[k].img.volume = 0;
+        //     AM.audio[k].img.currentTime = 0;
+        //     AM.audio[k].img.play();
+        //     // AM.audio[k].img.pause();
             
-        }
+        // }
     }
     
 }
@@ -1658,74 +1658,78 @@ function controls() {
 
     canvas.addEventListener('touchstart', e => {
         // mousedownE(e.touches[0].clientX, e.touches[0].clientY);
-        if (!mDown) {
-            let mx = e.touches[0].clientX;
-            let my = e.touches[0].clientY;
+        if (e.type == 'touchstart' || e.type == 'touchmove' || e.type == 'touchend' || e.type == 'touchcancel'){
+            var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+            var touch = evt.touches[0] || evt.changedTouches[0];
+            let mx = touch.pageX;
+            let my = touch.pageY;
+            if (!mDown) {
+                mDown = true;
 
-            mDown = true;
+                // if (gameStart) {
+                //     splat(mx, my);
+                //     updateLevel();
+                // } else {
+                //     if (isBtnClicked(mx, my, btnBegin)) {
+                //         gameStart = true;
+                //     }
+                // }
 
-            // if (gameStart) {
-            //     splat(mx, my);
-            //     updateLevel();
-            // } else {
-            //     if (isBtnClicked(mx, my, btnBegin)) {
-            //         gameStart = true;
-            //     }
-            // }
-
-            // mDown = true;
-            if (gameover) {
-                if (isBtnClicked(mx, my, HUD.endscreenButtons)) {
-                    submitScore();
-                }
-            } else if (gameStart) {
-                
-                if (isBtnClicked(mx, my, HUD.volume)) {
-                    HUD.volumeOn = !HUD.volumeOn;  
-                    if (HUD.volumeOn) {
-                        AM.audio.bg.img.currentTime = 0;
-                        AM.audio.bg.img.play();
-
-                        AM.audio.explosion.img.currentTime = 0;
-                        AM.audio.explosion.img.play();
-                    } else {
-                        AM.audio.bg.img.pause();
-                        AM.audio.explosion.img.pause();
+                // mDown = true;
+                if (gameover) {
+                    if (isBtnClicked(mx, my, HUD.endscreenButtons)) {
+                        submitScore();
                     }
+                } else if (gameStart) {
+                    
+                    if (isBtnClicked(mx, my, HUD.volume)) {
+                        HUD.volumeOn = !HUD.volumeOn;  
+                        if (HUD.volumeOn) {
+                            AM.audio.bg.img.currentTime = 0;
+                            AM.audio.bg.img.play();
 
+                            AM.audio.explosion.img.currentTime = 0;
+                            AM.audio.explosion.img.play();
+                        } else {
+                            AM.audio.bg.img.pause();
+                            AM.audio.explosion.img.pause();
+                        }
+
+                        
+                    } else {
+                        splat(mx, my);
+                        updateLevel();
+                    }
                     
                 } else {
-                    splat(mx, my);
-                    updateLevel();
+                    // if (isBtnClicked(mx, my, btnBegin)) {
+                    if (isBtnClicked(mx, my, startButtonInfo)) {
+                        playAllAudio();
+                        // if (audioContext.state === "suspended") {
+                        //     audioContext.resume();
+                        // }
+
+                        gameStart = true;
+
+                        AM.audio.bg.img.volume = 0.5;
+                        AM.audio.bg.img.loop = true;
+                        // AM.audio.bg.img.play();
+
+                        AM.audio.explosion.img.volume = 0.8;
+                        AM.audio.explosion.img.loop = true;
+                        // AM.audio.explosion.img.play();
+
+                        // playAllAudio();
+
+                        if (HUD.volumeOn) {
+                            AM.audio.bg.img.play();
+                            AM.audio.explosion.img.play();
+                        }
+                    }
                 }
+
                 
-            } else {
-                // if (isBtnClicked(mx, my, btnBegin)) {
-                if (isBtnClicked(mx, my, startButtonInfo)) {
-                    if (audioContext.state === "suspended") {
-                        audioContext.resume();
-                    }
-
-                    gameStart = true;
-
-                    AM.audio.bg.img.volume = 0.5;
-                    AM.audio.bg.img.loop = true;
-                    // AM.audio.bg.img.play();
-
-                    AM.audio.explosion.img.volume = 0.8;
-                    AM.audio.explosion.img.loop = true;
-                    // AM.audio.explosion.img.play();
-
-                    playAllAudio();
-
-                    if (volumeOn) {
-                        AM.audio.bg.img.play();
-                        AM.audio.explosion.img.play();
-                    }
-                }
             }
-
-            
         }
     });
 
@@ -1794,7 +1798,7 @@ function controls() {
                     AM.audio.explosion.img.loop = true;
                     // AM.audio.explosion.img.play();
 
-                    if (volumeOn) {
+                    if (HUD.volumeOn) {
                         AM.audio.bg.img.play();
                         AM.audio.explosion.img.play();
                     }
@@ -2000,6 +2004,7 @@ function checkProjectileCollisions() {
                     initAnimateCanon(j);
                     
                     score += PROJECTILE_COLLISION_MINUS;
+                    score = Math.max(score, 0);
                     HUD.updateScoreSprite(zeroPad(score, 2));
                 }
             }
@@ -2033,6 +2038,7 @@ function checkCanonCollisions() {
         initAnimateCanon(3);
     }
 
+    score = Math.max(score, 0);
     HUD.updateScoreSprite(zeroPad(score, 2));
 }
 
@@ -2070,6 +2076,7 @@ function isCollided(p1, p2) {
 function reduceHP() {
     if (--lives < 0) {
         gameover = true;
+        score = Math.max(score, 0);
         HUD.updateGameoverScore(splashInfo, zeroPad(score, 2));
     }
 }
@@ -2168,6 +2175,7 @@ function splat(mx, my) {
         resetProjectile([i]);
         initAnimateCanon(i);
 
+        score = Math.max(score, 0);
         HUD.updateScoreSprite(zeroPad(score, 2));
         // break;
     }
@@ -2268,6 +2276,7 @@ function update() {
     if (timer.timer <= 0) {
         canReset = true;
         gameover = true;
+        score = Math.max(score, 0);
         HUD.updateGameoverScore(splashInfo, zeroPad(score, 2));
     }
 

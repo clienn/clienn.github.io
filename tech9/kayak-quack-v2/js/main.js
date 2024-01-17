@@ -1805,52 +1805,44 @@ function controls() {
     document.addEventListener('touchstart', (e) => {
         e.preventDefault();
 
-        if (gameover) {
-            // reset();
+        if (e.type == 'touchstart' || e.type == 'touchmove' || e.type == 'touchend' || e.type == 'touchcancel'){
+            var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+            var touch = evt.touches[0] || evt.changedTouches[0];
+            prevPos = touch.pageX;
+            prevPosY = touch.pageY;
+
             if (!mDown) {
                 mDown = true;
 
-                var x = e.changedTouches[event.changedTouches.length-1].pageX;
-                var y = e.changedTouches[event.changedTouches.length-1].pageY;
-
-                if (isBtnClicked(x, y, HUD.endscreenButtons)) {
-                    submitScore();
-                }
-            }
-            
-        } else {
-            if (e.type == 'touchstart' || e.type == 'touchmove' || e.type == 'touchend' || e.type == 'touchcancel'){
-                var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
-                var touch = evt.touches[0] || evt.changedTouches[0];
-                prevPos = touch.pageX;
-                prevPosY = touch.pageY;
-
-                if (!mDown) {
-
-                    if (isBtnClicked(touch.pageX, touch.pageY, {
-                        x: HUD.volume.x,
-                        y: HUD.volume.y,
-                        w: HUD.volume.w,
-                        h: HUD.volume.h
-                    })) {
-                        HUD.volumeOn = !HUD.volumeOn; 
-                        // console.log('test', HUD.volumeOn)
-                        if (HUD.volumeOn) {
-                            AM.audio.bg.img.currentTime = 0;
-                            AM.audio.bg.img.play();
-                        } else {
-                            AM.audio.bg.img.pause();
-                            // music.correct.obj.volume = 0;
-                        }
-                        
-                    } 
-
-                    mDown = true;
-                    mouseMoveOrigin.x = prevPos;
-
-                    if (isBtnClicked(touch.pageX, touch.pageY, joystick.hitbox) || !joystick.on) {
-                        joystick.active = true;
+                if (gameover) {
+                    // var x = e.changedTouches[event.changedTouches.length-1].pageX;
+                    // var y = e.changedTouches[event.changedTouches.length-1].pageY;
+    
+                    if (isBtnClicked(touch.pageX, touch.pageY, HUD.endscreenButtons)) {
+                        submitScore();
                     }
+                } else if (isBtnClicked(touch.pageX, touch.pageY, {
+                    x: HUD.volume.x,
+                    y: HUD.volume.y,
+                    w: HUD.volume.w,
+                    h: HUD.volume.h
+                })) {
+                    HUD.volumeOn = !HUD.volumeOn; 
+                    // console.log('test', HUD.volumeOn)
+                    if (HUD.volumeOn) {
+                        AM.audio.bg.img.currentTime = 0;
+                        AM.audio.bg.img.play();
+                    } else {
+                        AM.audio.bg.img.pause();
+                        // music.correct.obj.volume = 0;
+                    }
+                    
+                } 
+
+                mouseMoveOrigin.x = prevPos;
+
+                if (isBtnClicked(touch.pageX, touch.pageY, joystick.hitbox) || !joystick.on) {
+                    joystick.active = true;
                 }
             }
         }
@@ -1873,12 +1865,14 @@ function controls() {
             //     kayak.vx = 0;
             // }
 
-            if (mDown) {
-                mDown = false;
-                // kayak.updateOriginalPos();
-                // kayak.zRotate = 0;
-                mouseUp();
-            }
+            
+        }
+
+        if (mDown) {
+            mDown = false;
+            // kayak.updateOriginalPos();
+            // kayak.zRotate = 0;
+            mouseUp();
         }
     });
 
@@ -1949,16 +1943,14 @@ function controls() {
         // mousedownE(e.offsetX, e.offsetY);
         let mx = e.offsetX;
         let my = e.offsetY;
-        if (gameover) {
-            if (!mDown) {
-                mDown = true;
+        if (!mDown) {
+            mDown = true;
+
+            if (gameover) {
                 if (isBtnClicked(mx, my, HUD.endscreenButtons)) {
                     submitScore();
                 }
-            }
-
-        } else if (!mDown) {
-            if (gameStart) {
+            } else if (gameStart) {
                 if (isBtnClicked(mx, my, {
                     x: HUD.volume.x,
                     y: HUD.volume.y,
@@ -1978,7 +1970,7 @@ function controls() {
                 } 
 
                 // if (!mDown) {
-                    mDown = true;
+                    
                     mouseMoveOrigin.x = mx;
 
                     // joystick.active = true;
@@ -1989,6 +1981,8 @@ function controls() {
                 // }
 
             }
+
+            
         }
 
         
