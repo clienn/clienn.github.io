@@ -124,7 +124,8 @@ class Sprite {
         // Untransformed draw position
         const position = {x: this.x, y: this.y};
         // In degrees
-        const rotation = { x: 0, y: Math.sin(this.t2) * this.flippingSpeed + this.yRotate, z: angle + this.zRotate};
+        const rotation = { x: 0, y: this.yRotate, z: angle + this.zRotate};
+        // const rotation = { x: 0, y: Math.sin(this.t2) * this.flippingSpeed + this.yRotate, z: angle + this.zRotate};
         // Rotation relative to here (this is the center of the image)
         const rotPt = { x: this.w / 2, y: this.h / 2 };
 
@@ -206,12 +207,14 @@ class Sprite {
 
     swim(ctx, img) {
         let frame = Math.floor(this.t) % this.frames;
+        if (frame > 5) console.log(frame, this.frames)
         // console.log(frame * this.cw);
         ctx.save();
         // Untransformed draw position
         const position = {x: this.x, y: this.y};
         // In degrees
-        const rotation = { x: 0, y: Math.sin(this.t) * this.flippingSpeed + this.yRotate, z: 0};
+        const rotation = { x: 0, y: this.yRotate, z: 0};
+        // const rotation = { x: 0, y: Math.sin(this.t) * this.flippingSpeed + this.yRotate, z: 0};
         // Rotation relative to here (this is the center of the image)
         const rotPt = { x: this.w / 2, y: this.h / 2 };
 

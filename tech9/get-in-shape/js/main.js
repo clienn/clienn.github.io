@@ -319,9 +319,11 @@ function main(w, h) {
     splashInfo.x = w / 2 - splashInfo.w / 2;
     splashInfo.y = Math.abs(h / 2 - splashInfo.h / 2);
 
-    if (onMobile && !onTablet) {
-        splashInfo.y = 0;
-    }
+    // if (onMobile && !onTablet) {
+    //     splashInfo.y = 0;
+    // }
+
+    splashInfo.y = 0;
 
     rescaleSize(startButtonInfo, scaleX, scaleX);
     startButtonInfo.x = w / 2 - startButtonInfo.w / 2;
@@ -446,9 +448,17 @@ function main(w, h) {
 
     portal.move(w, h);
 
-    if (isMobile()) {
+    if (isMobile() || isTablet()) {
         canvas.addEventListener('touchstart', e => {
-            mousedownE(e.touches[0].clientX, e.touches[0].clientY);
+            console.log('test')
+            if (e.type == 'touchstart' || e.type == 'touchmove' || e.type == 'touchend' || e.type == 'touchcancel'){
+                var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+                var touch = evt.touches[0] || evt.changedTouches[0];
+                let x = touch.pageX;
+                let y = touch.pageY;
+                mousedownE(x, y);
+                
+            }
         });
     
         canvas.addEventListener('touchmove', e => {
@@ -613,45 +623,40 @@ function displayScore() {
 }
 
 function mousedownE(mx, my) {    
+    
     if (!mDown) {
         mouseX = mx;
         mouseY = my;
-    }
-    
-    if (gameover) {
-        // canReset = true;
-        if (!mDown) {
-            mDown = true;
+        mDown = true;
+        if (gameover) {
+            // canReset = true;
             if (isBtnClicked(mx, my, HUD.endscreenButtons)) {
                 submitScore();
             }
-        }
-    } else if (!portal.isAnimating)  {
-        for (let i = 0; i < nContainers; ++i) {
-            if (!correctAnswers.includes(i)) {
-                let r = collission(mx, my, shapes[i].x, shapes[i].y, portal.gridDimX, portal.gridDimY);
-
-                if (r) {
-                    // center to mouse
-                    let adj = portal.gridDim / 2;
-                    shapes[i].x = mx - adj;
-                    shapes[i].y = my - adj - shapes[i].h / 2;
-
-                    dragID = i;
-                    isDraggable = true;
+        } else if (!portal.isAnimating)  {
+            for (let i = 0; i < nContainers; ++i) {
+                if (!correctAnswers.includes(i)) {
+                    let r = collission(mx, my, shapes[i].x, shapes[i].y, portal.gridDimX, portal.gridDimY);
                     
+                    if (r) {
+                        // center to mouse
+                        let adj = portal.gridDim / 2;
+                        shapes[i].x = mx - adj;
+                        shapes[i].y = my - adj - shapes[i].h / 2;
+    
+                        dragID = i;
+                        isDraggable = true;
+                        
+                    }
                 }
             }
         }
-    }
-
-    if (!mDown) {
-        mDown = true;
     }
 }
 
 function mousemoveE(mx, my) {
     if (isDraggable) {
+        
         let adj = portal.gridDim / 2;
         shapes[dragID].x = mx - adj;
         shapes[dragID].y = my - adj - shapes[dragID].h / 2;

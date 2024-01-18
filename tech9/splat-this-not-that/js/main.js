@@ -691,7 +691,8 @@ const waterInfo = {
     x: 0,
     y: 160,
     w: 0,
-    h: 50,
+    // h: 50,
+    h: 38.16 * 2,
     cw: 0,
     ch: 0
 }
@@ -905,9 +906,11 @@ function main(w, h) {
     splashInfo.x = w / 2 - splashInfo.w / 2;
     splashInfo.y = Math.abs(h / 2 - splashInfo.h / 2);
 
-    if (onMobile && !onTablet) {
-        splashInfo.y = 0;
-    }
+    // if (onMobile && !onTablet) {
+    //     splashInfo.y = 0;
+    // }
+
+    splashInfo.y = 0;
 
     rescaleSize(startButtonInfo, scaleX, scaleX);
     startButtonInfo.x = w / 2 - startButtonInfo.w / 2;
@@ -1037,7 +1040,7 @@ function main(w, h) {
     //     sounds.load(music[k].obj, music[k].src, music[k].ext);
     // }
 
-    init();
+    
 
     
 
@@ -1046,7 +1049,9 @@ function main(w, h) {
     rescaleSize(completeInfo, scaleX, scaleX);
     rescaleSize(scoreTextInfo, scaleX, scaleX);
     rescaleAll(trophyInfo, scaleX, scaleY);
-    rescaleAll(waterInfo, scaleX, scaleY);
+    
+    rescalePos(waterInfo, scaleX, scaleY);
+
     rescaleAll(kaboomInfo, scaleX, scaleY);
     rescaleAll(explosionStarInfo, scaleX, scaleY);
     rescaleAll(ouchInfo, scaleX, scaleY);
@@ -1054,10 +1059,20 @@ function main(w, h) {
 
     rescaleAll(volumeInfo, scaleX, scaleY);
 
+    waterInfo.w *= splashInfo.sx;
+    waterInfo.h *= splashInfo.sx;
+    
+    if (onTablet) {
+        waterInfo.y = h - 455 * splashInfo.sy;
+    } else {
+        waterInfo.y = h - waterInfo.h / 2;
+    }
+    
 
+    init();
     initTopHUD();
 
-    waterInfo.y = h - waterInfo.h;
+    
 
     shineInfo.w *= 2;
     shineInfo.h *= 2;
@@ -1875,9 +1890,11 @@ function init() {
     canons.init();
 
     landPosX = canvas.width - images.landLeft.w;
-    landPosY = canvas.height - images.landLeft.h;
+    // landPosY = canvas.height - images.landLeft.h;
+    landPosY = waterInfo.y + waterInfo.h - images.landLeft.h;
 
     images.landLeft.y = landPosY;
+    // images.landLeft.y = waterInfo.y - images.landLeft.h;
     images.landRight.x = landPosX;
     images.landRight.y = landPosY + 10 * scaleX;
 
@@ -2344,12 +2361,15 @@ function gameCycle() {
             if (gameStart) {
                 // bg
                 // ctx.drawImage(AM.images.bg.img, 0, 0, 927, 429, 0, 0, canvas.width, canvas.height);
-                ctx.drawImage(AM.images.sky.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
+                // ctx.drawImage(AM.images.sky.img, 0, 0, 2732, 2048, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(AM.images.sky.img, 0, 0, AM.images.sky.cw, AM.images.sky.ch, 0, 0, canvas.width, canvas.height);
+                // console.log(AM.images.sky.cw, canvas.width);
 
                 drawFloaters();
 
                 ctx.beginPath();
-                ctx.fillStyle = '#70D2ED';
+                // ctx.fillStyle = '#70D2ED';
+                ctx.fillStyle = '#4CDAFE';
                 ctx.rect(0, waterInfo.y, canvas.width, waterInfo.h);
                 ctx.fill();
 

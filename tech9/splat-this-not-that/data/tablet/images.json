@@ -114,10 +114,10 @@
         },
         {
             "id": "sky",
-            "src": "sky",
+            "src": "tab/sky",
             "ext": "png",
-            "cw": 926,
-            "ch": 428
+            "cw": 2732,
+            "ch": 2048
         },
         {
             "id": "title",

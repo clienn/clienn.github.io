@@ -250,9 +250,11 @@ function main(w, h) {
     splashInfo.x = w / 2 - splashInfo.w / 2;
     splashInfo.y = Math.abs(h / 2 - splashInfo.h / 2);
 
-    if (onMobile && !onTablet) {
-        splashInfo.y = 0;
-    }
+    // if (onMobile && !onTablet) {
+    //     splashInfo.y = 0;
+    // }
+
+    splashInfo.y = 0;
 
     rescaleSize(startButtonInfo, scaleX, scaleX);
     startButtonInfo.x = w / 2 - startButtonInfo.w / 2;
@@ -288,7 +290,7 @@ function main(w, h) {
     // console.log(TXT.texts);
     
     
-    setFishInfo(scaleX, scaleX, 2.5);
+    setFishInfo(scaleX, scaleX, 3 * splashInfo.sx);
     setSchoolFishInfo(scaleX, scaleX, 0.5);
     setGarbageInfo(scaleX, scaleX, 0.5);
     rescaleSize(eelInfo.head, scaleX, scaleX);
@@ -599,9 +601,9 @@ function addSmartFish() {
     let direction = Math.floor(Math.random() * 2) ? FACE.RIGHT : FACE.LEFT;
 
 
-    let fishScale = (Math.floor(Math.random() * 50) + 50) / 100;
-    let fishW = fishInfo[rng].w * fishScale;
-    let fishH = fishInfo[rng].h * fishScale;
+    // let fishScale = (Math.floor(Math.random() * 50) + 50) / 100;
+    let fishW = fishInfo[rng].w;
+    let fishH = fishInfo[rng].h;
 
     if (direction > 0) {
         rngX = -fishInfo[rng].w;
@@ -616,7 +618,8 @@ function addSmartFish() {
     fish.flippingSpeed = 15;
     fish.dest = [canvas.width / 2, canvas.height / 2];
     // fish.setFrames(fishInfo[rng].frames);
-    fish.frames = fishInfo[rng].frames;
+    // fish.frames = fishInfo[rng].frames;
+    fish.frames = 6;
     smartSwimmers.push(fish);
 }
 
@@ -1217,10 +1220,10 @@ function initStartPage() {
 }
 
 function setFishInfo(sx, sy, sizePercentage) {
-    for (let i = 1; i < 7; ++i) {
+    for (let i = 0; i < 7; ++i) {
         let key = 'sfish_' + i;
 
-        if (AM.images[key].frames) AM.images[key].cw = AM.images[key].cw / AM.images[key].frames;
+        // if (AM.images[key].frames) AM.images[key].cw = AM.images[key].cw / AM.images[key].frames;
         // console.log(AM.images[key].frames, AM.images[key].cw)
         // let cw = (AM.images[key].frames ? (AM.images[key].cw / AM.images[key].frames) : AM.images[key].cw);
 
@@ -1228,18 +1231,18 @@ function setFishInfo(sx, sy, sizePercentage) {
             x: 0,
             y: 0,
             w: AM.images[key].cw * sizePercentage * sx,
-            h: AM.images[key].ch * sizePercentage * sy,
+            h: AM.images[key].ch * sizePercentage * sx,
             frames: AM.images[key].frames
         };
     }
 
-    fishInfo[0] = {
-        x: 0,
-        y: 0,
-        w: AM.images.sfish_0.cw * 0.75 * sx,
-        h: AM.images.sfish_0.ch * 0.75 * sy,
-        frames: AM.images.sfish_0.frames
-    };
+    // fishInfo[0] = {
+    //     x: 0,
+    //     y: 0,
+    //     w: AM.images.sfish_0.cw * 0.75 * sx,
+    //     h: AM.images.sfish_0.ch * 0.75 * sy,
+    //     frames: AM.images.sfish_0.frames
+    // };
 }
 
 function setSchoolFishInfo(sx, sy, sizePercentage) {
@@ -1292,7 +1295,7 @@ function addFish() {
     fish.setRandomSpeed(fishMaxSpeed, fishMinSpeed);
     fish.id = rng;
     // fish.setFrames(fishInfo[rng].frames);
-    fish.frames = fishInfo[rng].frames;
+    fish.frames = 6;
     fishes.push(fish);
 }
 
@@ -1300,7 +1303,7 @@ function drawFishes() {
     for (let i = 0; i < fishes.length; ++i) {
         let key = 'sfish_' + fishes[i].id;
         fishes[i].swim(ctx, AM.images[key].img);
-        // fishes[i].t += 10 * delta;
+        fishes[i].t += 10 * delta;
     }
 }
 
@@ -1339,7 +1342,7 @@ function resetFish(fish, isEaten) {
     fish.mutateFish(rng, fishInfo[rng].w, fishInfo[rng].h, AM.images[key].cw, AM.images[key].ch, direction);
     fish.setRandomSpeed(fishMaxSpeed, fishMinSpeed);
     // fish.setFrames(fishInfo[rng].frames);
-    fish.frames = fishInfo[rng].frames;
+    // fish.frames = fishInfo[rng].frames;
 }
 
 function resetSmartFish(fish) {
@@ -1376,7 +1379,7 @@ function resetSmartFish(fish) {
     
     fish.morph(rng, fishInfo[rng].w, fishInfo[rng].h, AM.images[key].cw, AM.images[key].ch);
     // fish.setFrames(fishInfo[rng].frames);
-    fish.frames = fishInfo[rng].frames
+    // fish.frames = fishInfo[rng].frames
     // fish.setRandomSpeed(30, 15);
 }
 
