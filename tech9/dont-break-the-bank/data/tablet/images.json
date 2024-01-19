@@ -8,6 +8,20 @@
             "ch": 2048
         },
         {
+            "id": "knob",
+            "src": "hud/joystick/knob",
+            "ext": "png",
+            "cw": 144,
+            "ch": 144
+        },
+        {
+            "id": "area",
+            "src": "hud/joystick/area",
+            "ext": "png",
+            "cw": 288,
+            "ch": 144
+        },
+        {
             "id": "bg",
             "src": "tab/bg",
             "ext": "png",

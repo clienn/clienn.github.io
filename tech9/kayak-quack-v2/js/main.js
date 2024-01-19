@@ -1760,7 +1760,17 @@ function mouseMove(x, y, prevX, prevY) {
 
         let p = Math.abs(percent);
 
-        if (dist < 0) {
+        
+        let joystickPosX = joystick.x - joystick.mx;
+        console.log(joystick.mx);
+
+        // if (dist < 0) {
+        //     kayak.vx = -F * p;
+        // } else if (dist > 0) {
+        //     kayak.vx = F * p;
+        // }
+
+        if (joystick.mx < 0) {
             kayak.vx = -F * p;
         } else if (dist > 0) {
             kayak.vx = F * p;

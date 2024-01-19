@@ -53,6 +53,20 @@ class Joystick {
 
         this.on = true;
 
+        this.knob = {
+            x: x - this.r3,
+            y: y - this.r3,
+            w: this.r3 * 2,
+            h: this.r3 * 2
+        }
+
+        this.area = {
+            x: x - this.r,
+            y: y - this.r,
+            w: this.r * 2,
+            h: this.r * 2
+        }
+
         // this.totalDistX = 0;
     }
 
@@ -64,8 +78,8 @@ class Joystick {
                 this.maxVx = x;
             }
 
-            // this.prevMx = this.mx;
-            // this.prevMy = this.my;
+            this.prevMx = this.mx;
+            this.prevMy = this.my;
 
             this.mx += x;
             if (this.mx > this.moveLimit) {
@@ -105,47 +119,50 @@ class Joystick {
         if (joystick.on) {
             ctx.save();
 
-            ctx.globalAlpha = 0.2 + 0.25;
-            ctx.fillStyle = '#000';
+            // ctx.globalAlpha = 0.2 + 0.25;
+            // ctx.fillStyle = '#000';
 
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.r, this.startAngle, this.endAngle);
-            ctx.fill();
+            // ctx.beginPath();
+            // ctx.arc(this.x, this.y, this.r, this.startAngle, this.endAngle);
+            // ctx.fill();
 
-            ctx.globalAlpha = 0.25 + 0.25;
-            ctx.fillStyle = '#fff';
+            // ctx.globalAlpha = 0.25 + 0.25;
+            // ctx.fillStyle = '#fff';
 
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.r2, this.startAngle, this.endAngle);
-            ctx.fill();
+            // ctx.beginPath();
+            // ctx.arc(this.x, this.y, this.r2, this.startAngle, this.endAngle);
+            // ctx.fill();
 
-            ctx.save();
-            // Untransformed draw position
-            const position = {x: this.rect.x, y: this.rect.y};
-            // In degrees
-            const rotation = { x: 0, y: 0, z: 45};
-            // Rotation relative to here (this is the center of the image)
-            // const rotPt = { x: this.w / 2, y: this.h / 2 };
-            const rotPt = { x: this.rect.dim / 2, y: this.rect.dim / 2 };
+            // ctx.save();
+            // // Untransformed draw position
+            // const position = {x: this.rect.x, y: this.rect.y};
+            // // In degrees
+            // const rotation = { x: 0, y: 0, z: 45};
+            // // Rotation relative to here (this is the center of the image)
+            // // const rotPt = { x: this.w / 2, y: this.h / 2 };
+            // const rotPt = { x: this.rect.dim / 2, y: this.rect.dim / 2 };
 
-            ctx.setTransform(new DOMMatrix()
-                .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
-                .rotateSelf(rotation.x, rotation.y, rotation.z)
-            );
+            // ctx.setTransform(new DOMMatrix()
+            //     .translateSelf(position.x + rotPt.x, position.y + rotPt.y)
+            //     .rotateSelf(rotation.x, rotation.y, rotation.z)
+            // );
 
-            ctx.strokeStyle = '#fff';
-            ctx.beginPath();
-            ctx.rect(-rotPt.x, -rotPt.x, this.rect.dim, this.rect.dim);
-            ctx.stroke();
+            // ctx.strokeStyle = '#fff';
+            // ctx.beginPath();
+            // ctx.rect(-rotPt.x, -rotPt.x, this.rect.dim, this.rect.dim);
+            // ctx.stroke();
             
-            ctx.restore();
+            // ctx.restore();
 
-            ctx.globalAlpha = 0.55 + 0.25;
-            ctx.fillStyle = '#89CFF0';
+            // ctx.globalAlpha = 0.55 + 0.25;
+            // ctx.fillStyle = '#89CFF0';
 
-            ctx.beginPath();
-            ctx.arc(this.x + this.mx, this.y + this.my, this.r3, this.startAngle, this.endAngle);
-            ctx.fill();
+            // ctx.beginPath();
+            // ctx.arc(this.x + this.mx, this.y + this.my, this.r3, this.startAngle, this.endAngle);
+            // ctx.fill();
+
+            ctx.drawImage(AM.images.area.img, this.area.x, this.area.y, this.area.w, this.area.h);
+            ctx.drawImage(AM.images.knob.img, this.knob.x + this.mx, this.knob.y + this.my, this.knob.w, this.knob.h);
 
             ctx.restore();
         }
