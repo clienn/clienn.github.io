@@ -791,8 +791,8 @@ function main(w, h) {
 
     initStartPage();
 
-    TXT = new Text(ctx, w, h);
-    TXT.setScale(scaleX, scaleY);
+    // TXT = new Text(ctx, w, h);
+    // TXT.setScale(scaleX, scaleY);
 
     timerY = h / 2;
     textPos.x = w / 2;
@@ -900,70 +900,70 @@ function main(w, h) {
 
 
     // startpage texts
-    let tx = startPageInfo.text1.x;
-    let ty = startPageInfo.text1.y;
-    let adjX = (300 / 2 - 115 / 2) * scaleX;
-    // let t1H = startPageInfo.text1.h;
-    TXT.addText("text1_1", 'Watch and follow the turtle', 'normal', 20, 'Montserrat', tx, ty, 300, 35, '#221F20', false);
-    TXT.addText("text1_2", 'as it hides.', 'normal', 20, 'Montserrat', tx + adjX, ty + 40 * scaleY, 115, 35, '#221F20', false);
+    // let tx = startPageInfo.text1.x;
+    // let ty = startPageInfo.text1.y;
+    // let adjX = (300 / 2 - 115 / 2) * scaleX;
+    // // let t1H = startPageInfo.text1.h;
+    // TXT.addText("text1_1", 'Watch and follow the turtle', 'normal', 20, 'Montserrat', tx, ty, 300, 35, '#221F20', false);
+    // TXT.addText("text1_2", 'as it hides.', 'normal', 20, 'Montserrat', tx + adjX, ty + 40 * scaleY, 115, 35, '#221F20', false);
 
-    tx = startPageInfo.text2.x;
-    ty = startPageInfo.text2.y;
-    adjX = (330 / 2 - 190 / 2) * scaleX;
-    TXT.addText("text2_1", 'After the shuffle, tap where you', 'normal', 20, 'Montserrat', tx, ty, 330, 35, '#221F20', false);
-    TXT.addText("text2_2", 'think he is hiding.', 'normal', 20, 'Montserrat', tx + adjX, ty + 40 * scaleY, 190, 35, '#221F20', false);
+    // tx = startPageInfo.text2.x;
+    // ty = startPageInfo.text2.y;
+    // adjX = (330 / 2 - 190 / 2) * scaleX;
+    // TXT.addText("text2_1", 'After the shuffle, tap where you', 'normal', 20, 'Montserrat', tx, ty, 330, 35, '#221F20', false);
+    // TXT.addText("text2_2", 'think he is hiding.', 'normal', 20, 'Montserrat', tx + adjX, ty + 40 * scaleY, 190, 35, '#221F20', false);
 
-    tx = startPageInfo.text3.x;
-    ty = startPageInfo.text3.y;
-    adjX = (240 / 2 - 180 / 2) * scaleX;
-    TXT.addText("text3_1", 'You lose if you miss the', 'normal', 20, 'Montserrat', tx, ty, 240, 35, '#221F20', false);
-    TXT.addText("text3_2", 'turtle three times.', 'normal', 20, 'Montserrat', tx + adjX, ty + 40 * scaleY, 180, 35, '#221F20', false);
+    // tx = startPageInfo.text3.x;
+    // ty = startPageInfo.text3.y;
+    // adjX = (240 / 2 - 180 / 2) * scaleX;
+    // TXT.addText("text3_1", 'You lose if you miss the', 'normal', 20, 'Montserrat', tx, ty, 240, 35, '#221F20', false);
+    // TXT.addText("text3_2", 'turtle three times.', 'normal', 20, 'Montserrat', tx + adjX, ty + 40 * scaleY, 180, 35, '#221F20', false);
 
-    // Texts
+    // // Texts
     
-    TXT.addText(TEXT_ID.CORRECT, 'Correct!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
-    TXT.addText(TEXT_ID.YOU_GOT_IT, 'You got it!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
-    TXT.addText(TEXT_ID.YAY_YOU_FOUND_HIM, 'Yay, you found him!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 350, 50, '#fff', true); 
-    TXT.addText(TEXT_ID.NICE_WORK, 'Nice work!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
-    TXT.addText(TEXT_ID.GOOD_JOB, 'Good job!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
-    TXT.addText(TEXT_ID.MASTERFUL, 'Masterful!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
-    TXT.addText(TEXT_ID.YOUR_MOTHER_SHOULD_BE_PROUD, 'Your mother should be proud!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 500, 50, '#fff', true); 
-    TXT.addText(TEXT_ID.SHOWING_PROMISE, 'Showing promise!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 300, 50, '#fff', true); 
+    // TXT.addText(TEXT_ID.CORRECT, 'Correct!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
+    // TXT.addText(TEXT_ID.YOU_GOT_IT, 'You got it!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
+    // TXT.addText(TEXT_ID.YAY_YOU_FOUND_HIM, 'Yay, you found him!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 350, 50, '#fff', true); 
+    // TXT.addText(TEXT_ID.NICE_WORK, 'Nice work!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
+    // TXT.addText(TEXT_ID.GOOD_JOB, 'Good job!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
+    // TXT.addText(TEXT_ID.MASTERFUL, 'Masterful!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fff', true); 
+    // TXT.addText(TEXT_ID.YOUR_MOTHER_SHOULD_BE_PROUD, 'Your mother should be proud!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 500, 50, '#fff', true); 
+    // TXT.addText(TEXT_ID.SHOWING_PROMISE, 'Showing promise!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 300, 50, '#fff', true); 
 
-    TXT.addText(TEXT_ID.WRONG, 'Wrong!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
-    TXT.addText(TEXT_ID.WRONG_TURTLE, 'Wrong turtle!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
-    TXT.addText(TEXT_ID.NOPE_NOT_THAT_ONE, 'Nope, not that one!', 'bold', 20, 'Montserrat', w / 2, 250 * scaleY, 350, 50, '#fb2121', true); 
-    TXT.addText(TEXT_ID.THEY_DO_LOOK_ALIKE, 'They do look alike!', 'bold', 20, 'Montserrat', w / 2, 250 * scaleY, 350, 50, '#fb2121', true); 
-    TXT.addText(TEXT_ID.UMMM_NOPE, 'Ummm, nope!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
-    TXT.addText(TEXT_ID.YOU_CAN_DO_BETTER, 'You can do better!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 350, 50, '#fb2121', true); 
-    TXT.addText(TEXT_ID.NO_THATS_NOT_IT, 'No, that\'s not it!', 'bold', 20, 'Montserrat', w / 2, 250 * scaleY, 300, 50, '#fb2121', true); 
-    TXT.addText(TEXT_ID.TRY_AGAIN, 'Try again!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
+    // TXT.addText(TEXT_ID.WRONG, 'Wrong!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
+    // TXT.addText(TEXT_ID.WRONG_TURTLE, 'Wrong turtle!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
+    // TXT.addText(TEXT_ID.NOPE_NOT_THAT_ONE, 'Nope, not that one!', 'bold', 20, 'Montserrat', w / 2, 250 * scaleY, 350, 50, '#fb2121', true); 
+    // TXT.addText(TEXT_ID.THEY_DO_LOOK_ALIKE, 'They do look alike!', 'bold', 20, 'Montserrat', w / 2, 250 * scaleY, 350, 50, '#fb2121', true); 
+    // TXT.addText(TEXT_ID.UMMM_NOPE, 'Ummm, nope!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
+    // TXT.addText(TEXT_ID.YOU_CAN_DO_BETTER, 'You can do better!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 350, 50, '#fb2121', true); 
+    // TXT.addText(TEXT_ID.NO_THATS_NOT_IT, 'No, that\'s not it!', 'bold', 20, 'Montserrat', w / 2, 250 * scaleY, 300, 50, '#fb2121', true); 
+    // TXT.addText(TEXT_ID.TRY_AGAIN, 'Try again!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
 
-    TXT.addText(TEXT_ID.TOOSLOW, 'Too Slow!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
-    TXT.addText(TEXT_ID.COMPLETE, 'Complete!', 'bold', 20, 'Montserrat', w / 2, shineInfo.y - 25 * scaleY, 300, 70, '#fff', true); 
-    TXT.addText(TEXT_ID.SCORELABEL, 'Score', 'bold', 20, 'Montserrat', w / 2, shineInfo.y + shineInfo.h, 100, 50, '#fff', true); 
-    // TXT.addText(TEXT_ID.FINALSCORE, '11', 'bold', 20, 'Montserrat', w / 2, (320 + 145) * scaleY, 65, 60, '#fff', true); 
-    TXT.addText(TEXT_ID.RESETMSG, 'Tap to play again.', 'bold', 20, 'Montserrat', w / 2, h / 2, 600, 100, '#fff', true); 
-    TXT.addText(TEXT_ID.TOPTIMER, '09', (isMobile ? 'normal' : 'bold'), 20, 'Montserrat', 
-        topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2, topHUDInfo.timer.progress.y, 40, 40, '#000', true); 
+    // TXT.addText(TEXT_ID.TOOSLOW, 'Too Slow!', 'bold', 20, 'Montserrat', w / 2, 200 * scaleY, 250, 50, '#fb2121', true); 
+    // TXT.addText(TEXT_ID.COMPLETE, 'Complete!', 'bold', 20, 'Montserrat', w / 2, shineInfo.y - 25 * scaleY, 300, 70, '#fff', true); 
+    // TXT.addText(TEXT_ID.SCORELABEL, 'Score', 'bold', 20, 'Montserrat', w / 2, shineInfo.y + shineInfo.h, 100, 50, '#fff', true); 
+    // // TXT.addText(TEXT_ID.FINALSCORE, '11', 'bold', 20, 'Montserrat', w / 2, (320 + 145) * scaleY, 65, 60, '#fff', true); 
+    // TXT.addText(TEXT_ID.RESETMSG, 'Tap to play again.', 'bold', 20, 'Montserrat', w / 2, h / 2, 600, 100, '#fff', true); 
+    // TXT.addText(TEXT_ID.TOPTIMER, '09', (isMobile ? 'normal' : 'bold'), 20, 'Montserrat', 
+    //     topHUDInfo.timer.x + topHUD.timer.timecircle.w / 2, topHUDInfo.timer.progress.y, 40, 40, '#000', true); 
 
-    // TXT.addText(canvas, TEXT_ID.SCOREX, 'x', 'normal', topHUD.score.fontS, 'Montserrat', 
-    //     w / 2, topHUDInfo.score.y + (scoreAdjY + 2) * scaleY, 20, topHUD.score.fontH, '#fff', true); 
+    // // TXT.addText(canvas, TEXT_ID.SCOREX, 'x', 'normal', topHUD.score.fontS, 'Montserrat', 
+    // //     w / 2, topHUDInfo.score.y + (scoreAdjY + 2) * scaleY, 20, topHUD.score.fontH, '#fff', true); 
 
-    let scoreLabelY = isMobile ? 30 * scaleY : 37 * scaleY;
-    TXT.addText(TEXT_ID.SCOREX, 'x', 'normal', topHUD.score.fontS, 'Montserrat', 
-        w / 2 + 30 * scaleX, 42 * scaleY, 20, 40, '#fff', true);
+    // let scoreLabelY = isMobile ? 30 * scaleY : 37 * scaleY;
+    // TXT.addText(TEXT_ID.SCOREX, 'x', 'normal', topHUD.score.fontS, 'Montserrat', 
+    //     w / 2 + 30 * scaleX, 42 * scaleY, 20, 40, '#fff', true);
 
-    // TXT.addText(canvas, TEXT_ID.SCORE, '00', (isMobile ? 'normal' : 'bold'), topHUD.score.fontS, 'Montserrat', 
-    //     w / 2 + 50 * scaleX, topHUDInfo.score.y + scoreAdjY * scaleY, topHUD.score.fontW, topHUD.score.fontH, '#fff', true);
+    // // TXT.addText(canvas, TEXT_ID.SCORE, '00', (isMobile ? 'normal' : 'bold'), topHUD.score.fontS, 'Montserrat', 
+    // //     w / 2 + 50 * scaleX, topHUDInfo.score.y + scoreAdjY * scaleY, topHUD.score.fontW, topHUD.score.fontH, '#fff', true);
     
-    let scoreW = 50;
-    let scoreH = 50;
+    // let scoreW = 50;
+    // let scoreH = 50;
 
-    let scoreY = isMobile ? 23 * scaleY : 33 * scaleY;
+    // let scoreY = isMobile ? 23 * scaleY : 33 * scaleY;
 
-    TXT.addText(TEXT_ID.SCORE, '00', 'bold', 20, 'Montserrat', 
-        w / 2 + 120 * scaleX, 35 * scaleY, scoreW, scoreH, '#fff', true);
+    // TXT.addText(TEXT_ID.SCORE, '00', 'bold', 20, 'Montserrat', 
+    //     w / 2 + 120 * scaleX, 35 * scaleY, scoreW, scoreH, '#fff', true);
     // 
     // console.log(TXT.texts[TEXT_ID.SCORE].w);
     shineInfo.w *= 1.5;
@@ -1841,7 +1841,7 @@ function setCloudSpeed(max) {
 
 function moveClouds() {
     let maxY = canvas.height * 0.3;
-    
+
     for (let i = 1; i < 4; ++i) {
         let key = 'cloud' + i;
         bgInfo[key].x += cloudMovements[i - 1] * delta;
@@ -2093,8 +2093,8 @@ function drawTopHUD() {
     // textList.topTimer.obj.str = timeText;
     // TM.draw(textList.topTimer.obj);
     // TXT.texts[TEXT_ID.TOPTIMER].str = timeText;
-    TXT.texts[TEXT_ID.TOPTIMER].str = Math.floor(gameT);
-    TXT.draw(TEXT_ID.TOPTIMER);
+    // TXT.texts[TEXT_ID.TOPTIMER].str = Math.floor(gameT);
+    // TXT.draw(TEXT_ID.TOPTIMER);
 
     
 
@@ -2181,11 +2181,11 @@ function drawScoreHUD() {
         topHUD.score.turtleshine.ch, scoreProgressBar.x + 10 * scaleX, 30 * scaleY, topHUD.score.turtleshine.w, topHUD.score.turtleshine.h);
 
     // TM.draw(textList.scoreX.obj);
-    TXT.draw(TEXT_ID.SCOREX);
+    // TXT.draw(TEXT_ID.SCOREX);
     // textList.scoreN.obj.str = zeroPad(score, 2);
     // TM.draw(textList.scoreN.obj);
-    TXT.texts[TEXT_ID.SCORE].str = zeroPad(score, 2);
-    TXT.draw(TEXT_ID.SCORE);
+    // TXT.texts[TEXT_ID.SCORE].str = zeroPad(score, 2);
+    // TXT.draw(TEXT_ID.SCORE);
 }
 
 function drawProgress() {

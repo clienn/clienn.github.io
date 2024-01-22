@@ -8,11 +8,32 @@
             "ch": 861
         },
         {
-            "id": "startbg",
-            "src": "startbg",
+            "id": "endscreen",
+            "src": "hud/endscreen",
             "ext": "png",
-            "cw": 927,
-            "ch": 429
+            "cw": 1864,
+            "ch": 861
+        },
+        {
+            "id": "shake_turtle",
+            "src": "splash/shake",
+            "ext": "png",
+            "cw": 128,
+            "ch": 128
+        },
+        {
+            "id": "show_turtle",
+            "src": "splash/show",
+            "ext": "png",
+            "cw": 128,
+            "ch": 128
+        },
+        {
+            "id": "startbg",
+            "src": "bg",
+            "ext": "png",
+            "cw": 1852,
+            "ch": 856
         },
         {
             "id": "title",
@@ -20,6 +41,13 @@
             "ext": "png",
             "cw": 492,
             "ch": 40
+        },
+        {
+            "id": "return_home",
+            "src": "hud/return_home",
+            "ext": "png",
+            "cw": 628,
+            "ch": 143
         },
         {
             "id": "endscreen_buttons",

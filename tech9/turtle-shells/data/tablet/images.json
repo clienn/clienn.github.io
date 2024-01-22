@@ -134,34 +134,6 @@
             "ch": 57
         },
         {
-            "id": "text1",
-            "src": "text1",
-            "ext": "png",
-            "cw": 156,
-            "ch": 25
-        },
-        {
-            "id": "text2",
-            "src": "text2",
-            "ext": "png",
-            "cw": 145,
-            "ch": 28
-        },
-        {
-            "id": "text3",
-            "src": "text3",
-            "ext": "png",
-            "cw": 142,
-            "ch": 25
-        },
-        {
-            "id": "beginbutton",
-            "src": "beginbutton",
-            "ext": "png",
-            "cw": 213,
-            "ch": 49
-        },
-        {
             "id": "turtle",
             "src": "turtle",
             "ext": "png",
@@ -202,76 +174,6 @@
             "ext": "png",
             "cw": 576,
             "ch": 288
-        },
-        {
-            "id": "turtleshine",
-            "src": "turtleshine",
-            "ext": "png",
-            "cw": 42,
-            "ch": 43
-        },
-        {
-            "id": "timecircle",
-            "src": "tophud/timecircle",
-            "ext": "png",
-            "cw": 45,
-            "ch": 45
-        },
-        {
-            "id": "stopwatch",
-            "src": "tophud/stopwatch",
-            "ext": "png",
-            "cw": 43,
-            "ch": 45
-        },
-        {
-            "id": "palm",
-            "src": "palm",
-            "ext": "png",
-            "cw": 207,
-            "ch": 137
-        },
-        {
-            "id": "palmshadow",
-            "src": "palmshadow",
-            "ext": "png",
-            "cw": 142,
-            "ch": 85
-        },
-        {
-            "id": "umbrella",
-            "src": "umbrella",
-            "ext": "png",
-            "cw": 192,
-            "ch": 269
-        },
-        {
-            "id": "kayak",
-            "src": "kayak",
-            "ext": "png",
-            "cw": 71,
-            "ch": 100
-        },
-        {
-            "id": "sky",
-            "src": "sky",
-            "ext": "png",
-            "cw": 926,
-            "ch": 429
-        },
-        {
-            "id": "sand",
-            "src": "sand",
-            "ext": "png",
-            "cw": 926,
-            "ch": 176
-        },
-        {
-            "id": "sand2",
-            "src": "sand2",
-            "ext": "png",
-            "cw": 926,
-            "ch": 176
         },
         {
             "id": "cloudleft",
