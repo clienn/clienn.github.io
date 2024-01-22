@@ -2091,7 +2091,7 @@ function isCollided(p1, p2) {
 }
 
 function reduceHP() {
-    if (--lives < 0) {
+    if (--lives <= 0) {
         gameover = true;
         score = Math.max(score, 0);
         HUD.updateGameoverScore(splashInfo, zeroPad(score, 2));
