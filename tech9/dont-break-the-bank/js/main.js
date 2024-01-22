@@ -88,7 +88,7 @@ var kaboomstar = null;
 var ballsLimit = 15;
 var moneyLimit = 0;
 var coinLimit = 0;
-var glueLimit = 2;
+var glueLimit = 1;
 var hammerLimit = 5;
 var dropPadding = 0;
 var health = 100;
@@ -1174,8 +1174,10 @@ function drawGlues() {
 
 function resetGlue(i) {
     glues[i].dropSpeed = Math.floor(Math.random() * 15) + 1;
+    // glues[i].dropSpeed = 0.5;
     glues[i].x = Math.floor(Math.random() * (canvas.width - glues[i].w));
-    glues[i].y = -glues[i].h * glues[i].dropSpeed;
+    glues[i].y = -glues[i].h * 30;
+    // glues[i].y = -glues[i].h * glues[i].dropSpeed;
     glues[i].vy = 0;
     // glues[i].id = 'glue_' + (Math.floor(Math.random() * 2) + 1);
     // glues[i].id = 'glue_0';
