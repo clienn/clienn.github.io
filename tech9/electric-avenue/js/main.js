@@ -979,7 +979,7 @@ function controls() {
             if (isBtnClicked(x, y, startButtonInfo)) {
                 initAllAudio();
 
-                AM.audio.bg.img.volume = 0.5;
+                AM.audio.bg.img.volume = 0.3;
                 AM.audio.bg.img.loop = true;
                 AM.audio.bg.img.play();
 
@@ -1105,7 +1105,7 @@ function controls() {
                 initAllAudio();
 
                 // if (AM.audio.bg.img.paused) {
-                    AM.audio.bg.img.volume = 0.5;
+                    AM.audio.bg.img.volume = 0.3;
                     AM.audio.bg.img.loop = true;
                     AM.audio.bg.img.play();
                     // console.log('test')
