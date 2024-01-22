@@ -1425,29 +1425,30 @@ function resetSeagullSize(seagull) {
 }
 
 function drawBGs() {
-    ctx.drawImage(AM.images.sky.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(AM.images.startbg.img, 0, 0, AM.images.startbg.cw, AM.images.startbg.ch, 0, 0, canvas.width, canvas.height);
+    // ctx.drawImage(AM.images.sky.img, 0, 0, 926, 429, 0, 0, canvas.width, canvas.height);
                 
-    ctx.beginPath();
-    ctx.fillStyle = '#70D2ED';
-    ctx.rect(0, bgInfo.water.y, canvas.width, bgInfo.water.h);
-    ctx.fill();
+    // ctx.beginPath();
+    // ctx.fillStyle = '#70D2ED';
+    // ctx.rect(0, bgInfo.water.y, canvas.width, bgInfo.water.h);
+    // ctx.fill();
 
     drawClouds();
 
-    ctx.drawImage(AM.images.sand2.img, 0, 0, bgInfo.sand2.cw, bgInfo.sand2.ch, 0, bgInfo.sand2.y, canvas.width, bgInfo.sand2.h);
-    ctx.drawImage(AM.images.sand.img, 0, 0, bgInfo.sand.cw, bgInfo.sand.ch, 0, bgInfo.sand.y, canvas.width, bgInfo.sand.h);
+    // ctx.drawImage(AM.images.sand2.img, 0, 0, bgInfo.sand2.cw, bgInfo.sand2.ch, 0, bgInfo.sand2.y, canvas.width, bgInfo.sand2.h);
+    // ctx.drawImage(AM.images.sand.img, 0, 0, bgInfo.sand.cw, bgInfo.sand.ch, 0, bgInfo.sand.y, canvas.width, bgInfo.sand.h);
 
-    ctx.drawImage(AM.images.umbrella.img, 0, 0, bgInfo.umbrella.cw, bgInfo.umbrella.ch, 
-        bgInfo.umbrella.x, bgInfo.umbrella.y, bgInfo.umbrella.w, bgInfo.umbrella.h);
+    // ctx.drawImage(AM.images.umbrella.img, 0, 0, bgInfo.umbrella.cw, bgInfo.umbrella.ch, 
+    //     bgInfo.umbrella.x, bgInfo.umbrella.y, bgInfo.umbrella.w, bgInfo.umbrella.h);
 
-    ctx.drawImage(AM.images.palm.img, 0, 0, bgInfo.palm.cw, bgInfo.palm.ch, 
-        bgInfo.palm.x, bgInfo.palm.y, bgInfo.palm.w, bgInfo.palm.h);
+    // ctx.drawImage(AM.images.palm.img, 0, 0, bgInfo.palm.cw, bgInfo.palm.ch, 
+    //     bgInfo.palm.x, bgInfo.palm.y, bgInfo.palm.w, bgInfo.palm.h);
 
-    ctx.drawImage(AM.images.palmshadow.img, 0, 0, bgInfo.palmshadow.cw, bgInfo.palmshadow.ch, 
-        bgInfo.palmshadow.x, bgInfo.palmshadow.y, bgInfo.palmshadow.w, bgInfo.palmshadow.h);
+    // ctx.drawImage(AM.images.palmshadow.img, 0, 0, bgInfo.palmshadow.cw, bgInfo.palmshadow.ch, 
+    //     bgInfo.palmshadow.x, bgInfo.palmshadow.y, bgInfo.palmshadow.w, bgInfo.palmshadow.h);
 
-    ctx.drawImage(AM.images.kayak.img, 0, 0, bgInfo.kayak.cw, bgInfo.kayak.ch, 
-        bgInfo.kayak.x, bgInfo.kayak.y, bgInfo.kayak.w, bgInfo.kayak.h);
+    // ctx.drawImage(AM.images.kayak.img, 0, 0, bgInfo.kayak.cw, bgInfo.kayak.ch, 
+    //     bgInfo.kayak.x, bgInfo.kayak.y, bgInfo.kayak.w, bgInfo.kayak.h);
 }
 
 function drawClouds() {
@@ -1839,6 +1840,8 @@ function setCloudSpeed(max) {
 }
 
 function moveClouds() {
+    let maxY = canvas.height * 0.3;
+    
     for (let i = 1; i < 4; ++i) {
         let key = 'cloud' + i;
         bgInfo[key].x += cloudMovements[i - 1] * delta;
@@ -1857,7 +1860,8 @@ function moveClouds() {
                 bgInfo[key].x = -bgInfo[key].w;
             }
 
-            bgInfo[key].y = Math.floor(Math.random() * 200 + 200);
+            // bgInfo[key].y = Math.floor(Math.random() * 200 + 200);
+            bgInfo[key].y = Math.floor(Math.random() * maxY);
         } else if (bgInfo[key].x + bgInfo[key].w * 2 < 0) {
             
             let rngSpeed = Math.floor(Math.random() * 100 + 1);
@@ -1871,7 +1875,8 @@ function moveClouds() {
                 bgInfo[key].x = -bgInfo[key].w;
             }
 
-            bgInfo[key].y = Math.floor(Math.random() * 200 + 200);
+            // bgInfo[key].y = Math.floor(Math.random() * 200 + 200);
+            bgInfo[key].y = Math.floor(Math.random() * maxY);
         }
     }
 }

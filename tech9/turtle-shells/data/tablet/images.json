@@ -30,10 +30,10 @@
         },
         {
             "id": "startbg",
-            "src": "startbg",
+            "src": "tab/bg",
             "ext": "png",
-            "cw": 927,
-            "ch": 429
+            "cw": 2732,
+            "ch": 2048
         },
         {
             "id": "title",
