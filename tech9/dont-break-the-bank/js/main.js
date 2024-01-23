@@ -39,8 +39,10 @@ var btnBegin = {
 
 // sprite info
 var pigInfo = {
-    w: 100 * 2,
-    h: 70 * 2,
+    // w: 100 * 2,
+    // h: 70 * 2,
+    w: 384 * 0.60,
+    h: 289 * 0.60,
 }
 
 var moneyInfo = {
@@ -116,6 +118,8 @@ var score = 0;
 // startpage
 var startScreenTimerAnimT = 0;
 var startScreenHandAnimT = 0;
+
+var currPigKey = 'pig_0';
 
 var startPage = {
     title: {
@@ -922,18 +926,20 @@ function drawGlueBonus() {
 }
 
 function drawPig() {
-    let frame = 1;
+    let frame = 0;
 
     if (forceD != 0 || mDown) {
-        pig.t += 20 * delta;
-        frame = Math.floor(pig.t) % 5 + 1;
+        pig.t += 15 * delta;
+        frame = Math.floor(pig.t) % 4;
+        // frame = Math.floor(pig.t) % 5 + 1;
     }
 
     // pig.t += 10 * delta;
     // let frame = Math.floor(pig.t) % 5 + 1;
     
     // pig.draw(ctx, AM.images['pig_' + frame].img);
-    pig.drawRotate(ctx, AM.images['pig_' + frame].img);
+    pig.clipX = AM.images[currPigKey].cw * frame;
+    pig.drawRotate(ctx, AM.images[currPigKey].img);
     drawGlueBonus();
 }
 
@@ -1589,6 +1595,9 @@ function update() {
         // console.log(HUD.timeProgressBar.progress, timer.timer, delta);
         health -= 2 * delta;
         timer.tick(delta);
+
+        let n = 3 - Math.floor(Math.max(0, health) / 25);
+        currPigKey = 'pig_' + n;
 
         if (timer.timer <= 0) {
             gameover = true;

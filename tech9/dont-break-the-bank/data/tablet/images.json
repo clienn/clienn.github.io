@@ -141,39 +141,32 @@
             "ch": 24
         },
         {
-            "id": "pig_1",
-            "src": "pig/pig_1",
+            "id": "pig_0",
+            "src": "pig/run_0",
             "ext": "png",
-            "cw": 191,
-            "ch": 142
+            "cw": 384,
+            "ch": 289
+        },
+        {
+            "id": "pig_1",
+            "src": "pig/run_1",
+            "ext": "png",
+            "cw": 384,
+            "ch": 289
         },
         {
             "id": "pig_2",
-            "src": "pig/pig_2",
+            "src": "pig/run_2",
             "ext": "png",
-            "cw": 191,
-            "ch": 142
+            "cw": 384,
+            "ch": 289
         },
         {
             "id": "pig_3",
-            "src": "pig/pig_3",
+            "src": "pig/run_3",
             "ext": "png",
-            "cw": 192,
-            "ch": 142
-        },
-        {
-            "id": "pig_4",
-            "src": "pig/pig_4",
-            "ext": "png",
-            "cw": 191,
-            "ch": 142
-        },
-        {
-            "id": "pig_5",
-            "src": "pig/pig_5",
-            "ext": "png",
-            "cw": 191,
-            "ch": 142
+            "cw": 384,
+            "ch": 289
         },
         {
             "id": "pigbreak_0",
