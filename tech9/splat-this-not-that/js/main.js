@@ -1213,11 +1213,7 @@ function main(w, h) {
     for (let i = 0; i < soundGroup.scoreClones; ++i) {
         soundGroup.score.push(AM.audio.score.img.cloneNode());
     }
-    for (let i = 0; i < soundGroup.scoreClones; ++i) {
-        tracks[trackCounter] = audioContext.createMediaElementSource(soundGroup.score[i]);
-        tracks[trackCounter].connect(audioContext.destination);
-        trackCounter++;
-    }
+    
     
     
     gameCycle();
@@ -1632,6 +1628,12 @@ function muteAllAudio(flag) {
 }
 
 function playAllAudio() {
+    for (let i = 0; i < soundGroup.scoreClones; ++i) {
+        tracks[trackCounter] = audioContext.createMediaElementSource(soundGroup.score[i]);
+        tracks[trackCounter].connect(audioContext.destination);
+        trackCounter++;
+    }
+    
     for (let k in AM.audio) {
         tracks[trackCounter] = audioContext.createMediaElementSource(AM.audio[k].img);
         tracks[trackCounter].connect(audioContext.destination);
