@@ -886,6 +886,13 @@ const onMobile = isMobile();
 var tracks = {};
 var trackCounter = 0;
 
+var bottomBgInfo = {
+    w: 0,
+    h: 0
+};
+
+var flickerT = 0;
+
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
@@ -1633,7 +1640,7 @@ function playAllAudio() {
         tracks[trackCounter].connect(audioContext.destination);
         trackCounter++;
     }
-    
+
     for (let k in AM.audio) {
         tracks[trackCounter] = audioContext.createMediaElementSource(AM.audio[k].img);
         tracks[trackCounter].connect(audioContext.destination);
@@ -1899,6 +1906,16 @@ function init() {
     // images.landLeft.y = waterInfo.y - images.landLeft.h;
     images.landRight.x = landPosX;
     images.landRight.y = landPosY + 10 * scaleX;
+
+    let h = canvas.height - (landPosY + images.landLeft.h);
+
+    bottomBgInfo.w = canvas.width;
+    bottomBgInfo.h = h / 2;
+    bottomBgInfo.y = canvas.height - h;
+
+    if (onTablet) {
+        waterInfo.h += h;
+    }
 
     let adjY = onTablet ? 340 : 240;
     let adjY2 = onTablet ? 325 : 230;
@@ -2369,11 +2386,39 @@ function gameCycle() {
 
                 drawFloaters();
 
+                ctx.save();
                 ctx.beginPath();
                 // ctx.fillStyle = '#70D2ED';
                 ctx.fillStyle = '#4CDAFE';
                 ctx.rect(0, waterInfo.y, canvas.width, waterInfo.h);
                 ctx.fill();
+                ctx.restore();
+
+                if (onTablet) {
+                    
+                    // ctx.save();
+                    // ctx.beginPath();
+                    // ctx.fillStyle = '#4CDAFE';
+                    // ctx.rect(0, bottomBgInfo.y, bottomBgInfo.w, bottomBgInfo.h * 2);
+                    // ctx.fill();
+                    // ctx.restore();
+
+                    ctx.save();
+                    ctx.globalAlpha = 0.25;
+                    ctx.beginPath();
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.rect(0, bottomBgInfo.y, bottomBgInfo.w, bottomBgInfo.h);
+                    ctx.fill();
+                    ctx.restore();
+
+                    ctx.save();
+                    ctx.globalAlpha = 0.40;
+                    ctx.beginPath();
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.rect(0, bottomBgInfo.y + bottomBgInfo.h, bottomBgInfo.w, bottomBgInfo.h);
+                    ctx.fill();
+                    ctx.restore();
+                }
 
                 drawClouds();
                 // drawProgress();
@@ -2468,6 +2513,12 @@ function gameCycle() {
                         if (ouchAnimations[i].ouchSpriteKey != 'objectboom') {
                             let frame = Math.floor(ouchAnimations[i].ouchT2) % 6;
                             ctx.drawImage(AM.images[ouchAnimations[i].ouchSpriteKey].img, frame * ouchInfo.cw, 0, ouchInfo.cw, ouchInfo.ch, ouchAnimations[i].x, ouchAnimations[i].y, ouchInfo.w, ouchInfo.h);
+                            if (ouchAnimations[i].ouchSpriteKey == 'boom') {
+                                if (flickerT == 0) {
+                                    flickerT = 3;
+                                }
+                                
+                            }
                         } else {
                             let frame = Math.floor(ouchAnimations[i].ouchT2) % 7;
                             ctx.drawImage(AM.images[ouchAnimations[i].ouchSpriteKey].img, frame * objectBoomInfo.cw, 0, objectBoomInfo.cw, objectBoomInfo.ch, ouchAnimations[i].x, ouchAnimations[i].y, objectBoomInfo.w, objectBoomInfo.h);
@@ -2496,10 +2547,29 @@ function gameCycle() {
                 // drawExplosionStar(canvas.width / 2, canvas.height / 2);
                 // drawExplosionStar(0, 0);
 
+                
+
                 checkProjectileCollisions();
                 checkCanonCollisions();
                 // displayScore();
                 update();
+
+                if (flickerT) {
+                    let n = Math.floor(flickerT);
+
+                    if (n & 1) {
+                        ctx.save();
+                        ctx.globalAlpha = 0.50;
+                        ctx.beginPath();
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.rect(0, 0, canvas.width, canvas.height);
+                        ctx.fill();
+                        ctx.restore();
+                    }
+
+                    flickerT -= 10 * delta;
+                    if (flickerT <= 0) flickerT = 0;
+                }
             } else {
                 drawStartPage();
                 // let handx = Math.sin(startScreenHandAnimT) * 20;

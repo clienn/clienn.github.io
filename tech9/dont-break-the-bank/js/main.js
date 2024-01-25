@@ -328,8 +328,9 @@ function main(w, h) {
     rescaleSize(kaboomInfo, scaleX, scaleX);
 
     pig = new Sprite(w / 2 - pigInfo.w / 2, h - pigInfo.h - 10, pigInfo.w, pigInfo.h, AM.images.pig_1.cw, AM.images.pig_1.ch);
-    smoke = new Sprite(w / 2 - pigInfo.w / 2, h - pigInfo.h - 10, pigInfo.w, pigInfo.h, 192, 192);
+    smoke = new Sprite(w / 2 - pigInfo.w / 2, h - pigInfo.h - 10, 192 * scaleX, 192 * scaleX, 192, 192);
     pigbreak = new Sprite(w / 2 - pigInfo.w / 2, h - pigInfo.h - 10, pigInfo.w, pigInfo.h, 192, 145);
+    // pigbreak = new Sprite(w / 2 - pigInfo.w / 2, h - pigInfo.h - 10, pigInfo.w, pigInfo.h, 192, 145);
     
     gluebonus = new Sprite(0, pig.y - glueInfo.h, glueInfo.w, glueInfo.h, AM.images.glue_0.cw, AM.images.glue_0.ch);
     gluebonus.t = 5;
@@ -1642,7 +1643,7 @@ function startPageAnimations() {
     let x = midX - 420 * scaleX;
     ctx.drawImage(AM.images.splash_coin.img, frame * AM.images.splash_coin.cw, 0, AM.images.splash_coin.cw, AM.images.splash_coin.ch, x, y, w, h);
 
-    frame = Math.floor(startScreenHandAnimT) % 10;
+    frame = Math.floor(startScreenHandAnimT) % 13;
     w = AM.images.splash_hammer_marble.cw * 2.5 * scaleX;
     h = AM.images.splash_hammer_marble.ch * 2.5 * scaleX;
     ctx.drawImage(AM.images.splash_hammer_marble.img, frame * AM.images.splash_hammer_marble.cw, 0, AM.images.splash_hammer_marble.cw, AM.images.splash_hammer_marble.ch, midX, y - 40 * splashInfo.sx, w, h);
