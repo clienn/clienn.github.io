@@ -360,6 +360,12 @@ function main(w, h) {
     let joystickY = h * 0.75;
     
     joystick = new Joystick(joystickX, joystickY, 150 * 0.90 * scaleX);
+
+    joystick.area.w = AM.images.area.cw * scaleX * 1;
+    joystick.area.h = AM.images.area.ch * scaleX * 1;
+
+    joystick.knob.x = joystick.area.x + joystick.area.w / 2 - joystick.knob.w / 2;
+    joystick.knob.y = joystick.area.y + joystick.area.h / 2 - joystick.knob.h / 2;
     // var url_string = location.href; 
     // var url = new URL(url_string);
     // var isOn = url.searchParams.get("on");
