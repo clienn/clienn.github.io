@@ -2714,7 +2714,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 var canvas_advanced_1 = __importDefault(require("@rive-app/canvas-advanced"));
-function main() {
+window.gamestart = function main() {
   return __awaiter(this, void 0, void 0, function () {
     function initTiles() {
       for (var i = 0; i < 10; ++i) {
@@ -2793,6 +2793,39 @@ function main() {
     }
     function lerp(a, b, t) {
       return a + (b - a) * t;
+    }
+    function reset(flag) {
+      if (flag) {
+        timerT = 0;
+      }
+      bgMachinePop.fire();
+      setTimeout(function () {
+        bgMachineBalloonX.asNumber().value = 0;
+        bgMachineBalloonRotation.asNumber().value = 0;
+        if (flag) {
+          timerT = gameDuration;
+        }
+        timerMachineUrgent.asBool().value = false;
+        var textRun = artboardTimer.textRun("TimeLeft");
+        textRun.text = gameDuration.toString();
+        initTiles();
+        currTile = -1;
+        currNum = 1;
+        topNum = 10;
+        for (var _i = 0, _a = Array.from(tiles); _i < _a.length; _i++) {
+          var blockInstance = _a[_i];
+          var artboard = blockInstance.artboard,
+            machine = blockInstance.machine,
+            anim = blockInstance.anim,
+            anim2 = blockInstance.anim2,
+            tapTrigger = blockInstance.tapTrigger,
+            x = blockInstance.x,
+            y = blockInstance.y;
+          anim.advance(0);
+          anim2.advance(0);
+          // anim.apply(1);
+        }
+      }, 1000);
     }
     function renderLoop(time) {
       if (!lastTime) {
@@ -2926,33 +2959,27 @@ function main() {
       if (timerT > 0) {
         timerT -= elapsedTimeSec;
         if (timerT < 0) {
-          timerT = 0;
-          bgMachinePop.fire();
-          setTimeout(function () {
-            bgMachineBalloonX.asNumber().value = 0;
-            bgMachineBalloonRotation.asNumber().value = 0;
-            timerT = gameDuration;
-            timerMachineUrgent.asBool().value = false;
-            var textRun = artboardTimer.textRun("TimeLeft");
-            textRun.text = gameDuration.toString();
-            initTiles();
-            currTile = -1;
-            currNum = 1;
-            topNum = 10;
-            for (var _i = 0, _a = Array.from(tiles); _i < _a.length; _i++) {
-              var blockInstance = _a[_i];
-              var artboard = blockInstance.artboard,
-                machine = blockInstance.machine,
-                anim = blockInstance.anim,
-                anim2 = blockInstance.anim2,
-                tapTrigger = blockInstance.tapTrigger,
-                x = blockInstance.x,
-                y = blockInstance.y;
-              anim.advance(0);
-              anim2.advance(0);
-              // anim.apply(1);
-            }
-          }, 1000);
+          // timerT = 0;
+          // bgMachinePop.fire();
+          // setTimeout(() => {
+          //   bgMachineBalloonX.asNumber().value = 0;
+          //   bgMachineBalloonRotation.asNumber().value = 0;
+          //   timerT = gameDuration;
+          //   timerMachineUrgent.asBool().value = false;
+          //   var textRun = artboardTimer.textRun("TimeLeft");
+          //   textRun.text = gameDuration.toString();
+          //   initTiles();
+          //   currTile = -1;
+          //   currNum = 1;
+          //   topNum = 10;
+          //   for (let blockInstance of Array.from(tiles)) {
+          //     const { artboard, machine, anim, anim2, tapTrigger, x, y } = blockInstance;
+          //     anim.advance(0);
+          //     anim2.advance(0);
+          //     // anim.apply(1);
+          //   }
+          // }, 1000)
+          reset(true);
         }
         var currT = Math.floor(timerT);
         if (!timerMachineUrgent.asBool().value && currT < 11) {
@@ -3181,6 +3208,7 @@ function main() {
                     isCorrect = false;
                     tileAnim[currTile].type = 2;
                     tileAnim[currTile].t = 2;
+                    reset(false);
                     // bgMachinePop.fire();
                   }
                 }
@@ -3198,9 +3226,9 @@ function main() {
       }
     });
   });
-}
+};
 // export default main;
-main();
+// main();
 },{"@rive-app/canvas-advanced":"node_modules/@rive-app/canvas-advanced/canvas_advanced.mjs"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -3226,7 +3254,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54357" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58566" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
