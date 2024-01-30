@@ -510,7 +510,8 @@ function addGarbage() {
     trash.id = rng;
     trash.vy = Math.floor(Math.random() * garbageDropSpeed) + 20;
     trash.maxDegree = Math.floor(Math.random() * 540) + 180;
-    trash.hasBounce = Math.floor(Math.random() * 2);
+    trash.hasBounce = false;
+    // trash.hasBounce = Math.floor(Math.random() * 2);
     if (trash.hasBounce) {
         let mid = Math.floor(canvas.height / 2);
         trash.bounceLo = Math.floor(Math.random() * mid) + mid;

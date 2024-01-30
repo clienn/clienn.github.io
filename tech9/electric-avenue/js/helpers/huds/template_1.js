@@ -513,9 +513,10 @@ class Template_1 {
         let adjY = isTablet() ? 310 : 0;
         adjY *= this.sx;
 
-        score = Math.ceil(this.health).toString();
+        let currHealth = Math.ceil(this.health);
+        let score = currHealth.toString();
 
-        if (this.health < 10) {
+        if (currHealth < 10) {
             this.endscore[0].clipX = this.endscore[0].clipW * score;
             this.endscore[3].clipX = this.endscore[1].clipW * 12;
 
@@ -524,7 +525,7 @@ class Template_1 {
 
             this.endscore[3].x = this.endscore[0].x + this.endscore[1].w * 0.95;
             this.endscore[3].y = this.endscore[0].y;
-        } else if (this.health < 100) {
+        } else if (currHealth < 100) {
             this.endscore[0].clipX = this.endscore[0].clipW * score[0];
             this.endscore[1].clipX = this.endscore[1].clipW * score[1];
             this.endscore[3].clipX = this.endscore[1].clipW * 12;
@@ -604,7 +605,7 @@ class Template_1 {
         this.endscore[0].draw(ctx);
         if (this.health > 9) {
             this.endscore[1].draw(ctx);
-            if (this.health == 100) {
+            if (this.health > 99) {
                 this.endscore[2].draw(ctx);
             }
         }
