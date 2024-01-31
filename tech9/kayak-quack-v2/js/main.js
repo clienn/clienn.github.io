@@ -962,14 +962,14 @@ function updateBGWall(idx) {
         bgWalls[idx] = [
             // left
             { x: 0, y: bgTilesPosY[0] + distY * 2.75, w: 225, h: 20, degrees: 15 },
-            { x: 50, y: bgTilesPosY[0] + distY * 0.75, w: 225, h: 20, degrees: -20 },
-            { x: 250, y: bgTilesPosY[0] + distY * 0.05, w: 160, h: 20, degrees: -5},
+            // { x: 50, y: bgTilesPosY[0] + distY * 0.75, w: 225, h: 20, degrees: -20 },
+            // { x: 250, y: bgTilesPosY[0] + distY * 0.05, w: 160, h: 20, degrees: -5},
     
             // right
             { x: 1635, y: bgTilesPosY[0] + distY * 3.75, w: 320, h: 20, degrees: 10 },
             { x: 1505, y: bgTilesPosY[0] + distY * 3.35, w: 320, h: 20, degrees: 20 },
-            { x: 1565, y: bgTilesPosY[0] + distY * 0.60, w: 320, h: 20, degrees: 17 },
-            { x: 1335, y: bgTilesPosY[0] + distY * 0.15, w: 320, h: 20, degrees: 10 },
+            // { x: 1565, y: bgTilesPosY[0] + distY * 0.60, w: 320, h: 20, degrees: 17 },
+            // { x: 1335, y: bgTilesPosY[0] + distY * 0.15, w: 320, h: 20, degrees: 10 },
         ]
     } else if (idx == 1) {
         bgWalls[idx] = [
@@ -1047,19 +1047,22 @@ function updateBGWall(idx) {
         ]
     } else if (idx == 7) {
         bgWalls[idx] = [
-            // left
-            // { x: 0, y: bgTilesPosY[7], w: 270, h: 507, degrees: 0 },
-            { x: 270, y: bgTilesPosY[7], w: 10, h: 107, degrees: 0 },
-            { x: 270, y: bgTilesPosY[7] + distY, w: 15, h: 107, degrees: 0 },
-            { x: 260, y: bgTilesPosY[7] + distY * 2, w: 15, h: 107, degrees: 0 },
-            { x: 250, y: bgTilesPosY[7] + distY * 3, w: 10, h: 107, degrees: 0 },
-            { x: 1360, y: bgTilesPosY[7] + distY * 3.2, w: 100, h: 50, degrees: 0 },
+            // // left
+            // // { x: 0, y: bgTilesPosY[7], w: 270, h: 507, degrees: 0 },
+            { x: 70, y: bgTilesPosY[7] - distY * 0.80, w: 30, h: 307, degrees: 60 },
+            // { x: 270, y: bgTilesPosY[7], w: 10, h: 107, degrees: 0 },
+            // { x: 270, y: bgTilesPosY[7] + distY, w: 15, h: 107, degrees: 0 },
+            // { x: 260, y: bgTilesPosY[7] + distY * 2, w: 15, h: 107, degrees: 0 },
+            // { x: 250, y: bgTilesPosY[7] + distY * 3, w: 10, h: 107, degrees: 0 },
+            // { x: 1360, y: bgTilesPosY[7] + distY * 3.2, w: 100, h: 50, degrees: 0 },
     
-            // right
-            { x: 1580, y: bgTilesPosY[7], w: 10, h: 107, degrees: 0 },
-            { x: 1580, y: bgTilesPosY[7] + distY, w: 10, h: 107, degrees: 0 },
-            { x: 1580, y: bgTilesPosY[7] + distY * 2, w: 10, h: 107, degrees: 0 },
-            { x: 1580, y: bgTilesPosY[7] + distY * 3, w: 10, h: 107, degrees: 0 },
+            // // right
+            { x: 1780, y: bgTilesPosY[7] - distY  * 0.80, w: 30, h: 307, degrees: -60 },
+            { x: 1480, y: bgTilesPosY[7] + distY * 1.50, w: 100, h: 50, degrees: 0 },
+            // { x: 1580, y: bgTilesPosY[7], w: 10, h: 107, degrees: 0 },
+            // { x: 1580, y: bgTilesPosY[7] + distY, w: 10, h: 107, degrees: 0 },
+            // { x: 1580, y: bgTilesPosY[7] + distY * 2, w: 10, h: 107, degrees: 0 },
+            // { x: 1580, y: bgTilesPosY[7] + distY * 3, w: 10, h: 107, degrees: 0 },
         ]
     }
 
@@ -1090,14 +1093,14 @@ function initBGWalls() {
         [
             // left
             { x: 0, y: bgTilesPosY[0] + distY * 2.75, w: 225, h: 20, degrees: 15 },
-            { x: 50, y: bgTilesPosY[0] + distY * 0.75, w: 225, h: 20, degrees: -20 },
-            { x: 250, y: bgTilesPosY[0] + distY * 0.05, w: 160, h: 20, degrees: -5},
+            // { x: 50, y: bgTilesPosY[0] + distY * 0.75, w: 225, h: 20, degrees: -20 },
+            // { x: 250, y: bgTilesPosY[0] + distY * 0.05, w: 160, h: 20, degrees: -5},
 
             // right
             { x: 1635, y: bgTilesPosY[0] + distY * 3.75, w: 320, h: 20, degrees: 10 },
             { x: 1505, y: bgTilesPosY[0] + distY * 3.35, w: 320, h: 20, degrees: 20 },
-            { x: 1565, y: bgTilesPosY[0] + distY * 0.60, w: 320, h: 20, degrees: 17 },
-            { x: 1335, y: bgTilesPosY[0] + distY * 0.15, w: 320, h: 20, degrees: 10 },
+            // { x: 1565, y: bgTilesPosY[0] + distY * 0.60, w: 320, h: 20, degrees: 17 },
+            // { x: 1335, y: bgTilesPosY[0] + distY * 0.15, w: 320, h: 20, degrees: 10 },
         ],
         [
             { x: 175, y: bgTilesPosY[1] + distY * 3.35, w: 30, h: 100, degrees: -65 },
@@ -1168,19 +1171,22 @@ function initBGWalls() {
             { x: 1100 + 30, y: bgTilesPosY[6] + distY * 2.1, w: 800, h: 55, degrees: 10 },
         ],
         [
-            // left
-            // { x: 0, y: bgTilesPosY[7], w: 270, h: 507, degrees: 0 },
-            { x: 270, y: bgTilesPosY[7], w: 10, h: 107, degrees: 0 },
-            { x: 270, y: bgTilesPosY[7] + distY, w: 15, h: 107, degrees: 0 },
-            { x: 260, y: bgTilesPosY[7] + distY * 2, w: 15, h: 107, degrees: 0 },
-            { x: 250, y: bgTilesPosY[7] + distY * 3, w: 10, h: 107, degrees: 0 },
-            { x: 1360, y: bgTilesPosY[7] + distY * 3.2, w: 100, h: 50, degrees: 0 },
+            // // left
+            // // { x: 0, y: bgTilesPosY[7], w: 270, h: 507, degrees: 0 },
+            { x: 70, y: bgTilesPosY[7] - distY * 0.80, w: 30, h: 307, degrees: 60 },
+            // { x: 270, y: bgTilesPosY[7], w: 10, h: 107, degrees: 0 },
+            // { x: 270, y: bgTilesPosY[7] + distY, w: 15, h: 107, degrees: 0 },
+            // { x: 260, y: bgTilesPosY[7] + distY * 2, w: 15, h: 107, degrees: 0 },
+            // { x: 250, y: bgTilesPosY[7] + distY * 3, w: 10, h: 107, degrees: 0 },
+            // { x: 1360, y: bgTilesPosY[7] + distY * 3.2, w: 100, h: 50, degrees: 0 },
 
-            // right
-            { x: 1580, y: bgTilesPosY[7], w: 10, h: 107, degrees: 0 },
-            { x: 1580, y: bgTilesPosY[7] + distY, w: 10, h: 107, degrees: 0 },
-            { x: 1580, y: bgTilesPosY[7] + distY * 2, w: 10, h: 107, degrees: 0 },
-            { x: 1580, y: bgTilesPosY[7] + distY * 3, w: 10, h: 107, degrees: 0 },
+            // // right
+            { x: 1780, y: bgTilesPosY[7] - distY * 0.80, w: 30, h: 307, degrees: -60 },
+            { x: 1480, y: bgTilesPosY[7] + distY * 1.50, w: 100, h: 50, degrees: 0 },
+            // { x: 1580, y: bgTilesPosY[7], w: 10, h: 107, degrees: 0 },
+            // { x: 1580, y: bgTilesPosY[7] + distY, w: 10, h: 107, degrees: 0 },
+            // { x: 1580, y: bgTilesPosY[7] + distY * 2, w: 10, h: 107, degrees: 0 },
+            // { x: 1580, y: bgTilesPosY[7] + distY * 3, w: 10, h: 107, degrees: 0 },
         ]
     ];
 

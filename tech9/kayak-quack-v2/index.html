@@ -121,6 +121,13 @@
                         AM.initImageAssets('data/images.json');
                     }
 
+                    var url_string = location.href; 
+                    var url = new URL(url_string);
+                    var map = url.searchParams.get("map");
+
+                    if (map == null) map = 1;
+
+                    AM.initImageAssets('data/maps/' + map + '.json');
                     AM.initAudioAssets('data/audio.json');
                 }, 1000);
 

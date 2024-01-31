@@ -64,13 +64,6 @@
             "ch": 64
         },
         {
-            "id": "bg",
-            "src": "environment/bg",
-            "ext": "png",
-            "cw": 927,
-            "ch": 428
-        },
-        {
             "id": "watch",
             "src": "hud/watch",
             "ext": "png",
