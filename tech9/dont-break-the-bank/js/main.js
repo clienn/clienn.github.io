@@ -1293,7 +1293,7 @@ function collisionUpdate() {
         if (checkCollision(pig, moneyList[i])) {
             jump = jumpHeight;
             TXT.texts['points'].str = '+1.00';
-            health = Math.min(100, health + 1);
+            // health = Math.min(100, health + 1);
             score += 1;
             resetMoney(i);
             if (HUD.volumeOn)
@@ -1314,7 +1314,7 @@ function collisionUpdate() {
                 val = 0.10;
             }
 
-            health = Math.min(100, health + val);
+            // health = Math.min(100, health + val);
             score += val;
 
             TXT.texts['points'].str = '+' + val.toFixed(2);
@@ -1334,7 +1334,7 @@ function collisionUpdate() {
         if (checkCollision(pig, balls[i])) {
             kaboomT = 2;
             // health -= 10;
-            health -= 20;
+            health -= 25;
             resetBall(i);
 
             if (HUD.volumeOn)
@@ -1346,7 +1346,7 @@ function collisionUpdate() {
     for (let i = 0; i < glues.length; ++i) {
         if (checkCollision(pig, glues[i])) {
             // health += 10;
-            health = Math.min(100, health + 10);
+            health = Math.min(100, health + 25);
             resetGlue(i);
             gluebonus.t = 0;
             if (HUD.volumeOn)
@@ -1388,6 +1388,8 @@ function collisionUpdate() {
         //     resetHammer(i);
         // }
     }
+
+    HUD.updateHealthbar(health);
 }
 
 function bounceBalls() {
@@ -1588,7 +1590,7 @@ function update() {
 
     HUD.updateTimerSprite(zeroPad(Math.floor(timer.timer / 24), 2), gameDuration);
 
-    if (health < 0) {
+    if (health <= 0) {
         health = 0;
         gameover = true;
         gameoverT = 10;
@@ -1597,13 +1599,14 @@ function update() {
 
     if (delta < 1) {
         // HUD.timeProgressBar.update(delta, Math.floor(timer.timer / 24));
-        HUD.lifebar.update(delta, health);
+        // HUD.lifebar.update(delta, health);
         // HUD.timeProgressBar.progress = Math.floor(timer.timer / 24) / 90 * 100;
         // console.log(HUD.timeProgressBar.progress, timer.timer, delta);
-        health -= 2 * delta;
+        // health -= 2 * delta;
         timer.tick(delta);
 
-        let n = 3 - Math.floor(Math.max(0, health) / 25);
+        // let n = 3 - Math.floor(Math.max(0, health) / 25);
+        let n = Math.min(3, 4 - Math.floor(health / 25));
         currPigKey = 'pig_' + n;
 
         if (timer.timer <= 0) {

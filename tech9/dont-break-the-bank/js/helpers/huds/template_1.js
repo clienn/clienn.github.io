@@ -32,7 +32,8 @@ class Template_1 {
         // this.stopwatch = new StaticSprite(this.volume.x + this.volume.w + 10, this.volume.y + this.volume.h / 2 - 90 / 2, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
         // // this.stopwatch = new StaticSprite(10 + paddingX, 10, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.stopwatch.cw, AM.images.stopwatch.ch, 'stopwatch');
 
-        this.life = new StaticSprite(0, 0, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.life.cw, AM.images.life.ch, 'life');
+        // this.life = new StaticSprite(0, 0, 60 * 1.5, 60 * 1.5, 0, 0, AM.images.life.cw, AM.images.life.ch, 'life');
+        this.healthbar = new StaticSprite(0, 0, AM.images.healthbar.cw, AM.images.healthbar.ch, 0, 0, AM.images.healthbar.cw, AM.images.healthbar.ch, 'healthbar');
         // this.coin0 = new StaticSprite(0, 0, 60, 60, 0, 0, AM.images.coin_0.cw, AM.images.coin_0.ch, 'coin_0');
         
         // let gameoverAdjY = 180;
@@ -47,8 +48,10 @@ class Template_1 {
 
         // rescaleAll(this.timecircle, sx, sy);
         // rescaleAll(this.stopwatch, sx, sy);
-        rescaleSize(this.life, sx, sx);
-        rescalePos(this.life, sx, sy);
+        rescaleSize(this.healthbar, sx, sx);
+
+        // rescaleSize(this.life, sx, sx);
+        // rescalePos(this.life, sx, sy);
         // rescaleAll(this.coin0, sx, sy);
         // rescaleAll(this.shine, sx, sy);
         // rescaleAll(this.pigscore, sx, sy);
@@ -84,12 +87,15 @@ class Template_1 {
         // console.log(adjX);
 
         // this.lifebar = new ProgressBar(w - this.life.w - 100 * sx / 2 - 25 * sy - adjX, this.life.h / 2 - 25 * sx / 2 + paddingY, 160 * sx, 35 * sy);
-        this.lifebar = new ProgressBar(w - 260 * sx, this.score_rect.y + this.life.h / 2 - 35 * sx / 2, 160 * sx, 35 * sx);
-        // this.lifebar.y = this.score_rect.y;
-        this.lifebar.progress = 100;
+        // this.lifebar = new ProgressBar(w - 260 * sx, this.score_rect.y + this.life.h / 2 - 35 * sx / 2, 160 * sx, 35 * sx);
+        // // this.lifebar.y = this.score_rect.y;
+        // this.lifebar.progress = 100;
 
-        this.life.x = this.lifebar.x - this.life.w / 2;
-        this.life.y = this.score_rect.y;
+        // this.life.x = this.lifebar.x - this.life.w / 2;
+        // this.life.y = this.score_rect.y;
+
+        this.healthbar.x = w * 0.98 - this.healthbar.w;
+        this.healthbar.y = this.score_rect.y;
 
         // this.txt.addText('time', '90', 'bold', 20, 'Montserrat', 0, this.timecircle.y, 30 * 1.5, 30 * 1.5, '#000', true); 
         // this.txt.centerTo('time', this.timecircle.x, this.timecircle.y, this.timecircle.w, this.timecircle.h);
@@ -343,11 +349,15 @@ class Template_1 {
 
         // this.timeProgressBar.draw(ctx);
         // this.scoreBar.draw(ctx, 100);
-        this.lifebar.draw(ctx);
+        
         // this.timecircle.draw(ctx);
         // this.stopwatch.draw(ctx);
         // this.coin0.draw(ctx);
-        this.life.draw(ctx);
+
+        // this.lifebar.draw(ctx);
+        // this.life.draw(ctx);
+
+        this.healthbar.draw(ctx);
         // if (this.volumeOn) {
         //     this.volume.draw(ctx);
         // } else {
@@ -388,6 +398,12 @@ class Template_1 {
         
         ctx.drawImage(AM.images.intersect.img, this.intersect.clipX, this.intersect.clipY, this.intersect.clipW, this.intersect.clipH, -rotPt.x, -rotPt.y, this.intersect.w, this.intersect.h);
         ctx.restore();
+    }
+
+    updateHealthbar(health) {
+        let clipY = (4 - Math.floor(health / 25)) * AM.images.healthbar.ch;
+        // console.log(health)
+        this.healthbar.clipY = clipY;
     }
 
     gameover(ctx, splashInfo, delta) {

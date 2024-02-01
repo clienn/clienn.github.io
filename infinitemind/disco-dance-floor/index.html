@@ -8,8 +8,17 @@
         padding: 0;
       }
       body {
-        background: linear-gradient(104deg, #0075FF 0%, #FF00F5 100%);
+        /* background: linear-gradient(104deg, #0075FF 0%, #FF00F5 100%); */
+        background: #000;
       }
+      
+      .gradient {
+        position: absolute;
+        /* bring your own prefixes */
+        background: linear-gradient(104deg, #0075FF 0%, #FF00F5 100%);
+        z-index: -1;
+      }
+
       .centered {
         position: absolute;
         top: 50%;
@@ -33,6 +42,7 @@
   <body>
     <div id="app">
       <!-- <h1>Canvas Advanced API Example</h1> -->
+      <div id="gradient" class="gradient"></div>
       <canvas id="rive-canvas"></canvas>
     </div>
 

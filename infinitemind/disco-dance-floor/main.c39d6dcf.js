@@ -2935,7 +2935,7 @@ window.gamestart = function main() {
       renderer.restore();
       rive.requestAnimationFrame(renderLoop);
     }
-    var rive, canvas, scaleX, scaleY, ROWS, COLS, renderer, floorDim, totalDanceFloorWidth, totalDanceFloorHeight, danceFloorPos, floorBytes, floorFile, artboardFloor, timerBytes, timerFile, artboardTimer, timerInfo, timerMachine, gameDuration, timerT, timerMachineProgress, timerMachineUrgent, i, l, input, lastTime, floor, floors, danceFloorGrid, crawlGrid, crawlStack, DIRECTIONS, difficulty, maxDifficulty, currLevel, nextLevel, crawlT, crawlT2, crawlT3, crawlT4, crawlCount, isCorrect, mDown;
+    var rive, canvas, gradientDiv, scaleX, scaleY, ROWS, COLS, renderer, floorDim, totalDanceFloorWidth, totalDanceFloorHeight, danceFloorPos, floorBytes, floorFile, artboardFloor, timerBytes, timerFile, artboardTimer, timerInfo, timerMachine, gameDuration, timerT, timerMachineProgress, timerMachineUrgent, i, l, input, lastTime, floor, floors, danceFloorGrid, crawlGrid, crawlStack, DIRECTIONS, difficulty, maxDifficulty, currLevel, nextLevel, crawlT, crawlT2, crawlT3, crawlT4, crawlCount, isCorrect, mDown;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
@@ -2950,6 +2950,7 @@ window.gamestart = function main() {
           canvas = document.getElementById("rive-canvas");
           canvas.height = document.documentElement.clientHeight;
           canvas.width = document.documentElement.clientWidth;
+          gradientDiv = document.getElementById("gradient");
           scaleX = canvas.width / 1792;
           scaleY = canvas.height / 922;
           ROWS = 4;
@@ -2962,6 +2963,12 @@ window.gamestart = function main() {
             x: (canvas.width - totalDanceFloorWidth) / 2,
             y: (canvas.height - totalDanceFloorHeight) / 2 + 50 * scaleY
           };
+          if (gradientDiv) {
+            gradientDiv.style.width = totalDanceFloorWidth + 'px';
+            gradientDiv.style.height = totalDanceFloorHeight + 'px';
+            gradientDiv.style.left = danceFloorPos.x + 'px';
+            gradientDiv.style.top = danceFloorPos.y + 'px';
+          }
           // await fetch(new Request("2023-10-23-tile_test-001.riv"))
           return [4 /*yield*/, fetch(new Request("DanceFloor.riv"))
           // await fetch(new Request("Button.riv"))
@@ -3110,7 +3117,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64052" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61239" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

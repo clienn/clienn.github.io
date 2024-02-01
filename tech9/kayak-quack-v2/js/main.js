@@ -973,11 +973,11 @@ function updateBGWall(idx) {
         ]
     } else if (idx == 1) {
         bgWalls[idx] = [
-            { x: 175, y: bgTilesPosY[1] + distY * 3.35, w: 30, h: 100, degrees: -65 },
-            { x: 175, y: bgTilesPosY[1] + distY * 0.85, w: 30, h: 300, degrees: 30 },
+            { x: 75, y: bgTilesPosY[1] + distY * 3.75, w: 130, h: 100, degrees: -65 },
+            { x: 75, y: bgTilesPosY[1] + distY * 0.85, w: 130, h: 300, degrees: 30 },
             { x: 275, y: bgTilesPosY[1] + distY * 0.55, w: 250, h: 20, degrees: -10 },
-            { x: 475, y: bgTilesPosY[1] + distY * 0.50, w: 190, h: 20, degrees: 0 },
-            { x: 655, y: bgTilesPosY[1] + distY * 0.30, w: 90, h: 20, degrees: -20 },
+            { x: 475, y: bgTilesPosY[1] + distY * 0.10, w: 190, h: 60, degrees: 0 },
+            { x: 625, y: bgTilesPosY[1] + distY * 0.0, w: 90, h: 60, degrees: -20 },
     
             // right
             { x: 1125, y: bgTilesPosY[1] + distY * 3.70, w: 90, h: 20, degrees: 30 },
@@ -991,7 +991,7 @@ function updateBGWall(idx) {
             { x: 320, y: bgTilesPosY[2] + distY * 3.15, w: 380, h: 20, degrees: 5 },
             { x: 0, y: bgTilesPosY[2] + distY * 2.55, w: 380, h: 20, degrees: 7 },
             { x: 0, y: bgTilesPosY[2] + distY * 0.85, w: 310, h: 20, degrees: -2 },
-            { x: 170, y: bgTilesPosY[2] + distY * 0.25, w: 115, h: 20, degrees: -20 },
+            { x: 170, y: bgTilesPosY[2] + distY * 0.25, w: 115, h: 70, degrees: -20 },
             { x: 1210, y: bgTilesPosY[2] + distY * 0.60, w: 715, h: 20, degrees: 24 },
             { x: 1700, y: bgTilesPosY[2] + distY * 2.66, w: 70, h: 40, degrees: 0 },
             
@@ -1027,9 +1027,9 @@ function updateBGWall(idx) {
         bgWalls[idx] = [
             { x: 0, y: bgTilesPosY[5] + distY * 3.75, w: 300, h: 20, degrees: -25 },
             { x: 300 - 50, y: bgTilesPosY[5] + distY * 3.15, w: 650, h: 20, degrees: 0 },
-            { x: 915 - 50, y: bgTilesPosY[5] + distY * 2.75, w: 100, h: 20, degrees: -55 },
-            { x: 815 - 50, y: bgTilesPosY[5] + distY * 1.88, w: 190, h: 20, degrees: -155 },
-            { x: 485, y: bgTilesPosY[5] + distY * 1.35, w: 320, h: 20, degrees: 5 },
+            { x: 915 - 50, y: bgTilesPosY[5] + distY * 2.75, w: 100, h: 50, degrees: -55 },
+            { x: 815 - 50, y: bgTilesPosY[5] + distY * 1.88, w: 190, h: 150, degrees: -155 },
+            { x: 485, y: bgTilesPosY[5] + distY * 1.35, w: 320, h: 50, degrees: 10 },
             { x: 225, y: bgTilesPosY[5] + distY * 0.95, w: 270, h: 20, degrees: 15 },
             
         ] 
@@ -1049,7 +1049,7 @@ function updateBGWall(idx) {
         bgWalls[idx] = [
             // // left
             // // { x: 0, y: bgTilesPosY[7], w: 270, h: 507, degrees: 0 },
-            { x: 70, y: bgTilesPosY[7] - distY * 0.80, w: 30, h: 307, degrees: 60 },
+            { x: 30, y: bgTilesPosY[7] - distY * 0.55, w: 70, h: 237, degrees: 60 },
             // { x: 270, y: bgTilesPosY[7], w: 10, h: 107, degrees: 0 },
             // { x: 270, y: bgTilesPosY[7] + distY, w: 15, h: 107, degrees: 0 },
             // { x: 260, y: bgTilesPosY[7] + distY * 2, w: 15, h: 107, degrees: 0 },
@@ -1057,7 +1057,7 @@ function updateBGWall(idx) {
             // { x: 1360, y: bgTilesPosY[7] + distY * 3.2, w: 100, h: 50, degrees: 0 },
     
             // // right
-            { x: 1780, y: bgTilesPosY[7] - distY  * 0.80, w: 30, h: 307, degrees: -60 },
+            { x: 1780, y: bgTilesPosY[7] - distY  * 0.80, w: 70, h: 307, degrees: -60 },
             { x: 1480, y: bgTilesPosY[7] + distY * 1.50, w: 100, h: 50, degrees: 0 },
             // { x: 1580, y: bgTilesPosY[7], w: 10, h: 107, degrees: 0 },
             // { x: 1580, y: bgTilesPosY[7] + distY, w: 10, h: 107, degrees: 0 },
@@ -1103,11 +1103,11 @@ function initBGWalls() {
             // { x: 1335, y: bgTilesPosY[0] + distY * 0.15, w: 320, h: 20, degrees: 10 },
         ],
         [
-            { x: 175, y: bgTilesPosY[1] + distY * 3.35, w: 30, h: 100, degrees: -65 },
-            { x: 175, y: bgTilesPosY[1] + distY * 0.85, w: 30, h: 300, degrees: 30 },
+            { x: 75, y: bgTilesPosY[1] + distY * 3.75, w: 130, h: 100, degrees: -65 },
+            { x: 75, y: bgTilesPosY[1] + distY * 0.85, w: 130, h: 300, degrees: 30 },
             { x: 275, y: bgTilesPosY[1] + distY * 0.55, w: 250, h: 20, degrees: -10 },
-            { x: 475, y: bgTilesPosY[1] + distY * 0.50, w: 190, h: 20, degrees: 0 },
-            { x: 655, y: bgTilesPosY[1] + distY * 0.30, w: 90, h: 20, degrees: -20 },
+            { x: 475, y: bgTilesPosY[1] + distY * 0.10, w: 190, h: 60, degrees: 0 },
+            { x: 625, y: bgTilesPosY[1] + distY * 0.0, w: 90, h: 60, degrees: -20 },
 
             // right
             { x: 1125, y: bgTilesPosY[1] + distY * 3.70, w: 90, h: 20, degrees: 30 },
@@ -1120,7 +1120,7 @@ function initBGWalls() {
             { x: 320, y: bgTilesPosY[2] + distY * 3.15, w: 380, h: 20, degrees: 5 },
             { x: 0, y: bgTilesPosY[2] + distY * 2.55, w: 380, h: 20, degrees: 7 },
             { x: 0, y: bgTilesPosY[2] + distY * 0.85, w: 310, h: 20, degrees: -2 },
-            { x: 170, y: bgTilesPosY[2] + distY * 0.25, w: 115, h: 20, degrees: -20 },
+            { x: 170, y: bgTilesPosY[2] + distY * 0.25, w: 115, h: 70, degrees: -20 },
             { x: 1210, y: bgTilesPosY[2] + distY * 0.60, w: 715, h: 20, degrees: 24 },
             { x: 1700, y: bgTilesPosY[2] + distY * 2.66, w: 70, h: 40, degrees: 0 },
             
@@ -1153,9 +1153,9 @@ function initBGWalls() {
         [
             { x: 0, y: bgTilesPosY[5] + distY * 3.75, w: 300, h: 20, degrees: -25 },
             { x: 300 - 50, y: bgTilesPosY[5] + distY * 3.15, w: 650, h: 20, degrees: 0 },
-            { x: 915 - 50, y: bgTilesPosY[5] + distY * 2.75, w: 100, h: 20, degrees: -55 },
-            { x: 815 - 50, y: bgTilesPosY[5] + distY * 1.88, w: 190, h: 20, degrees: -155 },
-            { x: 485, y: bgTilesPosY[5] + distY * 1.35, w: 320, h: 20, degrees: 5 },
+            { x: 915 - 50, y: bgTilesPosY[5] + distY * 2.75, w: 100, h: 50, degrees: -55 },
+            { x: 815 - 50, y: bgTilesPosY[5] + distY * 1.88, w: 190, h: 150, degrees: -155 },
+            { x: 485, y: bgTilesPosY[5] + distY * 1.35, w: 320, h: 50, degrees: 10 },
             { x: 225, y: bgTilesPosY[5] + distY * 0.95, w: 270, h: 20, degrees: 15 },
             
         ],
@@ -1173,7 +1173,7 @@ function initBGWalls() {
         [
             // // left
             // // { x: 0, y: bgTilesPosY[7], w: 270, h: 507, degrees: 0 },
-            { x: 70, y: bgTilesPosY[7] - distY * 0.80, w: 30, h: 307, degrees: 60 },
+            { x: 30, y: bgTilesPosY[7] - distY * 0.55, w: 70, h: 237, degrees: 60 },
             // { x: 270, y: bgTilesPosY[7], w: 10, h: 107, degrees: 0 },
             // { x: 270, y: bgTilesPosY[7] + distY, w: 15, h: 107, degrees: 0 },
             // { x: 260, y: bgTilesPosY[7] + distY * 2, w: 15, h: 107, degrees: 0 },
@@ -1181,7 +1181,7 @@ function initBGWalls() {
             // { x: 1360, y: bgTilesPosY[7] + distY * 3.2, w: 100, h: 50, degrees: 0 },
 
             // // right
-            { x: 1780, y: bgTilesPosY[7] - distY * 0.80, w: 30, h: 307, degrees: -60 },
+            { x: 1780, y: bgTilesPosY[7] - distY * 0.80, w: 70, h: 307, degrees: -60 },
             { x: 1480, y: bgTilesPosY[7] + distY * 1.50, w: 100, h: 50, degrees: 0 },
             // { x: 1580, y: bgTilesPosY[7], w: 10, h: 107, degrees: 0 },
             // { x: 1580, y: bgTilesPosY[7] + distY, w: 10, h: 107, degrees: 0 },

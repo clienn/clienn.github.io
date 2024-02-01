@@ -141,6 +141,13 @@
             "ch": 24
         },
         {
+            "id": "healthbar",
+            "src": "hud/healthbar",
+            "ext": "png",
+            "cw": 272,
+            "ch": 88
+        },
+        {
             "id": "pig_0",
             "src": "pig/run_0",
             "ext": "png",
