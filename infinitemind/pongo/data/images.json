@@ -1,0 +1,53 @@
+{
+    "data": [
+        {
+            "id": "ball",
+            "src": "ball",
+            "ext": "png",
+            "cw": 44,
+            "ch": 44
+        },
+        {
+            "id": "barrier",
+            "src": "barrier",
+            "ext": "png",
+            "cw": 224,
+            "ch": 48
+        },
+        {
+            "id": "knob",
+            "src": "hud/joystick/knob",
+            "ext": "png",
+            "cw": 144,
+            "ch": 144
+        },
+        {
+            "id": "area",
+            "src": "hud/joystick/area",
+            "ext": "png",
+            "cw": 288,
+            "ch": 144
+        },
+        {
+            "id": "return_home",
+            "src": "hud/return_home",
+            "ext": "png",
+            "cw": 628,
+            "ch": 143
+        },
+        {
+            "id": "volume",
+            "src": "hud/volume",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        },
+        {
+            "id": "mute",
+            "src": "hud/mute",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        }
+    ]
+}
