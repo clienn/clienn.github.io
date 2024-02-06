@@ -1,19 +1,14 @@
 {
     "data": [
         {
-            "id": "bg",
-            "src": "sounds/bg",
-            "ext": "mp3"
+            "id": "cluck",
+            "src": "sounds/cluck",
+            "ext": "wav"
         }, 
         {
-            "id": "cry",
-            "src": "sounds/hit",
+            "id": "ppput",
+            "src": "sounds/ppput",
             "ext": "wav"
-        },
-        {
-            "id": "score",
-            "src": "sounds/score",
-            "ext": "mp3"
         }
     ]
 }

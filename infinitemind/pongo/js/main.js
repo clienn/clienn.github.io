@@ -84,6 +84,7 @@ const onTablet = isTablet();
 var ball = null;
 var barrier = null;
 
+var tracks = {};
 
 // #C7FC12
 /*
@@ -155,6 +156,19 @@ function main(w, h) {
     joystick.on = true;
 
     gameCycle();
+}
+
+function initAllAudio() {
+    if (audioContext.state === "suspended") {
+        audioContext.resume();
+    }
+
+    for (let k in AM.audio) {
+        tracks[k] = audioContext.createMediaElementSource(AM.audio[k].img);
+        tracks[k].connect(audioContext.destination);
+    }
+
+    // playAllAudio();
 }
 
 function reset() {
@@ -484,7 +498,25 @@ function doPolygonsIntersect (a, b) {
 /*
  * SOUNDS
  */
+function playHit() {
+    // if (HUD.volumeOn) {
+        setTimeout(() => {
+            AM.audio.cluck.img.volume = 0.5;
+            AM.audio.cluck.img.currentTime = 0;
+            AM.audio.cluck.img.play();
+        }, 0);
+    // }
+}
 
+function playFail() {
+    // if (HUD.volumeOn) {
+        setTimeout(() => {
+            AM.audio.ppput.img.volume = 1;
+            AM.audio.ppput.img.currentTime = 0;
+            AM.audio.ppput.img.play();
+        }, 0);
+    // }
+}
 
 // *********************************** SOUNDS END ******************************************************** //
 
@@ -516,14 +548,22 @@ function wallCollisions(obj) {
         let dy = rngMultiplier();
         obj.vx = F;
         obj.vy = F * dy;
+
+        return true;
     } else if (obj.x + obj.w >= canvas.width) {
         let dy = rngMultiplier();
         obj.vx = -F;
         obj.vy = F * dy;
+
+        return true;
     } else if (obj.y <= 0) {
         obj.vx = F * rngMultiplier();
         obj.vy = F;
+
+        return true;
     }
+
+    return false;
 }
 
 function update() {
@@ -544,12 +584,16 @@ function update() {
 
     if (ball.y >= canvas.height) {
         gameover = true;
+        playFail();
     } else {
         if (checkRectCollisions(ball, barrierInfo.hitbox)) {
             bounceBall();
+            playHit();
         }
     
-        wallCollisions(ball);    
+        if (wallCollisions(ball)) {
+            playHit();
+        } 
     }
     
     
@@ -564,6 +608,7 @@ function update() {
         if (currT <= 0) {
             currT = 0;
             gameover = true;
+            playFail();
         }
 
         let p = currT / gameDuration;
