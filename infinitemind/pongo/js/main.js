@@ -85,6 +85,11 @@ var ball = null;
 var barrier = null;
 
 var tracks = {};
+var baseBallSpeed = 3;
+var ballSpeed = 2;
+var barrierSpeed = 5;
+var ballSpeedInc = 0.1;
+var isBallCollided = false;
 
 // #C7FC12
 /*
@@ -109,6 +114,11 @@ function main(w, h) {
     G *= scaleY;
     F *= scaleX;
 
+    baseBallSpeed *= scaleX;
+    ballSpeed = baseBallSpeed;
+    ballSpeedInc *= scaleX;
+    barrierSpeed *= scaleX;
+    
     rescaleSize(ballInfo, scaleX, scaleX);
     rescaleSize(barrierInfo, scaleX, scaleX);
 
@@ -182,6 +192,7 @@ function reset() {
 
     currT = gameDuration;
     RiveInfo.urgent.value = false;
+    ballSpeed = baseBallSpeed;
 
     updateBarrierHitbox();
 }
@@ -539,8 +550,15 @@ function rngMultiplier() {
 
 function bounceBall() {
     let dx = rngMultiplier();
-    ball.vx = F * dx;
-    ball.vy = -F;
+    if (ball.y + ball.h > barrierInfo.hitbox.y + barrierInfo.hitbox.h * 0.5) {
+        let d = barrier.vx > 0 ? 1 : -1; 
+        ball.vx = F * dx * d;
+        ball.vy = -F * 0.25;
+    } else {
+        ball.vx = F * dx;
+        ball.vy = -F;
+    }
+    
 }
 
 function wallCollisions(obj) {
@@ -567,8 +585,7 @@ function wallCollisions(obj) {
 }
 
 function update() {
-    
-    barrier.update(delta, 5);
+    barrier.update(delta, barrierSpeed);
     if (barrier.x + barrier.w >= canvas.width) {
         barrier.x = canvas.width - barrier.w;
     } else if (barrier.x <= 0) {
@@ -577,24 +594,27 @@ function update() {
 
     updateBarrierHitbox();
 
-    
-    ball.update(delta, 2);
+    ball.update(delta, ballSpeed);
     ball.t += 0.5 * delta;
     ball.zRotate = Math.sin(ball.t) * 720;
 
-    if (ball.y >= canvas.height) {
+    if (ball.y + ball.h >= barrierInfo.hitbox.y + barrierInfo.hitbox.h * 0.5) {
         gameover = true;
         playFail();
     } else {
         if (checkRectCollisions(ball, barrierInfo.hitbox)) {
             bounceBall();
             playHit();
+            ballSpeed += ballSpeedInc;
         }
     
         if (wallCollisions(ball)) {
             playHit();
         } 
     }
+    
+
+    
     
     
     ball.drawWithRotation(ctx, AM.images.ball.img);
