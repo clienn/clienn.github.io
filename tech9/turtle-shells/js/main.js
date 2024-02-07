@@ -9,7 +9,8 @@ var delta = 0;
 var startGame = false; // orientation prep
 var gameStart = false; // start game
 var totalTimeSpent = 0;
-const gameDuration = 90;
+const gameDuration = 30;
+var G = 9.8;
 
 var scaleX = 1;
 var scaleY = 1;
@@ -711,7 +712,7 @@ var turtleSpeechInfo = {
     h: 0,
     isCorrect: false,
     failedKeys: [1, 2, 3, 4, 5, 6, 7],
-    successKeys: [1, 2, 3, 4, 5, 6, 7],
+    successKeys: [1, 2, 3, 4, 5, 4, 7],
     failedIdx: 0,
     successIdx: 0,
 }
@@ -749,9 +750,11 @@ function main(w, h) {
     canvas.style.display = 'block';
     instrucions.style.display = 'none';
 
-    
     scaleX = w / 1792;
     scaleY = h / 922;
+
+    G *= scaleX;
+    jumpHeight *= scaleX;
 
     if (onTablet) {
         splashInfo.w = AM.images.intro.cw;
@@ -780,6 +783,8 @@ function main(w, h) {
     } else {
         startButtonInfo.y = splashInfo.y + splashInfo.h - 230 * splashInfo.sx;
     }
+
+    // jumpHeight *= splashInfo.sy;
 
     let isMobile = detectMob();
     
@@ -1668,7 +1673,8 @@ function drawTurtle() {
                         AM.images.turtleunhappy.cw, AM.images.turtleunhappy.ch);
                 } else {
                     turtles[i].y -= turtles[i].jump;
-                    turtles[i].jump -= 9.8 * delta * 5;
+                    turtles[i].jump -= G * delta * 5;
+                    // turtles[i].jump -= 9.8 * delta * 5;
                     if (turtles[i].y > turtles[i].oy) {
                         turtles[i].y = turtles[i].oy;
                         turtles[i].jump = jumpHeight;
