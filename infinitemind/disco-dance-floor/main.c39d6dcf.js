@@ -2886,7 +2886,7 @@ window.gamestart = function main() {
           }, 1000);
         }
         var currT = Math.floor(timerT);
-        if (!timerMachineUrgent.asBool().value && currT < 11) {
+        if (!timerMachineUrgent.asBool().value && currT < 4) {
           timerMachineUrgent.asBool().value = true;
         }
         var percent = timerT / gameDuration * 100;
@@ -2921,6 +2921,10 @@ window.gamestart = function main() {
         artboard.draw(renderer);
         renderer.restore();
       }
+      // renderer.save();
+      // artboardBall.advance(elapsedTimeSec);
+      // artboardBall.draw(renderer);
+      // renderer.restore();
       // timer
       renderer.save();
       renderer.translate(timerInfo.x, timerInfo.y);
@@ -3117,7 +3121,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61239" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51757" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

@@ -2982,7 +2982,7 @@ window.gamestart = function main() {
           reset(true);
         }
         var currT = Math.floor(timerT);
-        if (!timerMachineUrgent.asBool().value && currT < 11) {
+        if (!timerMachineUrgent.asBool().value && currT < 4) {
           timerMachineUrgent.asBool().value = true;
         }
         var percent = timerT / gameDuration * 100;
@@ -3254,7 +3254,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58566" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51676" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
