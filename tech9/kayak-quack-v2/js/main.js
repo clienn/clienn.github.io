@@ -633,6 +633,40 @@ function initTileGroup() {
     }
 }
 
+function checkWaterObjIsCollided() {
+    // let arr = activeBGTilePos();
+    // console.log(arr)
+    // for (let k in arr) {
+    //     let group = bgTileGroup[k];
+    //     if (group > 0) {
+    //         let start = (group - 1) * 3;
+    //         let end = group * 3;
+
+    //         for (let i = start; i < end; ++i) {
+    //             if (waterObjHolder[i].id > -1) {
+    //                 const { x, y, w, h } = kayakHitBox;
+                
+    //                 collisionSide.top |= checkAngledCollisions({ x, y, w, h: 1 }, waterObjHolder[i]);
+    //                 collisionSide.right |= checkAngledCollisions({ x: x + w, y, w: 1, h }, waterObjHolder[i]);
+    //                 collisionSide.left |= checkAngledCollisions({ x, y, w: 1, h }, waterObjHolder[i]);
+    //                 collisionSide.bottom |= checkAngledCollisions({ x, y: y + h, w, h: 1 }, waterObjHolder[i]);
+    //             }
+    //         }
+    //     }
+    // }
+
+    for (let i = 0; i < waterObjHolder.length; ++i) {
+        if (waterObjHolder[i].id > -1) {
+            const { x, y, w, h } = kayakHitBox;
+        
+            collisionSide.top |= checkAngledCollisions({ x, y, w, h: 1 }, waterObjHolder[i]);
+            collisionSide.right |= checkAngledCollisions({ x: x + w, y, w: 1, h }, waterObjHolder[i]);
+            collisionSide.left |= checkAngledCollisions({ x, y, w: 1, h }, waterObjHolder[i]);
+            collisionSide.bottom |= checkAngledCollisions({ x, y: y + h, w, h: 1 }, waterObjHolder[i]);
+        }
+    }
+}
+
 function drawWaterObj(idx) {
     let group = bgTileGroup[idx];
     if (group > 0) {
@@ -676,18 +710,40 @@ function drawWaterObj(idx) {
                             if (score > 99) score = 99;
                             setPoints('+1', '#C7FC12');
                             playScore();
+                            updateScore();
+
+                            waterObjHolder[i].id = -1;
                         } else {
-                            score--;
-                            if (score < 0) score = 0;
-                            setPoints('-1', '#fb2121'); // red
-                            playCry();
+                            const { x, y, w, h } = kayakHitBox;
+                
+                            collisionSide.top |= checkAngledCollisions({ x, y, w, h: 1 }, waterObjHolder[i]);
+                            collisionSide.right |= checkAngledCollisions({ x: x + w, y, w: 1, h }, waterObjHolder[i]);
+                            collisionSide.left |= checkAngledCollisions({ x, y, w: 1, h }, waterObjHolder[i]);
+                            collisionSide.bottom |= checkAngledCollisions({ x, y: y + h, w, h: 1 }, waterObjHolder[i]);
                         }
     
-                        updateScore();
-
-                        waterObjHolder[i].id = -1;
+                        
                     }
                 }
+                // if (checkAngledCollisions(kayakHitBox, waterObjHolder[i])) {
+                //     if (waterObjHolder[i].id > 2) {
+                //         if (waterObjHolder[i].id == 3) {
+                //             score++;
+                //             if (score > 99) score = 99;
+                //             setPoints('+1', '#C7FC12');
+                //             playScore();
+                //         } else {
+                //             score--;
+                //             if (score < 0) score = 0;
+                //             setPoints('-1', '#fb2121'); // red
+                //             playCry();
+                //         }
+    
+                //         updateScore();
+
+                //         waterObjHolder[i].id = -1;
+                //     }
+                // }
             }
             
         }
@@ -1322,6 +1378,18 @@ function isKayakStuck() {
     return false;
 }
 
+function activeBGTilePos() {
+    let arr = [];
+    for (let i = 0; i < bgInfo.rows; ++i) {
+        
+        if (bgTilesPosY[i] < canvas.height && bgTilesPosY[i] + bgInfo.h > 0) {
+            arr.push(i);
+        }
+    }
+
+    return arr;
+}
+
 function updateBGTiles(speed) {
     for (let i = 0; i < bgInfo.rows; ++i) {
         if (!isKayakStuck()) {
@@ -1480,79 +1548,6 @@ function addDuck() {
 
     waterObjects.push(duck);
     // waterObjectRows[rngY] = waterObjects.length - 1;
-}
-
-function drawWaterObjects() {
-    for (let i = 0; i < waterObjectRows.length; ++i) {
-        let idx = waterObjectRows[i];
-
-        if (idx > -1) {
-            waterObjects[idx].swim(ctx, AM.images[waterObjects[idx].key].img);
-
-            if (checkAngledCollisions(kayakHitBox, waterObjects[idx])) {
-                if (!waterObjects[idx].key.match(/lily\d/g)) {
-                    waterObjects[idx].y = parallaxInfo.tile.yPos[currentTop] + containerH / 2 - waterObjects[idx].h / 2;
-                    let rowIdx = Math.floor(currentTop / 3)
-                    let colIdx = currentTop % 3; 
-                    let w = waterObjContainer[rowIdx][colIdx].w - waterObjects[idx].w;
-                    let rngX = Math.floor(Math.random() * w) + waterObjContainer[rowIdx][colIdx].x;
-                    waterObjects[idx].x = rngX;
-
-                    waterObjectRows[i] = -1;
-
-                    if (waterObjects[idx].key == 'duck') {
-                        score++;
-                        if (score > 99) score = 99;
-                        setPoints('+1', '#C7FC12');
-                        playScore();
-                    } else {
-                        score--;
-                        if (score < 0) score = 0;
-                        setPoints('-1', '#fb2121'); // red
-                        // playCry();
-                    }
-
-                    updateScore();
-                }
-            }
-            
-        }
-        
-    }
-
-
-    for (let i = 0; i < waterObjects.length; ++i) {
-        waterObjects[i].updatePos(delta, 1);
-        // waterObjects[i].y = parallaxInfo.tile.yPos[waterObjects[i].id];
-        // waterObjects[i].x += waterObjects[i].vx * delta;
-        waterObjects[i].y = parallaxInfo.tile.yPos[waterObjects[i].id] + containerH / 2 - waterObjects[i].h / 2;
-        // waterObjects[i].y = parallaxInfo.tile.yPos[waterObjects[i].id];
-
-        if (waterObjects[i].key == 'duck') {
-            waterObjects[i].updateFrameAnimation(6, 15, delta); // frames, speed, delta
-            let rngY = waterObjects[i].id;
-            let rowIdx = Math.floor(rngY / 3)
-            let colIdx = rngY % 3; 
-            let edgeX = waterObjContainer[rowIdx][colIdx].x + waterObjContainer[rowIdx][colIdx].w - waterObjects[i].w;
-
-            if (
-                (waterObjects[i].facing == 1 && waterObjects[i].x >= edgeX) || 
-                (waterObjects[i].facing == -1 && waterObjects[i].x <= waterObjContainer[rowIdx][colIdx].x)
-            ) {
-                waterObjects[i].setDirection(waterObjects[i].facing * -1);
-                waterObjects[i].setRandomSpeed(100, 50);
-            }
-            // if (
-            //     (waterObjects[i].facing == 1 && waterObjects[i].x >= parallaxInfo.water.edgeX - waterObjects[i].w) || 
-            //     (waterObjects[i].facing == -1 && waterObjects[i].x <= parallaxInfo.water.x)
-            // ) {
-            //     waterObjects[i].setDirection(waterObjects[i].facing * -1);
-            //     waterObjects[i].setRandomSpeed(100, 50);
-            // }
-        }
-
-        
-    }
 }
 
 function updateWaterObject(rngY) {
@@ -2571,35 +2566,22 @@ function update() {
     
     if (isKayakStuck()) {
         collisionSide.top = collisionSide.right = collisionSide.left = collisionSide.bottom = false;
+        checkWaterObjIsCollided();
 
         for (let i = 0; i < bgInfo.rows; ++i) {
             for (let j = 0; j < bgWalls[i].length; ++j) {
                 if (checkAngledCollisions(kayakHitBox, bgWalls[i][j])) {
                     const { x, y, w, h } = kayakHitBox;
                     
-                    collisionSide.top = checkAngledCollisions({ x, y, w, h: 1 }, bgWalls[i][j]);
-                    collisionSide.right = checkAngledCollisions({ x: x + w, y, w: 1, h }, bgWalls[i][j]);
-                    collisionSide.left = checkAngledCollisions({ x, y, w: 1, h }, bgWalls[i][j]);
-                    collisionSide.bottom = checkAngledCollisions({ x, y: y + h, w, h: 1 }, bgWalls[i][j]);
-
-                    // if (collisionSide.right) {
-                    //     // console.log(kayak.zRotate, { x: x + w, y, w: 1, h });
-                    //     let p = getRotatedRect({ x: x + w, y, w: 1, h }, kayak.degrees);
-                    //     let d = h;
-                    //     ctx.beginPath();
-                    //     ctx.rect(p[0].x, p[0].y, 1, d);
-                    //     ctx.rect(p[1].x, p[1].y, 1, d);
-                    //     ctx.rect(p[2].x, p[2].y, 1, d);
-                    //     ctx.rect(p[3].x, p[3].y, 1, d);
-                    //     ctx.stroke();
-                    // }
-                    // collisionSide.top = checkAngledCollisions({ x: p[0].x, y: p[0].y, w: d, h: d }, bgWalls[i][j]);
-                    // collisionSide.right = checkAngledCollisions({ x: p[1].x, y: p[1].y, w: d, h: d }, bgWalls[i][j]);
-                    // collisionSide.left = checkAngledCollisions({ x: p[2].x, y: p[2].y, w: d, h: d }, bgWalls[i][j]);
-                    // collisionSide.bottom = checkAngledCollisions({ x: p[3].x, y: p[3].y, w: d, h: d }, bgWalls[i][j]);
+                    collisionSide.top |= checkAngledCollisions({ x, y, w, h: 1 }, bgWalls[i][j]);
+                    collisionSide.right |= checkAngledCollisions({ x: x + w, y, w: 1, h }, bgWalls[i][j]);
+                    collisionSide.left |= checkAngledCollisions({ x, y, w: 1, h }, bgWalls[i][j]);
+                    collisionSide.bottom |= checkAngledCollisions({ x, y: y + h, w, h: 1 }, bgWalls[i][j]);
                 }
             }
         }
+
+        
     }
     
 

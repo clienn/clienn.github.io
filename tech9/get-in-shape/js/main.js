@@ -23,7 +23,7 @@ var portal = {
     h: 401,
     t: 0,
     et: 1.5,
-    duration: 5,
+    duration: 10,
     bonus: 5,
     isAnimating: true,
     isRefreshing: false,
@@ -86,13 +86,13 @@ var portal = {
     animate: () => {
         if (portal.isAnimating) {
             if (portal.shapesOpacity > 0) {
-                portal.shapesOpacity -= 1 * delta;
+                portal.shapesOpacity -= 5 * delta;
                 if (portal.shapesOpacity <= 0) {
                     portal.shapesOpacity = 0;
                     portal.isRefreshing = false;
                 }
             } else if (portal.t < portal.et) {
-                portal.t += 1 * delta;
+                portal.t += 5 * delta;
                 if (portal.t >= portal.et) {
                     portal.t = portal.et;
                     portal.isAnimating = false;
@@ -127,7 +127,7 @@ var portal = {
     },
     trigger: () => {
         if (!portal.isAnimating) {
-            portal.duration -= 1 * delta;
+            portal.duration -= 2 * delta;
             if (portal.duration < 2 && portal.et == 1.5) {
                 let a = Math.sin(portal.warningT) * 20;
 
@@ -143,7 +143,7 @@ var portal = {
             if (portal.duration <= 0) {
                 portal.toggle();
                 
-                portal.duration = portal.et == 1.5 ? Math.max((Math.floor(Math.random() * 7) + 1), 4) : 1;
+                portal.duration = portal.et == 1.5 ? Math.max((Math.floor(Math.random() * 10) + 1), 5) : 1;
                 portal.warningT = 0;
             }
         }
@@ -159,8 +159,8 @@ var shapeDim = 75;
 var shapeDimX = shapeDim;
 var shapeDimY = shapeDim;
 
-var containerShapeW = 100;
-var containerShapeH = 100;
+var containerShapeW = 125;
+var containerShapeH = 125;
 
 var sizes = [
     [34, 34],
@@ -897,7 +897,8 @@ function checkAnswers() {
         // cc_y = cy - containerRectDimY / 2;
         // correctAnswers = new Array(nContainers).fill(-1);   
         portal.duration = 0;
-        portal.isRefreshing = true;
+        // portal.isRefreshing = true;
+        portal.shapesOpacity = 0;
 
         // updateShapes();
         initShapesContainer();

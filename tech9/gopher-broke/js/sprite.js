@@ -67,15 +67,16 @@ class Sprite {
                 //     this.trailGapT = 0;
                 // }
                 // 
-                if (Math.floor(this.trailGapT) >= this.trailGap) {
-                    this.trail.push([this.x, this.y]);
+                
+                // if (Math.floor(this.trailGapT) >= this.trailGap) {
+                //     this.trail.push([this.x, this.y]);
     
-                    if (this.trail.length > 3) {
-                        this.trail.shift();
-                    }
+                //     if (this.trail.length > 3) {
+                //         this.trail.shift();
+                //     }
 
-                    this.trailGapT = 0;
-                }
+                //     this.trailGapT = 0;
+                // }
 
                 
                 
@@ -110,24 +111,24 @@ class Sprite {
     draw(ctx, img) {
         ctx.drawImage(img, this.clipX, this.clipY, this.clipW, this.clipH, this.x, this.y, this.w, this.h);
         // for (let i = this.trail.length - 1; i >= 0; --i) {
-        let opacity = 0.80;
-        let scale = 1;
-        for (let i = 0; i < this.trail.length; ++i) {
-            ctx.save();
-            // ctx.globalAlpha = 0.5 - i / 10;
-            ctx.globalAlpha = 0.16 + i * 0.16;
-            // scale = 0.5 + i * 0.0714;
-            scale = 0.7 + i * 0.1;
-            let w = this.w * scale;
-            let h = this.h * scale;
+        // let opacity = 0.80;
+        // let scale = 1;
+        // for (let i = 0; i < this.trail.length; ++i) {
+        //     ctx.save();
+        //     // ctx.globalAlpha = 0.5 - i / 10;
+        //     ctx.globalAlpha = 0.16 + i * 0.16;
+        //     // scale = 0.5 + i * 0.0714;
+        //     scale = 0.7 + i * 0.1;
+        //     let w = this.w * scale;
+        //     let h = this.h * scale;
 
-            let adjX = (this.w - w) / 2;
-            let adjY = (this.h - h) / 2;
+        //     let adjX = (this.w - w) / 2;
+        //     let adjY = (this.h - h) / 2;
 
-            ctx.drawImage(img, this.clipX, 0, this.clipW, this.clipH, this.trail[i][0] + adjX, this.trail[i][1] + adjY, w, h);
-            ctx.restore();
-            // console.log(this.trail[i].x)
-        }
+        //     ctx.drawImage(img, this.clipX, 0, this.clipW, this.clipH, this.trail[i][0] + adjX, this.trail[i][1] + adjY, w, h);
+        //     ctx.restore();
+        //     // console.log(this.trail[i].x)
+        // }
         // ctx.beginPath();
         // ctx.arc(this.x + this.w / 2, this.y + this.h / 2, 15.3125, 0, 2 * Math.PI);
         // ctx.stroke();

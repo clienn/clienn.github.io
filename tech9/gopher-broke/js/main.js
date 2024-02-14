@@ -95,8 +95,8 @@ var carrotInfo = {
 var gopherInfo = {
     // w: 125,
     // h: 85,
-    w: 64 * 2,
-    h: 65 * 2,
+    w: 64 * 2.5,
+    h: 65 * 2.5,
 }
 
 var gopherStunInfo = {
@@ -463,6 +463,16 @@ function submitScore() {
     Vue.prototype.$postData(result, true);
 }
 
+function circleCollision(x, y, scale, obj) {
+    let midX = obj.x + obj.w / 2;
+    let midY = obj.y + obj.h / 2;
+
+    let w = obj.w * scale;
+    let h = obj.h * scale;
+
+    return (x >= midX - w && x <= midX + w) && (y >= midY - h && y <= midY + h);
+}
+
 function controls() {
     let mid = canvas.width / 2;
 
@@ -521,7 +531,7 @@ function controls() {
                             y: gopher_hide.y,
                             w: gopher_hide.w,
                             h: gopher_hide.h
-                        })) {
+                        }) || circleCollision(mx, my, 1, gopher_hide)) {
                             
                             // console.log('collision!');
                             chatID = 0;
@@ -674,7 +684,8 @@ function drawGopher() {
         } else {
             gopher.clipX = 0;
             // gopher.draw(ctx, AM.images.gopher.img);
-            gopher.drawScale(ctx, AM.images.gopher.img, 1.25, gopher_hide.x, gopher_hide.y);
+            gopher.drawTo(ctx, AM.images.gopher.img, gopher_hide.x, gopher_hide.y);
+            // gopher.drawScale(ctx, AM.images.gopher.img, 1.25, gopher_hide.x, gopher_hide.y);
         }
         
     } else if (gopher_hide.goto != null || gopher_hide.moveDestinations.length > 0) {
