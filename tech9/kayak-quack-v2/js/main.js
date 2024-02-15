@@ -326,6 +326,8 @@ const onTablet = isTablet();
 var rotateLimit = 45;
 var scaleBg;
 
+var trees = [];
+
 // pool - 606px
 // rect - 12px, 6px
 // total width - 926px
@@ -576,7 +578,37 @@ function main(w, h) {
 
     joystick.on = true;
 
+    initTrees();
+
     gameCycle();
+}
+
+function initTrees() {
+    addTree(canvas.width / 2 + 350 * scaleX, 110 * scaleX, 6, 2);
+    addTree(100 * scaleX, 0, 5, 1);
+    addTree(450 * scaleX, 30 * scaleX, 5, 2);
+    addTree(canvas.width / 2 + 600 * scaleX, -30 * scaleX, 4, 1.5);
+    addTree(550 * scaleX, -250 * scaleX, 3, 1);
+    addTree(canvas.width / 2 + 750 * scaleX, -300 * scaleX, 1, 1);
+}
+
+function drawTrees() {
+    for (let i = 0; i < trees.length; ++i) {
+        ctx.drawImage(AM.images.tree.img, 0, 0, AM.images.tree.cw, AM.images.tree.ch, 
+            trees[i].x, bgTilesPosY[trees[i].tilePosIdx] + trees[i].y, trees[i].w, trees[i].h);
+    }
+}
+
+function addTree(x, y, tilePosIdx, scale) {
+    trees.push(
+        {
+            x: x,
+            y: y,
+            w: AM.images.tree.cw * scale * scaleX,
+            h: AM.images.tree.ch * scale * scaleX,
+            tilePosIdx: tilePosIdx
+        }
+    )
 }
 
 function initTileGroup() {
@@ -2639,21 +2671,26 @@ function gameCycle() {
             // ctx.clearRect(0, 0, canvas.width, canvas.height);
             // ctx.drawImage(AM.images.bg.img, 0, 0, AM.images.bg.cw, AM.images.bg.ch, 0, 0, canvas.width, 428);
             drawBGTiles();
+            
             // drawBGWalls();
             // drawWaterObjContainer();
 
             drawKayak();
 
             showPoints();
+
             
+            
+            
+
+            update();
+
+            drawTrees();
+
             HUD.draw(ctx);
 
             // if (onMobile)
             joystick.draw(ctx);
-
-            update();
-
-            
         } else {
             // ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
             drawStartPage();

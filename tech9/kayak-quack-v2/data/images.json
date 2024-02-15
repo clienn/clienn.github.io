@@ -8,6 +8,13 @@
             "ch": 861
         },
         {
+            "id": "tree",
+            "src": "environment/trees/tree",
+            "ext": "png",
+            "cw": 141,
+            "ch": 213
+        },
+        {
             "id": "endscreen",
             "src": "hud/endscreen",
             "ext": "png",
