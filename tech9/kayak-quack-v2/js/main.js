@@ -735,6 +735,7 @@ function drawWaterObj(idx) {
                     // }
                 }
 
+
                 if (checkAngledCollisions(kayakHitBox, waterObjHolder[i])) {
                     if (waterObjHolder[i].id > 2) {
                         if (waterObjHolder[i].id == 3) {
@@ -746,12 +747,15 @@ function drawWaterObj(idx) {
 
                             waterObjHolder[i].id = -1;
                         } else {
-                            const { x, y, w, h } = kayakHitBox;
+                            if (!isKayakStuck()) {
+                                const { x, y, w, h } = kayakHitBox;
                 
-                            collisionSide.top |= checkAngledCollisions({ x, y, w, h: 1 }, waterObjHolder[i]);
-                            collisionSide.right |= checkAngledCollisions({ x: x + w, y, w: 1, h }, waterObjHolder[i]);
-                            collisionSide.left |= checkAngledCollisions({ x, y, w: 1, h }, waterObjHolder[i]);
-                            collisionSide.bottom |= checkAngledCollisions({ x, y: y + h, w, h: 1 }, waterObjHolder[i]);
+                                collisionSide.top |= checkAngledCollisions({ x, y, w, h: 1 }, waterObjHolder[i]);
+                                collisionSide.right |= checkAngledCollisions({ x: x + w, y, w: 1, h }, waterObjHolder[i]);
+                                collisionSide.left |= checkAngledCollisions({ x, y, w: 1, h }, waterObjHolder[i]);
+                                collisionSide.bottom |= checkAngledCollisions({ x, y: y + h, w, h: 1 }, waterObjHolder[i]);
+                            }
+                            
                         }
     
                         
@@ -1881,52 +1885,14 @@ function mouseMove(x, y, prevX, prevY) {
     if (joystick.active) {
         // let dist = x - mouseMoveOrigin.x;
         let dist = x - prevX;
-        // let dist = joystick.mx - joystick.prevMx;
-        // kayak.x = kayak.ox + dist;
-        // if (!collisionSide.top && !collisionSide.right && !collisionSide.left) {
-        //     kayak.x = kayak.ox + dist;
-        // } else if (collisionSide.left && dist > 0) {
-        //     kayak.x = kayak.ox + dist;
-        //     kayak.vx = F;
-        // } else if (collisionSide.right && dist < 0) {
-        //     kayak.x = kayak.ox + dist;
-        // }
-        // 
         
-        
-
-
-        
-       
-       
-        // kayak.updateBounds(kayakBounds, kayakHitBox);
-
-        // setKayakRotation(prevX, x, dist);
-
-        // if (isKayakStuck()) {
-        //     collisionSide.top = collisionSide.right = collisionSide.left = false;
-    
-        //     for (let i = 0; i < bgInfo.rows; ++i) {
-        //         for (let j = 0; j < bgWalls[i].length; ++j) {
-        //             if (checkAngledCollisions(kayakHitBox, bgWalls[i][j])) {
-        //                 const { x, y, w, h } = kayakHitBox;
-                        
-        //                 collisionSide.top = checkAngledCollisions({ x, y, w, h: 1 }, bgWalls[i][j]);
-        //                 collisionSide.right = checkAngledCollisions({ x: x + w, y, w: w / 2, h }, bgWalls[i][j]);
-        //                 collisionSide.left = checkAngledCollisions({ x, y, w: w / 2, h }, bgWalls[i][j]);
-                        
-        //             }
-        //         }
-        //     }
-        // }
-
         let distX = x - prevX;
         let distY = prevY - y;
 
         // joystick.update(distX * 0.5, distY);
         joystick.update(distX * 0.5, 0);
         let percent = joystick.mx / joystick.moveLimit;
-        kayak.zRotate = rotateLimit * percent;
+        
 
         let p = Math.abs(percent);
 
@@ -1942,8 +1908,15 @@ function mouseMove(x, y, prevX, prevY) {
 
         if (joystick.mx < 0) {
             kayak.vx = -F * p;
+            if (!collisionSide.left || (collisionSide.left && collisionSide.top && collisionSide.right)) {
+                
+                kayak.zRotate = rotateLimit * percent;
+            }
         } else if (dist > 0) {
             kayak.vx = F * p;
+            if (!collisionSide.right || (collisionSide.left && collisionSide.top && collisionSide.right)) {
+                kayak.zRotate = rotateLimit * percent;
+            }
         }
     }
 }
@@ -2618,12 +2591,21 @@ function update() {
     
 
     if (isKayakStuck()) {
-        
-        if (collisionSide.left && kayak.vx < 0) {
-            kayak.vx = 0;
-        } else if (collisionSide.right && kayak.vx > 0) {
-            kayak.vx = 0;
+        if (!(collisionSide.left && collisionSide.right)) {
+            if (collisionSide.left && kayak.vx < 0) {
+                kayak.vx = 0;
+                // if (!(collisionSide.top && collisionSide.right)) {
+                //     kayak.vx = 0;
+                // }
+                
+            } else if (collisionSide.right && kayak.vx > 0) {
+                kayak.vx = 0;
+                // if (!(collisionSide.top && collisionSide.left)) {
+                //     kayak.vx = 0;
+                // }
+            }
         }
+        
     }
 
     if (!joystick.active) {
@@ -2652,6 +2634,8 @@ function update() {
         kayak.x += kayak.vx * delta;
         if (!isKayakStuck()) {
             kayak.y += kayak.vy * delta;
+        } else {
+            collisionSide.top = collisionSide.right = collisionSide.left = collisionSide.bottom = false;
         }
         kayak.updateBounds(kayakBounds, kayakHitBox);
     // }
