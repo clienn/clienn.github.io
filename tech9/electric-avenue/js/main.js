@@ -423,7 +423,8 @@ function main(w, h) {
 function moveUp(d) {
     let val = eelHead.y - d;
 
-    if (val > canvas.height * 0.25 && val < eelLowestPosY) {
+    // if (val > canvas.height * 0.25 && val < eelLowestPosY) {
+    if (val > 0 && val < eelLowestPosY) {
         eelHead.y = val;
         eelNeck.y -= d * 2;
         eel_hitbox.y -= d;

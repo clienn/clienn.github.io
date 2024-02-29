@@ -2960,7 +2960,7 @@ window.gamestart = function main() {
           ROWS = 4;
           COLS = 9;
           renderer = rive.makeRenderer(canvas);
-          floorDim = 180 * scaleY;
+          floorDim = 170 * scaleX;
           totalDanceFloorWidth = floorDim * COLS;
           totalDanceFloorHeight = floorDim * ROWS;
           danceFloorPos = {
@@ -3121,7 +3121,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51757" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49804" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

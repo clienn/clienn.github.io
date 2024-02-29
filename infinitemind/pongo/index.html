@@ -68,6 +68,10 @@
                 display: none;
                 z-index: 10;
             }
+
+            #directions-text-2 {
+                color: #000;
+            }
         </style>
     </head>
     <body>
@@ -146,6 +150,7 @@
                 setTimeout(() => {
                     AM = new AssetManager(() => {
                         setTimeout(() => {
+                            e.innerHTML = "Tap to start";
                             main(document.documentElement.clientWidth, document.documentElement.clientHeight);
                         }, 2000);
                     });

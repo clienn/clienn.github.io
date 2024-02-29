@@ -12,7 +12,7 @@ var currT = gameDuration;
 
 // game start
 var startGame = false; // orientation prep
-var gameStart = true; // start game
+var gameStart = false; // start game
 var gameover = false;
 
 // mouse 
@@ -100,7 +100,8 @@ function main(w, h) {
     canvas.height = h;
 
     canvas.style.display = 'block';
-    instrucions.style.display = 'none';
+    // instrucions.style.display = 'none';
+    instrucions.style.transform = "translate(-50%, 0%)";
     riveTimer.style.display = 'block';
 
     scaleX = w / 1792;
@@ -323,7 +324,12 @@ function controls() {
 
         if (mDown) {
             mDown = false;
-            mouseUp();
+            if (!gameStart) {
+                mouseUp();
+            } else {
+                initStartGame();
+            }
+            
         }
 
         // if (!gameStart) {
@@ -373,15 +379,16 @@ function controls() {
         let my = e.offsetY;
         // let my = e.offsetY;
 
-        if (gameover) mDown = false;
+        if (gameStart) {
+            if (gameover) mDown = false;
 
-        if (mDown) {
-            mouseMove(mx, my, prevPos, prevPosY);
-            
-            prevPos = mx;
-            prevPosY = my;
+            if (mDown) {
+                mouseMove(mx, my, prevPos, prevPosY);
+                
+                prevPos = mx;
+                prevPosY = my;
+            }
         }
-
     });
     
     canvas.addEventListener('mouseup', e => {
@@ -389,9 +396,19 @@ function controls() {
         let mx = e.offsetX;
         let my = e.offsetY;
         
+        if (mDown) {
+            mDown = false;
+            initStartGame();
+        }
         
     });
 
+}
+
+function initStartGame() {
+    initAllAudio();
+    gameStart = true;
+    instrucions.style.display = 'none';
 }
 
 // *********************************** GAME INITIATLIZATIONS AND CONTROLS END ******************************************************** //
@@ -511,21 +528,21 @@ function doPolygonsIntersect (a, b) {
  */
 function playHit() {
     // if (HUD.volumeOn) {
-        setTimeout(() => {
+        // setTimeout(() => {
             AM.audio.cluck.img.volume = 0.5;
             AM.audio.cluck.img.currentTime = 0;
             AM.audio.cluck.img.play();
-        }, 0);
+        // }, 0);
     // }
 }
 
 function playFail() {
     // if (HUD.volumeOn) {
-        setTimeout(() => {
+        // setTimeout(() => {
             AM.audio.ppput.img.volume = 1;
             AM.audio.ppput.img.currentTime = 0;
             AM.audio.ppput.img.play();
-        }, 0);
+        // }, 0);
     // }
 }
 
@@ -664,6 +681,9 @@ function gameCycle() {
         } else {
             // ctx.drawImage(AM.images.intro.img, 0, 0, AM.images.intro.cw, AM.images.intro.ch, 0, 0, canvas.width, canvas.height);
             // drawStartPage();
+            drawLines();
+            ball.drawWithRotation(ctx, AM.images.ball.img);
+            barrier.draw(ctx, AM.images.barrier.img);
         }
 
         
