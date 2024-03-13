@@ -1,0 +1,1161 @@
+{
+    "data": [
+        {
+            "id": "intro",
+            "src": "splash/intro",
+            "ext": "png",
+            "cw": 1864,
+            "ch": 861
+        },
+        {
+            "id": "endscreen",
+            "src": "hud/endscreen",
+            "ext": "png",
+            "cw": 1864,
+            "ch": 861
+        },
+        {
+            "id": "shake_turtle",
+            "src": "splash/shake",
+            "ext": "png",
+            "cw": 128,
+            "ch": 128
+        },
+        {
+            "id": "show_turtle",
+            "src": "splash/show",
+            "ext": "png",
+            "cw": 128,
+            "ch": 128
+        },
+        {
+            "id": "startbg",
+            "src": "bg",
+            "ext": "png",
+            "cw": 1852,
+            "ch": 856
+        },
+        {
+            "id": "title",
+            "src": "title",
+            "ext": "png",
+            "cw": 492,
+            "ch": 40
+        },
+        {
+            "id": "return_home",
+            "src": "hud/return_home",
+            "ext": "png",
+            "cw": 628,
+            "ch": 143
+        },
+        {
+            "id": "endscreen_buttons",
+            "src": "hud/endscreen_buttons",
+            "ext": "png",
+            "cw": 428,
+            "ch": 329
+        },
+        {
+            "id": "premium_endscreen_buttons",
+            "src": "hud/premium_endscreen_buttons",
+            "ext": "png",
+            "cw": 379,
+            "ch": 213
+        },
+        {
+            "id": "watch",
+            "src": "hud/watch",
+            "ext": "png",
+            "cw": 45,
+            "ch": 53
+        },
+        {
+            "id": "progressbar",
+            "src": "hud/progress_bar",
+            "ext": "png",
+            "cw": 101,
+            "ch": 21
+        },
+        {
+            "id": "timeprogress",
+            "src": "hud/timeprogress",
+            "ext": "png",
+            "cw": 97,
+            "ch": 17
+        },
+        {
+            "id": "score_rect",
+            "src": "hud/score_rect",
+            "ext": "png",
+            "cw": 128,
+            "ch": 46
+        },
+        {
+            "id": "intersect",
+            "src": "hud/intersect",
+            "ext": "png",
+            "cw": 287,
+            "ch": 289
+        },
+        {
+            "id": "endscore",
+            "src": "hud/numbers/endscore",
+            "ext": "png",
+            "cw": 80,
+            "ch": 80
+        },
+        {
+            "id": "numbers_white",
+            "src": "hud/numbers/white",
+            "ext": "png",
+            "cw": 24,
+            "ch": 25
+        },
+        {
+            "id": "numbers_black",
+            "src": "hud/numbers/black",
+            "ext": "png",
+            "cw": 24,
+            "ch": 24
+        },
+        {
+            "id": "numbers_red",
+            "src": "hud/numbers/red",
+            "ext": "png",
+            "cw": 24,
+            "ch": 24
+        },
+        {
+            "id": "hand",
+            "src": "hand",
+            "ext": "png",
+            "cw": 56,
+            "ch": 57
+        },
+        {
+            "id": "text1",
+            "src": "text1",
+            "ext": "png",
+            "cw": 156,
+            "ch": 25
+        },
+        {
+            "id": "text2",
+            "src": "text2",
+            "ext": "png",
+            "cw": 145,
+            "ch": 28
+        },
+        {
+            "id": "text3",
+            "src": "text3",
+            "ext": "png",
+            "cw": 142,
+            "ch": 25
+        },
+        {
+            "id": "beginbutton",
+            "src": "beginbutton",
+            "ext": "png",
+            "cw": 213,
+            "ch": 49
+        },
+        {
+            "id": "turtle",
+            "src": "turtle",
+            "ext": "png",
+            "cw": 120,
+            "ch": 121
+        },
+        {
+            "id": "shell",
+            "src": "shell",
+            "ext": "png",
+            "cw": 105,
+            "ch": 116
+        },
+        {
+            "id": "turtlehide",
+            "src": "turtlehide",
+            "ext": "png",
+            "cw": 120,
+            "ch": 121
+        },
+        {
+            "id": "turtlehappy",
+            "src": "turtlehappy",
+            "ext": "png",
+            "cw": 120,
+            "ch": 121
+        },
+        {
+            "id": "turtleunhappy",
+            "src": "turtleunhappy",
+            "ext": "png",
+            "cw": 120,
+            "ch": 122
+        },
+        {
+            "id": "seagull",
+            "src": "seagull",
+            "ext": "png",
+            "cw": 576,
+            "ch": 288
+        },
+        {
+            "id": "turtleshine",
+            "src": "turtleshine",
+            "ext": "png",
+            "cw": 42,
+            "ch": 43
+        },
+        {
+            "id": "timecircle",
+            "src": "tophud/timecircle",
+            "ext": "png",
+            "cw": 45,
+            "ch": 45
+        },
+        {
+            "id": "stopwatch",
+            "src": "tophud/stopwatch",
+            "ext": "png",
+            "cw": 43,
+            "ch": 45
+        },
+        {
+            "id": "palm",
+            "src": "palm",
+            "ext": "png",
+            "cw": 207,
+            "ch": 137
+        },
+        {
+            "id": "palmshadow",
+            "src": "palmshadow",
+            "ext": "png",
+            "cw": 142,
+            "ch": 85
+        },
+        {
+            "id": "umbrella",
+            "src": "umbrella",
+            "ext": "png",
+            "cw": 192,
+            "ch": 269
+        },
+        {
+            "id": "kayak",
+            "src": "kayak",
+            "ext": "png",
+            "cw": 71,
+            "ch": 100
+        },
+        {
+            "id": "sky",
+            "src": "sky",
+            "ext": "png",
+            "cw": 926,
+            "ch": 429
+        },
+        {
+            "id": "sand",
+            "src": "sand",
+            "ext": "png",
+            "cw": 926,
+            "ch": 176
+        },
+        {
+            "id": "sand2",
+            "src": "sand2",
+            "ext": "png",
+            "cw": 926,
+            "ch": 176
+        },
+        {
+            "id": "cloudleft",
+            "src": "cloudleft",
+            "ext": "png",
+            "cw": 438,
+            "ch": 227
+        },
+        {
+            "id": "cloudright",
+            "src": "cloudright",
+            "ext": "png",
+            "cw": 380,
+            "ch": 234
+        },
+        {
+            "id": "cloud1",
+            "src": "cloud1",
+            "ext": "png",
+            "cw": 286,
+            "ch": 67
+        },
+        {
+            "id": "cloud2",
+            "src": "cloud2",
+            "ext": "png",
+            "cw": 371,
+            "ch": 99
+        },
+        {
+            "id": "cloud3",
+            "src": "cloud3",
+            "ext": "png",
+            "cw": 188,
+            "ch": 42
+        },
+        {
+            "id": "shine",
+            "src": "shine",
+            "ext": "png",
+            "cw": 352,
+            "ch": 290
+        },
+        {
+            "id": "speech_failed_1_1",
+            "src": "speeches/failed/1_1",
+            "ext": "png",
+            "cw": 138,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_1_2",
+            "src": "speeches/failed/1_2",
+            "ext": "png",
+            "cw": 138,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_1_3",
+            "src": "speeches/failed/1_3",
+            "ext": "png",
+            "cw": 138,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_2_1",
+            "src": "speeches/failed/2_1",
+            "ext": "png",
+            "cw": 170,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_2_2",
+            "src": "speeches/failed/2_2",
+            "ext": "png",
+            "cw": 170,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_2_3",
+            "src": "speeches/failed/2_3",
+            "ext": "png",
+            "cw": 170,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_3_1",
+            "src": "speeches/failed/3_1",
+            "ext": "png",
+            "cw": 113,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_3_2",
+            "src": "speeches/failed/3_2",
+            "ext": "png",
+            "cw": 113,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_3_3",
+            "src": "speeches/failed/3_3",
+            "ext": "png",
+            "cw": 113,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_4_1",
+            "src": "speeches/failed/4_1",
+            "ext": "png",
+            "cw": 154,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_4_2",
+            "src": "speeches/failed/4_2",
+            "ext": "png",
+            "cw": 154,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_4_3",
+            "src": "speeches/failed/4_3",
+            "ext": "png",
+            "cw": 154,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_5_1",
+            "src": "speeches/failed/5_1",
+            "ext": "png",
+            "cw": 176,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_5_2",
+            "src": "speeches/failed/5_2",
+            "ext": "png",
+            "cw": 176,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_5_3",
+            "src": "speeches/failed/5_3",
+            "ext": "png",
+            "cw": 176,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_6_1",
+            "src": "speeches/failed/6_1",
+            "ext": "png",
+            "cw": 101,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_6_2",
+            "src": "speeches/failed/6_2",
+            "ext": "png",
+            "cw": 101,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_6_3",
+            "src": "speeches/failed/6_3",
+            "ext": "png",
+            "cw": 101,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_7_1",
+            "src": "speeches/failed/7_1",
+            "ext": "png",
+            "cw": 177,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_7_2",
+            "src": "speeches/failed/7_2",
+            "ext": "png",
+            "cw": 177,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_7_3",
+            "src": "speeches/failed/7_3",
+            "ext": "png",
+            "cw": 177,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_1_1",
+            "src": "speeches/success/1_1",
+            "ext": "png",
+            "cw": 93,
+            "ch": 46
+        },
+        {
+            "id": "speech_success_1_2",
+            "src": "speeches/success/1_2",
+            "ext": "png",
+            "cw": 93,
+            "ch": 46
+        },
+        {
+            "id": "speech_success_1_3",
+            "src": "speeches/success/1_3",
+            "ext": "png",
+            "cw": 93,
+            "ch": 46
+        },
+        {
+            "id": "speech_success_2_1",
+            "src": "speeches/success/2_1",
+            "ext": "png",
+            "cw": 104,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_2_2",
+            "src": "speeches/success/2_2",
+            "ext": "png",
+            "cw": 104,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_2_3",
+            "src": "speeches/success/2_3",
+            "ext": "png",
+            "cw": 104,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_3_1",
+            "src": "speeches/success/3_1",
+            "ext": "png",
+            "cw": 103,
+            "ch": 48
+        },
+        {
+            "id": "speech_success_3_2",
+            "src": "speeches/success/3_2",
+            "ext": "png",
+            "cw": 103,
+            "ch": 48
+        },
+        {
+            "id": "speech_success_3_3",
+            "src": "speeches/success/3_3",
+            "ext": "png",
+            "cw": 103,
+            "ch": 48
+        },
+        {
+            "id": "speech_success_4_1",
+            "src": "speeches/success/4_1",
+            "ext": "png",
+            "cw": 112,
+            "ch": 48
+        },
+        {
+            "id": "speech_success_4_2",
+            "src": "speeches/success/4_2",
+            "ext": "png",
+            "cw": 112,
+            "ch": 48
+        },
+        {
+            "id": "speech_success_4_3",
+            "src": "speeches/success/4_3",
+            "ext": "png",
+            "cw": 112,
+            "ch": 48
+        },
+        {
+            "id": "speech_success_5_1",
+            "src": "speeches/success/5_1",
+            "ext": "png",
+            "cw": 170,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_5_2",
+            "src": "speeches/success/5_2",
+            "ext": "png",
+            "cw": 170,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_5_3",
+            "src": "speeches/success/5_3",
+            "ext": "png",
+            "cw": 170,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_6_1",
+            "src": "speeches/success/6_1",
+            "ext": "png",
+            "cw": 263,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_6_2",
+            "src": "speeches/success/6_2",
+            "ext": "png",
+            "cw": 263,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_6_3",
+            "src": "speeches/success/6_3",
+            "ext": "png",
+            "cw": 263,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_7_1",
+            "src": "speeches/success/7_1",
+            "ext": "png",
+            "cw": 157,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_7_2",
+            "src": "speeches/success/7_2",
+            "ext": "png",
+            "cw": 157,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_7_3",
+            "src": "speeches/success/7_3",
+            "ext": "png",
+            "cw": 157,
+            "ch": 47
+        },
+
+
+        {
+            "id": "volume",
+            "src": "volume",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        },
+        {
+            "id": "mute",
+            "src": "mute",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        }
+    ]
+}
+
+{
+    "data": [
+        {
+            "id": "intro",
+            "src": "splash/intro",
+            "ext": "png",
+            "cw": 1864,
+            "ch": 861
+        },
+        {
+            "id": "endscreen",
+            "src": "hud/endscreen",
+            "ext": "png",
+            "cw": 1864,
+            "ch": 861
+        },
+        {
+            "id": "shake_turtle",
+            "src": "splash/shake",
+            "ext": "png",
+            "cw": 128,
+            "ch": 128
+        },
+        {
+            "id": "show_turtle",
+            "src": "splash/show",
+            "ext": "png",
+            "cw": 128,
+            "ch": 128
+        },
+        {
+            "id": "startbg",
+            "src": "bg",
+            "ext": "png",
+            "cw": 1852,
+            "ch": 856
+        },
+        {
+            "id": "title",
+            "src": "title",
+            "ext": "png",
+            "cw": 492,
+            "ch": 40
+        },
+        {
+            "id": "return_home",
+            "src": "hud/return_home",
+            "ext": "png",
+            "cw": 628,
+            "ch": 143
+        },
+        {
+            "id": "endscreen_buttons",
+            "src": "hud/endscreen_buttons",
+            "ext": "png",
+            "cw": 428,
+            "ch": 329
+        },
+        {
+            "id": "premium_endscreen_buttons",
+            "src": "hud/premium_endscreen_buttons",
+            "ext": "png",
+            "cw": 379,
+            "ch": 213
+        },
+        {
+            "id": "watch",
+            "src": "hud/watch",
+            "ext": "png",
+            "cw": 45,
+            "ch": 53
+        },
+        {
+            "id": "progressbar",
+            "src": "hud/progress_bar",
+            "ext": "png",
+            "cw": 101,
+            "ch": 21
+        },
+        {
+            "id": "timeprogress",
+            "src": "hud/timeprogress",
+            "ext": "png",
+            "cw": 97,
+            "ch": 17
+        },
+        {
+            "id": "score_rect",
+            "src": "hud/score_rect",
+            "ext": "png",
+            "cw": 128,
+            "ch": 46
+        },
+        {
+            "id": "intersect",
+            "src": "hud/intersect",
+            "ext": "png",
+            "cw": 287,
+            "ch": 289
+        },
+        {
+            "id": "endscore",
+            "src": "hud/numbers/endscore",
+            "ext": "png",
+            "cw": 80,
+            "ch": 80
+        },
+        {
+            "id": "numbers_white",
+            "src": "hud/numbers/white",
+            "ext": "png",
+            "cw": 24,
+            "ch": 25
+        },
+        {
+            "id": "numbers_black",
+            "src": "hud/numbers/black",
+            "ext": "png",
+            "cw": 24,
+            "ch": 24
+        },
+        {
+            "id": "numbers_red",
+            "src": "hud/numbers/red",
+            "ext": "png",
+            "cw": 24,
+            "ch": 24
+        },
+        {
+            "id": "hand",
+            "src": "hand",
+            "ext": "png",
+            "cw": 56,
+            "ch": 57
+        },
+        {
+            "id": "turtle",
+            "src": "turtle",
+            "ext": "png",
+            "cw": 120,
+            "ch": 121
+        },
+        {
+            "id": "shell",
+            "src": "shell",
+            "ext": "png",
+            "cw": 105,
+            "ch": 116
+        },
+        {
+            "id": "turtlehide",
+            "src": "turtlehide",
+            "ext": "png",
+            "cw": 120,
+            "ch": 121
+        },
+        {
+            "id": "turtlehappy",
+            "src": "turtlehappy",
+            "ext": "png",
+            "cw": 120,
+            "ch": 121
+        },
+        {
+            "id": "turtleunhappy",
+            "src": "turtleunhappy",
+            "ext": "png",
+            "cw": 120,
+            "ch": 122
+        },
+        {
+            "id": "seagull",
+            "src": "seagull",
+            "ext": "png",
+            "cw": 576,
+            "ch": 288
+        },
+        {
+            "id": "cloudleft",
+            "src": "cloudleft",
+            "ext": "png",
+            "cw": 438,
+            "ch": 227
+        },
+        {
+            "id": "cloudright",
+            "src": "cloudright",
+            "ext": "png",
+            "cw": 380,
+            "ch": 234
+        },
+        {
+            "id": "cloud1",
+            "src": "cloud1",
+            "ext": "png",
+            "cw": 286,
+            "ch": 67
+        },
+        {
+            "id": "cloud2",
+            "src": "cloud2",
+            "ext": "png",
+            "cw": 371,
+            "ch": 99
+        },
+        {
+            "id": "cloud3",
+            "src": "cloud3",
+            "ext": "png",
+            "cw": 188,
+            "ch": 42
+        },
+        {
+            "id": "shine",
+            "src": "shine",
+            "ext": "png",
+            "cw": 352,
+            "ch": 290
+        },
+        {
+            "id": "speech_failed_1_1",
+            "src": "speeches/failed/1_1",
+            "ext": "png",
+            "cw": 138,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_1_2",
+            "src": "speeches/failed/1_2",
+            "ext": "png",
+            "cw": 138,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_1_3",
+            "src": "speeches/failed/1_3",
+            "ext": "png",
+            "cw": 138,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_2_1",
+            "src": "speeches/failed/2_1",
+            "ext": "png",
+            "cw": 170,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_2_2",
+            "src": "speeches/failed/2_2",
+            "ext": "png",
+            "cw": 170,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_2_3",
+            "src": "speeches/failed/2_3",
+            "ext": "png",
+            "cw": 170,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_3_1",
+            "src": "speeches/failed/3_1",
+            "ext": "png",
+            "cw": 113,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_3_2",
+            "src": "speeches/failed/3_2",
+            "ext": "png",
+            "cw": 113,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_3_3",
+            "src": "speeches/failed/3_3",
+            "ext": "png",
+            "cw": 113,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_4_1",
+            "src": "speeches/failed/4_1",
+            "ext": "png",
+            "cw": 154,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_4_2",
+            "src": "speeches/failed/4_2",
+            "ext": "png",
+            "cw": 154,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_4_3",
+            "src": "speeches/failed/4_3",
+            "ext": "png",
+            "cw": 154,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_5_1",
+            "src": "speeches/failed/5_1",
+            "ext": "png",
+            "cw": 176,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_5_2",
+            "src": "speeches/failed/5_2",
+            "ext": "png",
+            "cw": 176,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_5_3",
+            "src": "speeches/failed/5_3",
+            "ext": "png",
+            "cw": 176,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_6_1",
+            "src": "speeches/failed/6_1",
+            "ext": "png",
+            "cw": 101,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_6_2",
+            "src": "speeches/failed/6_2",
+            "ext": "png",
+            "cw": 101,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_6_3",
+            "src": "speeches/failed/6_3",
+            "ext": "png",
+            "cw": 101,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_7_1",
+            "src": "speeches/failed/7_1",
+            "ext": "png",
+            "cw": 177,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_7_2",
+            "src": "speeches/failed/7_2",
+            "ext": "png",
+            "cw": 177,
+            "ch": 47
+        },
+        {
+            "id": "speech_failed_7_3",
+            "src": "speeches/failed/7_3",
+            "ext": "png",
+            "cw": 177,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_1_1",
+            "src": "speeches/success/1_1",
+            "ext": "png",
+            "cw": 93,
+            "ch": 46
+        },
+        {
+            "id": "speech_success_1_2",
+            "src": "speeches/success/1_2",
+            "ext": "png",
+            "cw": 93,
+            "ch": 46
+        },
+        {
+            "id": "speech_success_1_3",
+            "src": "speeches/success/1_3",
+            "ext": "png",
+            "cw": 93,
+            "ch": 46
+        },
+        {
+            "id": "speech_success_2_1",
+            "src": "speeches/success/2_1",
+            "ext": "png",
+            "cw": 104,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_2_2",
+            "src": "speeches/success/2_2",
+            "ext": "png",
+            "cw": 104,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_2_3",
+            "src": "speeches/success/2_3",
+            "ext": "png",
+            "cw": 104,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_3_1",
+            "src": "speeches/success/3_1",
+            "ext": "png",
+            "cw": 103,
+            "ch": 48
+        },
+        {
+            "id": "speech_success_3_2",
+            "src": "speeches/success/3_2",
+            "ext": "png",
+            "cw": 103,
+            "ch": 48
+        },
+        {
+            "id": "speech_success_3_3",
+            "src": "speeches/success/3_3",
+            "ext": "png",
+            "cw": 103,
+            "ch": 48
+        },
+        {
+            "id": "speech_success_4_1",
+            "src": "speeches/success/4_1",
+            "ext": "png",
+            "cw": 112,
+            "ch": 48
+        },
+        {
+            "id": "speech_success_4_2",
+            "src": "speeches/success/4_2",
+            "ext": "png",
+            "cw": 112,
+            "ch": 48
+        },
+        {
+            "id": "speech_success_4_3",
+            "src": "speeches/success/4_3",
+            "ext": "png",
+            "cw": 112,
+            "ch": 48
+        },
+        {
+            "id": "speech_success_5_1",
+            "src": "speeches/success/5_1",
+            "ext": "png",
+            "cw": 170,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_5_2",
+            "src": "speeches/success/5_2",
+            "ext": "png",
+            "cw": 170,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_5_3",
+            "src": "speeches/success/5_3",
+            "ext": "png",
+            "cw": 170,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_6_1",
+            "src": "speeches/success/6_1",
+            "ext": "png",
+            "cw": 263,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_6_2",
+            "src": "speeches/success/6_2",
+            "ext": "png",
+            "cw": 263,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_6_3",
+            "src": "speeches/success/6_3",
+            "ext": "png",
+            "cw": 263,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_7_1",
+            "src": "speeches/success/7_1",
+            "ext": "png",
+            "cw": 157,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_7_2",
+            "src": "speeches/success/7_2",
+            "ext": "png",
+            "cw": 157,
+            "ch": 47
+        },
+        {
+            "id": "speech_success_7_3",
+            "src": "speeches/success/7_3",
+            "ext": "png",
+            "cw": 157,
+            "ch": 47
+        },
+
+
+        {
+            "id": "volume",
+            "src": "volume",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        },
+        {
+            "id": "mute",
+            "src": "mute",
+            "ext": "png",
+            "cw": 46,
+            "ch": 46
+        }
+    ]
+}

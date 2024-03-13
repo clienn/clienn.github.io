@@ -1,0 +1,11 @@
+{
+    "data": [
+        {
+            "id": "bg",
+            "src": "environment/bg_ice",
+            "ext": "png",
+            "cw": 927,
+            "ch": 428
+        }
+    ]
+}
