@@ -600,7 +600,7 @@ const TEXT_ID = {
 
 var answerIdx = -1;
 var showAnswerT = 0;
-var jumpHeight = 10;
+var jumpHeight = 8;
 
 var volumeOn = true;
 
@@ -757,6 +757,7 @@ function main(w, h) {
 
     G *= scaleX;
     jumpHeight *= scaleX;
+    // jumpHeight *= scaleY;
 
     if (onTablet) {
         splashInfo.w = AM.images.intro.cw;
@@ -770,6 +771,8 @@ function main(w, h) {
 
     splashInfo.x = w / 2 - splashInfo.w / 2;
     splashInfo.y = Math.abs(h / 2 - splashInfo.h / 2);
+
+    // jumpHeight *= splashInfo.sy;
 
     // if (onMobile && !onTablet) {
     //     splashInfo.y = 0;
@@ -1697,12 +1700,20 @@ function drawTurtle() {
             // }
 
             if (showTarget && i == target) {
-                turtles[i].animateSprite(delta, turtlehideInfo, 5, 7);
-                if (turtles[i].activateSpriteAnimation) {
-                    turtles[i].draw(ctx, AM.images.turtlehide.img, 1, turtlehideInfo);
+                if (timer.timer < 30) {
+                    turtles[i].animateSprite(delta, turtlehideInfo, 5, 7);
+                    if (turtles[i].activateSpriteAnimation) {
+                        
+
+                        turtles[i].draw(ctx, AM.images.turtlehide.img, 1, turtlehideInfo);
+                    } else {
+                        turtles[i].draw(ctx, AM.images.shell.img, 1, turtlehideInfo);
+                    }
                 } else {
-                    turtles[i].draw(ctx, AM.images.shell.img, 1, turtlehideInfo);
+                    turtles[i].clipX = 0;
+                    turtles[i].draw(ctx, AM.images.turtlehide.img, 1, turtlehideInfo);
                 }
+                
             } else {
                 if (i != selectedTurtlePos) {
                     turtles[i].clipX = 0;
