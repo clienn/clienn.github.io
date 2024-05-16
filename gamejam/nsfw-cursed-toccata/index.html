@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+        <link rel="shortcut icon" href="#">
+        <title>
+            N-Body Problem Simulation
+        </title>
+        <!-- <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"
+            integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ=="
+            crossorigin="anonymous"
+            defer
+        ></script> -->
+        <style>
+            :root {
+                touch-action: pan-x pan-y;
+                height: 100%;
+            }
+            @font-face {
+                font-family: 'Montserrat';
+                src: url('assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf');
+            }
+            html, body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                /* background: #000; */
+            }
+            #game-surface {
+                background: transparent;
+                touch-action: manipulation;
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="game-surface"></canvas>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
+        <script type="text/javascript" src="js/init-buffers.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript">
+            main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+        </script>
+    </body>
+</html>
