@@ -90,19 +90,85 @@ const mob = {
 
 
 var groundY = 0;
+var groundLimit = 0;
 var ceilingY = 0;
+var maxRight = 0;
+var minLeft = 0;
 
 var isKeyDown = false;
 
+var g_texture = null;
 
-// const yPos = (-8.0 - 2.5) * scaleX + 2.25;
-//     let zPos = (-22.0 - 5.0) * scaleX;
-//     let xPos = (-10.0 - 11.0) + 2.1 * heroPos + 0.2;
+var sun = {
+    x: 0.0,
+    y: 0.0,
+    r: 1.0
+}
 
-//     let heroY = -1.30 * scaleX;
-//     let heroZ = (-24.5 - 4.0) * scaleX;
+var noteInfo = {
+    0: {
+        stem: {
+            x: 0.25,
+            y: 0.60,
+            sw: 0.5,
+            sh: 4.5,
+        },
+        head: {
+            x: 0.0,
+            y: 0.0,
+            sw: 0.25,
+            sh: 0.25,
+        },
+    },
+    1: {
+        stem: {
+            x: 1.40,
+            y: 0.95,
+            sw: 0.5,
+            sh: 4.0,
+        },
+        head: {
+            x: 1.20,
+            y: 0.35,
+            sw: 0.25,
+            sh: 0.25,
+        },
+        beam: {
+            x: 0.80,
+            y: 1.40,
+            sw: 0.5,
+            sh: 4.0,
+            rotation: 1.7 // radians
+        }
+    },
+    z: 0.0,
+    SINGLE: 0,
+    DOUBLE: 1,
+    patterns: {
+        DROP: 0,
+        BOUNCE: 1,
+        TRAIL: 2,
+    }
+};
+
+const notes = [];
+
+var maxTrail = 10;
+var trailCount = 0;
+var timer = 0;
+
+// if (type == 0) {
+//     drawNoteStem(projectionMatrix, 0.25, 0.60, hero.z, 0.5, 4.5, 0);
+//     drawSphere(projectionMatrix, sun.x, sun.y, hero.z, 0.25, 0.25, false);
+// } else {
+//     drawNoteStem(projectionMatrix, 0.25, 0.60, hero.z, 0.5, 4.5, 0);
+//     drawSphere(projectionMatrix, sun.x, sun.y, hero.z, 0.25, 0.25, false);
+
+//     drawNoteStem(projectionMatrix, 0.80, 1.40, hero.z, 0.5, 4.0, 1.7);
     
-//     drawHero(projectionMatrix, xPos, yPos, zPos, 1.0, 1.0);
+//     drawNoteStem(projectionMatrix, sun.x + 1.40, 0.60 + 0.35, hero.z, 0.5, 4.0, 0);
+//     drawSphere(projectionMatrix, sun.x + 1.2, sun.y + 0.35, hero.z, 0.25, 0.25, false);
+// }
 
 function main(w, h) {
     canvas.width = w;
@@ -125,6 +191,10 @@ function main(w, h) {
 
     groundY = pianoKeysPos.white.lower.y + 2.25;
     ceilingY = 10.2 * scaleX;
+    minLeft = pianoKeysPos.white.lower.x;
+    maxRight = pianoKeysPos.white.lower.x + pianoKeysPos.gap * 20;
+
+    groundLimit = groundY - 12.25;
 
     hero.x = pianoKeysPos.white.lower.x + hero.adjX;
     hero.y = groundY;
@@ -134,7 +204,9 @@ function main(w, h) {
     mob.pressDepth *= scaleX;
     hero.dashSpeed *= scaleX;
 
-    G *= scaleX;
+    noteInfo.z = hero.z;
+
+    G *= scaleY;
 
     init();
     
@@ -159,6 +231,7 @@ function init() {
         attribute vec4 aVertexPosition;
         attribute vec3 aVertexNormal;
         attribute vec4 aVertexColor;
+        attribute vec2 aTextureCoord;
     
         uniform mat4 uNormalMatrix;
         uniform mat4 uModelViewMatrix;
@@ -171,7 +244,8 @@ function init() {
     
         void main(void) {
             gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-        
+            vTextureCoord = aTextureCoord;
+
             // Apply lighting effect
             highp vec3 ambientLight = vec3(0.3, 0.3, 0.3);
             highp vec3 directionalLightColor = vec3(1, 1, 1);
@@ -199,12 +273,23 @@ function init() {
     var fragCode = `
         varying highp vec3 vLighting;
         varying lowp vec4 vColor;
+        varying highp vec2 vTextureCoord;
+
+        uniform sampler2D uSampler;
+        uniform int hasSampler;
 
         void main(void) {
-            gl_FragColor = vec4(vColor.rgb * vLighting, vColor.a);
+            if (hasSampler == 1) {
+                highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
+                gl_FragColor = vec4(texelColor.rgb * vLighting, 1.0);
+            } else {
+                gl_FragColor = vec4(vColor.rgb * vLighting, vColor.a);
+            }
+            
         }
    `;
-        
+    //    gl_FragColor = vec4(vColor.rgb * vLighting, vColor.a);
+
      // Create fragment shader object
      var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
 
@@ -234,7 +319,8 @@ function init() {
         attribLocations: {
           vertexPosition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
           vertexColor: gl.getAttribLocation(shaderProgram, "aVertexColor"),
-          vertexNormal: gl.getAttribLocation(shaderProgram, "aVertexNormal")
+          vertexNormal: gl.getAttribLocation(shaderProgram, "aVertexNormal"),
+          textureCoord: gl.getAttribLocation(shaderProgram, "aTextureCoord"),
         },
         uniformLocations: {
           projectionMatrix: gl.getUniformLocation(
@@ -242,19 +328,164 @@ function init() {
             "uProjectionMatrix"
           ),
           modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix"),
-          normalMatrix: gl.getUniformLocation(shaderProgram, "uNormalMatrix")
+          normalMatrix: gl.getUniformLocation(shaderProgram, "uNormalMatrix"),
+          uSampler: gl.getUniformLocation(shaderProgram, "uSampler"),
+          hasSampler: gl.getUniformLocation(shaderProgram, "hasSampler"),
         },
     };
 
     buffers = initBuffers(gl);
 
+    // console.log(buffers.sphere.colors.list);
+
+    // Load texture
+    g_texture = loadTexture(gl, "assets/textures/sun.jpg");
+    // Flip image pixels into the bottom-to-top order that WebGL expects.
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
     initKeys();
 
     // keys[8].pressed = true;
     // keys[3].pressed = true;
+    // let vel = getRandomVelocity(2);
+    // let posX = getRandomHorizontalPos();
+    // let posY = ceilingY - 5.0;
+    
+    // addNote(posX, posY, 0.75, noteInfo.SINGLE, 0, noteInfo.patterns.DROP, vel.x, vel.y);
 
+    // vel = getRandomVelocity(2);
+    // posX = getRandomHorizontalPos();
+    // addNote(posX, posY, 1.0, noteInfo.SINGLE, 1, noteInfo.patterns.DROP, vel.x, vel.y);
+
+    // vel = getRandomVelocity(2);
+    // posX = getRandomHorizontalPos();
+    // addNote(posX, posY, 1.5, noteInfo.SINGLE, 2, noteInfo.patterns.DROP, vel.x, vel.y);
+
+    // vel = getRandomVelocity(2);
+    // posX = getRandomHorizontalPos();
+    // addNote(posX, posY, 2.0, noteInfo.SINGLE, 0, noteInfo.patterns.DROP, vel.x, vel.y);
+
+    // vel = getRandomVelocity(2);
+    // posX = getRandomHorizontalPos();
+    // addNote(posX,posY, 1.0, noteInfo.DOUBLE, 1, noteInfo.patterns.DROP, vel.x, vel.y);
+    // // addNote(-5.0, 10.0, 1.5, noteInfo.DOUBLE, 2);
+    // // addNote(15.0, -10.0, 2.0, noteInfo.DOUBLE, 2);
+
+    generateDropNote();
+    generateDropNote();
+    generateDropNote();
+    generateDropNote();
+    generateDropNote();
+    generateDropNote();
+    generateDropNote();
 
     controls();
+}
+
+function morphNote(idx) {
+    let vel = getRandomVelocity(20);
+    let posX = getRandomHorizontalPos();
+    let posY = ceilingY + (Math.floor(Math.random() * 15) + 5.0);
+
+    // addNote(posX, posY, 1.0, type, 0, noteInfo.patterns.DROP, vel.x, vel.y);
+
+    let x = posX;
+    let y = posY;
+    let scale = 1.0 + Math.floor(Math.random() * 100) / 100;
+    let type = Math.floor(Math.random() * 2);
+    
+    let colorIdx = Math.floor(Math.random() * 3);
+    let pattern = noteInfo.patterns.DROP
+    let vx = vel.x
+    let vy = vel.y
+
+    notes[idx] = {
+        heads: [
+            {
+                x: x + noteInfo[noteInfo.SINGLE].head.x * scale,
+                y: y + noteInfo[noteInfo.SINGLE].head.y * scale,
+                z: noteInfo.z,
+                sw: noteInfo[noteInfo.SINGLE].head.sw * scale,
+                sh: noteInfo[noteInfo.SINGLE].head.sh * scale
+            },
+        ],
+        stems: [
+            {
+                x: x + noteInfo[noteInfo.SINGLE].stem.x * scale,
+                y: y + noteInfo[noteInfo.SINGLE].stem.y * scale,
+                z: noteInfo.z,
+                sw: noteInfo[noteInfo.SINGLE].stem.sw * scale,
+                sh: noteInfo[noteInfo.SINGLE].stem.sh * scale
+            },
+        ],
+        colorIdx: colorIdx,
+        pattern: pattern,
+        vx: vx,
+        vy: vy
+    };
+
+    if (type == noteInfo.DOUBLE) {
+        notes[idx].heads.push(
+            {
+                x: x + noteInfo[noteInfo.DOUBLE].head.x * scale,
+                y: y + noteInfo[noteInfo.DOUBLE].head.y * scale,
+                z: noteInfo.z,
+                sw: noteInfo[noteInfo.DOUBLE].head.sw * scale,
+                sh: noteInfo[noteInfo.DOUBLE].head.sh * scale
+            },
+        );
+
+        notes[idx].stems.push(
+            {
+                x: x + noteInfo[noteInfo.DOUBLE].stem.x * scale,
+                y: y + noteInfo[noteInfo.DOUBLE].stem.y * scale,
+                z: noteInfo.z,
+                sw: noteInfo[noteInfo.DOUBLE].stem.sw * scale,
+                sh: noteInfo[noteInfo.DOUBLE].stem.sh * scale
+            },
+        );
+        notes[idx].beam = {
+            x: x + noteInfo[noteInfo.DOUBLE].beam.x * scale,
+            y: y + noteInfo[noteInfo.DOUBLE].beam.y * scale,
+            z: noteInfo.z,
+            sw: noteInfo[noteInfo.DOUBLE].beam.sw * scale,
+            sh: noteInfo[noteInfo.DOUBLE].beam.sh * scale,
+            rotation: noteInfo[noteInfo.DOUBLE].beam.rotation,
+        }
+    }
+
+    if (notes.length < 20) {
+        generateDropNote();
+    }
+}
+
+function generateDropNote() {
+    let vel = getRandomVelocity(20);
+    let posX = getRandomHorizontalPos();
+    let posY = ceilingY + (Math.floor(Math.random() * 15) + 5.0);
+    let type = Math.floor(Math.random() * 2);
+    let color = Math.floor(Math.random() * 3);
+    
+    addNote(posX, posY, 1.0, type, color, noteInfo.patterns.DROP, vel.x, vel.y);
+}
+
+function getRandomVelocity(max) {
+    let mul = Math.floor(Math.random() * 2);
+    let rngX = Math.floor(Math.random() * max) * (mul ? -1 : 1);
+    let rngY = Math.floor(Math.random() * max) + 1;
+
+    return {
+        x: rngX,
+        y: -rngY,
+    }
+}
+
+function getRandomHorizontalPos() {
+    let rngPos = Math.floor(Math.random() * maxRight);
+    let rngNeg = Math.floor(Math.random() * Math.abs(minLeft)) * -1;
+    let rng = Math.floor(Math.random() * 1);
+    let r = rng ? rngPos : rngNeg;
+    return r;
 }
 
 function controls() {
@@ -418,6 +649,9 @@ function drawScene() {
     // drawPiano(projectionMatrix, 9.7, 2.5, 5.0);
     // drawPiano(projectionMatrix, 11.0, 2.5, 5.0);
     drawPiano(projectionMatrix, pianoKeysPos.white.lower.x, pianoKeysPos.white.lower.y, pianoKeysPos.white.lower.z);
+
+    // drawNote(projectionMatrix, 1);
+    drawNotes(projectionMatrix);
     drawHero(projectionMatrix, hero.x, hero.y, hero.z, 1.0, 1.0);
     
 }
@@ -541,6 +775,7 @@ function drawKey(projectionMatrix, x, y, z, width, height, colorIdx) {
     // Tell WebGL which indices to use to index the vertices
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.piano.indices);
 
+    // setTextureAttribute(gl, buffers.sphere.textureCoord, programInfo);
     setNormalAttribute(gl, buffers.piano.normal, programInfo);
 
     // Tell WebGL to use our program when drawing
@@ -563,6 +798,8 @@ function drawKey(projectionMatrix, x, y, z, width, height, colorIdx) {
         normalMatrix
     );
 
+    gl.uniform1i(programInfo.uniformLocations.hasSampler, 0);
+
     {
         const vertexCount = 36;
         const type = gl.UNSIGNED_SHORT;
@@ -570,7 +807,6 @@ function drawKey(projectionMatrix, x, y, z, width, height, colorIdx) {
         gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
     }
 }
-
 
 function drawHero(projectionMatrix, x, y, z, width, height) {
     // Set the drawing position to the "identity" point, which is
@@ -630,6 +866,8 @@ function drawHero(projectionMatrix, x, y, z, width, height) {
         normalMatrix
     );
 
+    gl.uniform1i(programInfo.uniformLocations.hasSampler, 0);
+
     {
         const vertexCount = 6;
         const type = gl.UNSIGNED_SHORT;
@@ -662,6 +900,341 @@ function getSteppedKeys(x, w) {
     }
 
     return [p1, p2];
+}
+
+function drawSphere(projectionMatrix, x, y, z, width, height, colorIdx, useTexture) {
+    // Set the drawing position to the "identity" point, which is
+    // the center of the scene.
+    const modelViewMatrix = mat4.create();
+  
+    // Now move the drawing position a bit to where we want to
+    // start drawing the square.
+    mat4.translate(
+      modelViewMatrix, // destination matrix
+      modelViewMatrix, // matrix to translate
+      [x, y, z]
+    ); // amount to translate
+
+    mat4.scale(modelViewMatrix, modelViewMatrix, [width, height, 1]);
+
+    const normalMatrix = mat4.create();
+    mat4.invert(normalMatrix, modelViewMatrix);
+    mat4.transpose(normalMatrix, normalMatrix);
+
+    // Tell WebGL how to pull out the positions from the position
+    // buffer into the vertexPosition attribute.
+    setPositionAttribute(gl, buffers.sphere.position, programInfo);
+
+    setColorAttribute(gl, buffers.sphere.colors.list[colorIdx], programInfo);
+
+    
+
+    // Tell WebGL which indices to use to index the vertices
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.sphere.indices);
+
+    
+    setTextureAttribute(gl, buffers.sphere.textureCoord, programInfo);
+    setNormalAttribute(gl, buffers.sphere.normal, programInfo);
+
+    // Tell WebGL to use our program when drawing
+    gl.useProgram(programInfo.program);
+
+    // Set the shader uniforms
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.projectionMatrix,
+        false,
+        projectionMatrix
+    );
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.modelViewMatrix,
+        false,
+        modelViewMatrix
+    );
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.normalMatrix,
+        false,
+        normalMatrix
+    );
+
+    if (useTexture) {
+        // Tell WebGL we want to affect texture unit 0
+        gl.activeTexture(gl.TEXTURE0);
+
+        // Bind the texture to texture unit 0
+        gl.bindTexture(gl.TEXTURE_2D, g_texture);
+
+        // Tell the shader we bound the texture to texture unit 0
+        gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
+        gl.uniform1i(programInfo.uniformLocations.hasSampler, 1);
+    } else {
+        gl.uniform1i(programInfo.uniformLocations.hasSampler, 0);
+    }
+    
+    
+    {
+        const vertexCount = buffers.sphere.vertexCount;
+        const type = gl.UNSIGNED_SHORT;
+        const offset = 0;
+        gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+    }
+
+}
+
+function drawNote(projectionMatrix, type) {
+    // single
+    // if (type == 0) {
+    //     let adjX = 10.0
+    //     drawNoteStem(projectionMatrix, 0.40 + adjX, 0.75, hero.z, 1.0, 5.5, 0);
+    //     drawSphere(projectionMatrix, sun.x + adjX, sun.y, hero.z, 0.50, 0.50, false);
+    // } else {
+    //     drawNoteStem(projectionMatrix, 0.35, 0.77, hero.z, 1.0, 7.0, 0);
+    //     drawSphere(projectionMatrix, sun.x, sun.y, hero.z, 0.50, 0.50, false);
+
+    //     drawNoteStem(projectionMatrix, 1.32, 1.77, hero.z, 1.0, 7.8, 1.7);
+        
+    //     drawNoteStem(projectionMatrix, sun.x + 2.35, 0.75 + 0.35, hero.z, 1.0, 5.0, 0);
+    //     drawSphere(projectionMatrix, sun.x + 2.0, sun.y + 0.35, hero.z, 0.50, 0.50, false);
+    // }
+
+    // if (type == 0) {
+    //     drawNoteStem(projectionMatrix, 0.25, 0.60, hero.z, 0.5, 4.5, 0);
+    //     drawSphere(projectionMatrix, sun.x, sun.y, hero.z, 0.25, 0.25, false);
+    // } else {
+    //     drawNoteStem(projectionMatrix, 0.25, 0.60, hero.z, 0.5, 4.5, 0);
+    //     drawSphere(projectionMatrix, sun.x, sun.y, hero.z, 0.25, 0.25, false);
+
+    //     drawNoteStem(projectionMatrix, 0.80, 1.40, hero.z, 0.5, 4.0, 1.7);
+        
+    //     drawNoteStem(projectionMatrix, sun.x + 1.40, 0.60 + 0.35, hero.z, 0.5, 4.0, 0);
+    //     drawSphere(projectionMatrix, sun.x + 1.2, sun.y + 0.35, hero.z, 0.25, 0.25, false);
+    // }
+}
+
+function drawNoteStem(projectionMatrix, x, y, z, width, height, rotation, colorIdx) {
+    const modelViewMatrix = mat4.create();
+  
+    // Now move the drawing position a bit to where we want to
+    // start drawing the square.
+    mat4.translate(
+      modelViewMatrix, // destination matrix
+      modelViewMatrix, // matrix to translate
+      [x, y, z]
+    ); // amount to translate
+
+    mat4.rotate(
+      modelViewMatrix, // destination matrix
+      modelViewMatrix, // matrix to rotate
+      rotation, // amount to rotate in radians
+      [0, 0, 1]
+    ); // axis to rotate around (Z)
+
+    mat4.scale(modelViewMatrix, modelViewMatrix, [width, height, 1]);
+
+    const normalMatrix = mat4.create();
+    mat4.invert(normalMatrix, modelViewMatrix);
+    mat4.transpose(normalMatrix, normalMatrix);
+
+    // Tell WebGL how to pull out the positions from the position
+    // buffer into the vertexPosition attribute.
+    setPositionAttribute(gl, buffers.noteStem.position, programInfo);
+
+    setColorAttribute(gl, buffers.noteStem.colors.list[colorIdx], programInfo);
+    
+
+    // Tell WebGL which indices to use to index the vertices
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.noteStem.indices);
+
+    // setTextureAttribute(gl, buffers.sphere.textureCoord, programInfo);
+    setNormalAttribute(gl, buffers.noteStem.normal, programInfo);
+
+    // Tell WebGL to use our program when drawing
+    gl.useProgram(programInfo.program);
+
+    // Set the shader uniforms
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.projectionMatrix,
+        false,
+        projectionMatrix
+    );
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.modelViewMatrix,
+        false,
+        modelViewMatrix
+    );
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.normalMatrix,
+        false,
+        normalMatrix
+    );
+
+    gl.uniform1i(programInfo.uniformLocations.hasSampler, 0);
+
+    {
+        const vertexCount = buffers.noteStem.vertexCount;
+        const type = gl.UNSIGNED_SHORT;
+        const offset = 0;
+        gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+    }
+}
+
+function resetTrailNote(i, j) {
+    let adjX = Math.floor(Math.random() * 10);
+    let color = Math.floor(Math.random() * 3);
+    notes[i].heads[j].x = notes[i].heads[j].ox - adjX;
+    notes[i].heads[j].y = notes[i].heads[j].oy;
+
+    notes[i].stems[j].x = notes[i].heads[j].ox - adjX;
+    notes[i].stems[j].y = notes[i].heads[j].oy;
+
+    notes[i].colorIdx = color;
+
+    if (notes[i].beam) {
+        notes[i].beam.x = notes[i].beam.ox - adjX;
+        notes[i].beam.y = notes[i].beam.oy;
+    }
+}
+
+
+function drawNotes(projectionMatrix) {
+    if (delta < 1) {
+        let angle = 1.5;
+        let range = 12.25;
+        for (let i = 0; i < notes.length; ++i) {
+            for (let j = 0; j < notes[i].heads.length; ++j) {
+                if (notes[i].pattern == noteInfo.patterns.DROP) {
+                    notes[i].heads[j].x += notes[i].vx * delta;
+                    notes[i].heads[j].y += notes[i].vy * delta;
+
+                    if (notes[i].heads[j].y <= groundLimit) {
+                        morphNote(i);
+                    }
+                } else if (notes[i].pattern == noteInfo.patterns.TRAIL) {
+                    notes[i].angle += angle * delta;
+                    notes[i].heads[j].x += notes[i].vx * delta;
+                    notes[i].heads[j].y = notes[i].heads[j].oy + Math.sin(notes[i].angle) * range;
+
+                    if (notes[i].heads[j].x > maxRight + 10.0) {
+                        resetTrailNote(i, j);
+                    }
+                }
+    
+                drawSphere(projectionMatrix, 
+                    notes[i].heads[j].x, notes[i].heads[j].y, notes[i].heads[j].z, 
+                    notes[i].heads[j].sw, notes[i].heads[j].sh, 
+                    notes[i].colorIdx,
+                    false // don't use texture if false
+                );
+            }
+    
+            for (let j = 0; j < notes[i].stems.length; ++j) {
+                if (notes[i].pattern == noteInfo.patterns.DROP) {
+                    notes[i].stems[j].x += notes[i].vx * delta;
+                    notes[i].stems[j].y += notes[i].vy * delta;
+                } else if (notes[i].pattern == noteInfo.patterns.TRAIL) {
+                    notes[i].angle += angle * delta;
+                    notes[i].stems[j].x += notes[i].vx * delta;
+                    notes[i].stems[j].y = notes[i].stems[j].oy + Math.sin(notes[i].angle) * range;
+                }
+
+                drawNoteStem(projectionMatrix, 
+                    notes[i].stems[j].x, notes[i].stems[j].y, notes[i].stems[j].z, 
+                    notes[i].stems[j].sw, notes[i].stems[j].sh, 
+                    0,
+                    notes[i].colorIdx,
+                );
+            }
+    
+            if (notes[i].beam) {
+                if (notes[i].pattern == noteInfo.patterns.DROP) {
+                    notes[i].beam.x += notes[i].vx * delta;
+                    notes[i].beam.y += notes[i].vy * delta;
+                } else if (notes[i].pattern == noteInfo.patterns.TRAIL) {
+                    notes[i].angle += angle * delta;
+                    notes[i].beam.x += notes[i].vx * delta;
+                    notes[i].beam.y = notes[i].beam.oy + Math.sin(notes[i].angle) * range;
+                }
+
+                drawNoteStem(projectionMatrix, 
+                    notes[i].beam.x, notes[i].beam.y, notes[i].beam.z, 
+                    notes[i].beam.sw, notes[i].beam.sh, 
+                    notes[i].beam.rotation,
+                    notes[i].colorIdx,
+                );
+            }
+        }
+    }
+    
+}
+
+function addNote(x, y, scale, type, colorIdx, pattern, vx, vy) {
+    let note = {
+        heads: [
+            {
+                x: x + noteInfo[noteInfo.SINGLE].head.x * scale,
+                y: y + noteInfo[noteInfo.SINGLE].head.y * scale,
+                ox: x + noteInfo[noteInfo.SINGLE].head.x * scale,
+                oy: y + noteInfo[noteInfo.SINGLE].head.y * scale,
+                z: noteInfo.z,
+                sw: noteInfo[noteInfo.SINGLE].head.sw * scale,
+                sh: noteInfo[noteInfo.SINGLE].head.sh * scale
+            },
+        ],
+        stems: [
+            {
+                x: x + noteInfo[noteInfo.SINGLE].stem.x * scale,
+                y: y + noteInfo[noteInfo.SINGLE].stem.y * scale,
+                ox: x + noteInfo[noteInfo.SINGLE].stem.x * scale,
+                oy: y + noteInfo[noteInfo.SINGLE].stem.y * scale,
+                z: noteInfo.z,
+                sw: noteInfo[noteInfo.SINGLE].stem.sw * scale,
+                sh: noteInfo[noteInfo.SINGLE].stem.sh * scale
+            },
+        ],
+        colorIdx: colorIdx,
+        pattern: pattern,
+        vx: vx,
+        vy: vy,
+        angle: 0,
+        direction: 1,
+    };
+
+    if (type == noteInfo.DOUBLE) {
+        note.heads.push(
+            {
+                x: x + noteInfo[noteInfo.DOUBLE].head.x * scale,
+                y: y + noteInfo[noteInfo.DOUBLE].head.y * scale,
+                ox: x + noteInfo[noteInfo.DOUBLE].head.x * scale,
+                oy: y + noteInfo[noteInfo.DOUBLE].head.y * scale,
+                z: noteInfo.z,
+                sw: noteInfo[noteInfo.DOUBLE].head.sw * scale,
+                sh: noteInfo[noteInfo.DOUBLE].head.sh * scale
+            },
+        );
+
+        note.stems.push(
+            {
+                x: x + noteInfo[noteInfo.DOUBLE].stem.x * scale,
+                y: y + noteInfo[noteInfo.DOUBLE].stem.y * scale,
+                ox: x + noteInfo[noteInfo.DOUBLE].stem.x * scale,
+                oy: y + noteInfo[noteInfo.DOUBLE].stem.y * scale,
+                z: noteInfo.z,
+                sw: noteInfo[noteInfo.DOUBLE].stem.sw * scale,
+                sh: noteInfo[noteInfo.DOUBLE].stem.sh * scale
+            },
+        );
+        note.beam = {
+            x: x + noteInfo[noteInfo.DOUBLE].beam.x * scale,
+            y: y + noteInfo[noteInfo.DOUBLE].beam.y * scale,
+            ox: x + noteInfo[noteInfo.DOUBLE].beam.x * scale,
+            oy: y + noteInfo[noteInfo.DOUBLE].beam.y * scale,
+            z: noteInfo.z,
+            sw: noteInfo[noteInfo.DOUBLE].beam.sw * scale,
+            sh: noteInfo[noteInfo.DOUBLE].beam.sh * scale,
+            rotation: noteInfo[noteInfo.DOUBLE].beam.rotation,
+        }
+    }
+
+    notes.push(note);
 }
 
 // Tell WebGL how to pull out the positions from the position
@@ -724,6 +1297,121 @@ function setNormalAttribute(gl, normal, programInfo) {
     );
     gl.enableVertexAttribArray(programInfo.attribLocations.vertexNormal);
 }
+
+function setTextureAttribute(gl, textureCoord, programInfo) {
+    const num = 2; // every coordinate composed of 2 values
+    const type = gl.FLOAT; // the data in the buffer is 32-bit float
+    const normalize = false; // don't normalize
+    const stride = 0; // how many bytes to get from one set to the next
+    const offset = 0; // how many bytes inside the buffer to start from
+    gl.bindBuffer(gl.ARRAY_BUFFER, textureCoord);
+    gl.vertexAttribPointer(
+      programInfo.attribLocations.textureCoord,
+      num,
+      type,
+      normalize,
+      stride,
+      offset,
+    );
+    gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
+}
+
+//
+// Initialize a texture and load an image.
+// When the image finished loading copy it into the texture.
+//
+function loadTexture(gl, url) {
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+  
+    // Because images have to be downloaded over the internet
+    // they might take a moment until they are ready.
+    // Until then put a single pixel in the texture so we can
+    // use it immediately. When the image has finished downloading
+    // we'll update the texture with the contents of the image.
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const width = 1;
+    const height = 1;
+    const border = 0;
+    const srcFormat = gl.RGBA;
+    const srcType = gl.UNSIGNED_BYTE;
+    const pixel = new Uint8Array([0, 0, 255, 255]); // opaque blue
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      level,
+      internalFormat,
+      width,
+      height,
+      border,
+      srcFormat,
+      srcType,
+      pixel
+    );
+  
+    const image = new Image();
+    image.onload = () => {
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        level,
+        internalFormat,
+        srcFormat,
+        srcType,
+        image
+      );
+  
+      // WebGL1 has different requirements for power of 2 images
+      // vs non power of 2 images so check if the image is a
+      // power of 2 in both dimensions.
+      if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+        // Yes, it's a power of 2. Generate mips.
+        gl.generateMipmap(gl.TEXTURE_2D);
+      } else {
+        // No, it's not a power of 2. Turn off mips and set
+        // wrapping to clamp to edge
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      }
+    };
+    image.src = url;
+  
+    return texture;
+  }
+  
+  function isPowerOf2(value) {
+    return (value & (value - 1)) === 0;
+  }
+
+//////
+
+// physics
+function rectCircleCollision(circle, rect){
+    var distX = Math.abs(circle.x - rect.x - rect.w / 2);
+    var distY = Math.abs(circle.y - rect.y - rect.h / 2);
+
+    if (distX > (rect.w / 2 + circle.r)) { return false; }
+    if (distY > (rect.h / 2 + circle.r)) { return false; }
+
+    if (distX <= (rect.w / 2)) { return true; } 
+    if (distY <= (rect.h / 2)) { return true; }
+
+    var dx = distX - rect.w / 2;
+    var dy = distY - rect.h / 2;
+    return (dx * dx + dy * dy <= (circle.r * circle.r));
+}
+
+function checkHeroCircleCollision(circle) {
+    return rectCircleCollision(circle, {
+        x: hero.x,
+        y: hero.y,
+        w: 1.0,
+        h: 1.0,
+    })
+}
+
+/////////
 
 function heroDashJump(to) {
     let centerAdj = (to < 11 ? 0.025 : 0.030) * to;
@@ -811,12 +1499,32 @@ function update() {
             updatePianoKeys(keys[i]);
             updatePianoKeys(keys[i].sprites);
         }
+        
+        // if (checkHeroCircleCollision(sun)) {
+        //     console.log('collided')
+        // }
+        if (notes.length >= 20) {
+            let r = Math.ceil(timer / 0.2);
+            // console.log('test', r, timer)
+            if (trailCount < maxTrail) {
+                if (r > trailCount) {
+                    let vel = getRandomVelocity(2);
+                    let color = Math.floor(Math.random() * 3);
+                    addNote(minLeft - 3.0 * trailCount, 2.0 * trailCount, 1.0, noteInfo.SINGLE, color, noteInfo.patterns.TRAIL, 5.0, vel.y);
+                    trailCount++;
+                    // addNote(minLeft - 3.0, 2.0, 1.0, noteInfo.SINGLE, 1, noteInfo.patterns.TRAIL, 5.0, vel.y);
+                    // addNote(minLeft - 3.0 * 2, 2.0 * 2, 1.0, noteInfo.SINGLE, 1, noteInfo.patterns.TRAIL, 5.0, vel.y);
+                    // addNote(minLeft - 3.0 * 3, 2.0 * 3, 1.0, noteInfo.SINGLE, 1, noteInfo.patterns.TRAIL, 5.0, vel.y);
+                    // addNote(minLeft - 3.0 * 4, 2.0 * 4, 1.0, noteInfo.SINGLE, 1, noteInfo.patterns.TRAIL, 5.0, vel.y);
+                }
+            }
 
+            timer += 1 * delta;
+        }
         
     }
     
 }
-
 
 function gameCycle() {
     let now = Date.now();
