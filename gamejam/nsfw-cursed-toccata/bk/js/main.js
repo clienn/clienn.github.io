@@ -72,8 +72,6 @@ const hero = {
     x: 0,
     y: 0,
     z: 0,
-    w: 1.0,
-    h: 1.0,
     adjX: 0.25,
     pressDepth: 0.30,
     dashSpeed: 50,
@@ -83,10 +81,7 @@ const hero = {
     ay: 0,
     ax: 0,
     vx: 0,
-    vy: 0,
-    radians: 0,
-    sw: 1.0,
-    sh: 1.0,
+    vy: 0
 };
 
 const mob = {
@@ -104,29 +99,76 @@ var isKeyDown = false;
 
 var g_texture = null;
 
-const notes = [];
-
-const sampleEnemy = {
-    x: 3.0,
+var sun = {
+    x: 0.0,
     y: 0.0,
-    w: 1.0,
-    h: 1.0,
-    sw: 3.0,
-    sh: 0.2,
-    radians: 0,
-    // radians: 0.785398,
+    r: 1.0
 }
 
-// portal info
-var timer = 0.0;
-var isPortalOpening = false;
-var ripplePoint = [0.0, 0.0];
-var maxPortalRadius = 0.025;
-var portalRadius = 0;
-var portalWarpSpeed = 0.005;
-var portalDuration = 10;
-var portalT = 0;
+var noteInfo = {
+    0: {
+        stem: {
+            x: 0.25,
+            y: 0.60,
+            sw: 0.5,
+            sh: 4.5,
+        },
+        head: {
+            x: 0.0,
+            y: 0.0,
+            sw: 0.25,
+            sh: 0.25,
+        },
+    },
+    1: {
+        stem: {
+            x: 1.40,
+            y: 0.95,
+            sw: 0.5,
+            sh: 4.0,
+        },
+        head: {
+            x: 1.20,
+            y: 0.35,
+            sw: 0.25,
+            sh: 0.25,
+        },
+        beam: {
+            x: 0.80,
+            y: 1.40,
+            sw: 0.5,
+            sh: 4.0,
+            rotation: 1.7 // radians
+        }
+    },
+    z: 0.0,
+    SINGLE: 0,
+    DOUBLE: 1,
+    patterns: {
+        DROP: 0,
+        BOUNCE: 1,
+        TRAIL: 2,
+    }
+};
 
+const notes = [];
+
+var maxTrail = 10;
+var trailCount = 0;
+var timer = 0;
+
+// if (type == 0) {
+//     drawNoteStem(projectionMatrix, 0.25, 0.60, hero.z, 0.5, 4.5, 0);
+//     drawSphere(projectionMatrix, sun.x, sun.y, hero.z, 0.25, 0.25, false);
+// } else {
+//     drawNoteStem(projectionMatrix, 0.25, 0.60, hero.z, 0.5, 4.5, 0);
+//     drawSphere(projectionMatrix, sun.x, sun.y, hero.z, 0.25, 0.25, false);
+
+//     drawNoteStem(projectionMatrix, 0.80, 1.40, hero.z, 0.5, 4.0, 1.7);
+    
+//     drawNoteStem(projectionMatrix, sun.x + 1.40, 0.60 + 0.35, hero.z, 0.5, 4.0, 0);
+//     drawSphere(projectionMatrix, sun.x + 1.2, sun.y + 0.35, hero.z, 0.25, 0.25, false);
+// }
 
 function main(w, h) {
     canvas.width = w;
@@ -162,9 +204,9 @@ function main(w, h) {
     mob.pressDepth *= scaleX;
     hero.dashSpeed *= scaleX;
 
-    G *= scaleY;
+    noteInfo.z = hero.z;
 
-    // console.log(degreesToRadians(90));
+    G *= scaleY;
 
     init();
     
@@ -199,24 +241,15 @@ function init() {
         varying highp vec3 vLighting;
 
         varying lowp vec4 vColor;
-
-        varying highp vec2 v_uv;
     
         void main(void) {
-            v_uv = aVertexPosition.xy;
             gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
             vTextureCoord = aTextureCoord;
 
             // Apply lighting effect
-            // highp vec3 ambientLight = vec3(0.6823529411764706, 0.1411764705882353, 0.0);
-            // highp vec3 ambientLight = vec3(0.9254901960784314, 0.6509803921568628, 0.1568627450980392);
-            highp vec3 ambientLight = vec3(0.9254901960784314, 0.6509803921568628, 0.2568627450980392);
-            // highp vec3 ambientLight = vec3(0.3, 0.3, 0.3);
-            // highp vec3 directionalLightColor = vec3(0.9254901960784314, 0.6509803921568628, 0.1568627450980392);
-            // highp vec3 directionalLightColor = vec3(0.9803921568627451, 0.8666666666666667, 0.26666666666666666);
+            highp vec3 ambientLight = vec3(0.3, 0.3, 0.3);
             highp vec3 directionalLightColor = vec3(1, 1, 1);
-            // highp vec3 directionalVector = normalize(vec3(1.0, 2.0, 3.0));
-            highp vec3 directionalVector = normalize(vec3(0.0, 5.0, 20.0));
+            highp vec3 directionalVector = normalize(vec3(1.0, 2.0, 3.0));
         
             highp vec4 transformedNormal = uNormalMatrix * vec4(aVertexNormal, 1.0);
         
@@ -241,47 +274,16 @@ function init() {
         varying highp vec3 vLighting;
         varying lowp vec4 vColor;
         varying highp vec2 vTextureCoord;
-        varying highp vec2 v_uv;
 
         uniform sampler2D uSampler;
         uniform int hasSampler;
-        uniform highp float u_time;
-        uniform highp vec2 u_ripplePoint;
-        uniform highp float u_portal_radius;
-
-        void ripples() {
-            highp vec2 uv = vTextureCoord;
-          
-            // if (u_start == 1.0) {
-            highp vec2 mouse = vec2(0.0, 0.0) - 1.0;
-            highp vec2 cPos = -1.0 + 1.0 * v_uv.xy;
-              
-            cPos -= vec2(mouse.x, mouse.y) + u_ripplePoint;
-            // cPos -= vec2(0.0, 0.0);
-            highp float cLength = length(cPos) * 0.5;
-
-            uv += ((cPos / cLength) * cos(cLength * 12.0 - u_time * 2.0) * 0.5) * u_portal_radius;
-            // // }
-          
-            // highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
-            // gl_FragColor = vec4(texelColor.rgb * vLighting, 1.0);
-            highp vec3 col = texture2D(uSampler, uv).xyz;
-            // highp vec3 col = vec3(0.0627 - uv.y, 0.667 * uv.x, 0.843);
-            // highp vec3 col = vec3(texelColor.r - uv.y, texelColor.g * uv.x, texelColor.b);
-            // highp vec3 color = vec3(0.8);
-            // color += sweep(v_uv, vec2(0.5), 0.3, 0.003, 0.001) * vec3(0.1, 0.3, 1.0);
-            gl_FragColor = vec4(col, 1.0);
-        } 
 
         void main(void) {
             if (hasSampler == 1) {
-                // highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
-                // gl_FragColor = vec4(texelColor.rgb, 1.0);
-
-                ripples();
+                highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
+                gl_FragColor = vec4(texelColor.rgb * vLighting, 1.0);
             } else {
                 gl_FragColor = vec4(vColor.rgb * vLighting, vColor.a);
-                // ripples();
             }
             
         }
@@ -329,9 +331,6 @@ function init() {
           normalMatrix: gl.getUniformLocation(shaderProgram, "uNormalMatrix"),
           uSampler: gl.getUniformLocation(shaderProgram, "uSampler"),
           hasSampler: gl.getUniformLocation(shaderProgram, "hasSampler"),
-          u_time: gl.getUniformLocation(shaderProgram, "u_time"),
-          u_ripplePoint: gl.getUniformLocation(shaderProgram, "u_ripplePoint"),
-          u_portal_radius: gl.getUniformLocation(shaderProgram, "u_portal_radius"),
         },
     };
 
@@ -340,61 +339,156 @@ function init() {
     // console.log(buffers.sphere.colors.list);
 
     // Load texture
-    g_texture = loadTexture(gl, "assets/textures/bg.png");
+    g_texture = loadTexture(gl, "assets/textures/sun.jpg");
     // Flip image pixels into the bottom-to-top order that WebGL expects.
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
     initKeys();
 
+    // keys[8].pressed = true;
+    // keys[3].pressed = true;
+    // let vel = getRandomVelocity(2);
+    // let posX = getRandomHorizontalPos();
+    // let posY = ceilingY - 5.0;
+    
+    // addNote(posX, posY, 0.75, noteInfo.SINGLE, 0, noteInfo.patterns.DROP, vel.x, vel.y);
+
+    // vel = getRandomVelocity(2);
+    // posX = getRandomHorizontalPos();
+    // addNote(posX, posY, 1.0, noteInfo.SINGLE, 1, noteInfo.patterns.DROP, vel.x, vel.y);
+
+    // vel = getRandomVelocity(2);
+    // posX = getRandomHorizontalPos();
+    // addNote(posX, posY, 1.5, noteInfo.SINGLE, 2, noteInfo.patterns.DROP, vel.x, vel.y);
+
+    // vel = getRandomVelocity(2);
+    // posX = getRandomHorizontalPos();
+    // addNote(posX, posY, 2.0, noteInfo.SINGLE, 0, noteInfo.patterns.DROP, vel.x, vel.y);
+
+    // vel = getRandomVelocity(2);
+    // posX = getRandomHorizontalPos();
+    // addNote(posX,posY, 1.0, noteInfo.DOUBLE, 1, noteInfo.patterns.DROP, vel.x, vel.y);
+    // // addNote(-5.0, 10.0, 1.5, noteInfo.DOUBLE, 2);
+    // // addNote(15.0, -10.0, 2.0, noteInfo.DOUBLE, 2);
+
+    generateDropNote();
+    generateDropNote();
+    generateDropNote();
+    generateDropNote();
+    generateDropNote();
+    generateDropNote();
+    generateDropNote();
+
     controls();
 }
 
-function rngPosNeg(n) {
-    let rng = Math.floor(Math.random() * 2);
-    return rng ? n : -n;
-}
+function morphNote(idx) {
+    let vel = getRandomVelocity(20);
+    let posX = getRandomHorizontalPos();
+    let posY = ceilingY + (Math.floor(Math.random() * 15) + 5.0);
 
-function rngYesNo() {
-    let rng = Math.floor(Math.random() * 2);
-    return rng ? 1 : 0;
-}
+    // addNote(posX, posY, 1.0, type, 0, noteInfo.patterns.DROP, vel.x, vel.y);
 
-function updateRipplePoint() {
-    let rngX = rngPosNeg(5) * rngYesNo() / 10;
-    let rngY = rngPosNeg(5) * rngYesNo() / 10;
-    ripplePoint = [rngX, rngY];
-    gl.uniform2fv(programInfo.uniformLocations.u_ripplePoint, ripplePoint);
-}
+    let x = posX;
+    let y = posY;
+    let scale = 1.0 + Math.floor(Math.random() * 100) / 100;
+    let type = Math.floor(Math.random() * 2);
+    
+    let colorIdx = Math.floor(Math.random() * 3);
+    let pattern = noteInfo.patterns.DROP
+    let vx = vel.x
+    let vy = vel.y
 
-function updatePortalRadius() {
-    if (isPortalOpening) {
-        timer += delta;
-        portalRadius = Math.min(portalRadius + portalWarpSpeed * delta, maxPortalRadius);
-        portalT += 1 * delta;
+    notes[idx] = {
+        heads: [
+            {
+                x: x + noteInfo[noteInfo.SINGLE].head.x * scale,
+                y: y + noteInfo[noteInfo.SINGLE].head.y * scale,
+                z: noteInfo.z,
+                sw: noteInfo[noteInfo.SINGLE].head.sw * scale,
+                sh: noteInfo[noteInfo.SINGLE].head.sh * scale
+            },
+        ],
+        stems: [
+            {
+                x: x + noteInfo[noteInfo.SINGLE].stem.x * scale,
+                y: y + noteInfo[noteInfo.SINGLE].stem.y * scale,
+                z: noteInfo.z,
+                sw: noteInfo[noteInfo.SINGLE].stem.sw * scale,
+                sh: noteInfo[noteInfo.SINGLE].stem.sh * scale
+            },
+        ],
+        colorIdx: colorIdx,
+        pattern: pattern,
+        vx: vx,
+        vy: vy
+    };
 
-        if (portalT > portalDuration) {
-            isPortalOpening = false;
-            portalT = 0;
-        }
-    } else if (!isPortalOpening && portalRadius > 0) {
-        timer += delta;
-        portalRadius -= portalWarpSpeed * delta;
-        if (portalRadius <= 0) {
-            portalRadius = 0;
-            timer = 0;
+    if (type == noteInfo.DOUBLE) {
+        notes[idx].heads.push(
+            {
+                x: x + noteInfo[noteInfo.DOUBLE].head.x * scale,
+                y: y + noteInfo[noteInfo.DOUBLE].head.y * scale,
+                z: noteInfo.z,
+                sw: noteInfo[noteInfo.DOUBLE].head.sw * scale,
+                sh: noteInfo[noteInfo.DOUBLE].head.sh * scale
+            },
+        );
+
+        notes[idx].stems.push(
+            {
+                x: x + noteInfo[noteInfo.DOUBLE].stem.x * scale,
+                y: y + noteInfo[noteInfo.DOUBLE].stem.y * scale,
+                z: noteInfo.z,
+                sw: noteInfo[noteInfo.DOUBLE].stem.sw * scale,
+                sh: noteInfo[noteInfo.DOUBLE].stem.sh * scale
+            },
+        );
+        notes[idx].beam = {
+            x: x + noteInfo[noteInfo.DOUBLE].beam.x * scale,
+            y: y + noteInfo[noteInfo.DOUBLE].beam.y * scale,
+            z: noteInfo.z,
+            sw: noteInfo[noteInfo.DOUBLE].beam.sw * scale,
+            sh: noteInfo[noteInfo.DOUBLE].beam.sh * scale,
+            rotation: noteInfo[noteInfo.DOUBLE].beam.rotation,
         }
     }
 
-    gl.uniform1f(programInfo.uniformLocations.u_portal_radius, portalRadius);
+    if (notes.length < 20) {
+        generateDropNote();
+    }
+}
+
+function generateDropNote() {
+    let vel = getRandomVelocity(20);
+    let posX = getRandomHorizontalPos();
+    let posY = ceilingY + (Math.floor(Math.random() * 15) + 5.0);
+    let type = Math.floor(Math.random() * 2);
+    let color = Math.floor(Math.random() * 3);
+    
+    addNote(posX, posY, 1.0, type, color, noteInfo.patterns.DROP, vel.x, vel.y);
+}
+
+function getRandomVelocity(max) {
+    let mul = Math.floor(Math.random() * 2);
+    let rngX = Math.floor(Math.random() * max) * (mul ? -1 : 1);
+    let rngY = Math.floor(Math.random() * max) + 1;
+
+    return {
+        x: rngX,
+        y: -rngY,
+    }
+}
+
+function getRandomHorizontalPos() {
+    let rngPos = Math.floor(Math.random() * maxRight);
+    let rngNeg = Math.floor(Math.random() * Math.abs(minLeft)) * -1;
+    let rng = Math.floor(Math.random() * 1);
+    let r = rng ? rngPos : rngNeg;
+    return r;
 }
 
 function controls() {
-    document.addEventListener('click', (e) => {
-        updateRipplePoint();
-        isPortalOpening = true;
-        portalRadius = 0;
-    });
-
     document.addEventListener('keydown', (e) => {
         e.preventDefault();
 
@@ -554,31 +648,11 @@ function drawScene() {
 
     // drawPiano(projectionMatrix, 9.7, 2.5, 5.0);
     // drawPiano(projectionMatrix, 11.0, 2.5, 5.0);
-    // drawPiano(projectionMatrix, pianoKeysPos.white.lower.x, pianoKeysPos.white.lower.y, pianoKeysPos.white.lower.z);
     drawPiano(projectionMatrix, pianoKeysPos.white.lower.x, pianoKeysPos.white.lower.y, pianoKeysPos.white.lower.z);
-    drawSquare(projectionMatrix, hero.x, hero.y, hero.z, hero.sw, hero.sh, 1, hero.radians, 0); // hero
 
-    let x = sampleEnemy.sw * Math.cos(sampleEnemy.radians);
-    let y = sampleEnemy.sw * Math.sin(sampleEnemy.radians);
-    drawSquare(projectionMatrix, x, y, hero.z, sampleEnemy.sw, sampleEnemy.sh, 0, sampleEnemy.radians); // enemy
-
-
-    x = sampleEnemy.sw * Math.cos(sampleEnemy.radians + 1.5708);
-    y = sampleEnemy.sw * Math.sin(sampleEnemy.radians + 1.5708);
-    drawSquare(projectionMatrix, x, y, hero.z, sampleEnemy.sw, sampleEnemy.sh, 0, sampleEnemy.radians + 1.5708); // enemy
-
-    x = sampleEnemy.sw * Math.cos(sampleEnemy.radians + 3.14159);
-    y = sampleEnemy.sw * Math.sin(sampleEnemy.radians + 3.14159);
-    drawSquare(projectionMatrix, x, y, hero.z, sampleEnemy.sw, sampleEnemy.sh, 0, sampleEnemy.radians + 3.14159); // enemy
-
-    x = sampleEnemy.sw * Math.cos(sampleEnemy.radians + 4.71239);
-    y = sampleEnemy.sw * Math.sin(sampleEnemy.radians + 4.71239);
-    drawSquare(projectionMatrix, x, y, hero.z, sampleEnemy.sw, sampleEnemy.sh, 0, sampleEnemy.radians + 4.71239); // enemy
-    // drawSquare(projectionMatrix, sampleEnemy.x, sampleEnemy.y, hero.z, sampleEnemy.sw, sampleEnemy.sh, 0, sampleEnemy.radians); // enemy
-
-    drawSquare(projectionMatrix, 0.0, 0.0, hero.z - 10.0, 1.81 * 16.1, 1.0 * 16.1, 1, 0.0, 1); // hero
-
-    
+    // drawNote(projectionMatrix, 1);
+    drawNotes(projectionMatrix);
+    drawHero(projectionMatrix, hero.x, hero.y, hero.z, 1.0, 1.0);
     
 }
 
@@ -702,8 +776,6 @@ function drawKey(projectionMatrix, x, y, z, width, height, colorIdx) {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.piano.indices);
 
     // setTextureAttribute(gl, buffers.sphere.textureCoord, programInfo);
-    // setTextureAttribute(gl, buffers.square.textureCoord, programInfo);
-    gl.disableVertexAttribArray(programInfo.attribLocations.textureCoord);
     setNormalAttribute(gl, buffers.piano.normal, programInfo);
 
     // Tell WebGL to use our program when drawing
@@ -726,13 +798,7 @@ function drawKey(projectionMatrix, x, y, z, width, height, colorIdx) {
         normalMatrix
     );
 
-    // gl.activeTexture(gl.TEXTURE0);
-    // gl.bindTexture(gl.TEXTURE_2D, null);
-    // gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
-
     gl.uniform1i(programInfo.uniformLocations.hasSampler, 0);
-
-
 
     {
         const vertexCount = 36;
@@ -742,26 +808,25 @@ function drawKey(projectionMatrix, x, y, z, width, height, colorIdx) {
     }
 }
 
-function drawSquare(projectionMatrix, x, y, z, width, height, colorIdx, radians, useTexture, isRotating) {
+function drawHero(projectionMatrix, x, y, z, width, height) {
     // Set the drawing position to the "identity" point, which is
     // the center of the scene.
     const modelViewMatrix = mat4.create();
   
     // Now move the drawing position a bit to where we want to
     // start drawing the square.
-
     mat4.translate(
       modelViewMatrix, // destination matrix
       modelViewMatrix, // matrix to translate
       [x, y, z]
     ); // amount to translate
   
-    mat4.rotate(
-      modelViewMatrix, // destination matrix
-      modelViewMatrix, // matrix to rotate
-      radians, // amount to rotate in radians
-      [0, 0, 1]
-    ); // axis to rotate around (Z)
+    // mat4.rotate(
+    //   modelViewMatrix, // destination matrix
+    //   modelViewMatrix, // matrix to rotate
+    //   cubeRotation, // amount to rotate in radians
+    //   [0, 0, 1]
+    // ); // axis to rotate around (Z)
 
     mat4.scale(modelViewMatrix, modelViewMatrix, [width, height, 1]);
 
@@ -771,16 +836,15 @@ function drawSquare(projectionMatrix, x, y, z, width, height, colorIdx, radians,
 
     // Tell WebGL how to pull out the positions from the position
     // buffer into the vertexPosition attribute.
-    setPositionAttribute(gl, buffers.square.positions, programInfo);
+    setPositionAttribute(gl, buffers.hero.position, programInfo);
 
-    setColorAttribute(gl, buffers.square.colors[colorIdx], programInfo);
-    setTextureAttribute(gl, buffers.square.textureCoord, programInfo);
-    setNormalAttribute(gl, buffers.square.normal, programInfo);
+    setColorAttribute(gl, buffers.hero.colors.default, programInfo);
+    
 
     // Tell WebGL which indices to use to index the vertices
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.square.indices);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.hero.indices);
 
-    
+    setNormalAttribute(gl, buffers.hero.normal, programInfo);
 
     // Tell WebGL to use our program when drawing
     gl.useProgram(programInfo.program);
@@ -802,25 +866,10 @@ function drawSquare(projectionMatrix, x, y, z, width, height, colorIdx, radians,
         normalMatrix
     );
 
-    gl.uniform1i(programInfo.uniformLocations.hasSampler, useTexture);
-
-    // if (useTexture) {
-    //     gl.uniform2fv(programInfo.uniformLocations.u_ripplePoint, ripplePoint);
-    //     gl.uniform1f(programInfo.uniformLocations.u_portal_radius, portalRadius);
-    // }
-
-    // // Tell WebGL we want to affect texture unit 0
-    // gl.activeTexture(gl.TEXTURE0);
-
-    // // Bind the texture to texture unit 0
-    // gl.bindTexture(gl.TEXTURE_2D, g_texture);
-
-    // // Tell the shader we bound the texture to texture unit 0
-    // gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
-    
+    gl.uniform1i(programInfo.uniformLocations.hasSampler, 0);
 
     {
-        const vertexCount = buffers.square.vertexCount;
+        const vertexCount = 6;
         const type = gl.UNSIGNED_SHORT;
         const offset = 0;
         gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
@@ -851,6 +900,341 @@ function getSteppedKeys(x, w) {
     }
 
     return [p1, p2];
+}
+
+function drawSphere(projectionMatrix, x, y, z, width, height, colorIdx, useTexture) {
+    // Set the drawing position to the "identity" point, which is
+    // the center of the scene.
+    const modelViewMatrix = mat4.create();
+  
+    // Now move the drawing position a bit to where we want to
+    // start drawing the square.
+    mat4.translate(
+      modelViewMatrix, // destination matrix
+      modelViewMatrix, // matrix to translate
+      [x, y, z]
+    ); // amount to translate
+
+    mat4.scale(modelViewMatrix, modelViewMatrix, [width, height, 1]);
+
+    const normalMatrix = mat4.create();
+    mat4.invert(normalMatrix, modelViewMatrix);
+    mat4.transpose(normalMatrix, normalMatrix);
+
+    // Tell WebGL how to pull out the positions from the position
+    // buffer into the vertexPosition attribute.
+    setPositionAttribute(gl, buffers.sphere.position, programInfo);
+
+    setColorAttribute(gl, buffers.sphere.colors.list[colorIdx], programInfo);
+
+    
+
+    // Tell WebGL which indices to use to index the vertices
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.sphere.indices);
+
+    
+    setTextureAttribute(gl, buffers.sphere.textureCoord, programInfo);
+    setNormalAttribute(gl, buffers.sphere.normal, programInfo);
+
+    // Tell WebGL to use our program when drawing
+    gl.useProgram(programInfo.program);
+
+    // Set the shader uniforms
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.projectionMatrix,
+        false,
+        projectionMatrix
+    );
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.modelViewMatrix,
+        false,
+        modelViewMatrix
+    );
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.normalMatrix,
+        false,
+        normalMatrix
+    );
+
+    if (useTexture) {
+        // Tell WebGL we want to affect texture unit 0
+        gl.activeTexture(gl.TEXTURE0);
+
+        // Bind the texture to texture unit 0
+        gl.bindTexture(gl.TEXTURE_2D, g_texture);
+
+        // Tell the shader we bound the texture to texture unit 0
+        gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
+        gl.uniform1i(programInfo.uniformLocations.hasSampler, 1);
+    } else {
+        gl.uniform1i(programInfo.uniformLocations.hasSampler, 0);
+    }
+    
+    
+    {
+        const vertexCount = buffers.sphere.vertexCount;
+        const type = gl.UNSIGNED_SHORT;
+        const offset = 0;
+        gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+    }
+
+}
+
+function drawNote(projectionMatrix, type) {
+    // single
+    // if (type == 0) {
+    //     let adjX = 10.0
+    //     drawNoteStem(projectionMatrix, 0.40 + adjX, 0.75, hero.z, 1.0, 5.5, 0);
+    //     drawSphere(projectionMatrix, sun.x + adjX, sun.y, hero.z, 0.50, 0.50, false);
+    // } else {
+    //     drawNoteStem(projectionMatrix, 0.35, 0.77, hero.z, 1.0, 7.0, 0);
+    //     drawSphere(projectionMatrix, sun.x, sun.y, hero.z, 0.50, 0.50, false);
+
+    //     drawNoteStem(projectionMatrix, 1.32, 1.77, hero.z, 1.0, 7.8, 1.7);
+        
+    //     drawNoteStem(projectionMatrix, sun.x + 2.35, 0.75 + 0.35, hero.z, 1.0, 5.0, 0);
+    //     drawSphere(projectionMatrix, sun.x + 2.0, sun.y + 0.35, hero.z, 0.50, 0.50, false);
+    // }
+
+    // if (type == 0) {
+    //     drawNoteStem(projectionMatrix, 0.25, 0.60, hero.z, 0.5, 4.5, 0);
+    //     drawSphere(projectionMatrix, sun.x, sun.y, hero.z, 0.25, 0.25, false);
+    // } else {
+    //     drawNoteStem(projectionMatrix, 0.25, 0.60, hero.z, 0.5, 4.5, 0);
+    //     drawSphere(projectionMatrix, sun.x, sun.y, hero.z, 0.25, 0.25, false);
+
+    //     drawNoteStem(projectionMatrix, 0.80, 1.40, hero.z, 0.5, 4.0, 1.7);
+        
+    //     drawNoteStem(projectionMatrix, sun.x + 1.40, 0.60 + 0.35, hero.z, 0.5, 4.0, 0);
+    //     drawSphere(projectionMatrix, sun.x + 1.2, sun.y + 0.35, hero.z, 0.25, 0.25, false);
+    // }
+}
+
+function drawNoteStem(projectionMatrix, x, y, z, width, height, rotation, colorIdx) {
+    const modelViewMatrix = mat4.create();
+  
+    // Now move the drawing position a bit to where we want to
+    // start drawing the square.
+    mat4.translate(
+      modelViewMatrix, // destination matrix
+      modelViewMatrix, // matrix to translate
+      [x, y, z]
+    ); // amount to translate
+
+    mat4.rotate(
+      modelViewMatrix, // destination matrix
+      modelViewMatrix, // matrix to rotate
+      rotation, // amount to rotate in radians
+      [0, 0, 1]
+    ); // axis to rotate around (Z)
+
+    mat4.scale(modelViewMatrix, modelViewMatrix, [width, height, 1]);
+
+    const normalMatrix = mat4.create();
+    mat4.invert(normalMatrix, modelViewMatrix);
+    mat4.transpose(normalMatrix, normalMatrix);
+
+    // Tell WebGL how to pull out the positions from the position
+    // buffer into the vertexPosition attribute.
+    setPositionAttribute(gl, buffers.noteStem.position, programInfo);
+
+    setColorAttribute(gl, buffers.noteStem.colors.list[colorIdx], programInfo);
+    
+
+    // Tell WebGL which indices to use to index the vertices
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.noteStem.indices);
+
+    // setTextureAttribute(gl, buffers.sphere.textureCoord, programInfo);
+    setNormalAttribute(gl, buffers.noteStem.normal, programInfo);
+
+    // Tell WebGL to use our program when drawing
+    gl.useProgram(programInfo.program);
+
+    // Set the shader uniforms
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.projectionMatrix,
+        false,
+        projectionMatrix
+    );
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.modelViewMatrix,
+        false,
+        modelViewMatrix
+    );
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.normalMatrix,
+        false,
+        normalMatrix
+    );
+
+    gl.uniform1i(programInfo.uniformLocations.hasSampler, 0);
+
+    {
+        const vertexCount = buffers.noteStem.vertexCount;
+        const type = gl.UNSIGNED_SHORT;
+        const offset = 0;
+        gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+    }
+}
+
+function resetTrailNote(i, j) {
+    let adjX = Math.floor(Math.random() * 10);
+    let color = Math.floor(Math.random() * 3);
+    notes[i].heads[j].x = notes[i].heads[j].ox - adjX;
+    notes[i].heads[j].y = notes[i].heads[j].oy;
+
+    notes[i].stems[j].x = notes[i].heads[j].ox - adjX;
+    notes[i].stems[j].y = notes[i].heads[j].oy;
+
+    notes[i].colorIdx = color;
+
+    if (notes[i].beam) {
+        notes[i].beam.x = notes[i].beam.ox - adjX;
+        notes[i].beam.y = notes[i].beam.oy;
+    }
+}
+
+
+function drawNotes(projectionMatrix) {
+    if (delta < 1) {
+        let angle = 1.5;
+        let range = 12.25;
+        for (let i = 0; i < notes.length; ++i) {
+            for (let j = 0; j < notes[i].heads.length; ++j) {
+                if (notes[i].pattern == noteInfo.patterns.DROP) {
+                    notes[i].heads[j].x += notes[i].vx * delta;
+                    notes[i].heads[j].y += notes[i].vy * delta;
+
+                    if (notes[i].heads[j].y <= groundLimit) {
+                        morphNote(i);
+                    }
+                } else if (notes[i].pattern == noteInfo.patterns.TRAIL) {
+                    notes[i].angle += angle * delta;
+                    notes[i].heads[j].x += notes[i].vx * delta;
+                    notes[i].heads[j].y = notes[i].heads[j].oy + Math.sin(notes[i].angle) * range;
+
+                    if (notes[i].heads[j].x > maxRight + 10.0) {
+                        resetTrailNote(i, j);
+                    }
+                }
+    
+                drawSphere(projectionMatrix, 
+                    notes[i].heads[j].x, notes[i].heads[j].y, notes[i].heads[j].z, 
+                    notes[i].heads[j].sw, notes[i].heads[j].sh, 
+                    notes[i].colorIdx,
+                    false // don't use texture if false
+                );
+            }
+    
+            for (let j = 0; j < notes[i].stems.length; ++j) {
+                if (notes[i].pattern == noteInfo.patterns.DROP) {
+                    notes[i].stems[j].x += notes[i].vx * delta;
+                    notes[i].stems[j].y += notes[i].vy * delta;
+                } else if (notes[i].pattern == noteInfo.patterns.TRAIL) {
+                    notes[i].angle += angle * delta;
+                    notes[i].stems[j].x += notes[i].vx * delta;
+                    notes[i].stems[j].y = notes[i].stems[j].oy + Math.sin(notes[i].angle) * range;
+                }
+
+                drawNoteStem(projectionMatrix, 
+                    notes[i].stems[j].x, notes[i].stems[j].y, notes[i].stems[j].z, 
+                    notes[i].stems[j].sw, notes[i].stems[j].sh, 
+                    0,
+                    notes[i].colorIdx,
+                );
+            }
+    
+            if (notes[i].beam) {
+                if (notes[i].pattern == noteInfo.patterns.DROP) {
+                    notes[i].beam.x += notes[i].vx * delta;
+                    notes[i].beam.y += notes[i].vy * delta;
+                } else if (notes[i].pattern == noteInfo.patterns.TRAIL) {
+                    notes[i].angle += angle * delta;
+                    notes[i].beam.x += notes[i].vx * delta;
+                    notes[i].beam.y = notes[i].beam.oy + Math.sin(notes[i].angle) * range;
+                }
+
+                drawNoteStem(projectionMatrix, 
+                    notes[i].beam.x, notes[i].beam.y, notes[i].beam.z, 
+                    notes[i].beam.sw, notes[i].beam.sh, 
+                    notes[i].beam.rotation,
+                    notes[i].colorIdx,
+                );
+            }
+        }
+    }
+    
+}
+
+function addNote(x, y, scale, type, colorIdx, pattern, vx, vy) {
+    let note = {
+        heads: [
+            {
+                x: x + noteInfo[noteInfo.SINGLE].head.x * scale,
+                y: y + noteInfo[noteInfo.SINGLE].head.y * scale,
+                ox: x + noteInfo[noteInfo.SINGLE].head.x * scale,
+                oy: y + noteInfo[noteInfo.SINGLE].head.y * scale,
+                z: noteInfo.z,
+                sw: noteInfo[noteInfo.SINGLE].head.sw * scale,
+                sh: noteInfo[noteInfo.SINGLE].head.sh * scale
+            },
+        ],
+        stems: [
+            {
+                x: x + noteInfo[noteInfo.SINGLE].stem.x * scale,
+                y: y + noteInfo[noteInfo.SINGLE].stem.y * scale,
+                ox: x + noteInfo[noteInfo.SINGLE].stem.x * scale,
+                oy: y + noteInfo[noteInfo.SINGLE].stem.y * scale,
+                z: noteInfo.z,
+                sw: noteInfo[noteInfo.SINGLE].stem.sw * scale,
+                sh: noteInfo[noteInfo.SINGLE].stem.sh * scale
+            },
+        ],
+        colorIdx: colorIdx,
+        pattern: pattern,
+        vx: vx,
+        vy: vy,
+        angle: 0,
+        direction: 1,
+    };
+
+    if (type == noteInfo.DOUBLE) {
+        note.heads.push(
+            {
+                x: x + noteInfo[noteInfo.DOUBLE].head.x * scale,
+                y: y + noteInfo[noteInfo.DOUBLE].head.y * scale,
+                ox: x + noteInfo[noteInfo.DOUBLE].head.x * scale,
+                oy: y + noteInfo[noteInfo.DOUBLE].head.y * scale,
+                z: noteInfo.z,
+                sw: noteInfo[noteInfo.DOUBLE].head.sw * scale,
+                sh: noteInfo[noteInfo.DOUBLE].head.sh * scale
+            },
+        );
+
+        note.stems.push(
+            {
+                x: x + noteInfo[noteInfo.DOUBLE].stem.x * scale,
+                y: y + noteInfo[noteInfo.DOUBLE].stem.y * scale,
+                ox: x + noteInfo[noteInfo.DOUBLE].stem.x * scale,
+                oy: y + noteInfo[noteInfo.DOUBLE].stem.y * scale,
+                z: noteInfo.z,
+                sw: noteInfo[noteInfo.DOUBLE].stem.sw * scale,
+                sh: noteInfo[noteInfo.DOUBLE].stem.sh * scale
+            },
+        );
+        note.beam = {
+            x: x + noteInfo[noteInfo.DOUBLE].beam.x * scale,
+            y: y + noteInfo[noteInfo.DOUBLE].beam.y * scale,
+            ox: x + noteInfo[noteInfo.DOUBLE].beam.x * scale,
+            oy: y + noteInfo[noteInfo.DOUBLE].beam.y * scale,
+            z: noteInfo.z,
+            sw: noteInfo[noteInfo.DOUBLE].beam.sw * scale,
+            sh: noteInfo[noteInfo.DOUBLE].beam.sh * scale,
+            rotation: noteInfo[noteInfo.DOUBLE].beam.rotation,
+        }
+    }
+
+    notes.push(note);
 }
 
 // Tell WebGL how to pull out the positions from the position
@@ -1106,28 +1490,8 @@ function updateHero() {
     }
 }
 
-function checkCollisions() {
-    return checkAngledCollisions(
-        {
-            x: hero.x - hero.w * hero.sw,
-            y: hero.y - hero.h * hero.sh,
-            w: hero.w * 2 * hero.sw,
-            h: hero.h * 2 * hero.sh,
-            radians: hero.radians
-        },
-        {
-            x: sampleEnemy.x - (sampleEnemy.w) * sampleEnemy.sw,
-            y: sampleEnemy.y - (sampleEnemy.h) * sampleEnemy.sh,
-            w: sampleEnemy.w * 2 * sampleEnemy.sw,
-            h: sampleEnemy.h * 2 * sampleEnemy.sh,
-            radians: sampleEnemy.radians
-        },
-    )
-}
-
 function update() {
     // cubeRotation += delta;
-    sampleEnemy.radians += delta;
     if (delta < 1) {
         heroDashJump(hero.moveTo);
         updateHero();
@@ -1135,35 +1499,29 @@ function update() {
             updatePianoKeys(keys[i]);
             updatePianoKeys(keys[i].sprites);
         }
-
-        if (checkCollisions()) {
-            console.log('collided');
-        }
-
-        // if (isPortalOpening) {
-        //     timer += delta;
-        //     if (timer > 3) {
-        //         isPortalOpening = false;
-        //     } else {
-        //         timer += delta;
-        //         if (timer > 10) {
-        //             isPortalOpening = false;
-        //         }
-        //     }
-            
-            
-        // } else if (timer > startPortalT) {
-        //     timer -= delta;
-        //     if (timer <= startPortalT) {
-        //         timer = startPortalT;
-        //     }
+        
+        // if (checkHeroCircleCollision(sun)) {
+        //     console.log('collided')
         // }
+        if (notes.length >= 20) {
+            let r = Math.ceil(timer / 0.2);
+            // console.log('test', r, timer)
+            if (trailCount < maxTrail) {
+                if (r > trailCount) {
+                    let vel = getRandomVelocity(2);
+                    let color = Math.floor(Math.random() * 3);
+                    addNote(minLeft - 3.0 * trailCount, 2.0 * trailCount, 1.0, noteInfo.SINGLE, color, noteInfo.patterns.TRAIL, 5.0, vel.y);
+                    trailCount++;
+                    // addNote(minLeft - 3.0, 2.0, 1.0, noteInfo.SINGLE, 1, noteInfo.patterns.TRAIL, 5.0, vel.y);
+                    // addNote(minLeft - 3.0 * 2, 2.0 * 2, 1.0, noteInfo.SINGLE, 1, noteInfo.patterns.TRAIL, 5.0, vel.y);
+                    // addNote(minLeft - 3.0 * 3, 2.0 * 3, 1.0, noteInfo.SINGLE, 1, noteInfo.patterns.TRAIL, 5.0, vel.y);
+                    // addNote(minLeft - 3.0 * 4, 2.0 * 4, 1.0, noteInfo.SINGLE, 1, noteInfo.patterns.TRAIL, 5.0, vel.y);
+                }
+            }
 
-        updatePortalRadius();
-
-        gl.uniform1f(programInfo.uniformLocations.u_time, timer);
-
-        // if (timer )
+            timer += 1 * delta;
+        }
+        
     }
     
 }
@@ -1172,7 +1530,6 @@ function gameCycle() {
     let now = Date.now();
     delta = (now - last) / 1000;
     last = now;
-
 
     drawScene();
     update();
