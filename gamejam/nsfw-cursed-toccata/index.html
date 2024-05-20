@@ -24,17 +24,53 @@
             html, body {
                 margin: 0;
                 padding: 0;
-                overflow: hidden;
-                /* background: #000; */
+                overflow: hidden !important;
+                background: #E76B18;
+                /* background: #97DE54; */
+                -webkit-touch-callout: none; /* iOS Safari */
+                -webkit-user-select: none; /* Safari */
+                -khtml-user-select: none; /* Konqueror HTML */
+                -moz-user-select: none; /* Old versions of Firefox */
+                    -ms-user-select: none; /* Internet Explorer/Edge */
+                        user-select: none; /* Non-prefixed version, currently
+                                            supported by Chrome, Edge, Opera and Firefox */
             }
+            
             #game-surface {
                 background: transparent;
                 touch-action: manipulation;
                 display: none;
             }
+            #loading {
+                color: #fff;
+                font-family: 'Montserrat';
+                font-size: 48px;
+            }
+            .center {
+                margin: 0;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+            }
+
+            #gameover-screen {
+                color: #fff;
+                font-family: 'Montserrat';
+                font-size: 48px;
+                display: none;
+            }
         </style>
     </head>
     <body>
+        <div id="loading" class="center">
+            <h1>Loading</h1>
+        </div>
+        <div id="gameover-screen" class="center">
+            <h1>GAMEOVER!</h1>
+            <h3>You Lasted <span id="totalSurvivalTime"></span></h3>
+        </div>
         <canvas id="game-surface"></canvas>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
         <script type="text/javascript" src="js/init-buffers.js"></script>

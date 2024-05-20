@@ -1,5 +1,8 @@
 const canvas = document.getElementById('game-surface');
-const gl = canvas.getContext("webgl");
+const gl = canvas.getContext("webgl", {premultipliedAlpha: false, alpha: false});
+const loading = document.getElementById('loading');
+const gameoverScreen = document.getElementById('gameover-screen');
+const totalSurvivalTime = document.getElementById('totalSurvivalTime');
 
 var last = 0;
 var delta = 0;
@@ -85,8 +88,55 @@ const hero = {
     vx: 0,
     vy: 0,
     radians: 0,
-    sw: 1.0,
-    sh: 1.0,
+    sw: 2.0,
+    sh: 2.0,
+    stateTypes: {
+        'IDLE': 0,
+        'JUMP': 1,
+        'SLIDE_LEFT': 2,
+        'SLIDE_RIGHT': 3,
+        'GLIDE_LEFT': 4,
+        'GLIDE_RIGHT': 5,
+    },
+    state: {
+        0: {
+            frame: 0,
+            frames: 1, // this means 6 frames
+            start: 0, // this means 6 frames
+        }, // idle
+
+        1: {
+            frame: 0,
+            frames: 6, // this means 6 frames
+            start: 0,
+        }, // jump
+
+        2: {
+            frame: 0,
+            frames: 2, // this means 6 frames
+            start: 6,
+        }, // slide left
+
+        3: {
+            frame: 0,
+            frames: 2, // this means 6 frames
+            start: 8,
+        }, // slide right
+
+        4: {
+            frame: 0,
+            frames: 2, // this means 6 frames
+            start: 10,
+        }, // glide left
+
+        5: {
+            frame: 0,
+            frames: 2, // this means 6 frames
+            start: 12,
+        }, // glide right
+    },
+    currentState: 0
+    // frameAnimT: 0
 };
 
 const mob = {
@@ -99,12 +149,12 @@ var groundLimit = 0;
 var ceilingY = 0;
 var maxRight = 0;
 var minLeft = 0;
+var edgeLeft = 0;
+var edgeRight = 0;
 
 var isKeyDown = false;
 
-var g_texture = null;
-
-const notes = [];
+var g_textures = [];
 
 const sampleEnemy = {
     x: 3.0,
@@ -127,12 +177,236 @@ var portalWarpSpeed = 0.005;
 var portalDuration = 10;
 var portalT = 0;
 
+// baton
+const batons = [];
+var batonBaseRadian = 0;
+var activateBatonPhase = 0;
+var testInc = 0.0;
+var batonReleaseMode = 1; // 0 - explosion, 1 - wheel around
+var batonReleaseT = 0;
+var batonReleaseForce = 0;
+var batonHoldDuration = 0;
+var batonHoldT = 0;
+var batonReleaseVel = 0;
+var batonWheelCount = 4;
+
+// notes
+const notes = [];
+const notesPressDepth = 0.5;
+var isNoteStepping = false;
+
+// death rattle
+const bloodCount = 300;
+const blood = [];
+var deathT = 0;
+var gameover = false;
+
+var loaded = 0;
+var totalAssets = 0;
+
+var gamestart = false;
+var totalTime = 0;
+
+var bgSound = null;
+
+function initBlood() {
+    for (let i = 0; i < bloodCount; ++i) {
+        blood.push({
+            x: hero.x,
+            y: hero.y,
+            z: hero.z,
+            w: 0.1,
+            h: 0.1,
+            vx: 0.0,
+            vy: 0.0,
+            vz: 0.0,
+            ax: randomIntFromInterval(-50, 50),
+            ay: randomIntFromInterval(-20, 200),
+            az: randomIntFromInterval(-450, 450)
+        });
+    }
+}
+
+function triggerDeathRattle(projectionMatrix) {
+    if (gameover && deathT < 5.0) {
+        for (let i = 0; i < bloodCount; ++i) {
+            blood[i].x += blood[i].ax * delta * 0.25;
+            blood[i].y += blood[i].ay * delta * 0.25;
+            blood[i].z += blood[i].az * delta * 0.25;
+    
+            blood[i].ax -= delta;
+            blood[i].ay -= G * delta;
+            blood[i].az -= delta;
+            drawSquare(projectionMatrix, blood[i].x, blood[i].y, blood[i].z, blood[i].w, blood[i].h, 0, 0, 0, 0);
+        }
+    }
+    
+}
+
+function addBaton(x, y, w, h, radians, adj) {
+    let baton = {
+        x: x,
+        y: y,
+        ox: x,
+        oy: y,
+        w: w,
+        h: h,
+        radians: radians,
+        adj: adj,
+        state: 0,
+        stateDuration: 5,
+        statesT: [0, 0]
+    };
+
+    batons.push(baton);
+}
+
+function generateBatons(rippleX, rippleY) {
+    let n = 4;
+    let w = 0.2;
+    let h = 0.2;
+    let degrees = 0;
+
+    let adj = [
+        [h, 0, 0, 0],
+        [0, h, 0, 0],
+        [-h, 0, 0, 0],
+        [0, -h, 0, 0],
+        [h, h, 0, 0],
+        [-h, h, 0, 0],
+        [-h, -h, 0, 0],
+        [h, -h, 0, 0],
+    ]
+
+    for (let i = 0; i < n; ++i) {
+        let radians = degreesToRadians(degrees);
+        let x = w * Math.cos(radians) - adj[i][0];
+        let y = w * Math.sin(radians) - adj[i][1];
+        
+        // group 1
+        addBaton(x + rippleX, y + rippleY, w, h, radians, adj);
+
+        degrees += 90;
+    }
+
+    degrees = 45;
+    for (let i = 0; i < n; ++i) {
+        let radians = degreesToRadians(degrees);
+        let x = w * Math.cos(radians) - adj[i][0];
+        let y = w * Math.sin(radians) - adj[i][1];
+
+        // group 2
+        addBaton(x + rippleX, y + rippleY, w, h, radians, adj);
+
+        degrees += 90;
+    }
+}
+
+function initBatons(rippleX, rippleY) {
+    let w = 0.2;
+    let h = 0.2;
+    let degrees = 0;
+
+    batonBaseRadian = 0;
+    activateBatonPhase = 0;
+    batonReleaseMode = Math.floor(Math.random() * 2);
+    batonWheelCount = Math.floor(Math.random() * 2) ? 4 : 8;
+    
+    batonHoldDuration = Math.floor(Math.random() * 5) + 5;
+    if (batonReleaseMode == 0) {
+        batonReleaseForce = Math.floor(Math.random() * 20) + 10;
+    } else {
+        batonReleaseForce = Math.floor(Math.random() * 5) + 5;
+    }
+    
+    batonReleaseT = 0;
+    batonHoldT = 0;
+    batonReleaseVel = 0;
+
+    let adj = [
+        [h, 0, 0, 0],
+        [0, h, 0, 0],
+        [-h, 0, 0, 0],
+        [0, -h, 0, 0],
+        [h, h, 0, 0],
+        [-h, h, 0, 0],
+        [-h, -h, 0, 0],
+        [h, -h, 0, 0],
+    ]
+
+    for (let i = 0; i < 4; ++i) {
+        let radians = degreesToRadians(degrees);
+        let x = w * Math.cos(radians) - adj[i][0];
+        let y = w * Math.sin(radians) - adj[i][1];
+        batons[i].x = batons[i].ox = x + rippleX;
+        batons[i].y = batons[i].oy = y + rippleY;
+        batons[i].w = w;
+        batons[i].h = h;
+        batons[i].radians = radians;
+        batons[i].adj = adj;
+
+        degrees += 90;
+    }
+
+    degrees = 45;
+    for (let i = 4; i < 8; ++i) {
+        let radians = degreesToRadians(degrees);
+        let x = w * Math.cos(radians) - adj[i][0];
+        let y = w * Math.sin(radians) - adj[i][1];
+        batons[i].x = batons[i].ox = x + rippleX;
+        batons[i].y = batons[i].oy = y + rippleY;
+        batons[i].w = w;
+        batons[i].h = h;
+        batons[i].radians = radians;
+        batons[i].adj = adj;
+
+        degrees += 90;
+    }
+}
+
+function drawBatons(projectionMatrix, n) {
+    for (let i = 0; i < n; ++i) {
+        let adjX = 0;
+        let adjY = 0;
+
+        if (activateBatonPhase == 1) {
+            batons[i].w = Math.min(batons[i].w + 0.5 * delta, 3.0);
+            batons[i].x = batons[i].ox + batons[i].w * Math.cos(batons[i].radians);
+            batons[i].y = batons[i].oy + batons[i].w * Math.sin(batons[i].radians);
+            
+
+            if (batons[i].w == 3.0) {
+                if (batons[i].adj[i][0]) {
+                    batons[i].adj[i][2] = Math.min(batons[i].adj[i][2] + 1 * delta, batons[i].adj[i][0]);
+                    adjX = batons[i].adj[i][2];
+                } else if (batons[i].adj[i][1]) {
+                    batons[i].adj[i][3] = Math.min(batons[i].adj[i][3] + 1 * delta, batons[i].adj[i][1]);
+                    adjY = batons[i].adj[i][3];
+                }
+            }
+        } else  if (activateBatonPhase == 2) {
+            batons[i].x = batons[i].ox + (batons[i].w + batons[i].h) * Math.cos(batons[i].radians + batonBaseRadian);
+            batons[i].y = batons[i].oy + (batons[i].w + batons[i].h) * Math.sin(batons[i].radians + batonBaseRadian);
+        }
+        else  if (activateBatonPhase == 3) {
+            batons[i].x = batons[i].ox + (batons[i].w + batons[i].h + batonReleaseVel) * Math.cos(batons[i].radians + batonBaseRadian);
+            batons[i].y = batons[i].oy + (batons[i].w + batons[i].h + batonReleaseVel) * Math.sin(batons[i].radians + batonBaseRadian);
+        }
+
+        const { x, y, w, h, radians, adj } = batons[i];
+        
+        drawSquare(projectionMatrix, x + adjX, y + adjY, hero.z, w, h, 0, radians + batonBaseRadian, 1, 22); // enemy
+    }
+    // drawSquare(projectionMatrix, x, y, hero.z, sampleEnemy.sw, sampleEnemy.sh, 0, sampleEnemy.radians + 1.5708); // enemy
+
+}
 
 function main(w, h) {
     canvas.width = w;
     canvas.height = h;
-
-    canvas.style.display = 'block';
+    
+    // canvas.style.display = 'block';
+    // loading.style.display = 'none';
 
     scaleX = 1792 / w;
     // scaleX = w / 1792;
@@ -151,6 +425,9 @@ function main(w, h) {
     ceilingY = 10.2 * scaleX;
     minLeft = pianoKeysPos.white.lower.x;
     maxRight = pianoKeysPos.white.lower.x + pianoKeysPos.gap * 20;
+    
+    edgeLeft = pianoKeysPos.white.lower.x - 1.0;
+    edgeRight = maxRight + 1.0;
 
     groundLimit = groundY - 12.25;
 
@@ -167,8 +444,130 @@ function main(w, h) {
     // console.log(degreesToRadians(90));
 
     init();
+
+    generateBatons(0.0, 0.0);
+
+    addNote();
+    addNote();
+    addNote();
+    addNote();
+    addNote();
+    // addNote();
+    // addNote();
+    // addNote();
+    // addNote();
+    // addNote();
+
+    // initBlood();
     
     gameCycle();
+}
+
+function randomIntFromInterval(min, max) { // min and max included 
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function mkRandomNote() {
+    let x = randomIntFromInterval(minLeft, maxRight);
+    let mid = (maxRight - minLeft) / 2;
+    let y = ceilingY + randomIntFromInterval(0, 10);
+    let w = 1.0;
+    let h = 1.0;
+    let texId = randomIntFromInterval(15, 21);
+
+    let vx = randomIntFromInterval(5, 15);
+    let vy = randomIntFromInterval(5, 15);
+    
+    if (x > 0.0) {
+        vx *= -1;
+    }
+
+    let type = Math.floor(Math.random() * 2);
+
+    return {
+        x: x,
+        y: y,
+        w: w,
+        h: h,
+        radians: 0,
+        texId: texId,
+        vx: vx,
+        vy: vy,
+        type: type
+    }
+}
+
+function morphNote(i) {
+    let info = mkRandomNote();
+    const { x, y, w, h, radians, texId, vx, vy, type } = info;
+
+    notes[i] = {
+        x: x,
+        y: y,
+        w: w,
+        h: h,
+        radians: radians,
+        texId: texId,
+        vx: vx,
+        vy: vy,
+        type: type,
+        pressDepth: notesPressDepth
+    }
+}
+
+function addNote() {
+    let info = mkRandomNote();
+    const { x, y, w, h, radians, texId, vx, vy, type } = info;
+
+    let note = {
+        x: x,
+        y: y,
+        w: w,
+        h: h,
+        radians: radians,
+        texId: texId,
+        vx: vx,
+        vy: vy,
+        type: type,
+        pressDepth: notesPressDepth
+    }
+
+    notes.push(note);
+}
+
+function displayNotes(projectionMatrix) {
+    for (let i = 0; i < notes.length; ++i) {
+        const { x, y, w, h, radians, texId } = notes[i];
+        drawSquare(projectionMatrix, x, y, hero.z, w, h, 0, radians, 1, texId);
+        notes[i].x += notes[i].vx * delta;
+        notes[i].y -= notes[i].vy * delta;
+
+        if (notes[i].type == 1 && notes[i].y < groundY) {
+            notes[i].y = groundY;
+            let vx = randomIntFromInterval(5, 15);
+            if (notes[i].x > 0) {
+                vx *= -1;
+            }
+            notes[i].vx = vx;
+            notes[i].vy = 0;            
+        } else {
+            if (notes[i].type == 1 && notes[i].y == groundY) {
+                isNoteStepping = true;
+                pressSteppedKeys(notes[i]);
+            } else {
+                isNoteStepping = false;
+            }
+
+            if (notes[i].x < edgeLeft || notes[i].x > edgeRight) {
+                morphNote(i);
+            }
+            if (notes[i].y < groundLimit) {
+                morphNote(i);
+            }
+        }
+
+        
+    }
 }
 
 function init() {
@@ -245,9 +644,13 @@ function init() {
 
         uniform sampler2D uSampler;
         uniform int hasSampler;
+        uniform int isBg;
         uniform highp float u_time;
         uniform highp vec2 u_ripplePoint;
         uniform highp float u_portal_radius;
+
+        uniform lowp vec4 newColor;
+        uniform int useNewColor;
 
         void ripples() {
             highp vec2 uv = vTextureCoord;
@@ -275,12 +678,30 @@ function init() {
 
         void main(void) {
             if (hasSampler == 1) {
-                // highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
-                // gl_FragColor = vec4(texelColor.rgb, 1.0);
+                if (isBg == 1) {
+                    ripples();
+                    
+                } else {
+                    // highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
+                    // gl_FragColor = vec4(texelColor.rgb, texelColor.a);
+                    highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
+                    // highp float a = 1.0;
+                    // if (texelColor.r == 1.0 && texelColor.g == 1.0 && texelColor.b == 1.0) {
+                    //     a = 0.0;
+                    // }
+                    gl_FragColor = vec4(texelColor.rgb, texelColor.a);
+                    // gl_FragColor.rgb *= gl_FragColor.a;
+                    // ripples();
+                }
 
-                ripples();
+                // ripples();
             } else {
-                gl_FragColor = vec4(vColor.rgb * vLighting, vColor.a);
+                if (useNewColor == 1) {
+                    gl_FragColor = vec4((vColor.rgb - newColor.rgb) * vLighting, vColor.a);
+                } else {
+                    gl_FragColor = vec4(vColor.rgb * vLighting, vColor.a);
+                }
+                
                 // ripples();
             }
             
@@ -332,6 +753,9 @@ function init() {
           u_time: gl.getUniformLocation(shaderProgram, "u_time"),
           u_ripplePoint: gl.getUniformLocation(shaderProgram, "u_ripplePoint"),
           u_portal_radius: gl.getUniformLocation(shaderProgram, "u_portal_radius"),
+          isBg: gl.getUniformLocation(shaderProgram, "isBg"),
+          newColor: gl.getUniformLocation(shaderProgram, "newColor"),
+          useNewColor: gl.getUniformLocation(shaderProgram, "useNewColor"),
         },
     };
 
@@ -340,9 +764,53 @@ function init() {
     // console.log(buffers.sphere.colors.list);
 
     // Load texture
-    g_texture = loadTexture(gl, "assets/textures/bg.png");
+    g_textures.push(loadTexture(gl, "assets/textures/bg.png"));
+
+    // vertical 1 - 6
+    g_textures.push(loadTexture(gl, "assets/textures/staccato/1.png"));
+    g_textures.push(loadTexture(gl, "assets/textures/staccato/2.png"));
+    g_textures.push(loadTexture(gl, "assets/textures/staccato/3.png"));
+    g_textures.push(loadTexture(gl, "assets/textures/staccato/4.png"));
+    g_textures.push(loadTexture(gl, "assets/textures/staccato/5.png"));
+    g_textures.push(loadTexture(gl, "assets/textures/staccato/6.png"));
+
+    // slide 7 - 10
+    g_textures.push(loadTexture(gl, "assets/textures/staccato/slide/right/1.png"));
+    g_textures.push(loadTexture(gl, "assets/textures/staccato/slide/right/2.png"));
+    g_textures.push(loadTexture(gl, "assets/textures/staccato/slide/left/1.png"));
+    g_textures.push(loadTexture(gl, "assets/textures/staccato/slide/right/2.png"));
+
+     // slide 11 - 14
+     g_textures.push(loadTexture(gl, "assets/textures/staccato/glide/right/1.png"));
+     g_textures.push(loadTexture(gl, "assets/textures/staccato/glide/right/2.png"));
+     g_textures.push(loadTexture(gl, "assets/textures/staccato/glide/left/1.png"));
+     g_textures.push(loadTexture(gl, "assets/textures/staccato/glide/right/2.png"));
+
+     // notes 15 - 21 (1, 2, 10, 14, 6, 7, 13)
+     g_textures.push(loadTexture(gl, "assets/textures/notes/1.png"));
+     g_textures.push(loadTexture(gl, "assets/textures/notes/2.png"));
+     g_textures.push(loadTexture(gl, "assets/textures/notes/6.png"));
+     g_textures.push(loadTexture(gl, "assets/textures/notes/7.png"));
+     g_textures.push(loadTexture(gl, "assets/textures/notes/10.png"));
+     g_textures.push(loadTexture(gl, "assets/textures/notes/13.png"));
+     g_textures.push(loadTexture(gl, "assets/textures/notes/14.png"));
+
+     // baton 22
+     g_textures.push(loadTexture(gl, "assets/textures/baton.png"));
+
+    // g_textures.push(loadTexture(gl, "assets/textures/notes/1.png"));
     // Flip image pixels into the bottom-to-top order that WebGL expects.
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+
+    // audio
+    // loadAudio(bgSound, 'sounds/bg', 'mp3');
+    bgSound = new Audio();
+    bgSound.src = 'assets/sounds/bg.mp3';
+    totalAssets++;
+    bgSound.addEventListener('canplaythrough', () => {
+        loaded++;
+    }, false);
 
     initKeys();
 
@@ -361,8 +829,15 @@ function rngYesNo() {
 
 function updateRipplePoint() {
     let rngX = rngPosNeg(5) * rngYesNo() / 10;
-    let rngY = rngPosNeg(5) * rngYesNo() / 10;
+    let rngY = (rngYesNo() ? 5.0 : 0.0) / 10; // avoid negative y for this
+    // let rngY = rngPosNeg(5) * rngYesNo() / 10;
     ripplePoint = [rngX, rngY];
+
+    let rippleX = 0;
+    if (rngX > 0) rippleX = 15.0;
+    if (rngX < 0) rippleX = -15.0;
+
+    initBatons(rippleX, rngY ? 9.0 : 0.0);
     gl.uniform2fv(programInfo.uniformLocations.u_ripplePoint, ripplePoint);
 }
 
@@ -375,6 +850,7 @@ function updatePortalRadius() {
         if (portalT > portalDuration) {
             isPortalOpening = false;
             portalT = 0;
+            activateBatonPhase = 1;
         }
     } else if (!isPortalOpening && portalRadius > 0) {
         timer += delta;
@@ -382,6 +858,7 @@ function updatePortalRadius() {
         if (portalRadius <= 0) {
             portalRadius = 0;
             timer = 0;
+            activateBatonPhase = 2;
         }
     }
 
@@ -390,9 +867,19 @@ function updatePortalRadius() {
 
 function controls() {
     document.addEventListener('click', (e) => {
-        updateRipplePoint();
-        isPortalOpening = true;
-        portalRadius = 0;
+        // updateRipplePoint();
+        // isPortalOpening = true;
+        // activateBatonPhase = 0;
+        // portalRadius = 0;
+        
+        if (!gamestart && loaded >= totalAssets) {
+            canvas.style.display = 'block';
+            loading.style.display = 'none';
+            
+            bgSound.loop = true;
+            bgSound.play();
+            gamestart = true;
+        }
     });
 
     document.addEventListener('keydown', (e) => {
@@ -404,9 +891,12 @@ function controls() {
             hero.moveTo = steppedKeys[0];
             hero.isDashing = false;
             hero.ay = -50 * scaleX;
+            
         } else if (key in PIANO_KEYS) {
             if (!keys[PIANO_KEYS[key]].pressed) {
                 pressPianoKey(PIANO_KEYS[key]);
+                keys[PIANO_KEYS[key]].health = 0;
+
                 hero.moveTo = PIANO_KEYS[key];
                 // if (!hero.isAirborne) {
                     
@@ -440,11 +930,11 @@ function controls() {
                 isKeyDown = false;
             }
         } else {
-            if (key == 'ArrowRight') {
-                moveHeroToPos(Math.min(20, hero.pos + 1));
-            } if (key == 'ArrowLeft') {
-                moveHeroToPos(Math.max(0, hero.pos - 1));
-            }
+            // if (key == 'ArrowRight') {
+            //     moveHeroToPos(Math.min(20, hero.pos + 1));
+            // } if (key == 'ArrowLeft') {
+            //     moveHeroToPos(Math.max(0, hero.pos - 1));
+            // }
         }
     });
 }
@@ -480,8 +970,8 @@ function getPianoKeyPressDepth(idx) {
     if (keys[idx].up || keys[idx].pressed) {
         pressDepth = keys[idx].depth;
     } else if (keys[idx].sprites.up || keys[idx].sprites.pressed) {
-        if (!hero.isAirborne)
-        pressDepth = keys[idx].sprites.depth;
+        // if (!hero.isAirborne || isNoteStepping)
+            pressDepth = keys[idx].sprites.depth;
     }
 
     return pressDepth;
@@ -520,20 +1010,26 @@ function initKeys() {
                 pressT: 0,
                 pressDepth: 0,
                 depth: 0
-            }
+            },
+            health: 0.0
         }
     }
 }
 
 function drawScene() {
-    gl.clearColor(0.1, 0.2, 0.3, 1.0); // Clear to black, fully opaque
+    gl.clearColor(1.0, 1.0, 1.0, 0.0); // Clear to black, fully opaque
     gl.clearDepth(1.0); // Clear everything
+    gl.enable (gl.BLEND);
+    gl.blendFunc(gl.DST_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    // gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
     gl.enable(gl.DEPTH_TEST); // Enable depth testing
+    
     gl.depthFunc(gl.LEQUAL); // Near things obscure far things
   
     // Clear the canvas before we start drawing on it.
   
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
 
     // Create a perspective matrix, a special matrix that is
     // used to simulate the distortion of perspective in a camera.
@@ -552,33 +1048,63 @@ function drawScene() {
     // as the destination to receive the result.
     mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
+    
+
+    drawSquare(projectionMatrix, 0.0, 0.0, hero.z - 10.0, 1.81 * 16.1 * scaleX, 1.0 * 16.1 * scaleX, 1, 0.0, 1, 0); // hero
+
+    
     // drawPiano(projectionMatrix, 9.7, 2.5, 5.0);
     // drawPiano(projectionMatrix, 11.0, 2.5, 5.0);
     // drawPiano(projectionMatrix, pianoKeysPos.white.lower.x, pianoKeysPos.white.lower.y, pianoKeysPos.white.lower.z);
     drawPiano(projectionMatrix, pianoKeysPos.white.lower.x, pianoKeysPos.white.lower.y, pianoKeysPos.white.lower.z);
-    drawSquare(projectionMatrix, hero.x, hero.y, hero.z, hero.sw, hero.sh, 1, hero.radians, 0); // hero
 
-    let x = sampleEnemy.sw * Math.cos(sampleEnemy.radians);
-    let y = sampleEnemy.sw * Math.sin(sampleEnemy.radians);
-    drawSquare(projectionMatrix, x, y, hero.z, sampleEnemy.sw, sampleEnemy.sh, 0, sampleEnemy.radians); // enemy
+    if (!gameover) {
+        let state = hero.currentState;
+        hero.state[state].frame += 5.0 * delta;
+        let frame = Math.floor((hero.state[state].frame)) + 1; // jump
+        if (frame > hero.state[state].frames) frame = hero.state[state].frames;
+        
 
-
-    x = sampleEnemy.sw * Math.cos(sampleEnemy.radians + 1.5708);
-    y = sampleEnemy.sw * Math.sin(sampleEnemy.radians + 1.5708);
-    drawSquare(projectionMatrix, x, y, hero.z, sampleEnemy.sw, sampleEnemy.sh, 0, sampleEnemy.radians + 1.5708); // enemy
-
-    x = sampleEnemy.sw * Math.cos(sampleEnemy.radians + 3.14159);
-    y = sampleEnemy.sw * Math.sin(sampleEnemy.radians + 3.14159);
-    drawSquare(projectionMatrix, x, y, hero.z, sampleEnemy.sw, sampleEnemy.sh, 0, sampleEnemy.radians + 3.14159); // enemy
-
-    x = sampleEnemy.sw * Math.cos(sampleEnemy.radians + 4.71239);
-    y = sampleEnemy.sw * Math.sin(sampleEnemy.radians + 4.71239);
-    drawSquare(projectionMatrix, x, y, hero.z, sampleEnemy.sw, sampleEnemy.sh, 0, sampleEnemy.radians + 4.71239); // enemy
-    // drawSquare(projectionMatrix, sampleEnemy.x, sampleEnemy.y, hero.z, sampleEnemy.sw, sampleEnemy.sh, 0, sampleEnemy.radians); // enemy
-
-    drawSquare(projectionMatrix, 0.0, 0.0, hero.z - 10.0, 1.81 * 16.1, 1.0 * 16.1, 1, 0.0, 1); // hero
-
+        drawSquare(projectionMatrix, hero.x, hero.y, hero.z, hero.sw, hero.sh, 1, hero.radians, 1, frame + hero.state[state].start); // hero
+    }
     
+    if (activateBatonPhase) {
+        if (activateBatonPhase == 2) {
+            batonBaseRadian += delta;
+            batonHoldT += delta;
+            if (batonHoldT > batonHoldDuration) {
+                activateBatonPhase = 3;
+            }
+        } else if (activateBatonPhase == 3) {
+            batonReleaseT += delta;
+            batonReleaseVel += batonReleaseForce * delta; 
+            if (batonReleaseMode == 1) {
+                batonBaseRadian += delta;
+            }
+
+            if (batonReleaseT > 12) {
+                activateBatonPhase = 0;
+                batonReleaseT = 0;
+            }
+        }
+
+        drawBatons(projectionMatrix, batonWheelCount);
+
+        // batonBaseRadian += delta;
+    } else if (!isPortalOpening) {
+        if (delta < 1) {
+            batonReleaseT += delta;
+            if (batonReleaseT > 10) {
+                updateRipplePoint();
+                isPortalOpening = true;
+                portalRadius = 0;
+            }
+        }
+    }
+
+    displayNotes(projectionMatrix);
+
+    triggerDeathRattle(projectionMatrix);
     
 }
 
@@ -598,7 +1124,7 @@ function drawPiano(projectionMatrix, xAdj, yAdj, zAdj) {
         //     pressDepth = keys[i].depth;
         // }
 
-        drawKey(projectionMatrix, start, yPos - pressDepth, pianoKeysPos.white.lower.z, 1.0, 1.0, 0);
+        drawKey(projectionMatrix, start, yPos - pressDepth, pianoKeysPos.white.lower.z, 1.0, 1.0, 0, i);
         start += pianoKeysPos.gap;
     }
 
@@ -628,18 +1154,18 @@ function drawPiano(projectionMatrix, xAdj, yAdj, zAdj) {
         // }
 
         if (r == 0.4) {
-            drawKey(projectionMatrix, start, yPos - pressDepth, pianoKeysPos.white.upper.z, 0.6, 1.0, 0);
+            drawKey(projectionMatrix, start, yPos - pressDepth, pianoKeysPos.white.upper.z, 0.6, 1.0, 0, i);
         } else {
-            drawKey(projectionMatrix, start, yPos - pressDepth, pianoKeysPos.white.upper.z, 0.5, 1.0, 0);
+            drawKey(projectionMatrix, start, yPos - pressDepth, pianoKeysPos.white.upper.z, 0.5, 1.0, 0, i);
         }
 
         if (!pianoKeysPos.black.guide[i]) { // bruteforce
             if (i == 4) {
-                drawKey(projectionMatrix, (start + pianoKeysPos.gap + r) - 1.2, yPos + 0.35, pianoKeysPos.black.z, 0.6, 1.35, 1);
+                drawKey(projectionMatrix, (start + pianoKeysPos.gap + r) - 1.2, yPos + 0.35, pianoKeysPos.black.z, 0.6, 1.35, 1, -1);
             } else if (i == 5) {
-                drawKey(projectionMatrix, (start + pianoKeysPos.gap + r) - 1.2, yPos + 0.35, pianoKeysPos.black.z, 0.6, 1.35, 1);
+                drawKey(projectionMatrix, (start + pianoKeysPos.gap + r) - 1.2, yPos + 0.35, pianoKeysPos.black.z, 0.6, 1.35, 1, -1);
             } else {
-                drawKey(projectionMatrix, (start + pianoKeysPos.gap + r) - 1.2, yPos + 0.35, pianoKeysPos.black.z, 0.6, 1.35, 1);
+                drawKey(projectionMatrix, (start + pianoKeysPos.gap + r) - 1.2, yPos + 0.35, pianoKeysPos.black.z, 0.6, 1.35, 1, -1);
             }
         }
 
@@ -649,7 +1175,7 @@ function drawPiano(projectionMatrix, xAdj, yAdj, zAdj) {
     }
 }
 
-function drawKey(projectionMatrix, x, y, z, width, height, colorIdx) {
+function drawKey(projectionMatrix, x, y, z, width, height, colorIdx, keyIdx) {
     // Set the drawing position to the "identity" point, which is
     // the center of the scene.
     const modelViewMatrix = mat4.create();
@@ -732,8 +1258,14 @@ function drawKey(projectionMatrix, x, y, z, width, height, colorIdx) {
 
     gl.uniform1i(programInfo.uniformLocations.hasSampler, 0);
 
-
-
+    if (keyIdx > -1) {
+        gl.uniform1i(programInfo.uniformLocations.useNewColor, 1);
+        let health = keys[keyIdx].health;
+        gl.uniform4fv(programInfo.uniformLocations.newColor, [health, health, health, 1.0]);
+    } else {
+        gl.uniform1i(programInfo.uniformLocations.useNewColor, 0);
+    }
+    
     {
         const vertexCount = 36;
         const type = gl.UNSIGNED_SHORT;
@@ -742,7 +1274,7 @@ function drawKey(projectionMatrix, x, y, z, width, height, colorIdx) {
     }
 }
 
-function drawSquare(projectionMatrix, x, y, z, width, height, colorIdx, radians, useTexture, isRotating) {
+function drawSquare(projectionMatrix, x, y, z, width, height, colorIdx, radians, useTexture, textureIdx) {
     // Set the drawing position to the "identity" point, which is
     // the center of the scene.
     const modelViewMatrix = mat4.create();
@@ -809,14 +1341,22 @@ function drawSquare(projectionMatrix, x, y, z, width, height, colorIdx, radians,
     //     gl.uniform1f(programInfo.uniformLocations.u_portal_radius, portalRadius);
     // }
 
-    // // Tell WebGL we want to affect texture unit 0
-    // gl.activeTexture(gl.TEXTURE0);
+    if (useTexture) {
+        // Tell WebGL we want to affect texture unit 0
+        gl.activeTexture(gl.TEXTURE0);
 
-    // // Bind the texture to texture unit 0
-    // gl.bindTexture(gl.TEXTURE_2D, g_texture);
+        // Bind the texture to texture unit 0
+        gl.bindTexture(gl.TEXTURE_2D, g_textures[textureIdx]);
 
-    // // Tell the shader we bound the texture to texture unit 0
-    // gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
+        // Tell the shader we bound the texture to texture unit 0
+        gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
+
+        if (textureIdx == 0) {
+            gl.uniform1i(programInfo.uniformLocations.isBg, 1);
+        } else {
+            gl.uniform1i(programInfo.uniformLocations.isBg, 0);
+        }
+    }
     
 
     {
@@ -937,6 +1477,7 @@ function setTextureAttribute(gl, textureCoord, programInfo) {
 // When the image finished loading copy it into the texture.
 //
 function loadTexture(gl, url) {
+    totalAssets++;
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
   
@@ -990,6 +1531,8 @@ function loadTexture(gl, url) {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       }
+
+      loaded++;
     };
     image.src = url;
   
@@ -1034,6 +1577,12 @@ function heroDashJump(to) {
     let edge = pianoKeysPos.white.upper.x + pianoKeysPos.gap * to + hero.adjX - centerAdj;
 
     if (hero.pos < to) {
+        if (!hero.isAirborne) {
+            updateHeroState(hero.stateTypes.SLIDE_RIGHT);
+        } else {
+            updateHeroState(hero.stateTypes.GLIDE_RIGHT);
+        }
+
         if (hero.x < edge) {
             hero.x += hero.dashSpeed * delta;
             hero.isDashing = true;
@@ -1043,6 +1592,11 @@ function heroDashJump(to) {
             hero.isDashing = false;   
         }
     } else if (hero.pos > to) {
+        if (!hero.isAirborne) {
+            updateHeroState(hero.stateTypes.SLIDE_LEFT);
+        } else {
+            updateHeroState(hero.stateTypes.GLIDE_LEFT);
+        }
         if (hero.x > edge) {
             hero.x -= hero.dashSpeed * delta;
             hero.isDashing = true;
@@ -1054,20 +1608,29 @@ function heroDashJump(to) {
     } else {
         // jump
         hero.isDashing = false;
-
+        
         if (isKeyDown) {
             if (hero.allowJump) {
                 hero.ay = 25 * scaleX;
                 hero.allowJump = false;
-                
+                updateHeroState(hero.stateTypes.JUMP);
             } 
             
             if (isKeyDown) {
                 hero.ay += 1.20 * scaleX;
             }
         }
+
+        if (hero.currentState != hero.stateTypes.JUMP) {
+            updateHeroState(hero.stateTypes.IDLE);
+        }
         
     }
+}
+
+function updateHeroState(state) {
+    hero.currentState = state;
+    hero.state[state].frame = 0;
 }
 
 function updateHero() {
@@ -1091,22 +1654,77 @@ function updateHero() {
     }
 
     if (!hero.isAirborne) {
-        let steppedKeys = getSteppedKeys(hero.x, 1.0);
-        for (let i = 0; i < totalKeys; ++i) {
-            if (!keys[i].sprites.pressed) {
-                if (steppedKeys[0] == i || steppedKeys[1] == i) {
-                    spritePianoKeyDown(i, hero.pressDepth);
-                }
-            } else if (!keys[i].sprites.up) {
-                if (steppedKeys[0] != i && steppedKeys[1] != i) {
-                    spritePianoKeyUp(i);
-                }
-            }
+        let sk = pressSteppedKeys(hero);
+        if (keys[sk[0]].health == 1 || keys[sk[1]].health == 1) {
+            initGameover();
         }
+        // let steppedKeys = getSteppedKeys(hero.x, 1.0);
+        // for (let i = 0; i < totalKeys; ++i) {
+        //     if (!keys[i].sprites.pressed) {
+        //         if (steppedKeys[0] == i || steppedKeys[1] == i) {
+        //             spritePianoKeyDown(i, hero.pressDepth);
+        //         }
+        //     } else if (!keys[i].sprites.up) {
+        //         if (steppedKeys[0] != i && steppedKeys[1] != i) {
+        //             spritePianoKeyUp(i);
+        //         }
+        //     }
+        // }
     }
 }
 
-function checkCollisions() {
+function pressSteppedKeys(obj) {
+    let steppedKeys = getSteppedKeys(obj.x, 1.0);
+    for (let i = 0; i < totalKeys; ++i) {
+        if (!keys[i].sprites.pressed) {
+            if (steppedKeys[0] == i || steppedKeys[1] == i) {
+                spritePianoKeyDown(i, obj.pressDepth);
+            }
+        } else if (!keys[i].sprites.up) {
+            if (steppedKeys[0] != i && steppedKeys[1] != i) {
+                spritePianoKeyUp(i);
+            }
+        }
+    }
+
+    return steppedKeys;
+}
+
+function checkBatonCollisions() {
+    if (activateBatonPhase > 0) {
+        for (let i = 0; i < batonWheelCount; ++i) {
+            if (checkCollisions({
+                x: batons[i].x,
+                y: batons[i].y,
+                sw: batons[i].w,
+                sh: batons[i].h,
+                radians: batons[i].radians
+            })) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+function checkNoteCollisions() {
+    for (let i = 0; i < notes.length; ++i) {
+        if (checkCollisions({
+            x: notes[i].x,
+            y: notes[i].y,
+            sw: notes[i].w,
+            sh: notes[i].h,
+            radians: notes[i].radians
+        })) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function checkCollisions(obj) {
     return checkAngledCollisions(
         {
             x: hero.x - hero.w * hero.sw,
@@ -1116,56 +1734,90 @@ function checkCollisions() {
             radians: hero.radians
         },
         {
-            x: sampleEnemy.x - (sampleEnemy.w) * sampleEnemy.sw,
-            y: sampleEnemy.y - (sampleEnemy.h) * sampleEnemy.sh,
-            w: sampleEnemy.w * 2 * sampleEnemy.sw,
-            h: sampleEnemy.h * 2 * sampleEnemy.sh,
-            radians: sampleEnemy.radians
+            x: obj.x - obj.sw,
+            y: obj.y - obj.sh,
+            w: 2 * obj.sw,
+            h: 2 * obj.sh,
+            radians: obj.radians
         },
     )
 }
 
+// function checkCollisions() {
+//     return checkAngledCollisions(
+//         {
+//             x: hero.x - hero.w * hero.sw,
+//             y: hero.y - hero.h * hero.sh,
+//             w: hero.w * 2 * hero.sw,
+//             h: hero.h * 2 * hero.sh,
+//             radians: hero.radians
+//         },
+//         {
+//             x: sampleEnemy.x - (sampleEnemy.w) * sampleEnemy.sw,
+//             y: sampleEnemy.y - (sampleEnemy.h) * sampleEnemy.sh,
+//             w: sampleEnemy.w * 2 * sampleEnemy.sw,
+//             h: sampleEnemy.h * 2 * sampleEnemy.sh,
+//             radians: sampleEnemy.radians
+//         },
+//     )
+// }
+
 function update() {
     // cubeRotation += delta;
-    sampleEnemy.radians += delta;
+    // sampleEnemy.radians += delta;
     if (delta < 1) {
+        totalTime += delta;
+        drawScene();
+
         heroDashJump(hero.moveTo);
         updateHero();
+
         for (let i = 0; i < totalKeys; ++i) {
             updatePianoKeys(keys[i]);
             updatePianoKeys(keys[i].sprites);
+            keys[i].health += 0.025 * delta;
+            keys[i].health = Math.min(1, keys[i].health);
         }
 
-        if (checkCollisions()) {
-            console.log('collided');
+        if (checkBatonCollisions()) {
+            // console.log('collided with baton');
+            initGameover();
+        } else if (checkNoteCollisions()) {
+            // console.log('collided with note');
+            
+            initGameover();
         }
-
-        // if (isPortalOpening) {
-        //     timer += delta;
-        //     if (timer > 3) {
-        //         isPortalOpening = false;
-        //     } else {
-        //         timer += delta;
-        //         if (timer > 10) {
-        //             isPortalOpening = false;
-        //         }
-        //     }
-            
-            
-        // } else if (timer > startPortalT) {
-        //     timer -= delta;
-        //     if (timer <= startPortalT) {
-        //         timer = startPortalT;
-        //     }
-        // }
 
         updatePortalRadius();
 
         gl.uniform1f(programInfo.uniformLocations.u_time, timer);
 
         // if (timer )
+
+        // hero.frameAnimT += delta;
     }
-    
+}
+
+function initGameover() {
+    initBlood();
+    gameoverScreen.style.display = 'block';
+    totalSurvivalTime.innerHTML = totalTime.toFixed(2) + ' seconds.';
+    gameover = true;
+}
+
+function gameoverScene() {
+    drawScene();
+
+    for (let i = 0; i < totalKeys; ++i) {
+        updatePianoKeys(keys[i]);
+        updatePianoKeys(keys[i].sprites);
+        keys[i].health += 0.05 * delta;
+        keys[i].health = Math.min(1, keys[i].health);
+    }
+
+    updatePortalRadius();
+
+    gl.uniform1f(programInfo.uniformLocations.u_time, timer);
 }
 
 function gameCycle() {
@@ -1173,9 +1825,23 @@ function gameCycle() {
     delta = (now - last) / 1000;
     last = now;
 
-
-    drawScene();
-    update();
+    if (gamestart) {
+        if (!gameover) {
+            update();
+        } else {
+            deathT += delta;
+            gameoverScene();
+        }
+    } else {
+        if (loaded >= totalAssets) {
+            // canvas.style.display = 'block';
+            // loading.style.display = 'none';
+            
+            // gamestart = true;
+            loading.innerHTML = 'Click anywhere to play.'
+        }
+    }
+    
 
     requestAnimationFrame(gameCycle);
 }
