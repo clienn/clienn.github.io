@@ -204,7 +204,7 @@ var gameover = false;
 var loaded = 0;
 var totalAssets = 0;
 
-var gamestart = false;
+var gamestart = 0;
 var totalTime = 0;
 
 var bgSound = null;
@@ -799,8 +799,9 @@ function init() {
      // baton 22
      g_textures.push(loadTexture(gl, "assets/textures/baton.png"));
 
-     // Load texture 23
+     // Load texture 23 - 24
      g_textures.push(loadTexture(gl, "assets/textures/logo.png"));
+     g_textures.push(loadTexture(gl, "assets/textures/instructions.png"));
 
 
     // g_textures.push(loadTexture(gl, "assets/textures/notes/1.png"));
@@ -889,9 +890,13 @@ function controls() {
             canvas.style.display = 'block';
             loading.style.display = 'none';
             
+            // bgSound.loop = true;
+            // bgSound.play();
+            gamestart = 1;
+        } else if (gamestart == 1) {
             bgSound.loop = true;
             bgSound.play();
-            gamestart = true;
+            gamestart = 2;
         }
     });
 
@@ -904,10 +909,14 @@ function controls() {
             canvas.style.display = 'block';
             loading.style.display = 'none';
             
+            // bgSound.loop = true;
+            // bgSound.play();
+            gamestart = 1;
+        } else if (gamestart == 1) {
             bgSound.loop = true;
             bgSound.play();
-            gamestart = true;
-        } else {
+            gamestart = 2;
+        } else if (gamestart == 2) {
             let key = e.key;
             if (key == ' ') {
                 let steppedKeys = getSteppedKeys(hero.x, 1.0);
@@ -1080,7 +1089,7 @@ function drawScene() {
     mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
     
-    if (gamestart) {
+    if (gamestart == 2) {
         drawSquare(projectionMatrix, 0.0, 0.0, hero.z - 10.0, 1.81 * 16.1 * scaleX, 1.0 * 16.1 * scaleX, 1, 0.0, 1, 0); // hero
 
     
@@ -1137,7 +1146,20 @@ function drawScene() {
 
         triggerDeathRattle(projectionMatrix);
     } else {
-        drawSquare(projectionMatrix, 0.0, 0.0, hero.z - 10.0, 1.81 * 16.1 * scaleX, 1.0 * 16.1 * scaleX, 1, 0.0, 1, 23); // hero
+        if (gamestart == 0) {
+            drawSquare(projectionMatrix, 0.0, 0.0, hero.z - 10.0, 1.81 * 16.1 * scaleX, 1.0 * 16.1 * scaleX, 1, 0.0, 1, 23); // hero
+        } else if (gamestart == 1) {
+            console.log(canvas.width)
+            if (canvas.width >= 1792) {
+
+                drawSquare(projectionMatrix, 0.0, 0.0, hero.z - 10.0, 1.81 * 16.1 * scaleX, 1.0 * 15.4 * scaleX, 1, 0.0, 1, 24); // hero
+            } else {
+                drawSquare(projectionMatrix, 0.0, 0.0, -2.1, 0.60, 0.40, 1, 0.0, 1, 24); // hero
+            }
+            
+            
+        }
+        
     }
 
     
@@ -1900,7 +1922,7 @@ function gameCycle() {
     delta = (now - last) / 1000;
     last = now;
 
-    if (gamestart) {
+    if (gamestart == 2) {
         if (!gameover) {
             update();
         } else {
