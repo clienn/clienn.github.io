@@ -71,7 +71,7 @@ const pianoKeysPos = {
 
 const hero = {
     pos: 0,
-    moveTo: 0,
+    moveTo: 10,
     x: 0,
     y: 0,
     z: 0,
@@ -208,13 +208,14 @@ var gamestart = false;
 var totalTime = 0;
 
 var bgSound = null;
+var bgDeath = null;
 
 function initBlood() {
     for (let i = 0; i < bloodCount; ++i) {
         blood.push({
-            x: hero.x,
-            y: hero.y,
-            z: hero.z,
+            x: 0,
+            y: 0,
+            z: 0,
             w: 0.1,
             h: 0.1,
             vx: 0.0,
@@ -237,7 +238,7 @@ function triggerDeathRattle(projectionMatrix) {
             blood[i].ax -= delta;
             blood[i].ay -= G * delta;
             blood[i].az -= delta;
-            drawSquare(projectionMatrix, blood[i].x, blood[i].y, blood[i].z, blood[i].w, blood[i].h, 0, 0, 0, 0);
+            drawSquare(projectionMatrix, blood[i].x + hero.x, blood[i].y + hero.y, blood[i].z + hero.z, blood[i].w, blood[i].h, 0, 0, 0, 0);
         }
     }
     
@@ -798,6 +799,10 @@ function init() {
      // baton 22
      g_textures.push(loadTexture(gl, "assets/textures/baton.png"));
 
+     // Load texture 23
+     g_textures.push(loadTexture(gl, "assets/textures/logo.png"));
+
+
     // g_textures.push(loadTexture(gl, "assets/textures/notes/1.png"));
     // Flip image pixels into the bottom-to-top order that WebGL expects.
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -809,6 +814,13 @@ function init() {
     bgSound.src = 'assets/sounds/bg.mp3';
     totalAssets++;
     bgSound.addEventListener('canplaythrough', () => {
+        loaded++;
+    }, false);
+
+    bgDeath = new Audio();
+    bgDeath.src = 'assets/sounds/splash.wav';
+    totalAssets++;
+    bgDeath.addEventListener('canplaythrough', () => {
         loaded++;
     }, false);
 
@@ -871,8 +883,9 @@ function controls() {
         // isPortalOpening = true;
         // activateBatonPhase = 0;
         // portalRadius = 0;
-        
-        if (!gamestart && loaded >= totalAssets) {
+        if (gameover) {
+            reset();
+        } else if (!gamestart && loaded >= totalAssets) {
             canvas.style.display = 'block';
             loading.style.display = 'none';
             
@@ -885,26 +898,44 @@ function controls() {
     document.addEventListener('keydown', (e) => {
         e.preventDefault();
 
-        let key = e.key;
-        if (key == ' ') {
-            let steppedKeys = getSteppedKeys(hero.x, 1.0);
-            hero.moveTo = steppedKeys[0];
-            hero.isDashing = false;
-            hero.ay = -50 * scaleX;
+        if (gameover) {
+            reset();
+        } else if (!gamestart && loaded >= totalAssets) {
+            canvas.style.display = 'block';
+            loading.style.display = 'none';
             
-        } else if (key in PIANO_KEYS) {
-            if (!keys[PIANO_KEYS[key]].pressed) {
-                pressPianoKey(PIANO_KEYS[key]);
-                keys[PIANO_KEYS[key]].health = 0;
-
-                hero.moveTo = PIANO_KEYS[key];
-                // if (!hero.isAirborne) {
-                    
-                // }
-                hero.allowJump = true;
-                isKeyDown = true;
+            bgSound.loop = true;
+            bgSound.play();
+            gamestart = true;
+        } else {
+            let key = e.key;
+            if (key == ' ') {
+                let steppedKeys = getSteppedKeys(hero.x, 1.0);
+                hero.moveTo = steppedKeys[0];
+                hero.isDashing = false;
+                hero.ay = -50 * scaleX;
+                
+            } else if (key in PIANO_KEYS) {
+                if (keys[PIANO_KEYS[key]].health < 1.0) {
+                    if (!keys[PIANO_KEYS[key]].pressed) {
+                        pressPianoKey(PIANO_KEYS[key]);
+                        keys[PIANO_KEYS[key]].health = 0;
+    
+                        hero.moveTo = PIANO_KEYS[key];
+                        // if (!hero.isAirborne) {
+                            
+                        // }
+                        hero.allowJump = true;
+                        isKeyDown = true;
+                    }
+                } else {
+                    initGameover();
+                }
+                
             }
         }
+
+        
     });
 
     document.addEventListener('keyup', (e) => {
@@ -1049,62 +1080,67 @@ function drawScene() {
     mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
     
-
-    drawSquare(projectionMatrix, 0.0, 0.0, hero.z - 10.0, 1.81 * 16.1 * scaleX, 1.0 * 16.1 * scaleX, 1, 0.0, 1, 0); // hero
+    if (gamestart) {
+        drawSquare(projectionMatrix, 0.0, 0.0, hero.z - 10.0, 1.81 * 16.1 * scaleX, 1.0 * 16.1 * scaleX, 1, 0.0, 1, 0); // hero
 
     
-    // drawPiano(projectionMatrix, 9.7, 2.5, 5.0);
-    // drawPiano(projectionMatrix, 11.0, 2.5, 5.0);
-    // drawPiano(projectionMatrix, pianoKeysPos.white.lower.x, pianoKeysPos.white.lower.y, pianoKeysPos.white.lower.z);
-    drawPiano(projectionMatrix, pianoKeysPos.white.lower.x, pianoKeysPos.white.lower.y, pianoKeysPos.white.lower.z);
+        // drawPiano(projectionMatrix, 9.7, 2.5, 5.0);
+        // drawPiano(projectionMatrix, 11.0, 2.5, 5.0);
+        // drawPiano(projectionMatrix, pianoKeysPos.white.lower.x, pianoKeysPos.white.lower.y, pianoKeysPos.white.lower.z);
+        drawPiano(projectionMatrix, pianoKeysPos.white.lower.x, pianoKeysPos.white.lower.y, pianoKeysPos.white.lower.z);
 
-    if (!gameover) {
-        let state = hero.currentState;
-        hero.state[state].frame += 5.0 * delta;
-        let frame = Math.floor((hero.state[state].frame)) + 1; // jump
-        if (frame > hero.state[state].frames) frame = hero.state[state].frames;
+        if (!gameover) {
+            let state = hero.currentState;
+            hero.state[state].frame += 5.0 * delta;
+            let frame = Math.floor((hero.state[state].frame)) + 1; // jump
+            if (frame > hero.state[state].frames) frame = hero.state[state].frames;
+            
+
+            drawSquare(projectionMatrix, hero.x, hero.y, hero.z, hero.sw, hero.sh, 1, hero.radians, 1, frame + hero.state[state].start); // hero
+        }
         
-
-        drawSquare(projectionMatrix, hero.x, hero.y, hero.z, hero.sw, hero.sh, 1, hero.radians, 1, frame + hero.state[state].start); // hero
-    }
-    
-    if (activateBatonPhase) {
-        if (activateBatonPhase == 2) {
-            batonBaseRadian += delta;
-            batonHoldT += delta;
-            if (batonHoldT > batonHoldDuration) {
-                activateBatonPhase = 3;
-            }
-        } else if (activateBatonPhase == 3) {
-            batonReleaseT += delta;
-            batonReleaseVel += batonReleaseForce * delta; 
-            if (batonReleaseMode == 1) {
+        if (activateBatonPhase) {
+            if (activateBatonPhase == 2) {
                 batonBaseRadian += delta;
+                batonHoldT += delta;
+                if (batonHoldT > batonHoldDuration) {
+                    activateBatonPhase = 3;
+                }
+            } else if (activateBatonPhase == 3) {
+                batonReleaseT += delta;
+                batonReleaseVel += batonReleaseForce * delta; 
+                if (batonReleaseMode == 1) {
+                    batonBaseRadian += delta;
+                }
+
+                if (batonReleaseT > 12) {
+                    activateBatonPhase = 0;
+                    batonReleaseT = 0;
+                }
             }
 
-            if (batonReleaseT > 12) {
-                activateBatonPhase = 0;
-                batonReleaseT = 0;
+            drawBatons(projectionMatrix, batonWheelCount);
+
+            // batonBaseRadian += delta;
+        } else if (!isPortalOpening) {
+            if (delta < 1) {
+                batonReleaseT += delta;
+                if (batonReleaseT > 10) {
+                    updateRipplePoint();
+                    isPortalOpening = true;
+                    portalRadius = 0;
+                }
             }
         }
 
-        drawBatons(projectionMatrix, batonWheelCount);
+        displayNotes(projectionMatrix);
 
-        // batonBaseRadian += delta;
-    } else if (!isPortalOpening) {
-        if (delta < 1) {
-            batonReleaseT += delta;
-            if (batonReleaseT > 10) {
-                updateRipplePoint();
-                isPortalOpening = true;
-                portalRadius = 0;
-            }
-        }
+        triggerDeathRattle(projectionMatrix);
+    } else {
+        drawSquare(projectionMatrix, 0.0, 0.0, hero.z - 10.0, 1.81 * 16.1 * scaleX, 1.0 * 16.1 * scaleX, 1, 0.0, 1, 23); // hero
     }
 
-    displayNotes(projectionMatrix);
-
-    triggerDeathRattle(projectionMatrix);
+    
     
 }
 
@@ -1803,6 +1839,8 @@ function initGameover() {
     gameoverScreen.style.display = 'block';
     totalSurvivalTime.innerHTML = totalTime.toFixed(2) + ' seconds.';
     gameover = true;
+    bgDeath.currentTime = 0;
+    bgDeath.play();
 }
 
 function gameoverScene() {
@@ -1820,6 +1858,43 @@ function gameoverScene() {
     gl.uniform1f(programInfo.uniformLocations.u_time, timer);
 }
 
+function reset() {
+    for (let i = 0; i < totalKeys; ++i) {
+        keys[i].health = 0;
+    }
+
+    for (let i = 0; i < notes.length; ++i) {
+        morphNote(i);
+    }
+
+    // blood.length = 0;
+    // initBlood();
+    for (let i = 0; i < bloodCount; ++i) {
+        blood[i].x = 0;
+        blood[i].y = 0;
+        blood[i].z = 0;
+        blood[i].ax = randomIntFromInterval(-50, 50);
+        blood[i].ay = randomIntFromInterval(-20, 200);
+        blood[i].az = randomIntFromInterval(-450, 450);
+    }
+
+    deathT = 0;
+
+    activateBatonPhase = 0;
+    isPortalOpening = false;
+    portalT = 0;
+    portalRadius = 0;
+    timer = 0;
+
+    bgSound.currentTime = 0;
+    gameover = false;
+    hero.moveTo = 10;
+
+    totalTime = 0;
+
+    gameoverScreen.style.display = 'none';
+}
+
 function gameCycle() {
     let now = Date.now();
     delta = (now - last) / 1000;
@@ -1834,11 +1909,15 @@ function gameCycle() {
         }
     } else {
         if (loaded >= totalAssets) {
+
+            canvas.style.display = 'block';
             // canvas.style.display = 'block';
-            // loading.style.display = 'none';
+            loading.style.display = 'none';
             
             // gamestart = true;
-            loading.innerHTML = 'Click anywhere to play.'
+            // loading.innerHTML = 'Click anywhere to play.';
+            
+            drawScene();
         }
     }
     
