@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+        <link rel="shortcut icon" href="#">
+        <title>
+            Boilerplate Landscape - Prototype
+        </title>
+        <style>
+            :root {
+                touch-action: pan-x pan-y;
+                height: 100%;
+            }
+            @font-face {
+                font-family: 'Montserrat';
+                src: url('assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf');
+            }
+            html, body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden !important;
+                background: #453f3d;
+                /* background: #E76B18;
+                background: #97DE54; */
+                -webkit-touch-callout: none; /* iOS Safari */
+                -webkit-user-select: none; /* Safari */
+                -khtml-user-select: none; /* Konqueror HTML */
+                -moz-user-select: none; /* Old versions of Firefox */
+                    -ms-user-select: none; /* Internet Explorer/Edge */
+                        user-select: none; /* Non-prefixed version, currently
+                                            supported by Chrome, Edge, Opera and Firefox */
+            }
+            
+            #game-surface, #css-game {
+                background: transparent;
+                touch-action: manipulation;
+                display: none;
+            }
+
+            .container {
+                font-family: 'Montserrat';
+                position: absolute;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 100%;
+            }
+
+            .container-2 {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 100%;
+                border: 1px solid #000;
+            }
+
+            .container-3 {
+                position: absolute;
+                width: 50%;
+                border: 1px solid #000;
+            }
+
+            .score-container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                position: absolute;
+                top: -50%;
+                font-size: 32px;
+                color: #fff;
+                z-index: 999999999;
+            }
+            
+            #color-display {
+                width: 100%;
+                height: 100%;
+                font-size: 64px;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                border: 1px solid #000;
+            }
+
+            .controls {
+                width: 50%;
+                height: 50%;
+                font-size: 48px;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                border: 1px solid #000;
+            }
+
+            .color-0 {
+                background: #fff;
+            }
+
+            .color-1 {
+                background: #000;
+            }
+
+            .color-2 {
+                background: #ff0000;
+            }
+
+            .color-3 {
+                background: #00ff00;
+            }
+
+            .color-4 {
+                background: #0000ff;
+            }
+
+            .color-5 {
+                background: #ffff00;
+            }
+
+            .text-color-0 {
+                color: #fff;
+            }
+
+            .text-color-1 {
+                color: #000;
+            }
+
+            .text-color-2 {
+                color: #ff0000;
+            }
+
+            .text-color-3 {
+                color: #00ff00;
+            }
+
+            .text-color-4 {
+                color: #0000ff;
+            }
+
+            .text-color-5 {
+                color: #ffff00;
+            }
+
+            
+        </style>
+    </head>
+    <body>
+        <div id="css-game" class="container">
+            <div class="container-3">
+                <div id="score" class="score-container">SCORE: 0000000</div>
+                <div class="container-2">
+                    <div id="color-display">Yellow</div>
+                </div>
+                
+                <div class="container-2">
+                    <div id="no-answer" class="controls color-0 text-color-1">NO</div>
+                    <div id="yes-answer" class="controls color-0 text-color-1">YES</div>
+                </div>
+            </div>
+            
+            
+        </div>
+        <canvas id="game-surface"></canvas>
+        <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript">
+            window.addEventListener("orientationchange", function() {
+                if (!startGame) {
+                    startGame = isPortrait();
+                    main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+                }
+            }, false);
+
+            if (startGame) {
+                main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+            } else if (!isPortrait()) {
+                startGame = true;
+                main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+            } else {
+                alert('Rotate to landscape to start game.');
+                // alert('Rotate to portrait to start game.');
+            }
+
+            // document.addEventListener('click', (e) => {
+            //     if (!gameStart) {
+            //         if (startGame) {
+            //             main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+            //         } else if (!isPortrait()) {
+            //             startGame = true;
+            //             main(document.documentElement.clientWidth, document.documentElement.clientHeight);
+            //         } else {
+            //             alert('Rotate to landscape to start game.');
+            //             // alert('Rotate to portrait to start game.');
+            //         }
+            //     }
+                
+            // });
+        </script>
+    </body>
+</html>
