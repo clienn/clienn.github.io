@@ -66,10 +66,17 @@ function generateRound() {
     let textRNG = Math.floor(Math.random() * colors.texts.length);
     let arr = [...colors.colors];
     
+    // let textColorRNG = arr[Math.floor(Math.random() * arr.length)];
+    // arr.splice(textColorRNG, 1);
+
+    let chance = Math.floor(Math.random() * 2); // 50% chance correct
+    let colorRNG = chance ? textRNG : arr[Math.floor(Math.random() * arr.length)];
+
+    arr.splice(colorRNG, 1);
     let textColorRNG = arr[Math.floor(Math.random() * arr.length)];
-    arr.splice(textColorRNG, 1);
-    let colorRNG = arr[Math.floor(Math.random() * arr.length)];
+    
     // console.log(textColorRNG, colorRNG)
+
     return {
         textRNG: textRNG,
         textColorRNG: textColorRNG,
