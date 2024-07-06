@@ -42,7 +42,7 @@ window.onload = function() {
     let last = Date.now();
 
     let heroImg = new Image();
-    heroImg.src = 'assets/hero.png';
+    heroImg.src = 'assets/hero2.png';
 
     const hero = new Hero(width / 2, height - 30, 17, width);
 
@@ -59,7 +59,7 @@ window.onload = function() {
         canvas.height = height;
 
         container.style.width = width + "px";
-        container.style.height = height + "px";
+        // container.style.height = height + "px";
     }
 
     function animate() {

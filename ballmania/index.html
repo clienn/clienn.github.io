@@ -10,18 +10,27 @@
                 /* margin: 0; */
                 /* background: #172c3c; */
             /* } */
-            html, body {
-                -moz-user-select: none;
-                -khtml-user-select: none;
-                -webkit-user-select: none;
-
-                /*
-                    Introduced in Internet Explorer 10.
-                    See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
-                */
-                -ms-user-select: none;
-                user-select: none;
+            :root {
+                touch-action: pan-x pan-y;
+                height: 100%;
             }
+
+            html, body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden !important;
+                /* background: #453f3d; */
+                /* background: #E76B18;
+                background: #97DE54; */
+                -webkit-touch-callout: none; /* iOS Safari */
+                -webkit-user-select: none; /* Safari */
+                -khtml-user-select: none; /* Konqueror HTML */
+                -moz-user-select: none; /* Old versions of Firefox */
+                    -ms-user-select: none; /* Internet Explorer/Edge */
+                        user-select: none; /* Non-prefixed version, currently
+                                            supported by Chrome, Edge, Opera and Firefox */
+            }
+
 
             .title-1 {
                 font-family: "Times New Roman", Times, serif;
