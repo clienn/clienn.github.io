@@ -536,6 +536,7 @@ function update() {
         // }
 
         if (sqFlag) {
+            console.log('tesst')
             if (sqT < 1.0) {
                 sqT += 0.1 * delta;
                 if (sqT >= 1.0) sqT = 1.0;

@@ -12,7 +12,7 @@ var scaleY = 1;
 let total = 100;
 let radius = 200;
 let sqT = 0;
-let sqFlag = 0;
+let sqFlag = 1;
 let sqSpeed = 1.25;
 let zoom = 3000;
 let continuousT = 0;
@@ -79,7 +79,7 @@ function controls() {
 
     canvas.addEventListener('mouseup', (e) => {
         if (mdown) {
-            sqFlag = !sqFlag;
+            // sqFlag = !sqFlag
             mdown = false;
         }
     });
@@ -535,8 +535,9 @@ function update() {
         //         zoom = 3000.0 + sqT * 5600;
         //     }
         // }
-
+        
         if (sqFlag) {
+            
             if (sqT < 1.0) {
                 sqT += 0.1 * delta;
                 if (sqT >= 1.0) sqT = 1.0;
