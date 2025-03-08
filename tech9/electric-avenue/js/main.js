@@ -248,13 +248,15 @@ function main(w, h) {
     splashInfo.h *= splashInfo.sx;
 
     splashInfo.x = w / 2 - splashInfo.w / 2;
-    splashInfo.y = Math.abs(h / 2 - splashInfo.h / 2);
+    // splashInfo.y = Math.abs(h / 2 - splashInfo.h / 2);
+    // splashInfo.y = Math.abs(h / 2 - splashInfo.h / 2); // for mobile and tab splash
+    splashInfo.y = (h / 2 - splashInfo.h / 2);
 
     // if (onMobile && !onTablet) {
     //     splashInfo.y = 0;
     // }
 
-    splashInfo.y = 0;
+    // splashInfo.y = 0;
 
     rescaleSize(startButtonInfo, scaleX, scaleX);
     startButtonInfo.x = w / 2 - startButtonInfo.w / 2;
@@ -1820,7 +1822,7 @@ function gameCycle() {
             // TXT.draw('angle');
             // TXT.draw('angle'); 
             HUD.draw(ctx);  
-            // displaySchool();          
+            displaySchool();          
             drawFishes();
             drawSmartFishes();
             drawGarbage();
