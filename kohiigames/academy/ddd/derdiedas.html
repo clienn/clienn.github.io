@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%; /* iOS fix */
+      text-size-adjust: 100%;
+      /* background: #2A2A2A; */
+      background: #2B2B2B;
+      overflow: hidden;
+    }
+
+
+    canvas {
+      display: block;
+    }
+
+    #buttons {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 100px;
+      pointer-events: none; /* allow buttons through */
+    }
+
+    .lane-button:active {
+      background: #555;
+    }
+
+/* Base shared button styles */
+.lane-button {
+  position: absolute;
+  bottom: 0;
+  width: 33.33%;
+  font-size: 5vw;       /* scales with viewport width */
+  height: 8vh;          /* 12% of viewport height */
+  line-height: 8vh;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-align: center;
+  pointer-events: auto;
+  user-select: none;
+  border-top: 3px solid #666;
+  transition: background 0.2s, box-shadow 0.2s;
+  color: #fff !important;
+  text-shadow:
+    -1px -1px 0 #000,
+     1px -1px 0 #000,
+    -1px  1px 0 #000,
+     1px  1px 0 #000,
+     0    0   4px rgba(0, 0, 0, 0.8) !important;
+}
+
+.lane-button.electric {
+  background: linear-gradient(to top, #00f0ff, #00b2ff);
+  color: #ffffff;
+  text-shadow: 0 0 6px #00f0ff, 0 0 12px #00f0ff;
+  box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff inset;
+}
+.lane-button.electric.active {
+  background: linear-gradient(to top, #00f0ff, #33ffff);
+  box-shadow: 0 0 30px #00f0ff, 0 0 60px #00f0ff;
+}
+
+
+.lane-button.green {
+  background: linear-gradient(to top, #00ffb3, #00e673);
+  color: #ffffff;
+  text-shadow: 0 0 6px #00ffb3, 0 0 12px #00ffb3;
+  box-shadow: 0 0 10px #00ffb3, 0 0 20px #00ffb3 inset;
+}
+.lane-button.green.active {
+  background: linear-gradient(to top, #00ffcc, #33ff99);
+  box-shadow: 0 0 30px #00ffb3, 0 0 60px #00ffb3;
+}
+
+
+
+.lane-button.violet {
+  background: linear-gradient(to top, #d100ff, #a000ff);
+  color: #ffffff;
+  text-shadow: 0 0 6px #d100ff, 0 0 12px #d100ff;
+  box-shadow: 0 0 10px #d100ff, 0 0 20px #d100ff inset;
+}
+.lane-button.violet.active {
+  background: linear-gradient(to top, #f041ff, #c720ff);
+  box-shadow: 0 0 30px #d100ff, 0 0 60px #d100ff;
+}
+
+
+/* Cyan */
+.lane-button.cyan {
+  background: #003344;
+  color: #00e5ff;
+}
+.lane-button.cyan.active {
+  background: #005566;
+  box-shadow: 0 0 20px rgba(0, 200, 255, 0.6);
+}
+
+/* Magenta */
+.lane-button.magenta {
+  background: #330022;
+  color: #ff33cc;
+}
+.lane-button.magenta.active {
+  background: #550044;
+  box-shadow: 0 0 20px rgba(255, 51, 204, 0.6);
+}
+
+/* Green */
+/* .lane-button.green {
+  background: #003300;
+  color: #39ff14;
+}
+.lane-button.green.active {
+  background: #005500;
+  box-shadow: 0 0 20px rgba(57, 255, 20, 0.6);
+} */
+
+
+  </style>
+</head>
+<body>
+
+<canvas id="gameCanvas"></canvas>
+<div id="buttons">
+  <div id="btn-0" class="lane-button electric" data-lane="0">DER</div>
+  <div id="btn-1" class="lane-button green" data-lane="1">DIE</div>
+  <div id="btn-2" class="lane-button violet" data-lane="2">DAS</div>
+</div>
+
+<script type="text/javascript" src="explosion.js"></script>
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+
+
+// Perspective lane math
+const topWidthRatio = 0.4;
+const bottomWidthRatio = 0.9;
+const lanes = 3;
+
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+
+const wordList = ["der", "die", "das", "Auto", "Mädchen", "Apfel", "Tisch", "Abenteuer", "Schmetterer", "Verschluss", "Rindfleischetikettierung", "Sicherheitsmaßnahmen"];
+const germanWords = [
+  // DER
+  [
+    "Apfel", "Tisch", "Stuhl", "Hund", "Computer", "Löffel", "Schrank", "Kühlschrank",
+    "Bildschirm", "Wasserkocher", "Rucksack", "Fußboden", "Zug", "Wagenheber",
+    "Schornstein", "Fahrstuhl", "Staubsauger", "Hintergrund", "Bleistift", "Weltkrieg",
+    "Schneeballschlacht",            // 20
+    "Weltmeisterschaftsspiel"        // 24
+  ],
+  // DIE
+  [
+    "Blume", "Lampe", "Zeitung", "Tasche", "Gabel", "Flasche", "Schule", "Küche",
+    "Erinnerung", "Gesellschaft", "Wahrheit", "Fernbedienung", "Autobahn", "Rechnung",
+    "Vorstellung", "Bewegung", "Schwierigkeit", "Angelegenheit", "Herausforderung", "Wissenschaft",
+    "Unabhängigkeitserklärung",      // 24
+    "Versicherungspolice"           // 22
+  ],
+  // DAS
+  [
+    "Kind", "Haus", "Buch", "Fenster", "Auto", "Essen", "Mädchen", "Wort", "Frühstück",
+    "Flugzeug", "Ergebnis", "Abenteuer", "Gebäude", "Spielzeug", "Telefon", "Leben",
+    "Universum", "Gespräch", "Rindfleisch", "Lichtsignal",
+    "Warenwirtschaftssystem",       // 23
+    "Bundesausbildungsplatz"        // 24
+  ]
+];
+const words = [];
+
+const btnWrapper = document.getElementById("buttons");
+// const rect = btnWrapper.getBoundingClientRect();
+// const hitLineY = rect.top + window.scrollY;
+const dpr = window.devicePixelRatio || 1;
+const rect = btnWrapper.getBoundingClientRect();
+// const hitLineY = (rect.top + window.scrollY);
+const hitLineY = canvas.height * 0.91;
+let hitZoneLeftX = 0;
+let hitZoneRightX = 0;
+
+// console.log(rect, canvas.height)
+const spacingHeight = rect.height * 2.25;
+
+const explosionPos = [0, 0, 0];
+
+calculateHitZonePos(hitLineY, canvas, topWidthRatio, bottomWidthRatio);
+
+const wordStyles = [
+  {
+    name: "electric",
+    boxGradient: ["#00f0ff", "#007a8c"],
+    textColor: "#ffffff",
+    textShadow: "0 0 2px #000, 0 0 4px #00f0ff"
+  },
+  {
+    name: "violet",
+    boxGradient: ["#d100ff", "#73009a"],
+    textColor: "#ffffff",
+    textShadow: "0 0 2px #000, 0 0 4px #d100ff"
+  },
+  {
+    name: "green",
+    boxGradient: ["#00ffb3", "#00cc66"],
+    textColor: "#ffffff",
+    textShadow: "0 0 2px #000, 0 0 4px #00ffb3"
+  },
+  {
+    name: "yellow",
+    boxGradient: ["#fff200", "#ffb700"],
+    textColor: "#000000",
+    textShadow: "0 0 2px #fff, 0 0 4px #fff200"
+  },
+  {
+    name: "orange",
+    boxGradient: ["#ff5e00", "#cc3300"],
+    textColor: "#ffffff",
+    textShadow: "0 0 2px #000, 0 0 4px #ff5e00"
+  },
+  {
+    name: "red",
+    boxGradient: ["#ff0033", "#990000"],
+    textColor: "#ffffff",
+    textShadow: "0 0 2px #000, 0 0 4px #ff0033"
+  },
+  {
+    name: "pink",
+    boxGradient: ["#ff66cc", "#cc3399"],
+    textColor: "#ffffff",
+    textShadow: "0 0 2px #000, 0 0 4px #ff66cc"
+  }
+];
+
+const spacing = spacingHeight;
+generateWords();
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  positionButtons(); // reposition buttons after resize
+}
+
+function drawPath() {
+  const topWidth = canvas.width * topWidthRatio;
+  const bottomWidth = canvas.width * bottomWidthRatio;
+  const height = canvas.height;
+
+  const topLeftX = (canvas.width - topWidth) / 2;
+  const topRightX = (canvas.width + topWidth) / 2;
+  const bottomLeftX = (canvas.width - bottomWidth) / 2;
+  const bottomRightX = (canvas.width + bottomWidth) / 2;
+
+  // 🟦 Fill transparent white path
+  ctx.fillStyle = "rgba(255, 255, 255, 0.1)"; // translucent white
+  ctx.beginPath();
+  ctx.moveTo(topLeftX, 0);
+  ctx.lineTo(topRightX, 0);
+  ctx.lineTo(bottomRightX, height);
+  ctx.lineTo(bottomLeftX, height);
+  ctx.closePath();
+  ctx.fill();
+
+  // ➖ Draw solid white left edge
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(topLeftX, 0);
+  ctx.lineTo(bottomLeftX, height);
+  ctx.stroke();
+
+  // ➖ Draw solid white right edge
+  ctx.beginPath();
+  ctx.moveTo(topRightX, 0);
+  ctx.lineTo(bottomRightX, height);
+  ctx.stroke();
+}
+
+function getLaneCenter(lane, y, occupied) {
+  const topWidth = canvas.width * topWidthRatio;
+  const bottomWidth = canvas.width * bottomWidthRatio;
+  const progress = y / canvas.height;
+  const currentWidth = topWidth + (bottomWidth - topWidth) * progress;
+  const leftX = (canvas.width - currentWidth) / 2;
+  const laneWidth = currentWidth / occupied;
+  // const laneWidth = currentWidth / lanes;
+  return leftX + laneWidth * lane + laneWidth / 2;
+}
+
+function getScale(y) {
+  const maxScale = 1.5;
+  const minScale = 0.5;
+  const progress = y / canvas.height;
+  return minScale + (maxScale - minScale) * progress;
+}
+
+function drawWords() {
+  for (let word of words) {
+    const scale = getScale(word.y);
+    const progress = word.y / canvas.height;
+
+    // Calculate current lane width
+    const topWidth = canvas.width * topWidthRatio;
+    const bottomWidth = canvas.width * bottomWidthRatio;
+    const currentWidth = topWidth + (bottomWidth - topWidth) * progress;
+    // const laneWidth = currentWidth / lanes;
+    const laneWidth = currentWidth / word.occupied;
+
+    // Limit box size to be smaller and well-contained
+    const boxWidth = laneWidth * 0.85; // 85% of lane
+    const boxHeight = canvas.height / 18 * scale; // shorter boxes
+
+    const x = getLaneCenter(word.lane, word.y, word.occupied) - boxWidth / 2;
+    const y = word.y;
+
+    const vh = window.innerHeight / 100; // 1vh in pixels
+    const baseFontSize = 2.5 * vh; // e.g., 2.5vh = responsive text
+    ctx.font = `${baseFontSize}px Arial`;
+
+    // Optionally still shrink if the word is too wide for the box
+    const maxFontWidth = boxWidth * 0.8;
+    let measured = ctx.measureText(word.text).width;
+
+    if (measured > maxFontWidth) {
+      const scaleFactor = maxFontWidth / measured;
+      ctx.font = `${baseFontSize * scaleFactor}px Arial`;
+    }
+
+    // // Draw box
+    // ctx.fillStyle = "#222";
+    // ctx.fillRect(x, y, boxWidth, boxHeight);
+
+    // // Draw text
+    // ctx.fillStyle = "#fff";
+    // ctx.textAlign = "center";
+    // ctx.textBaseline = "middle";
+    // ctx.fillText(word.text, x + boxWidth / 2, y + boxHeight / 2);
+    // Draw glow behind the box using a blurred rectangle
+    ctx.save();
+    ctx.shadowColor = word.style.boxGradient[0];
+    ctx.shadowBlur = 20;
+    ctx.fillStyle = word.style.boxGradient[0];
+    ctx.fillRect(x, y, boxWidth, boxHeight);
+    ctx.restore();
+
+    const gradient = ctx.createLinearGradient(x, y, x, y + boxHeight);
+    gradient.addColorStop(0, word.style.boxGradient[0]);
+    gradient.addColorStop(1, word.style.boxGradient[1]);
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x, y, boxWidth, boxHeight);
+
+    ctx.fillStyle = word.style.textColor;
+    ctx.font = `${baseFontSize}px Arial`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    const txt = germanWords[word.ddd][word.idx];
+
+    // Stroke-like black edge
+    ctx.shadowColor = "#000";
+    ctx.shadowBlur = 5;
+    ctx.fillText(txt, x + boxWidth / 2, y + boxHeight / 2);
+    // ctx.fillText(word.text, x + boxWidth / 2, y + boxHeight / 2);
+
+    // Optional outer glow matching the box
+    ctx.shadowColor = word.style.boxGradient[0];
+    ctx.shadowBlur = 15;
+    ctx.fillText(txt, x + boxWidth / 2, y + boxHeight / 2);
+    // ctx.fillText(word.text, x + boxWidth / 2, y + boxHeight / 2);
+
+    // Reset shadow
+    ctx.shadowBlur = 0;
+
+  }
+}
+
+function getWordInfo(w) {
+  let lane = 0;
+  let occupied = 1;
+
+  if (w.length <= 8) {
+    lane = Math.floor(Math.random() * lanes);
+    occupied = 3;
+  } else if (w.length <= 16) {
+    lane = Math.floor(Math.random() * 2);
+    occupied = 2;
+  }
+
+  return { lane, occupied };
+}
+
+function getRandomGermanWord() {
+  let ddd = Math.floor(Math.random() * 3);
+  let idx = Math.floor(Math.random() * germanWords[ddd].length);
+
+  return { ddd, idx };
+}
+
+function generateWords() {
+  for (let i = 0; i < 10; i++) {
+    // const w = wordList[i % wordList.length];
+    const { ddd, idx } = getRandomGermanWord();
+    const w = germanWords[ddd][idx];
+    const { lane, occupied } = getWordInfo(w);
+    
+
+    words.push({
+      // text: w,
+      y: -(i + 1) * spacing,
+      lane: lane,
+      style: wordStyles[Math.floor(Math.random() * wordStyles.length)],
+      occupied: occupied,
+      ddd: ddd,
+      idx: idx 
+    });
+  }
+}
+
+function updateWords(dt) {
+  const speed = 200; // pixels per second
+  for (let word of words) {
+    word.y += speed * dt;
+  }
+
+  if (words[0].y > canvas.height + 50) {
+    const old = words.shift();
+
+    // Get the last word’s y position
+    const lastWord = words[words.length - 1];
+    const spacing = spacingHeight; // minimum vertical space between words
+    const newY = lastWord ? lastWord.y - spacing : -spacingHeight * 10;
+
+    // const w = wordList[Math.floor(Math.random() * wordList.length)];
+    const { ddd, idx } = getRandomGermanWord();
+    const { lane, occupied } = getWordInfo(germanWords[ddd][idx]);
+
+    // old.text = wordList[Math.floor(Math.random() * wordList.length)];
+    // old.text = w;
+    old.y = newY;
+    old.lane = lane;
+    old.occupied = occupied;
+    old.ddd = ddd;
+    old.idx = idx;
+    old.style = wordStyles[Math.floor(Math.random() * wordStyles.length)];
+    words.push(old);
+  }
+}
+
+function validateAnswer(ddd, idx, lane) {
+  return (germanWords[ddd][idx] == germanWords[lane][idx]);
+}
+
+function checkHit(lane) {
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    const scale = getScale(word.y);
+    const boxHeight = canvas.height / 18 * scale;
+    // const hitZoneY = canvas.height - 100;
+    const hitZoneY = hitLineY;
+    
+    if (
+      // word.lane === lane &&
+      validateAnswer(word.ddd, word.idx, lane) &&
+      word.y + boxHeight >= hitZoneY &&
+      word.y - boxHeight * 0.5 <= hitZoneY
+    ) {
+      let score = ((word.y + boxHeight - hitZoneY) / boxHeight) * 100;
+      if (score > 90) {
+        console.log('miss points')
+      } else {
+        console.log("HIT!", germanWords[word.ddd][word.idx], score);
+        // Calculate current lane width
+        const progress = word.y / canvas.height;
+        const topWidth = canvas.width * topWidthRatio;
+        const bottomWidth = canvas.width * bottomWidthRatio;
+        const currentWidth = topWidth + (bottomWidth - topWidth) * progress;
+        const laneWidth = currentWidth / word.occupied;
+
+        // Limit box size to be smaller and well-contained
+        const boxWidth = laneWidth * 0.85; // 85% of lane
+
+        const x = getLaneCenter(word.lane, word.y, word.occupied) - boxWidth / 2;
+        explode(x + boxWidth / 2, word.y, 'random', 15);
+      }
+
+      // Get the last word’s y position
+      const lastWord = words[words.length - 1];
+      const spacing = spacingHeight; // minimum vertical space between words
+      const newY = lastWord ? lastWord.y - spacing : -spacingHeight * 10;
+
+      // const w = wordList[Math.floor(Math.random() * wordList.length)];
+      const { ddd, idx } = getRandomGermanWord();
+      const w = germanWords[ddd][idx];
+      const { lane, occupied } = getWordInfo(w);
+
+      words.splice(i, 1);
+      words.push({
+        // text: w,
+        y: newY,
+        // y: -(i + 1) * spacing,
+        lane: lane,
+        occupied: occupied,
+        ddd: ddd,
+        idx: idx,
+        // lane: Math.floor(Math.random() * lanes),
+        style: wordStyles[Math.floor(Math.random() * wordStyles.length)]
+      });
+      return;
+    }
+  }
+  console.log("MISS");
+}
+
+function displayGlow() {
+  const radius = 100;
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height - radius;
+  
+
+  // Create glow-like radial gradient
+  const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+  // gradient.addColorStop(0, "rgba(0, 200, 255, 1)");   // Bright center
+  // gradient.addColorStop(0.5, "rgba(0, 200, 255, 0.3)"); // Fading
+  // gradient.addColorStop(1, "rgba(0, 200, 255, 0)");   // Fully transparent
+
+  // gradient.addColorStop(0, "rgba(255, 51, 204, 1)");
+  // gradient.addColorStop(0.5, "rgba(255, 51, 204, 0.3)");
+  // gradient.addColorStop(1, "rgba(255, 51, 204, 0)");
+
+  gradient.addColorStop(0, "rgba(57, 255, 20, 1)");
+  gradient.addColorStop(0.5, "rgba(57, 255, 20, 0.3)");
+  gradient.addColorStop(1, "rgba(57, 255, 20, 0)");
+
+
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// Button hit logic
+// document.querySelectorAll(".lane-button").forEach((btn) => {
+//   btn.addEventListener("click", () => {
+//     const lane = parseInt(btn.id.split("-")[1]);
+//     checkHit(lane);
+//   });
+// });
+// canvas.addEventListener('click', e => {
+//   explode(e.offsetX, hitLineY, 'star', 30);
+// });
+
+document.querySelectorAll(".lane-button").forEach((btn) => {
+  const lane = parseInt(btn.dataset.lane);
+
+  // Finger down
+  btn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    btn.classList.add("active");
+    checkHit(lane);
+  });
+
+  // Finger up — remove active class
+  btn.addEventListener("touchend", (e) => {
+    btn.classList.remove("active");
+  });
+
+  // Optional: remove on cancel (e.g., swipe away)
+  btn.addEventListener("touchcancel", (e) => {
+    btn.classList.remove("active");
+  });
+});
+
+
+
+// Position buttons to match bottom lane perspective
+function positionButtons() {
+  const bottomWidth = canvas.width * bottomWidthRatio;
+  const totalOffset = (canvas.width - bottomWidth) / 2;
+  const laneWidth = bottomWidth / lanes;
+
+  for (let i = 0; i < lanes; i++) {
+    const btn = document.getElementById(`btn-${i}`);
+    btn.style.width = `${laneWidth}px`;
+    btn.style.left = `${i * laneWidth}px`;
+    // btn.style.left = `${(canvas.width + bottomWidth) / 2}px`;
+  }
+
+  const btnContainer = document.getElementById("buttons");
+  btnContainer.style.width = `${bottomWidth}px`;
+  btnContainer.style.left = `${totalOffset}px`;
+  // btnContainer.style.left = `${(canvas.width - bottomWidth) / 2}px`;
+}
+
+function drawGlowingLine(ctx, x, y, x2, y2, color = '#00ffff', width = 5, glow = 20) {
+    ctx.save(); // Save the current context state
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = glow;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+
+    ctx.restore(); // Restore to original state (to avoid affecting other drawings)
+  }
+
+  function calculateHitZonePos(y, canvas, topWidthRatio, bottomWidthRatio) {
+    const topWidth = canvas.width * topWidthRatio;
+    const bottomWidth = canvas.width * bottomWidthRatio;
+    const height = canvas.height;
+
+    const topLeftX = (canvas.width - topWidth) / 2;
+    const topRightX = (canvas.width + topWidth) / 2;
+    const bottomLeftX = (canvas.width - bottomWidth) / 2;
+    const bottomRightX = (canvas.width + bottomWidth) / 2;
+
+    const t = y / height; // interpolation factor (0 at top, 1 at bottom)
+
+    const leftX = topLeftX + (bottomLeftX - topLeftX) * t;
+    const rightX = topRightX + (bottomRightX - topRightX) * t;
+    const totalW = rightX - leftX;
+    const laneW = totalW / lanes;
+    
+    let pos0 = leftX + laneW / 2;
+    explosionPos[0] = pos0;
+    explosionPos[1] = pos0 + laneW;
+    explosionPos[2] = pos0 + laneW * 2;
+
+    hitZoneLeftX = leftX;
+    hitZoneRightX = rightX;
+
+    console.log(leftX)
+  }
+
+function drawHorizontalLineAtY(ctx, color = '#00ffff', width = 5, glow = 20) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = glow;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+
+  ctx.beginPath();
+  ctx.moveTo(hitZoneLeftX, hitLineY);
+  ctx.lineTo(hitZoneRightX, hitLineY);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function animateExplosion() {
+  for (const p of particles) {
+    p.update();
+    p.draw(ctx);
+  }
+}
+
+let lastTime = performance.now();
+
+function loop(currentTime = performance.now()) {
+  const deltaTime = (currentTime - lastTime) / 1000; // in seconds
+  lastTime = currentTime;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawPath();
+  displayGlow();
+  drawWords();
+  updateWords(deltaTime); // pass deltaTime in seconds
+  animateExplosion();
+  drawHorizontalLineAtY(ctx, '#ffff00', 20, 40);
+  requestAnimationFrame(loop);
+}
+
+
+loop();
+</script>
+</body>
+</html>
