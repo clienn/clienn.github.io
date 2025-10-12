@@ -1,0 +1,1186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hiragana Stroke Tester</title>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --ink: #e2e8f0;
+        --muted: #94a3b8;
+        --accent: #22c55e;
+        --warn: #fbbf24;
+        --bad: #ef4444;
+        --ghost: #60a5fa;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Inter,
+          "Helvetica Neue",
+          Arial;
+        background: linear-gradient(180deg, #0b1223 0%, #0f172a 100%);
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .app {
+        width: min(1120px, 95vw);
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 18px;
+      }
+      .card {
+        background: #0b1223;
+        border: 1px solid #111827;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+      .hdr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border-bottom: 1px solid #111827;
+        background: #0a0f1e;
+      }
+      .hdr h2 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: 0.3px;
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      button {
+        background: #0f172a;
+        color: var(--ink);
+        border: 1px solid #1f2937;
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #111c37;
+      }
+      button.primary {
+        background: #16a34a;
+        border-color: #16a34a;
+      }
+      button.primary:hover {
+        filter: brightness(1.05);
+      }
+      select,
+      input[type="range"] {
+        background: #0f172a;
+        color: var(--ink);
+        border: 1px solid #1f2937;
+        border-radius: 10px;
+        padding: 6px 8px;
+      }
+      label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .canvasWrap {
+        position: relative;
+      }
+      canvas {
+        display: block;
+        width: 100%;
+        height: 520px;
+        background: #0a0f1e;
+        cursor: crosshair;
+      }
+      .legend {
+        padding: 10px 14px;
+        font-size: 13px;
+        color: var(--muted);
+        border-top: 1px solid #111827;
+      }
+      .panel {
+        padding: 12px 14px;
+      }
+      .scoreRow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 8px;
+        border-bottom: 1px solid #111827;
+      }
+      .scoreRow:last-child {
+        border-bottom: none;
+      }
+      .badge {
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 12px;
+      }
+      .ok {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.35);
+      }
+      .mid {
+        background: rgba(251, 191, 36, 0.12);
+        color: #fbbf24;
+        border: 1px solid rgba(251, 191, 36, 0.35);
+      }
+      .bad {
+        background: rgba(239, 68, 68, 0.12);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.35);
+      }
+      .tiny {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .hint {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="card">
+        <div class="hdr">
+          <h2>
+            Draw <span id="currentKana">「」</span> —
+            <span id="strokeCount">?</span> strokes
+          </h2>
+          <div class="toolbar">
+            <label>
+              Kana
+              <select id="kanaSel"></select>
+            </label>
+            <button id="refreshKanaBtn" title="Rebuild list from templates">
+              Refresh
+            </button>
+            <button id="undoBtn">Undo</button>
+            <button id="clearBtn">Clear</button>
+            <button id="evalBtn" class="primary">Evaluate</button>
+            <label
+              ><input type="checkbox" id="ghostChk" /> Show template &
+              AOIs</label
+            >
+            <label><input type="checkbox" id="glyphChk" /> Trace glyph</label>
+            <label
+              ><input type="checkbox" id="arrowsChk" checked /> Show direction
+              arrows</label
+            >
+            <label
+              >Opacity
+              <input
+                type="range"
+                id="glyphOpacity"
+                min="0.1"
+                max="1"
+                step="0.05"
+                value="0.25"
+            /></label>
+            <label
+              >Y offset
+              <input
+                type="range"
+                id="glyphYOffset"
+                min="-0.3"
+                max="0.3"
+                step="0.01"
+                value="0"
+            /></label>
+          </div>
+        </div>
+        <div class="canvasWrap">
+          <canvas id="pad" width="800" height="520"></canvas>
+        </div>
+        <div class="legend">
+          <div id="legendText" class="tiny"></div>
+          <div class="hint">
+            Tip: draw with clear pen-up breaks between strokes.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hdr">
+          <h2>Scores</h2>
+          <div class="toolbar">
+            <span class="tiny"
+              >thresholds: per-stroke ≥ 0.65, overall ≥ 0.75</span
+            >
+          </div>
+        </div>
+        <div class="panel" id="scores">
+          <div class="tiny">
+            Draw to see live stroke count; press <b>Evaluate</b> for details.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Your unified templates (globals) -->
+    <script src="./js/templates/hiragana.js"></script>
+
+    <script>
+      // ========= Geometry helpers =========
+      function dist(a, b) {
+        const dx = a.x - b.x,
+          dy = a.y - b.y;
+        return Math.hypot(dx, dy);
+      }
+      function lerp(a, b, t) {
+        return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+      }
+      function pathLength(pts) {
+        let L = 0;
+        for (let i = 1; i < pts.length; i++) L += dist(pts[i - 1], pts[i]);
+        return L;
+      }
+      function resample(pts, n = 64) {
+        if (pts.length === 0) return [];
+        const L = pathLength(pts);
+        if (L === 0) return Array.from({ length: n }, () => ({ ...pts[0] }));
+        const step = L / (n - 1);
+        let D = 0,
+          out = [{ ...pts[0] }];
+        for (let i = 1; i < pts.length; i++) {
+          let a = pts[i - 1],
+            b = pts[i];
+          let d = dist(a, b);
+          while (d > 0 && D + d >= step) {
+            const t = (step - D) / d;
+            const q = lerp(a, b, t);
+            out.push(q);
+            a = q;
+            d = dist(a, b);
+            D = 0;
+          }
+          D += d;
+        }
+        while (out.length < n) out.push({ ...pts[pts.length - 1] });
+        return out;
+      }
+      function bboxOf(strokes) {
+        let xs = [],
+          ys = [];
+        for (const s of strokes)
+          for (const p of s) {
+            xs.push(p.x);
+            ys.push(p.y);
+          }
+        if (xs.length === 0) return { minX: 0, minY: 0, maxX: 1, maxY: 1 };
+        return {
+          minX: Math.min(...xs),
+          minY: Math.min(...ys),
+          maxX: Math.max(...xs),
+          maxY: Math.max(...ys),
+        };
+      }
+      function normalizeStrokes(strokes) {
+        const bb = bboxOf(strokes);
+        let w = bb.maxX - bb.minX,
+          h = bb.maxY - bb.minY;
+        const s = w > h ? 1 / w : 1 / h;
+        const tx = -bb.minX,
+          ty = -bb.minY;
+        let out = [];
+        for (const sPts of strokes) {
+          out.push(sPts.map((p) => ({ x: (p.x + tx) * s, y: (p.y + ty) * s })));
+        }
+        return out;
+      }
+      function dot(a, b) {
+        return a.x * b.x + a.y * b.y;
+      }
+      function norm(v) {
+        const m = Math.hypot(v.x, v.y) || 1e-9;
+        return { x: v.x / m, y: v.y / m };
+      }
+      function earlyDir(pts) {
+        if (pts.length < 6) return { x: 0, y: 1 };
+        const v = { x: pts[5].x - pts[0].x, y: pts[5].y - pts[0].y };
+        return norm(v);
+      }
+      function lateDir(pts) {
+        const m = pts.length - 1;
+        const v = { x: pts[m].x - pts[m - 5].x, y: pts[m].y - pts[m - 5].y };
+        return norm(v);
+      }
+      function dtw(A, B) {
+        const n = A.length,
+          m = B.length;
+        const dp = Array.from({ length: n + 1 }, () =>
+          Array(m + 1).fill(Infinity),
+        );
+        dp[0][0] = 0;
+        for (let i = 1; i <= n; i++)
+          for (let j = 1; j <= m; j++) {
+            const d = Math.hypot(
+              A[i - 1].x - B[j - 1].x,
+              A[i - 1].y - B[j - 1].y,
+            );
+            dp[i][j] =
+              d + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+          }
+        return dp[n][m] / (n + m);
+      }
+
+      // gating helpers for wobble lenience
+      function clamp(v, min = 0, max = 1) {
+        return Math.max(min, Math.min(max, v));
+      }
+      function smoothstep(edge0, edge1, x) {
+        const t = clamp((x - edge0) / (edge1 - edge0));
+        return t * t * (3 - 2 * t);
+      }
+
+      // ========= Intersection + loop helpers =========
+      function segIntersects(a, b, c, d) {
+        const o = (p, q, r) =>
+          Math.sign((q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x));
+        const o1 = o(a, b, c),
+          o2 = o(a, b, d),
+          o3 = o(c, d, a),
+          o4 = o(c, d, b);
+        if (o1 === 0 && o2 === 0 && o3 === 0 && o4 === 0) {
+          return false;
+        }
+        return o1 !== o2 && o3 !== o4;
+      }
+      function polylinesIntersect(A, B) {
+        for (let i = 1; i < A.length; i++)
+          for (let j = 1; j < B.length; j++) {
+            if (segIntersects(A[i - 1], A[i], B[j - 1], B[j])) return true;
+          }
+        return false;
+      }
+      function closestApproachToPolyline(P, Q) {
+        const pointSegDist = (p, a, b) => {
+          const ab = { x: b.x - a.x, y: b.y - a.y };
+          const t = Math.max(
+            0,
+            Math.min(
+              1,
+              ((p.x - a.x) * ab.x + (p.y - a.y) * ab.y) /
+                (ab.x * ab.x + ab.y * ab.y || 1e-9),
+            ),
+          );
+          const proj = { x: a.x + ab.x * t, y: a.y + ab.y * t };
+          return dist(p, proj);
+        };
+        let best = Infinity;
+        for (let i = 0; i < P.length; i++)
+          for (let j = 1; j < Q.length; j++) {
+            best = Math.min(best, pointSegDist(P[i], Q[j - 1], Q[j]));
+          }
+        return best;
+      }
+      function detectLoop(pts, eps = 0.05, minGap = 8) {
+        const n = pts.length;
+        let best = null;
+        for (let i = 0; i < n; i++)
+          for (let j = i + minGap; j < n; j++) {
+            if (dist(pts[i], pts[j]) < eps) {
+              best = { i, j };
+              break;
+            }
+            if (best) break;
+          }
+        if (!best) return { hasLoop: false };
+        const poly = pts.slice(best.i, best.j + 1);
+        let A = 0,
+          Cx = 0,
+          Cy = 0;
+        for (let k = 0; k < poly.length - 1; k++) {
+          const x1 = poly[k].x,
+            y1 = poly[k].y,
+            x2 = poly[k + 1].x,
+            y2 = poly[k + 1].y;
+          const cross = x1 * y2 - x2 * y1;
+          A += cross;
+          Cx += (x1 + x2) * cross;
+          Cy += (y1 + y2) * cross;
+        }
+        A *= 0.5;
+        const area = Math.abs(A);
+        if (area < 1e-6) return { hasLoop: false };
+        Cx /= 6 * A;
+        Cy /= 6 * A;
+        return { hasLoop: true, area, centroid: { x: Cx, y: Cy } };
+      }
+
+      // ========= Current template =========
+      let CURRENT_GLYPH = "";
+      let CURRENT_TEMPLATE = null;
+
+      // ========= Scoring =========
+      function pointInEllipseScore(p, e) {
+        const dx = p.x - e.cx,
+          dy = p.y - e.cy;
+        const v = (dx * dx) / (e.rx * e.rx) + (dy * dy) / (e.ry * e.ry);
+        return Math.max(0, Math.min(1, 1 / (1 + Math.max(0, v - 1) * 3)));
+      }
+
+      function scoreStroke(userStroke, templateStroke, context) {
+        const reasons = [];
+        const start = userStroke[0],
+          end = userStroke[userStroke.length - 1];
+        const aoiStart = pointInEllipseScore(start, templateStroke.startAOI);
+        const aoiEnd = pointInEllipseScore(end, templateStroke.endAOI);
+        const startEndScore = 0.5 * (aoiStart + aoiEnd);
+
+        // --- direction (strict) ---
+        const dirU = earlyDir(userStroke);
+        const dirT = norm({
+          x: templateStroke.dir.ux,
+          y: templateStroke.dir.uy,
+        });
+        const dirDot = Math.max(0, dot(dirU, dirT));
+        const directionScore = dirDot;
+        const minDot = templateStroke.dir.minDot;
+        const passedDir = dirDot >= minDot;
+        if (!passedDir) reasons.push("direction_too_off");
+
+        // how strongly we passed direction: 0 = just at threshold, 1 = perfect
+        const dirMargin = clamp((dirDot - minDot) / (1 - minDot));
+
+        // ramp gate from threshold..threshold+0.15
+        const dirGate = smoothstep(minDot, Math.min(1, minDot + 0.15), dirDot);
+
+        // --- flow consistency along the whole path (not just early direction) ---
+        // fraction of per-step vectors whose dot with dirT is positive
+        let pos = 0,
+          steps = 0;
+        for (let i = 1; i < userStroke.length; i++) {
+          const v = {
+            x: userStroke[i].x - userStroke[i - 1].x,
+            y: userStroke[i].y - userStroke[i - 1].y,
+          };
+          const d = dot(v, dirT);
+          if (!Number.isNaN(d)) {
+            steps++;
+            if (d > 0) pos++;
+          }
+        }
+        const dirCons = steps ? pos / steps : 0; // 0..1
+        // flow gate: needs majority-aligned flow; ramps 0.55..0.85
+        const flowGate = smoothstep(0.55, 0.85, dirCons);
+
+        // detect net reverse flow (end went backwards along template axis)
+        const projFromStart = dot(
+          { x: end.x - start.x, y: end.y - start.y },
+          dirT,
+        );
+        const reverse = projFromStart < 0;
+        if (reverse) reasons.push("reverse_flow");
+
+        // combine direction gating (if reverse -> clamp to 0)
+        const dirFlowGate = reverse ? 0 : dirGate * flowGate;
+
+        // --- shape (lenient only when direction is genuinely good) + start/end gate ---
+        const shapeD = dtw(userStroke, templateStroke.poly);
+        const tol = 0.4 + 0.25 * dirMargin; // 0.40..0.65
+        const rawShapeScore = Math.exp(-Math.pow(shapeD / tol, 2));
+        const seGate = smoothstep(0.25, 0.6, startEndScore); // AOI requirement
+        const shapeScore = rawShapeScore * seGate * dirFlowGate;
+
+        // --- placement (rules) ---
+        let placementScore = 1.0;
+        if (templateStroke.rules?.minLen) {
+          const L = pathLength(userStroke);
+          if (L < templateStroke.rules.minLen) {
+            placementScore *= 0.6;
+            reasons.push("too_short");
+          }
+        }
+        if (templateStroke.rules?.bandY != null) {
+          const yMid = userStroke[Math.floor(userStroke.length / 2)].y;
+          if (
+            Math.abs(yMid - templateStroke.rules.bandY) >
+            templateStroke.rules.tolY
+          ) {
+            placementScore *= 0.5;
+            reasons.push("wrong_y_band");
+          }
+        }
+        if (templateStroke.tag === "midbar") {
+          context.midbar = userStroke;
+        }
+        if (templateStroke.rules?.mustIntersectMidbar) {
+          const ok = context.midbar
+            ? polylinesIntersect(userStroke, context.midbar)
+            : false;
+          if (!ok) {
+            placementScore *= 0.3;
+            reasons.push("no_bar_cross");
+          }
+          if (context.midbar) {
+            const d = closestApproachToPolyline(userStroke, context.midbar);
+            if (d > 0.06) {
+              placementScore *= 0.7;
+              reasons.push("far_from_bar");
+            }
+          }
+        }
+        if (templateStroke.rules?.loop) {
+          const loop = detectLoop(userStroke, 0.06, 8);
+          if (!loop.hasLoop) {
+            placementScore *= 0.3;
+            reasons.push("no_loop");
+          } else {
+            const { area, centroid: c } = loop,
+              r = templateStroke.rules.loop;
+            if (!(area >= r.areaMin && area <= r.areaMax)) {
+              placementScore *= 0.6;
+              reasons.push("loop_area");
+            }
+            if (
+              !(
+                c.x >= r.cxMin &&
+                c.x <= r.cxMax &&
+                c.y >= r.cyMin &&
+                c.y <= r.cyMax
+              )
+            ) {
+              placementScore *= 0.6;
+              reasons.push("loop_pos");
+            }
+          }
+        }
+        if (templateStroke.rules?.finalHeadingAxis) {
+          const axis = norm(templateStroke.rules.finalHeadingAxis);
+          const tail = lateDir(userStroke);
+          const cos = dot(axis, tail);
+          const ang =
+            (Math.acos(Math.max(-1, Math.min(1, cos))) * 180) / Math.PI;
+          if (ang > templateStroke.rules.maxAxisAngleDeg) {
+            placementScore *= 0.7;
+            reasons.push("tail_heading");
+          }
+        }
+
+        // light direction-flow gate for placement too
+        placementScore *= 0.25 + 0.75 * dirFlowGate;
+
+        // --- final weighted sum, then overall gate to prevent reverse “high” totals ---
+        const w = CURRENT_TEMPLATE.weights;
+        let total =
+          w.startEnd * startEndScore +
+          w.direction * directionScore +
+          w.shape * shapeScore +
+          w.placement * placementScore;
+
+        // overall gate (keeps reversed/poor-flow strokes low even if shape overlaps)
+        const overallGate = 0.2 + 0.8 * dirFlowGate; // 0.2 when wrong, ~1 when good
+        total *= overallGate;
+
+        return {
+          total,
+          parts: {
+            startEnd: startEndScore,
+            direction: directionScore,
+            shape: shapeScore,
+            placement: placementScore,
+          },
+          reasons,
+        };
+      }
+
+      function evaluateAll(userStrokes) {
+        // Resample & normalize user strokes
+        const res = userStrokes.map((s) => resample(s, 64));
+        const normed = normalizeStrokes(res);
+
+        const N = CURRENT_TEMPLATE.strokes.length; // expected strokes
+        const ctx = {};
+        const scores = [];
+
+        // Score first N strokes (missing strokes get 0)
+        for (let i = 0; i < N; i++) {
+          const T = CURRENT_TEMPLATE.strokes[i];
+          const U = normed[i];
+          if (!U) {
+            scores.push({
+              missing: true,
+              total: 0,
+              parts: { startEnd: 0, direction: 0, shape: 0, placement: 0 },
+              reasons: ["missing_stroke"],
+            });
+            continue;
+          }
+          scores.push(scoreStroke(U, T, ctx));
+        }
+
+        // Count extras (don’t score them individually; they get penalized via countPenalty)
+        const drawnCount = normed.length;
+        const expectedCount = N;
+        const extraCount = Math.max(0, drawnCount - expectedCount);
+
+        // ---- 70/30 aggregation with stroke-count penalty on the 70% bucket ----
+        const w = CURRENT_TEMPLATE.weights;
+        const coreWsum = w.direction + w.shape || 1; // "direction + shape" bucket
+        const supWsum = w.startEnd + w.placement || 1; // "AOI + placement" bucket
+
+        // averages over expected strokes (missing strokes already 0)
+        const coreAvg =
+          scores.reduce(
+            (a, s) =>
+              a +
+              (w.direction * s.parts.direction + w.shape * s.parts.shape) /
+                coreWsum,
+            0,
+          ) / expectedCount;
+        const supAvg =
+          scores.reduce(
+            (a, s) =>
+              a +
+              (w.startEnd * s.parts.startEnd +
+                w.placement * s.parts.placement) /
+                supWsum,
+            0,
+          ) / expectedCount;
+
+        // stroke-count penalty: expected / drawn (<= 1). If drawn==0, penalty=0.
+        const countPenalty = drawnCount
+          ? expectedCount / Math.max(expectedCount, drawnCount)
+          : 0;
+
+        // Final 70/30 score
+        const corePortion = 0.7 * (coreAvg * countPenalty);
+        const supPortion = 0.3 * supAvg;
+        const overall70_30 = corePortion + supPortion;
+
+        // Keep showing per-stroke totals too (unchanged), but use 70/30 for pass
+        const perStrokeMean =
+          scores.reduce((a, s) => a + (s.total || 0), 0) / expectedCount;
+
+        // Pass rule (optional): use your existing thresholds but with the 70/30 overall
+        const perOk = scores.every((s) =>
+          s.missing
+            ? false
+            : s.total >= CURRENT_TEMPLATE.thresholds.perStrokeMin,
+        );
+        const passed =
+          perOk &&
+          overall70_30 >= CURRENT_TEMPLATE.thresholds.overallMean &&
+          extraCount === 0 &&
+          drawnCount === expectedCount;
+
+        return {
+          scores,
+          mean: overall70_30,
+          perStrokeMean,
+          corePortion,
+          supPortion,
+          countPenalty,
+          coreAvg,
+          supAvg,
+          expectedCount,
+          drawnCount,
+          extraCount,
+          passed,
+          normed,
+        };
+      }
+
+      // ========= Canvas + UI =========
+      const pad = document.getElementById("pad");
+      const g = pad.getContext("2d");
+      const kanaSel = document.getElementById("kanaSel");
+      const currentKanaEl = document.getElementById("currentKana");
+      const strokeCountEl = document.getElementById("strokeCount");
+      const legendText = document.getElementById("legendText");
+
+      let drawing = false;
+      let strokes = [];
+      let cur = [];
+
+      function toCanvasPoint(evt) {
+        const r = pad.getBoundingClientRect();
+        return {
+          x: (evt.clientX - r.left) * (pad.width / r.width),
+          y: (evt.clientY - r.top) * (pad.height / r.height),
+        };
+      }
+
+      function ellipse(ctx, cx, cy, rx, ry) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(rx, ry);
+        ctx.beginPath();
+        ctx.arc(0, 0, 1, 0, Math.PI * 2);
+        ctx.restore();
+      }
+
+      function drawGhost() {
+        const NORM = CURRENT_TEMPLATE.strokes.map((s) => s.poly);
+        const margin = 60;
+        const W = pad.width - 2 * margin,
+          H = pad.height - 2 * margin;
+        const sx = W,
+          sy = H;
+        // AOIs
+        for (const st of CURRENT_TEMPLATE.strokes) {
+          g.strokeStyle = "rgba(96,165,250,.45)";
+          g.lineWidth = 2;
+          g.beginPath();
+          const cx = margin + st.startAOI.cx * sx,
+            cy = margin + st.startAOI.cy * sy,
+            rx = st.startAOI.rx * sx,
+            ry = st.startAOI.ry * sy;
+          ellipse(g, cx, cy, rx, ry);
+          g.stroke();
+          g.beginPath();
+          const cx2 = margin + st.endAOI.cx * sx,
+            cy2 = margin + st.endAOI.cy * sy,
+            rx2 = st.endAOI.rx * sx,
+            ry2 = st.endAOI.ry * sy;
+          ellipse(g, cx2, cy2, rx2, ry2);
+          g.stroke();
+        }
+        // polylines
+        g.strokeStyle = "rgba(96,165,250,.9)";
+        g.lineWidth = 3;
+        NORM.forEach((poly) => {
+          g.beginPath();
+          poly.forEach((p, j) => {
+            const x = margin + p.x * sx,
+              y = margin + p.y * sy;
+            if (j === 0) g.moveTo(x, y);
+            else g.lineTo(x, y);
+          });
+          g.stroke();
+        });
+      }
+
+      function drawGlyph() {
+        const margin = 60;
+        const W = pad.width - 2 * margin,
+          H = pad.height - 2 * margin;
+        const baseFonts =
+          "\"Hiragino Kaku Gothic Pro\", 'Hiragino Sans', 'Yu Gothic', 'Meiryo', 'Noto Sans JP', 'Noto Serif JP', system-ui, sans-serif";
+        let fontPx = Math.floor(H * 0.8);
+        function metricsFor(px) {
+          g.font = `${px}px ${baseFonts}`;
+          const m = g.measureText(CURRENT_GLYPH);
+          const asc = m.actualBoundingBoxAscent || px * 0.8;
+          const desc = m.actualBoundingBoxDescent || px * 0.2;
+          return { width: m.width, height: asc + desc, ascent: asc };
+        }
+        let m = metricsFor(fontPx);
+        const k = Math.min(W / m.width, H / m.height) * 0.95;
+        fontPx = Math.floor(fontPx * k);
+        m = metricsFor(fontPx);
+        const yNudge = parseFloat(
+          document.getElementById("glyphYOffset")?.value || "0",
+        );
+        const x = margin + W / 2;
+        const y = margin + H / 2 + yNudge * H;
+        const alpha = parseFloat(
+          document.getElementById("glyphOpacity")?.value || "0.25",
+        );
+        g.save();
+        g.globalAlpha = alpha;
+        g.fillStyle = "#60a5fa";
+        g.strokeStyle = "#60a5fa";
+        g.lineWidth = 2;
+        g.textAlign = "center";
+        g.textBaseline = "middle";
+        g.font = `${fontPx}px ${baseFonts}`;
+        g.fillText(CURRENT_GLYPH, x, y);
+        g.strokeText(CURRENT_GLYPH, x, y);
+        g.restore();
+      }
+
+      function drawStartArrow(pts) {
+        if (pts.length < 6) return;
+        const p0 = pts[0],
+          p5 = pts[5];
+        const v = { x: p5.x - p0.x, y: p5.y - p0.y };
+        const mag = Math.hypot(v.x, v.y) || 1;
+        const ux = v.x / mag,
+          uy = v.y / mag;
+        const len = 28,
+          tip = { x: p0.x + ux * len, y: p0.y + uy * len };
+        g.save();
+        g.strokeStyle = "#60a5fa";
+        g.fillStyle = "#60a5fa";
+        g.lineWidth = 3;
+        g.beginPath();
+        g.moveTo(p0.x, p0.y);
+        g.lineTo(tip.x, tip.y);
+        g.stroke();
+        const left = {
+          x: tip.x - uy * 6 - ux * 10,
+          y: tip.y + ux * 6 - uy * 10,
+        };
+        const right = {
+          x: tip.x + uy * 6 - ux * 10,
+          y: tip.y - ux * 6 - uy * 10,
+        };
+        g.beginPath();
+        g.moveTo(tip.x, tip.y);
+        g.lineTo(left.x, left.y);
+        g.lineTo(right.x, right.y);
+        g.closePath();
+        g.fill();
+        g.restore();
+      }
+
+      function redraw() {
+        g.clearRect(0, 0, pad.width, pad.height);
+        // grid
+        g.globalAlpha = 0.15;
+        g.strokeStyle = "#1f2937";
+        for (let x = 0; x <= pad.width; x += 40) {
+          g.beginPath();
+          g.moveTo(x, 0);
+          g.lineTo(x, pad.height);
+          g.stroke();
+        }
+        for (let y = 0; y <= pad.height; y += 40) {
+          g.beginPath();
+          g.moveTo(0, y);
+          g.lineTo(pad.width, y);
+          g.stroke();
+        }
+        g.globalAlpha = 1;
+
+        if (document.getElementById("glyphChk").checked) {
+          drawGlyph();
+        }
+        if (document.getElementById("ghostChk").checked) {
+          drawGhost();
+        }
+
+        // strokes
+        g.lineCap = "round";
+        g.lineJoin = "round";
+        g.lineWidth = 6;
+        g.strokeStyle = "#e2e8f0";
+        for (const s of strokes) {
+          g.beginPath();
+          for (let i = 0; i < s.length; i++) {
+            const p = s[i];
+            if (i === 0) g.moveTo(p.x, p.y);
+            else g.lineTo(p.x, p.y);
+          }
+          g.stroke();
+          if (document.getElementById("arrowsChk").checked) drawStartArrow(s);
+        }
+        if (drawing && cur.length) {
+          g.beginPath();
+          for (let i = 0; i < cur.length; i++) {
+            const p = cur[i];
+            if (i === 0) g.moveTo(p.x, p.y);
+            else g.lineTo(p.x, p.y);
+          }
+          g.stroke();
+          if (document.getElementById("arrowsChk").checked) drawStartArrow(cur);
+        }
+      }
+
+      pad.addEventListener("pointerdown", (e) => {
+        drawing = true;
+        cur = [toCanvasPoint(e)];
+        redraw();
+      });
+      pad.addEventListener("pointermove", (e) => {
+        if (!drawing) return;
+        cur.push(toCanvasPoint(e));
+        redraw();
+      });
+      pad.addEventListener("pointerup", (e) => {
+        if (!drawing) return;
+        drawing = false;
+        if (cur.length > 1) strokes.push(cur);
+        cur = [];
+        redraw();
+        updateScoresPreview();
+      });
+      pad.addEventListener("pointerleave", (e) => {
+        if (drawing) {
+          drawing = false;
+          if (cur.length > 1) strokes.push(cur);
+          cur = [];
+          redraw();
+          updateScoresPreview();
+        }
+      });
+
+      // Buttons
+      document.getElementById("undoBtn").onclick = () => {
+        strokes.pop();
+        redraw();
+        updateScoresPreview();
+      };
+      document.getElementById("clearBtn").onclick = () => {
+        strokes.length = 0;
+        cur = [];
+        redraw();
+        updateScoresPreview();
+      };
+      document.getElementById("evalBtn").onclick = () => {
+        const res = evaluateAll(strokes);
+        renderScores(res);
+      };
+      document.getElementById("ghostChk").addEventListener("change", redraw);
+      document.getElementById("glyphChk").addEventListener("change", redraw);
+      document.getElementById("glyphOpacity").addEventListener("input", redraw);
+      document.getElementById("glyphYOffset").addEventListener("input", redraw);
+      document.getElementById("arrowsChk").addEventListener("change", redraw);
+
+      kanaSel.addEventListener("change", () => {
+        CURRENT_GLYPH = kanaSel.value;
+        CURRENT_TEMPLATE = window.HIRAGANA_TEMPLATES[CURRENT_GLYPH];
+        strokes.length = 0;
+        cur = [];
+        redraw();
+        updateScoresPreview();
+        updateHeader();
+      });
+
+      function badge(v) {
+        const cls = v >= 0.75 ? "ok" : v >= 0.5 ? "mid" : "bad";
+        return `<span class="badge ${cls}">${v.toFixed(2)}</span>`;
+      }
+      function human(key) {
+        return (
+          {
+            direction_too_off:
+              "Direction off (draw the stroke in the standard direction)",
+            too_short: "Stroke too short",
+            wrong_y_band: "Horizontal should sit near middle",
+            no_bar_cross: "Required crossing missing",
+            far_from_bar: "Too far from reference bar",
+            no_loop: "Finish with a loop",
+            loop_area: "Loop size out of range",
+            loop_pos: "Loop position off",
+            tail_heading: "Tail angle off",
+            missing_stroke: "Stroke missing",
+          }[key] || key
+        );
+      }
+
+      function renderScores(res) {
+        const sEl = document.getElementById("scores");
+        const badge = (v) =>
+          `<span class="badge ${v >= 0.75 ? "ok" : v >= 0.5 ? "mid" : "bad"}">${v.toFixed(2)}</span>`;
+        const parts = (p) =>
+          `<span class="tiny">start/end ${badge(p.startEnd || 0)} · dir ${badge(p.direction || 0)} · shape ${badge(p.shape || 0)} · place ${badge(p.placement || 0)}</span>`;
+        const human = (key) =>
+          ({
+            direction_too_off:
+              "Direction off (draw the stroke in the standard direction)",
+            too_short: "Stroke too short",
+            wrong_y_band: "Horizontal should sit near middle",
+            no_bar_cross: "Required crossing missing",
+            far_from_bar: "Too far from reference bar",
+            no_loop: "Finish with a loop",
+            loop_area: "Loop size out of range",
+            loop_pos: "Loop position off",
+            tail_heading: "Tail angle off",
+            missing_stroke: "Stroke missing",
+            extra_stroke: "Extra stroke (should be continuous)",
+          })[key] || key;
+
+        const line = (idx, s) => {
+          if (s.missing)
+            return `<div class="scoreRow"><div>Stroke ${idx + 1}</div><div><span class="badge bad">missing</span></div></div>`;
+          const explain = s.reasons?.length
+            ? `<div class="hint">${s.reasons.map((r) => `• ${human(r)}`).join(" ")}</div>`
+            : "";
+          return `<div class="scoreRow"><div><b>Stroke ${idx + 1}</b><div class="hint">${parts(s.parts)}</div>${explain}</div><div>${badge(s.total)}</div></div>`;
+        };
+
+        const rows = CURRENT_TEMPLATE.strokes
+          .map((_, i) => line(i, res.scores[i]))
+          .join("");
+
+        const breakdown = `
+    <div class="hint" style="margin-top:6px">
+      70/30 model: core(dir+shape)×penalty + support(start/end+placement)<br/>
+      core avg: <b>${res.coreAvg.toFixed(2)}</b> × count penalty <b>${res.countPenalty.toFixed(2)}</b> → ${res.corePortion.toFixed(2)} (70%)<br/>
+      support avg: <b>${res.supAvg.toFixed(2)}</b> → ${res.supPortion.toFixed(2)} (30%)<br/>
+      strokes: expected <b>${res.expectedCount}</b>, drawn <b>${res.drawnCount}</b>${res.extraCount ? ` (extra: ${res.extraCount})` : ""}
+    </div>`;
+
+        const overall = `
+    <div class="scoreRow" style="border-top:1px solid #111827;margin-top:8px">
+      <div><b>Overall (70/30)</b></div>
+      <div>${badge(res.mean)} ${res.passed ? '<span class="badge ok" style="margin-left:6px">PASS</span>' : '<span class="badge bad" style="margin-left:6px">TRY AGAIN</span>'}</div>
+    </div>`;
+
+        sEl.innerHTML =
+          rows +
+          overall +
+          breakdown +
+          `<div class="hint" style="margin-top:8px">Draw in order. Toggle "Show template & AOIs" or "Trace glyph" as guides.</div>`;
+      }
+
+      function updateScoresPreview() {
+        const sEl = document.getElementById("scores");
+        sEl.innerHTML = `<div><b>${strokes.length}</b> stroke(s) drawn. <span class="tiny">Expected: ${CURRENT_TEMPLATE.strokes.length}</span>. Press <b>Evaluate</b> for details.</div>`;
+      }
+      function updateHeader() {
+        document.getElementById("currentKana").textContent =
+          `「${CURRENT_GLYPH}」`;
+        document.getElementById("strokeCount").textContent =
+          CURRENT_TEMPLATE.strokes.length;
+        legendText.textContent = legendFor(CURRENT_GLYPH);
+      }
+      function legendFor(k) {
+        switch (k) {
+          case "あ":
+            return "1) small downward hook, 2) small diagonal tick, 3) large loop with cross.";
+          case "い":
+            return "2 strokes: short left curve down, then long right curve down.";
+          case "う":
+            return "1) short rightward tick, 2) long downward curve with rightward tail.";
+          case "え":
+            return "1) horizontal mid bar, 2) vertical curve with hook.";
+          case "お":
+            return "1) short vertical tick, 2) horizontal bar, 3) main loop with tail.";
+          case "か":
+            return "3 strokes: left vertical, diagonal tick, right vertical.";
+          case "き":
+            return "4 strokes: top bar, mid bar, vertical, loop/tail.";
+          case "く":
+            return "1 stroke: sweeping curve down-right.";
+          case "け":
+            return "3 strokes: left vertical, short bar, right vertical.";
+          case "こ":
+            return "2 strokes: upper bar, lower bar.";
+          case "さ":
+            return "3 strokes: short top bar (→), main vertical down, small diagonal tick to the right.";
+          case "し":
+            return "1 stroke: long downward curve with a slight rightward tail.";
+          case "す":
+            return "2 strokes: short vertical tick, then main curve with a small loop and descending tail.";
+          case "せ":
+            return "3 strokes: left vertical, horizontal mid bar, right vertical crossing the bar.";
+          case "そ":
+            return "1 stroke: small loop near the middle, then a descending tail.";
+          case "た":
+            return "3 strokes: left vertical, short mid bar, main curve with a small loop and tail.";
+          case "ち":
+            return "2 strokes: short vertical tick, then main curve with a loop and rightward tail.";
+          case "つ":
+            return "1 stroke: sweeping comma-like curve downward with a rightward tail (no loop).";
+          case "て":
+            return "1 stroke: short top bar, then curving down-left to finish.";
+          case "と":
+            return "2 strokes: short vertical tick, then a curved stroke with a small hook.";
+          case "な":
+            return "2 strokes: short left vertical, then bar → down with a small loop and tail.";
+          case "に":
+            return "2 strokes: left vertical, then long rightward bar with a slight downward tail.";
+          case "ぬ":
+            return "2 strokes: short vertical tick, then curve NE→SW→SE with a small loop.";
+          case "ね":
+            return "2 strokes: left vertical, then curve with a small loop crossing near the center.";
+          case "の":
+            return "1 stroke: counterclockwise loop that descends to finish.";
+          case "は":
+            return "3 strokes: left vertical, mid bar, then right curve with a small loop and tail.";
+          case "ひ":
+            return "1 stroke: NE→SW curve that bends to a descending rightward tail.";
+          case "ふ":
+            return "3 strokes: two small dots, then a long curve with a small loop and tail.";
+          case "へ":
+            return "1 stroke: start up-right (NE), crest, then descend to the right (SE).";
+          case "ほ":
+            return "4 strokes: left vertical, top bar, mid bar, then right vertical/loop component crossing the bar.";
+          case "ま":
+            return "4 strokes: left vertical, top bar, mid bar, then right curve with a small loop/tail.";
+          case "み":
+            return "2 strokes: short opening curve, then a longer curve with a small loop and descending tail.";
+          case "む":
+            return "2 strokes: short vertical tick, then a looped curve with a descending rightward tail.";
+          case "め":
+            return "2 strokes: short diagonal tick, then a looped curve with a descending tail.";
+          case "も":
+            return "3 strokes: top bar, mid bar, then right curve crossing the bar.";
+          case "や":
+            return "2 strokes: short left vertical, then a curve NE→SW with a small loop and SE tail.";
+          case "ゆ":
+            return "2 strokes: short vertical tick, then a large looped curve with a descending tail.";
+          case "よ":
+            return "2 strokes: short top curve to the right/down, then a right vertical down.";
+          case "ら":
+            return "2 strokes: short opener, then a descending curve with a small loop and tail.";
+          case "り":
+            return "2 strokes: short tick, then a long descending curve (no loop).";
+          case "る":
+            return "2 strokes: short diagonal tick, then a looped curve with a descending tail.";
+          case "れ":
+            return "2 strokes: left vertical, then a curve that crosses the vertical (no loop).";
+          case "ろ":
+            return "2 strokes: short top bar, then a curve that turns down with a small hook (no loop).";
+          case "わ":
+            return "2 strokes: left vertical, then a crossing curve with a small loop and descending tail.";
+          case "を":
+            return "3 strokes: short slant, short mid bar (→), then a sweeping curve down-right (no closed loop).";
+          case "ん":
+            return "1 stroke: go down-left, then curve/flick to the right to finish.";
+          default:
+            return "Draw in standard stroke order and direction.";
+        }
+      }
+
+      // Build dropdown from whatever templates are loaded in ./js/templates/hiragana.js
+      function buildKanaDropdown() {
+        const keys = Object.keys(window.HIRAGANA_TEMPLATES || {});
+        keys.sort(); // alphabetical by glyph; swap for gojūon ordering if you like
+        const prev = CURRENT_GLYPH;
+        kanaSel.innerHTML = "";
+        for (const k of keys) {
+          const opt = document.createElement("option");
+          opt.value = k;
+          opt.textContent = k;
+          kanaSel.appendChild(opt);
+        }
+        if (!keys.length) {
+          CURRENT_GLYPH = "";
+          CURRENT_TEMPLATE = null;
+          return;
+        }
+        if (!keys.includes(prev)) {
+          CURRENT_GLYPH = keys.includes("あ") ? "あ" : keys[0];
+        }
+        CURRENT_TEMPLATE = window.HIRAGANA_TEMPLATES[CURRENT_GLYPH];
+        kanaSel.value = CURRENT_GLYPH;
+        updateHeader();
+        redraw();
+        updateScoresPreview();
+      }
+      document
+        .getElementById("refreshKanaBtn")
+        .addEventListener("click", buildKanaDropdown);
+
+      // init
+      buildKanaDropdown();
+    </script>
+  </body>
+</html>

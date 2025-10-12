@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hiragana 「は」 stroke‑order tester</title>
+<style>
+  :root { --bg:#0f172a; --ink:#e2e8f0; --muted:#94a3b8; --accent:#22c55e; --warn:#fbbf24; --bad:#ef4444; --ghost:#60a5fa; }
+  html,body{height:100%;}
+  body{margin:0; font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial; background:linear-gradient(180deg,#0b1223 0%,#0f172a 100%); color:var(--ink); display:flex; align-items:center; justify-content:center;}
+  .app{width:min(1100px,95vw); display:grid; grid-template-columns: 1.2fr .8fr; gap:18px;}
+  .card{background:#0b1223; border:1px solid #111827; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.3); overflow:hidden}
+  .hdr{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid #111827; background:#0a0f1e}
+  .hdr h2{margin:0; font-size:18px; letter-spacing:.3px;}
+  .toolbar{display:flex; gap:8px; flex-wrap:wrap}
+  button{background:#0f172a; color:var(--ink); border:1px solid #1f2937; padding:8px 12px; border-radius:10px; cursor:pointer}
+  button:hover{background:#111c37}
+  button.primary{background:#16a34a; border-color:#16a34a}
+  button.primary:hover{filter:brightness(1.05)}
+  label{display:flex; align-items:center; gap:6px; color:var(--muted); font-size:13px}
+  .canvasWrap{position:relative;}
+  canvas{display:block; width:100%; height:520px; background:#0a0f1e; cursor:crosshair}
+  .legend{padding:10px 14px; font-size:13px; color:var(--muted); border-top:1px solid #111827}
+  .panel{padding:12px 14px}
+  .scoreRow{display:flex; align-items:center; justify-content:space-between; padding:10px 8px; border-bottom:1px solid #111827}
+  .scoreRow:last-child{border-bottom:none}
+  .badge{padding:2px 8px; border-radius:999px; font-weight:600; font-size:12px}
+  .ok{background:rgba(34,197,94,.12); color:#22c55e; border:1px solid rgba(34,197,94,.35)}
+  .mid{background:rgba(251,191,36,.12); color:#fbbf24; border:1px solid rgba(251,191,36,.35)}
+  .bad{background:rgba(239,68,68,.12); color:#ef4444; border:1px solid rgba(239,68,68,.35)}
+  .tiny{font-size:12px; color:var(--muted)}
+  .hint{color:var(--muted); font-size:12px; margin-top:6px}
+  .mono{font-family: ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace}
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+      <div class="hdr">
+        <h2>Draw 「は」 — 3 strokes</h2>
+        <div class="toolbar">
+          <button id="undoBtn">Undo stroke</button>
+          <button id="clearBtn">Clear</button>
+          <button id="evalBtn" class="primary">Evaluate</button>
+          <label><input type="checkbox" id="ghostChk"/> Show template & AOIs</label>
+          <label><input type="checkbox" id="glyphChk"/> Trace glyph</label>
+          <label>Opacity <input type="range" id="glyphOpacity" min="0.1" max="1" step="0.05" value="0.25"></label>
+          <label>Y offset <input type="range" id="glyphYOffset" min="-0.3" max="0.3" step="0.01" value="0"></label>
+        </div>
+      </div>
+      <div class="canvasWrap">
+        <canvas id="pad" width="800" height="520"></canvas>
+      </div>
+      <div class="legend">
+        <div>Stroke order: <b>1)</b> left vertical (top→bottom), <b>2)</b> middle horizontal (left→right), <b>3)</b> right vertical passing the bar, finish with loop + tail.</div>
+        <div class="hint">Tip: draw with clear pen‑up breaks between strokes.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hdr">
+        <h2>Scores</h2>
+        <div class="toolbar">
+          <span class="tiny">thresholds: per‑stroke ≥ 0.65, overall ≥ 0.75</span>
+        </div>
+      </div>
+      <div class="panel" id="scores">
+        <div class="tiny">Draw to see live stroke count; press <b>Evaluate</b> for details.</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/******************************
+ * Geometry helpers
+ ******************************/
+function dist(a,b){const dx=a.x-b.x, dy=a.y-b.y; return Math.hypot(dx,dy)}
+function lerp(a,b,t){return {x:a.x+(b.x-a.x)*t, y:a.y+(b.y-a.y)*t}}
+function pathLength(pts){let L=0; for(let i=1;i<pts.length;i++) L+=dist(pts[i-1],pts[i]); return L}
+function resample(pts, n=64){if(pts.length===0) return []; const L=pathLength(pts); if(L===0) return Array.from({length:n},()=>({...pts[0]})); const step=L/(n-1); let D=0, out=[{...pts[0]}]; for(let i=1;i<pts.length;i++){
+  let a=pts[i-1], b=pts[i]; let d=dist(a,b); while(d>0 && D+ d >= step){ const t=(step-D)/d; const q=lerp(a,b,t); out.push(q); a=q; d=dist(a,b); D=0; }
+  D+=d; }
+  while(out.length<n) out.push({...pts[pts.length-1]}); return out}
+function bboxOf(strokes){let xs=[], ys=[]; for(const s of strokes) for(const p of s){ xs.push(p.x); ys.push(p.y);} if(xs.length===0) return {minX:0,minY:0,maxX:1,maxY:1}; return {minX:Math.min(...xs), minY:Math.min(...ys), maxX:Math.max(...xs), maxY:Math.max(...ys)} }
+function normalizeStrokes(strokes){ // fit to unit square, preserve aspect, origin top-left
+  const bb=bboxOf(strokes); let w=bb.maxX-bb.minX, h=bb.maxY-bb.minY; const s= (w>h? 1/w : 1/h);
+  const tx = -bb.minX, ty = -bb.minY; // translate to origin then scale
+  let out=[]; for(const sPts of strokes){ out.push(sPts.map(p=>({x:(p.x+tx)*s, y:(p.y+ty)*s})))} return out }
+function dot(a,b){return a.x*b.x + a.y*b.y}
+function norm(v){const m=Math.hypot(v.x,v.y)||1e-9; return {x:v.x/m, y:v.y/m}}
+function earlyDir(pts){if(pts.length<6) return {x:0,y:1}; const v={x:pts[5].x-pts[0].x, y:pts[5].y-pts[0].y}; return norm(v)}
+function lateDir(pts){const m=pts.length-1; const v={x:pts[m].x-pts[m-5].x, y:pts[m].y-pts[m-5].y}; return norm(v)}
+
+function dtw(A,B){ // DTW with Euclidean distance
+  const n=A.length, m=B.length; const dp=Array.from({length:n+1},()=>Array(m+1).fill(Infinity)); dp[0][0]=0; for(let i=1;i<=n;i++) for(let j=1;j<=m;j++){
+    const d = Math.hypot(A[i-1].x-B[j-1].x, A[i-1].y-B[j-1].y);
+    dp[i][j] = d + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  } return dp[n][m]/(n+m);
+}
+
+/******************************
+ * AOI (ellipse) scoring
+ ******************************/
+function pointInEllipseScore(p, e){ // 1 at center; ~0 at ~2*rx or ~2*ry away
+  const dx=(p.x-e.cx), dy=(p.y-e.cy); const v = (dx*dx)/(e.rx*e.rx) + (dy*dy)/(e.ry*e.ry); // v=1 is boundary
+  const t = Math.max(0, 1 - Math.max(0,v-0.0)); // decay after 1
+  return Math.max(0, Math.min(1, 1/(1+Math.max(0,v-1)*3)) )
+}
+
+/******************************
+ * Intersection + loop checks
+ ******************************/
+function segIntersects(a,b,c,d){ // proper segment intersection
+  const o=(p,q,r)=>Math.sign((q.x-p.x)*(r.y-p.y)-(q.y-p.y)*(r.x-p.x));
+  const o1=o(a,b,c), o2=o(a,b,d), o3=o(c,d,a), o4=o(c,d,b);
+  if(o1===0&&o2===0&&o3===0&&o4===0){ // collinear overlap? ignore
+    return false;
+  }
+  return (o1!==o2 && o3!==o4);
+}
+function polylinesIntersect(A,B){ for(let i=1;i<A.length;i++) for(let j=1;j<B.length;j++){ if(segIntersects(A[i-1],A[i],B[j-1],B[j])) return true } return false }
+
+function closestApproachToPolyline(P, Q){ // min distance between two polylines (vertex to segment)
+  const pointSegDist=(p,a,b)=>{const ab={x:b.x-a.x, y:b.y-a.y}; const t=Math.max(0, Math.min(1, ((p.x-a.x)*ab.x+(p.y-a.y)*ab.y)/(ab.x*ab.x+ab.y*ab.y||1e-9))); const proj={x:a.x+ab.x*t, y:a.y+ab.y*t}; return dist(p,proj)}
+  let best=Infinity; for(let i=0;i<P.length;i++) for(let j=1;j<Q.length;j++){ best=Math.min(best, pointSegDist(P[i],Q[j-1],Q[j])) } return best
+}
+
+function detectLoop(pts, eps=0.05, minGap=8){ // return {hasLoop, area, centroid}
+  const n=pts.length; let best=null; for(let i=0;i<n;i++) for(let j=i+minGap;j<n;j++){
+    if(dist(pts[i], pts[j])<eps){ best={i,j}; break; } if(best) break;
+  }
+  if(!best) return {hasLoop:false};
+  const poly=pts.slice(best.i, best.j+1); let A=0, Cx=0, Cy=0; for(let k=0;k<poly.length-1;k++){
+    const x1=poly[k].x, y1=poly[k].y, x2=poly[k+1].x, y2=poly[k+1].y; const cross=x1*y2-x2*y1; A+=cross; Cx+=(x1+x2)*cross; Cy+=(y1+y2)*cross;
+  }
+  A*=0.5; const area=Math.abs(A); if(area<1e-6) return {hasLoop:false}; Cx/= (6*A); Cy/= (6*A); return {hasLoop:true, area, centroid:{x:Cx,y:Cy}};
+}
+
+/******************************
+ * 「は」 template
+ ******************************/
+const HA_TEMPLATE = {
+  weights: { startEnd:.35, direction:.35, shape:.20, placement:.10 },
+  thresholds: { perStrokeMin:.65, overallMean:.75 },
+  // AOIs are expressed in normalized space [0,1]^2
+  strokes:[
+    { // S0 vertical
+      startAOI:{cx:.22, cy:.12, rx:.08, ry:.08},
+      endAOI:  {cx:.22, cy:.78, rx:.08, ry:.08},
+      dir:{ux:0, uy:1, minDot:.90},
+      poly: (()=>{const N=32, xs=[], ys=[]; const a={x:.22,y:.12}, b={x:.24,y:.78}; let pts=[]; for(let i=0;i<N;i++){const t=i/(N-1); const x=a.x*(1-t)+b.x*t; const y=a.y*(1-t)+b.y*t; pts.push({x,y}); } return pts})(),
+      rules: { minLen:.45 }
+    },
+    { // S1 horizontal
+      startAOI:{cx:.14, cy:.50, rx:.10, ry:.07},
+      endAOI:  {cx:.78, cy:.50, rx:.10, ry:.07},
+      dir:{ux:1, uy:0, minDot:.90},
+      poly: (()=>{const N=32; const a={x:.14,y:.50}, b={x:.78,y:.50}; let pts=[]; for(let i=0;i<N;i++){const t=i/(N-1); pts.push({x:a.x*(1-t)+b.x*t, y:.50}); } return pts})(),
+      rules: { bandY:.50, tolY:.08 },
+      tag:"midbar"
+    },
+    { // S2 complex: vertical down crossing midbar, loop at lower-right, tail
+      startAOI:{cx:.62, cy:.18, rx:.10, ry:.10},
+      endAOI:  {cx:.68, cy:.88, rx:.12, ry:.10},
+      dir:{ux:0, uy:1, minDot:.80},
+      poly:(()=>{ // a stylized reference path for shape DTW
+        const pts=[];
+        // vertical approach
+        pts.push({x:.64,y:.20}); pts.push({x:.64,y:.48});
+        // small overshoot through the bar
+        pts.push({x:.64,y:.56});
+        // curve to the right to start loop
+        pts.push({x:.70,y:.62});
+        // loop (clockwise-ish)
+        pts.push({x:.78,y:.70});
+        pts.push({x:.74,y:.80});
+        pts.push({x:.62,y:.78});
+        pts.push({x:.66,y:.68});
+        // tail
+        pts.push({x:.72,y:.86});
+        return resample(pts, 48);
+      })(),
+      rules: {
+        mustIntersectMidbar:true,
+        loop:{ areaMin:.03, areaMax:.12, cxMin:.50, cxMax:.85, cyMin:.60, cyMax:.90 },
+        finalHeadingAxis:{x:.7,y:.7}, maxAxisAngleDeg:45
+      }
+    }
+  ]
+};
+
+/******************************
+ * Scoring engine
+ ******************************/
+function scoreStroke(userStroke, templateStroke, context){
+  const reasons=[];
+  // AOI
+  const start = userStroke[0], end = userStroke[userStroke.length-1];
+  const aoiStart = pointInEllipseScore(start, templateStroke.startAOI);
+  const aoiEnd   = pointInEllipseScore(end,   templateStroke.endAOI);
+  const startEndScore = 0.5*(aoiStart+aoiEnd);
+
+  // Direction
+  const dirU = earlyDir(userStroke); const dirT = norm({x:templateStroke.dir.ux, y:templateStroke.dir.uy});
+  const dirDot = Math.max(0, dot(dirU, dirT));
+  const directionScore = dirDot;
+  if(dirDot < templateStroke.dir.minDot) reasons.push("direction_too_off");
+
+  // Shape (DTW)
+  const shapeD = dtw(userStroke, templateStroke.poly);
+  const shapeScore = Math.exp(-Math.pow(shapeD/0.40,2)); // looser shape tolerance // 0.25 is softness
+
+  // Placement/relations
+  let placementScore = 1.0;
+  if(templateStroke.rules?.minLen){ const L = pathLength(userStroke); if(L < templateStroke.rules.minLen) { placementScore *= 0.6; reasons.push("too_short"); } }
+  if(templateStroke.rules?.bandY!=null){ const yMid = userStroke[Math.floor(userStroke.length/2)].y; if(Math.abs(yMid-templateStroke.rules.bandY) > templateStroke.rules.tolY){ placementScore *= 0.5; reasons.push("wrong_y_band"); } }
+
+  if(templateStroke.tag === 'midbar'){
+    context.midbar = userStroke; // store for later
+  }
+
+  if(templateStroke.rules?.mustIntersectMidbar){
+    const ok = context.midbar ? polylinesIntersect(userStroke, context.midbar) : false;
+    if(!ok){ placementScore *= 0.3; reasons.push("no_bar_cross"); }
+    // also check closest approach near y≈0.5 band
+    if(context.midbar){ const d = closestApproachToPolyline(userStroke, context.midbar); if(d>0.06){ placementScore *= 0.7; reasons.push("far_from_bar"); } }
+  }
+
+  if(templateStroke.rules?.loop){
+    const loop = detectLoop(userStroke, 0.06, 8);
+    if(!loop.hasLoop){ placementScore *= 0.3; reasons.push("no_loop"); }
+    else{
+      const {area, centroid:c} = loop;
+      const r = templateStroke.rules.loop;
+      if(!(area>=r.areaMin && area<=r.areaMax)) { placementScore *= 0.6; reasons.push("loop_area"); }
+      if(!(c.x>=r.cxMin && c.x<=r.cxMax && c.y>=r.cyMin && c.y<=r.cyMax)) { placementScore *= 0.6; reasons.push("loop_pos"); }
+    }
+  }
+
+  if(templateStroke.rules?.finalHeadingAxis){
+    const axis = norm(templateStroke.rules.finalHeadingAxis); const tail = lateDir(userStroke);
+    const cos = dot(axis, tail); const ang = Math.acos(Math.max(-1, Math.min(1, cos))) * 180/Math.PI;
+    if(ang > templateStroke.rules.maxAxisAngleDeg){ placementScore *= 0.7; reasons.push("tail_heading"); }
+  }
+
+  // Combine
+  const w = HA_TEMPLATE.weights;
+  const total = w.startEnd*startEndScore + w.direction*directionScore + w.shape*shapeScore + w.placement*placementScore;
+  return { total, parts:{startEnd:startEndScore, direction:directionScore, shape:shapeScore, placement:placementScore}, reasons };
+}
+
+function evaluateAll(userStrokes){
+  // Normalize & resample
+  const res = userStrokes.map(s=>resample(s,64));
+  const normed = normalizeStrokes(res);
+  const ctx = {};
+  const scores=[];
+  for(let i=0;i<HA_TEMPLATE.strokes.length;i++){
+    const T = HA_TEMPLATE.strokes[i];
+    const U = normed[i];
+    if(!U){ scores.push({missing:true, total:0, parts:{}, reasons:["missing_stroke"]}); continue; }
+    const sc = scoreStroke(U, T, ctx); scores.push(sc);
+  }
+  const mean = scores.reduce((a,s)=>a+(s.total||0),0)/HA_TEMPLATE.strokes.length;
+  return {scores, mean, passed: scores.every(s=> (s.missing?false:(s.total>=HA_TEMPLATE.thresholds.perStrokeMin))) && mean>=HA_TEMPLATE.thresholds.overallMean, normed};
+}
+
+/******************************
+ * Canvas + UI
+ ******************************/
+const pad = document.getElementById('pad');
+const g = pad.getContext('2d');
+let drawing=false; let strokes=[]; let cur=[];
+
+function toCanvasPoint(evt){ const r = pad.getBoundingClientRect(); return {x:(evt.clientX - r.left)* (pad.width/r.width), y:(evt.clientY - r.top)* (pad.height/r.height)} }
+
+function redraw(){
+  g.clearRect(0,0,pad.width,pad.height);
+  // grid
+  g.globalAlpha=0.15; g.strokeStyle="#1f2937"; for(let x=0;x<=pad.width;x+=40){ g.beginPath(); g.moveTo(x,0); g.lineTo(x,pad.height); g.stroke(); }
+  for(let y=0;y<=pad.height;y+=40){ g.beginPath(); g.moveTo(0,y); g.lineTo(pad.width,y); g.stroke(); }
+  g.globalAlpha=1;
+
+  // tracing glyph (behind everything)
+  if(document.getElementById('glyphChk')?.checked){ drawGlyph(); }
+
+  // ghost/template
+  if(document.getElementById('ghostChk').checked){ drawGhost(); }
+
+  // user strokes
+  g.lineCap='round'; g.lineJoin='round'; g.lineWidth=6; g.strokeStyle='#e2e8f0';
+  for(const s of strokes){ g.beginPath(); for(let i=0;i<s.length;i++){ const p=s[i]; if(i===0) g.moveTo(p.x,p.y); else g.lineTo(p.x,p.y);} g.stroke(); }
+  if(drawing && cur.length){ g.beginPath(); for(let i=0;i<cur.length;i++){ const p=cur[i]; if(i===0) g.moveTo(p.x,p.y); else g.lineTo(p.x,p.y);} g.stroke(); }
+}
+
+function drawGlyph(){
+  const margin=60; const W=pad.width-2*margin, H=pad.height-2*margin;
+  const baseFonts = "\"Hiragino Kaku Gothic Pro\", 'Hiragino Sans', 'Yu Gothic', 'Meiryo', 'Noto Sans JP', system-ui, sans-serif";
+  let fontPx = Math.floor(H*0.8);
+  // helper to measure width/height
+  function metricsFor(px){ g.font = `${px}px ${baseFonts}`; const m = g.measureText('は'); const ascent = m.actualBoundingBoxAscent||px*0.8; const descent=m.actualBoundingBoxDescent||px*0.2; return {width:m.width, height:ascent+descent}; }
+  let m = metricsFor(fontPx);
+  const k = Math.min(W/m.width, H/m.height) * 0.95; // fit and add small margin
+  fontPx = Math.floor(fontPx * k);
+  m = metricsFor(fontPx);
+
+  // center, with optional Y nudge
+  const yNudge = parseFloat(document.getElementById('glyphYOffset')?.value || '0');
+  const x = margin + W/2; // centered horizontally
+  const y = margin + H/2 + yNudge*H; // centered vertically + nudge
+  const alpha = parseFloat(document.getElementById('glyphOpacity')?.value || '0.25');
+
+  g.save();
+  g.globalAlpha = alpha;
+  g.fillStyle = '#60a5fa';
+  g.strokeStyle = '#60a5fa';
+  g.lineWidth = 2;
+  g.textAlign='center';
+  g.textBaseline='middle';
+  g.font = `${fontPx}px ${baseFonts}`;
+  g.fillText('は', x, y);
+  g.strokeText('は', x, y);
+  g.restore();
+}
+
+function drawGhost(){ 
+  const NORM = HA_TEMPLATE.strokes.map(s=>s.poly);
+  // scale template to canvas with margin
+  const margin=60; const W=pad.width-2*margin, H=pad.height-2*margin;
+  const sx=W, sy=H;
+  // AOIs
+  for(const st of HA_TEMPLATE.strokes){ g.strokeStyle='rgba(96,165,250,.45)'; g.lineWidth=2; g.beginPath();
+    const cx=margin+st.startAOI.cx*sx, cy=margin+st.startAOI.cy*sy, rx=st.startAOI.rx*sx, ry=st.startAOI.ry*sy; ellipse(g,cx,cy,rx,ry); g.stroke();
+    g.beginPath(); const cx2=margin+st.endAOI.cx*sx, cy2=margin+st.endAOI.cy*sy, rx2=st.endAOI.rx*sx, ry2=st.endAOI.ry*sy; ellipse(g,cx2,cy2,rx2,ry2); g.stroke();
+  }
+  // polylines
+  g.strokeStyle='rgba(96,165,250,.9)'; g.lineWidth=3; NORM.forEach((poly,i)=>{ g.beginPath(); poly.forEach((p,j)=>{ const x=margin+p.x*sx, y=margin+p.y*sy; if(j===0) g.moveTo(x,y); else g.lineTo(x,y); }); g.stroke(); });
+}
+
+function ellipse(ctx, cx, cy, rx, ry){ ctx.save(); ctx.translate(cx,cy); ctx.scale(rx,ry); ctx.beginPath(); ctx.arc(0,0,1,0,Math.PI*2); ctx.restore(); }
+
+pad.addEventListener('pointerdown', e=>{ drawing=true; cur=[toCanvasPoint(e)]; redraw(); })
+pad.addEventListener('pointermove', e=>{ if(!drawing) return; cur.push(toCanvasPoint(e)); redraw(); })
+pad.addEventListener('pointerup', e=>{ if(!drawing) return; drawing=false; if(cur.length>1) { strokes.push(cur); } cur=[]; redraw(); updateScoresPreview(); })
+pad.addEventListener('pointerleave', e=>{ if(drawing){ drawing=false; if(cur.length>1) strokes.push(cur); cur=[]; redraw(); updateScoresPreview(); } })
+
+function updateScoresPreview(){ const sEl=document.getElementById('scores'); sEl.innerHTML = `<div><b>${strokes.length}</b> stroke(s) drawn. Press <b>Evaluate</b> for details.</div>` }
+
+// Buttons
+const undoBtn=document.getElementById('undoBtn');
+const clearBtn=document.getElementById('clearBtn');
+const evalBtn=document.getElementById('evalBtn');
+undoBtn.onclick=()=>{ strokes.pop(); redraw(); updateScoresPreview(); }
+clearBtn.onclick=()=>{ strokes.length=0; cur=[]; redraw(); updateScoresPreview(); }
+evalBtn.onclick=()=>{
+  const res=evaluateAll(strokes);
+  renderScores(res);
+}
+
+document.getElementById('ghostChk').addEventListener('change', redraw);
+document.getElementById('glyphChk').addEventListener('change', redraw);
+document.getElementById('glyphOpacity').addEventListener('input', redraw);
+document.getElementById('glyphYOffset').addEventListener('input', redraw);
+
+function renderScores(res){
+  const sEl=document.getElementById('scores');
+  const badge=(v)=>{ const cls = v>=0.75? 'ok' : (v>=0.5? 'mid' : 'bad'); return `<span class="badge ${cls}">${v.toFixed(2)}</span>` }
+  const parts=(p)=>`<span class="tiny">start/end ${badge(p.startEnd||0)} · dir ${badge(p.direction||0)} · shape ${badge(p.shape||0)} · place ${badge(p.placement||0)}</span>`
+  const line=(idx, s)=>{
+    if(s.missing) return `<div class="scoreRow"><div>Stroke ${idx+1}</div><div><span class="badge bad">missing</span></div></div>`;
+    const explain = s.reasons?.length? `<div class="hint">${s.reasons.map(r=>`• ${human(r)}`).join(' ')} </div>` : '';
+    return `<div class="scoreRow"><div><b>Stroke ${idx+1}</b><div class="hint">${parts(s.parts)}</div>${explain}</div><div>${badge(s.total)}</div></div>`
+  }
+  const rows = HA_TEMPLATE.strokes.map((_,i)=>line(i,res.scores[i])).join('');
+  const overall = `<div class="scoreRow" style="border-top:1px solid #111827;margin-top:8px"><div><b>Overall</b></div><div>${badge(res.mean)} ${res.passed?'<span class="badge ok" style="margin-left:6px">PASS</span>':'<span class="badge bad" style="margin-left:6px">TRY AGAIN</span>'}</div></div>`
+  sEl.innerHTML = rows + overall + `<div class="hint" style="margin-top:8px">Reset and try to match the template. Toggle "Show template & AOIs" to see targets.</div>`;
+}
+
+function human(key){
+  return ({
+    direction_too_off:"Direction off (draw the stroke in the standard direction)",
+    too_short:"Stroke too short",
+    wrong_y_band:"Horizontal should sit near middle",
+    no_bar_cross:"3rd stroke must pass through the horizontal bar",
+    far_from_bar:"3rd stroke too far from bar",
+    no_loop:"Finish with a loop in the lower-right",
+    loop_area:"Loop size out of range",
+    loop_pos:"Loop position off",
+    tail_heading:"Tail should angle down-right",
+    missing_stroke:"Stroke missing"
+  }[key]||key);
+}
+
+// initial paint
+redraw(); updateScoresPreview();
+</script>
+</body>
+</html>

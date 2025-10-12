@@ -1,0 +1,127 @@
+# ============================================
+# OS Files
+# ============================================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# ============================================
+# Node.js
+# ============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.env
+.env.local
+.env.*.local
+dist/
+build/
+.cache/
+.vite/
+.next/
+out/
+coverage/
+logs/
+*.log
+
+# ============================================
+# Laravel / PHP
+# ============================================
+vendor/
+composer.lock
+.env
+.env.backup
+.phpunit.result.cache
+/storage/*.key
+/storage/*.log
+/storage/framework/*
+/storage/debugbar/*
+/storage/logs/*
+/bootstrap/cache/*.php
+
+# ============================================
+# Python
+# ============================================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+.eggs/
+*.manifest
+*.spec
+.env/
+.venv/
+venv/
+ENV/
+env.bak/
+pip-log.txt
+
+# ============================================
+# IDEs & Editors
+# ============================================
+# VSCode
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# JetBrains / PhpStorm / WebStorm
+.idea/
+*.iml
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# ============================================
+# System / Cache / Misc
+# ============================================
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*.orig
+*.lock
+.cache/
+tmp/
+temp/
+logs/
+debug.log
+
+# ============================================
+# Frontend Builds
+# ============================================
+*.sass-cache
+*.scssc
+*.css.map
+*.js.map
+
+# ============================================
+# Docker
+# ============================================
+docker-compose.override.yml
+.docker/
+.dockerignore
+
+# ============================================
+# Package Managers
+# ============================================
+/package-lock.json
+/pnpm-lock.yaml
+/yarn.lock
+
+# ============================================
+# Misc Project Files
+# ============================================
+*.sqlite
+*.sqlite3
+*.db
+*.pid
+*.seed
+*.seed.js
