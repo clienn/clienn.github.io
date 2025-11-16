@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Odd One Out – WebSocket Game</title>
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-elevated: #020617;
+      --border-subtle: #1f2937;
+      --accent-blue: #38bdf8;
+      --accent-green: #22c55e;
+      --accent-green-dark: #16a34a;
+      --accent-red: #ef4444;
+      --accent-red-dark: #b91c1c;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #0b1120, #020617);
+      margin: 0;
+      padding: 0;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .app {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr) 320px;
+      gap: 16px;
+      padding: 16px;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 960px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.97);
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      padding: 12px 14px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .card-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.9);
+      color: var(--text-main);
+      gap: 6px;
+      white-space: nowrap;
+      cursor: default;
+    }
+
+    .pill strong {
+      font-weight: 600;
+      color: var(--accent-blue);
+    }
+
+    .pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    /* Phase pill */
+    #phasePill.phase-lobby {
+      background: radial-gradient(circle at top, rgba(59,130,246,0.25), rgba(15,23,42,0.95));
+      border-color: rgba(129,140,248,0.9);
+      color: #e5e7eb;
+    }
+    #phasePill.phase-clue {
+      background: radial-gradient(circle at top, rgba(252,211,77,0.3), rgba(15,23,42,0.95));
+      border-color: rgba(250,204,21,0.9);
+      color: #fef9c3;
+    }
+    #phasePill.phase-vote {
+      background: radial-gradient(circle at top, rgba(248,113,113,0.35), rgba(15,23,42,0.97));
+      border-color: rgba(239,68,68,0.95);
+      color: #fee2e2;
+    }
+    #phasePill.phase-reveal {
+      background: radial-gradient(circle at top, rgba(34,197,94,0.35), rgba(15,23,42,0.97));
+      border-color: rgba(34,197,94,0.95);
+      color: #dcfce7;
+    }
+    #phasePill.phase-lobby strong { color: #bfdbfe; }
+    #phasePill.phase-clue strong { color: #facc15; }
+    #phasePill.phase-vote strong { color: #fecaca; }
+    #phasePill.phase-reveal strong { color: #bbf7d0; }
+
+    label {
+      font-size: 0.8rem;
+      color: #cbd5f5;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    input, button {
+      font: inherit;
+    }
+
+    .input {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #1e293b;
+      background: #020617;
+      color: var(--text-main);
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5);
+    }
+
+    .btn {
+      padding: 9px 16px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark));
+      color: white;
+      font-weight: 600;
+      transition: transform 0.05s ease, box-shadow 0.05s ease, background 0.2s;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .btn.secondary {
+      background: #1e293b;
+      color: var(--text-main);
+    }
+
+    .btn.danger {
+      background: linear-gradient(135deg, #f97373, #b91c1c);
+      color: #fee2e2;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) inset;
+    }
+
+    .btn[disabled] {
+      opacity: 0.45;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .status {
+      font-size: 0.78rem;
+      margin-top: 4px;
+      color: #94a3b8;
+      min-height: 18px;
+    }
+
+    .players-list {
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      padding: 6px 8px;
+      font-size: 0.8rem;
+      background: linear-gradient(135deg, rgba(15,23,42,0.96), rgba(15,23,42,0.85));
+      max-height: 260px;
+      overflow-y: auto;
+      margin-top: 4px;
+    }
+
+    .player-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 3px 0;
+      border-bottom: 1px dashed rgba(31,41,55,0.7);
+    }
+
+    .player-item:last-child {
+      border-bottom: none;
+    }
+
+    .player-name {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .player-name span.player-name-text {
+      font-weight: 500;
+    }
+
+    .player-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      min-width: 48px;
+    }
+
+    .badge {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(37,99,235,0.2);
+      color: #bfdbfe;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .badge.host {
+      background: rgba(56,189,248,0.16);
+      color: #7dd3fc;
+    }
+
+    .badge.you {
+      background: rgba(22,163,74,0.3);
+      color: #bbf7d0;
+    }
+
+    .badge.score {
+      font-size: 0.7rem;
+    }
+    .badge.score.pos {
+      background: rgba(22,163,74,0.26);
+      color: #bbf7d0;
+      border: 1px solid rgba(34,197,94,0.7);
+    }
+    .badge.score.neg {
+      background: rgba(239,68,68,0.22);
+      color: #fecaca;
+      border: 1px solid rgba(248,113,113,0.7);
+    }
+    .badge.score.zero {
+      background: rgba(59,130,246,0.18);
+      color: #bfdbfe;
+      border: 1px solid rgba(59,130,246,0.5);
+    }
+
+    .vote-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .game-title {
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      text-align: center;
+      margin-bottom: 6px;
+      color: var(--accent-blue);
+    }
+
+    .vote-intro {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .vote-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .vote-btn {
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      padding: 14px 22px;
+      font-size: 1.05rem;
+      background: #020617;
+      color: var(--text-main);
+      cursor: pointer;
+      min-width: 140px;
+      text-align: center;
+      flex: 1 1 calc(50% - 10px);
+      max-width: 100%;
+      transition: transform 0.08s ease, box-shadow 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+    }
+
+    .vote-btn:hover:not([disabled]) {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.7);
+      transform: translateY(-1px) scale(1.01);
+    }
+
+    .vote-btn[disabled] {
+      opacity: 0.5;
+      cursor: default;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .vote-btn.selected {
+      background: radial-gradient(circle at top, rgba(248,113,113,0.7), rgba(185,28,28,1));
+      border-color: #fee2e2;
+      box-shadow: 0 0 0 3px rgba(248,113,113,0.9);
+      font-weight: 700;
+      color: #fef2f2;
+    }
+
+    @keyframes votePulse {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.08); }
+      70%  { transform: scale(0.97); }
+      100% { transform: scale(1); }
+    }
+    .vote-btn.pulse {
+      animation: votePulse 220ms ease-out;
+    }
+
+    .vote-state {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .word-box {
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      padding: 8px 10px;
+      font-size: 0.9rem;
+      background: radial-gradient(circle at top, rgba(56,189,248,0.1), #020617);
+      margin-top: 4px;
+    }
+
+    .word-secret {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent-green);
+    }
+
+    .word-odd {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-red);
+    }
+
+    .phase-label {
+      font-size: 0.8rem;
+      color: var(--text-main);
+      margin-top: 4px;
+    }
+
+    .phase-label span {
+      font-weight: 600;
+    }
+
+    .messages {
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background: #020617;
+      height: 180px;
+      overflow-y: auto;
+      padding: 8px;
+      font-size: 0.8rem;
+      margin-top: 6px;
+    }
+
+    .msg {
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .msg .time {
+      font-size: 0.65rem;
+      color: #64748b;
+      margin-right: 4px;
+    }
+
+    .msg.system {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .msg.error {
+      color: #fecaca;
+    }
+
+    .msg.clue .from {
+      font-weight: 600;
+      margin-right: 4px;
+      color: var(--text-main);
+    }
+
+    .clue-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .clue-row input {
+      flex: 1;
+    }
+
+    .result-box {
+      margin-top: 14px;
+      border-radius: 10px;
+      border: 1px dashed #374151;
+      padding: 10px;
+      font-size: 0.9rem;
+      background: rgba(15,23,42,0.92);
+    }
+
+    .result-box strong {
+      color: var(--accent-blue);
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    #effectsLayer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 999;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 8px;
+      height: 14px;
+      border-radius: 2px;
+      opacity: 0.9;
+      animation: confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(-20px) rotateZ(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(110vh) rotateZ(360deg);
+        opacity: 0;
+      }
+    }
+
+    .red-flash {
+      position: absolute;
+      inset: 0;
+      background: rgba(239, 68, 68, 0.28);
+      animation: redFlash 0.45s ease-out forwards;
+    }
+
+    @keyframes redFlash {
+      0% { opacity: 0.8; }
+      40% { opacity: 0.4; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes screenShake {
+      0%   { transform: translate(0, 0); }
+      20%  { transform: translate(-6px, -3px); }
+      40%  { transform: translate(5px, 4px); }
+      60%  { transform: translate(-4px, 3px); }
+      80%  { transform: translate(4px, -4px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    .shake {
+      animation: screenShake 0.36s ease-in-out;
+    }
+  </style>
+</head>
+<body>
+  <div id="effectsLayer"></div>
+
+  <div class="app">
+    <!-- LEFT COLUMN: ROOM + PLAYERS -->
+    <div class="card">
+      <div class="card-title">Room & Player</div>
+
+      <div class="pill-row">
+        <div class="pill">
+          <span>Room:</span>
+          <strong id="roomDisplay">loading…</strong>
+        </div>
+      </div>
+
+      <div style="margin-bottom:6px;">
+        <label for="name">Your Name</label>
+        <input id="name" class="input" type="text" placeholder="e.g. Dustin" />
+      </div>
+
+      <div style="display:flex; gap:6px; margin-bottom:6px;">
+        <button id="joinBtn" class="btn" style="flex:1;">Join Room</button>
+        <button id="startRoundBtn" class="btn secondary" style="flex:1;" disabled>Start Round</button>
+      </div>
+
+      <div style="display:flex; gap:6px; margin-bottom:4px;">
+        <button id="resetRoundBtn" class="btn danger" style="flex:1;" disabled>Reset Game</button>
+      </div>
+
+      <div id="status" class="status"></div>
+
+      <div style="margin-top:8px;" class="card-title">Players</div>
+      <div class="players-list" id="playersList"></div>
+      <div class="small-note" style="margin-top:6px;">
+        Scoring: +1 for correct vote, -2 for wrong vote, odd one out gains +1 for every wrong vote.
+      </div>
+    </div>
+
+    <!-- MIDDLE COLUMN: TITLE + VOTING -->
+    <div class="card vote-card" id="voteCard">
+      <div>
+        <div class="game-title">ODD ONE OUT</div>
+        <div class="card-title">Vote: Who is the Odd One Out?</div>
+        <div class="vote-intro">
+          When voting starts, tap one of the big name pills. Your choice will glow red. You only get one vote.
+        </div>
+        <div class="vote-buttons" id="voteButtons"></div>
+      </div>
+
+      <div>
+        <div class="vote-state" id="voteStateText">
+          Waiting for round to start…
+        </div>
+        <div id="resultBox" class="result-box" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: ROLE, PHASE, CHAT -->
+    <div class="card">
+      <div class="card-title">Your Role & Phase</div>
+
+      <div class="pill-row">
+        <div class="pill phase-lobby" id="phasePill">
+          <span>Phase:</span>
+          <strong id="phaseText">Lobby</strong>
+        </div>
+      </div>
+
+      <div class="word-box" id="wordBox">
+        <div id="wordInfo">Not in a round yet.</div>
+      </div>
+
+      <div class="phase-label">
+        Current phase: <span id="phaseLabel">Lobby</span>
+      </div>
+
+      <div style="margin-top:10px;" class="card-title">Clues & Chat</div>
+
+      <div class="messages" id="messages"></div>
+
+      <div class="small-note" style="margin-top:6px;">
+        During clue phase, submit exactly one clue that fits the secret word (or bluff if you&apos;re the odd one out).
+      </div>
+
+      <div class="clue-row">
+        <input id="clueInput" class="input" type="text" placeholder="Type your clue..." disabled />
+        <button id="submitClueBtn" class="btn secondary" disabled>Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // const WEBSOCKET_URL = "ws://localhost:49153";
+    const WEBSOCKET_URL = "https://odd-one-out-server-1b99.onrender.com";
+
+    const roomDisplay = document.getElementById("roomDisplay");
+    const phaseText = document.getElementById("phaseText");
+    const phaseLabel = document.getElementById("phaseLabel");
+    const phasePill = document.getElementById("phasePill");
+    const nameInput = document.getElementById("name");
+    const joinBtn = document.getElementById("joinBtn");
+    const startRoundBtn = document.getElementById("startRoundBtn");
+    const resetRoundBtn = document.getElementById("resetRoundBtn");
+    const statusEl = document.getElementById("status");
+    const playersList = document.getElementById("playersList");
+    const messagesEl = document.getElementById("messages");
+    const wordInfo = document.getElementById("wordInfo");
+    const clueInput = document.getElementById("clueInput");
+    const submitClueBtn = document.getElementById("submitClueBtn");
+    const voteButtons = document.getElementById("voteButtons");
+    const resultBox = document.getElementById("resultBox");
+    const voteStateText = document.getElementById("voteStateText");
+    const voteCard = document.getElementById("voteCard");
+    const effectsLayer = document.getElementById("effectsLayer");
+
+    let socket = null;
+    let roomId = null;
+    let myPlayerId = null;
+    let hostId = null;
+    let isHost = false;
+    let currentRoundId = null;
+    let currentPhase = "lobby";
+    let youAreOdd = false;
+    let youVoted = false;
+    let youSubmittedClue = false;
+    let lastWord = null;
+    let players = [];
+    let selectedVoteTargetId = null;
+    let currentRoundNumber = 0;
+    let maxRounds = 5;
+    let endlessConfettiInterval = null;
+    const scoresById = new Map(); // playerId -> score
+
+    function getRoomFromQuery() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("room");
+    }
+
+    function initRoom() {
+      roomId = getRoomFromQuery();
+      if (!roomId) {
+        roomDisplay.textContent = "No ?room= in URL";
+        roomDisplay.style.color = "#fca5a5";
+        joinBtn.disabled = true;
+        startRoundBtn.disabled = true;
+        resetRoundBtn.disabled = true;
+        setStatus("Add ?room=ROOM_ID to the URL and reload.");
+      } else {
+        roomDisplay.textContent = roomId;
+      }
+    }
+
+    function setStatus(text) {
+      statusEl.textContent = text || "";
+    }
+
+    function addMessage({ type, text, from, time }) {
+      const div = document.createElement("div");
+      div.classList.add("msg");
+      if (type === "system") div.classList.add("system");
+      if (type === "error") div.classList.add("error");
+      if (type === "clue") div.classList.add("clue");
+
+      const timeEl = document.createElement("span");
+      timeEl.classList.add("time");
+      if (time) {
+        const t = new Date(time);
+        timeEl.textContent = `[${t.toLocaleTimeString()}]`;
+      } else {
+        timeEl.textContent = "";
+      }
+      div.appendChild(timeEl);
+
+      if (type === "clue") {
+        const fromEl = document.createElement("span");
+        fromEl.classList.add("from");
+        fromEl.textContent = (from || "Player") + ":";
+        div.appendChild(fromEl);
+        div.appendChild(document.createTextNode(" " + text));
+      } else {
+        div.appendChild(document.createTextNode(text));
+      }
+
+      messagesEl.appendChild(div);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function applyScores(scoresArr) {
+      scoresById.clear();
+      if (!scoresArr) return;
+      for (const s of scoresArr) {
+        scoresById.set(s.playerId, s.score);
+      }
+      renderPlayers();
+    }
+
+    function renderPlayers() {
+      playersList.innerHTML = "";
+      players.forEach((p) => {
+        const row = document.createElement("div");
+        row.classList.add("player-item");
+
+        const left = document.createElement("div");
+        left.classList.add("player-name");
+
+        const nameSpan = document.createElement("span");
+        nameSpan.classList.add("player-name-text");
+        nameSpan.textContent = p.name;
+        left.appendChild(nameSpan);
+
+        // YOU badge near name
+        if (p.id === myPlayerId) {
+          const youBadge = document.createElement("span");
+          youBadge.classList.add("badge", "you");
+          youBadge.textContent = "YOU";
+          left.appendChild(youBadge);
+        }
+
+        // HOST badge near name
+        if (p.id === hostId) {
+          const hostBadge = document.createElement("span");
+          hostBadge.classList.add("badge", "host");
+          hostBadge.textContent = "HOST";
+          left.appendChild(hostBadge);
+        }
+
+        const right = document.createElement("div");
+        right.classList.add("player-right");
+
+        const score = scoresById.has(p.id) ? scoresById.get(p.id) : 0;
+        const scoreBadge = document.createElement("span");
+        scoreBadge.classList.add("badge", "score");
+        if (score > 0) {
+          scoreBadge.classList.add("pos");
+        } else if (score < 0) {
+          scoreBadge.classList.add("neg");
+        } else {
+          scoreBadge.classList.add("zero");
+        }
+        scoreBadge.textContent = (score > 0 ? "+" : "") + score;
+
+        right.appendChild(scoreBadge);
+
+        row.appendChild(left);
+        row.appendChild(right);
+        playersList.appendChild(row);
+      });
+    }
+
+    function spawnConfetti() {
+      const colors = ["#facc15", "#fb7185", "#38bdf8", "#22c55e", "#e5e7eb"];
+      const count = 120;
+
+      for (let i = 0; i < count; i++) {
+        const div = document.createElement("div");
+        div.className = "confetti-piece";
+        const size = 6 + Math.random() * 5;
+        div.style.width = size + "px";
+        div.style.height = size * 1.6 + "px";
+        div.style.background = colors[Math.floor(Math.random() * colors.length)];
+        div.style.left = Math.random() * 100 + "vw";
+        const duration = 2 + Math.random() * 1.5;
+        const delay = Math.random() * 0.5;
+        div.style.animationDuration = duration + "s";
+        div.style.animationDelay = delay + "s";
+
+        effectsLayer.appendChild(div);
+        setTimeout(() => {
+          if (div.parentNode) effectsLayer.removeChild(div);
+        }, (duration + delay) * 1000 + 200);
+      }
+    }
+
+    function triggerOddWinEffect() {
+      const overlay = document.createElement("div");
+      overlay.className = "red-flash";
+      effectsLayer.appendChild(overlay);
+      setTimeout(() => {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      }, 500);
+
+      voteCard.classList.remove("shake");
+      void voteCard.offsetWidth;
+      voteCard.classList.add("shake");
+      setTimeout(() => {
+        voteCard.classList.remove("shake");
+      }, 400);
+    }
+
+    function updateVoteButtons() {
+      const buttons = voteButtons.querySelectorAll(".vote-btn");
+      buttons.forEach((btn) => {
+        const targetId = Number(btn.dataset.playerId);
+        if (selectedVoteTargetId != null && targetId === selectedVoteTargetId) {
+          btn.classList.add("selected");
+        } else {
+          btn.classList.remove("selected");
+        }
+
+        if (youVoted) {
+          btn.disabled = targetId !== selectedVoteTargetId;
+        }
+      });
+    }
+
+    function updatePhasePill() {
+      phasePill.classList.remove("phase-lobby", "phase-clue", "phase-vote", "phase-reveal");
+      if (currentPhase === "clue") {
+        phasePill.classList.add("phase-clue");
+      } else if (currentPhase === "vote") {
+        phasePill.classList.add("phase-vote");
+      } else if (currentPhase === "reveal") {
+        phasePill.classList.add("phase-reveal");
+      } else {
+        phasePill.classList.add("phase-lobby");
+      }
+    }
+
+    function updatePhaseUI() {
+      phaseText.textContent =
+        currentPhase === "clue"
+          ? "Clue"
+          : currentPhase === "vote"
+          ? "Vote"
+          : currentPhase === "reveal"
+          ? "Reveal"
+          : "Lobby";
+
+      phaseLabel.textContent =
+        currentPhase === "clue"
+          ? "Clue"
+          : currentPhase === "vote"
+          ? "Voting"
+          : currentPhase === "reveal"
+          ? "Reveal"
+          : "Lobby";
+
+      updatePhasePill();
+
+      const inClue = currentPhase === "clue";
+      const inVote = currentPhase === "vote";
+
+      clueInput.disabled = !inClue || youSubmittedClue;
+      submitClueBtn.disabled = !inClue || youSubmittedClue;
+
+      voteButtons.innerHTML = "";
+      if (inVote) {
+        players
+          .filter((p) => p.id !== myPlayerId)
+          .forEach((p) => {
+            const btn = document.createElement("button");
+            btn.classList.add("vote-btn");
+            btn.textContent = p.name;
+            btn.dataset.playerId = String(p.id);
+            btn.disabled = youVoted && selectedVoteTargetId !== p.id;
+            btn.addEventListener("click", () => {
+              if (youVoted && selectedVoteTargetId === p.id) return;
+              submitVote(p.id, btn);
+            });
+            voteButtons.appendChild(btn);
+          });
+        updateVoteButtons();
+      }
+
+      let roundInfo =
+        currentRoundNumber > 0
+          ? `Round ${currentRoundNumber}/${maxRounds} – `
+          : "";
+
+      if (currentPhase === "clue") {
+        voteStateText.textContent = `${roundInfo}Clue phase: everyone gives one clue.`;
+      } else if (currentPhase === "vote") {
+        voteStateText.textContent = `${roundInfo}${
+          youVoted
+            ? "You have voted. Waiting for others…"
+            : "Voting phase: tap a name to choose the odd one out."
+        }`;
+      } else if (currentPhase === "reveal") {
+        voteStateText.textContent = `${roundInfo}Round result shown below.`;
+      } else {
+        voteStateText.textContent = "Waiting for round to start…";
+      }
+
+      if (currentRoundNumber >= maxRounds && currentPhase === "reveal") {
+        startRoundBtn.disabled = true;
+        startRoundBtn.textContent = "Game Finished";
+      } else {
+        startRoundBtn.disabled = !isHost;
+        startRoundBtn.textContent =
+          currentRoundNumber > 0 ? "Next Round" : "Start Round";
+      }
+
+      resetRoundBtn.disabled = !isHost;
+    }
+
+    function updateWordBox() {
+      if (!currentRoundId) {
+        wordInfo.innerHTML = "Not in a round yet.";
+        return;
+      }
+
+      if (youAreOdd) {
+        wordInfo.innerHTML = `
+          <div class="word-odd">You are the ODD ONE OUT!</div>
+          <div style="font-size:0.78rem;color:#9ca3af;margin-top:4px;">
+            You didn&apos;t receive the secret word. Listen carefully and bluff with your clues.
+          </div>
+        `;
+      } else if (lastWord) {
+        wordInfo.innerHTML = `
+          <div style="font-size:0.78rem;color:#9ca3af;">Secret word:</div>
+          <div class="word-secret">${lastWord}</div>
+          <div style="font-size:0.78rem;color:#9ca3af;margin-top:4px;">
+            Give clues that are true but not too obvious.
+          </div>
+        `;
+      } else {
+        wordInfo.textContent = "Round in progress.";
+      }
+    }
+
+    function clearRoundState() {
+      currentRoundId = null;
+      currentPhase = "lobby";
+      youAreOdd = false;
+      youVoted = false;
+      youSubmittedClue = false;
+      selectedVoteTargetId = null;
+      lastWord = null;
+      messagesEl.innerHTML = "";
+      resultBox.style.display = "none";
+      if (endlessConfettiInterval) {
+        clearInterval(endlessConfettiInterval);
+        endlessConfettiInterval = null;
+      }
+      updateWordBox();
+      updatePhaseUI();
+    }
+
+    function connectAndJoin() {
+      if (!roomId) {
+        setStatus("No room in URL.");
+        return;
+      }
+      const name = nameInput.value.trim();
+      if (!name) {
+        setStatus("Please enter your name.");
+        return;
+      }
+
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.close();
+      }
+
+      setStatus("Connecting to " + WEBSOCKET_URL + "...");
+      socket = new WebSocket(WEBSOCKET_URL);
+
+      socket.addEventListener("open", () => {
+        setStatus("Connected. Joining room...");
+        socket.send(
+          JSON.stringify({
+            type: "join",
+            roomId,
+            name
+          })
+        );
+      });
+
+      socket.addEventListener("message", (event) => {
+        let data;
+        try {
+          data = JSON.parse(event.data);
+        } catch {
+          addMessage({ type: "error", text: "Failed to parse server message." });
+          return;
+        }
+
+        if (data.type === "error") {
+          addMessage({ type: "error", text: data.text });
+          setStatus(data.text);
+          return;
+        }
+
+        if (data.type === "joined") {
+          myPlayerId = data.playerId;
+          isHost = !!data.isHost;
+          hostId = isHost ? myPlayerId : data.hostId ?? null;
+          players = data.players || [];
+          currentRoundNumber = data.gameRoundNumber || 0;
+          maxRounds = data.maxRounds || maxRounds;
+          applyScores(data.scores);
+          setStatus("Joined room " + data.roomId + " as " + name + ".");
+          joinBtn.textContent = "Reconnect";
+          updatePhaseUI();
+          return;
+        }
+
+        if (data.type === "player_list") {
+          players = data.players || [];
+          hostId = data.hostId;
+          isHost = myPlayerId === hostId;
+          if (data.scores) applyScores(data.scores);
+          else renderPlayers();
+          updatePhaseUI();
+          return;
+        }
+
+        if (data.type === "system_message") {
+          addMessage({ type: "system", text: data.text });
+          return;
+        }
+
+        if (data.type === "round_start") {
+          currentRoundId = data.roundId;
+          youAreOdd = !!data.youAreOddOneOut;
+          lastWord = data.word;
+          youSubmittedClue = false;
+          youVoted = false;
+          selectedVoteTargetId = null;
+          messagesEl.innerHTML = "";
+          resultBox.style.display = "none";
+          currentPhase = "clue";
+          currentRoundNumber = data.roundNumber || currentRoundNumber;
+          maxRounds = data.maxRounds || maxRounds;
+          updatePhaseUI();
+          updateWordBox();
+          addMessage({
+            type: "system",
+            text: `Round ${currentRoundNumber}/${maxRounds} started.`
+          });
+          return;
+        }
+
+        if (data.type === "round_phase") {
+          currentPhase = data.phase || "lobby";
+          currentRoundNumber = data.roundNumber || currentRoundNumber;
+          maxRounds = data.maxRounds || maxRounds;
+          updatePhaseUI();
+          return;
+        }
+
+        if (data.type === "clue_submitted") {
+          addMessage({
+            type: "clue",
+            from: data.name,
+            text: data.text
+          });
+          if (data.playerId === myPlayerId) {
+            youSubmittedClue = true;
+            updatePhaseUI();
+          }
+          return;
+        }
+
+        if (data.type === "vote_submitted") {
+          return;
+        }
+
+        if (data.type === "round_result") {
+          const { word, oddOneOutId, votes, groupWon, roundNumber, maxRounds: mR, scores } = data;
+          lastWord = word;
+          currentRoundNumber = roundNumber || currentRoundNumber;
+          maxRounds = mR || maxRounds;
+          applyScores(scores);
+          updateWordBox();
+          currentPhase = "reveal";
+          updatePhaseUI();
+
+          let oddName = "Unknown";
+          players.forEach((p) => {
+            if (p.id === oddOneOutId) oddName = p.name;
+          });
+
+          const lines = [];
+          lines.push(
+            `<div style="font-size:1rem;font-weight:700;margin-bottom:4px;">Round ${currentRoundNumber} result</div>`
+          );
+          lines.push(`<div><strong>Secret word:</strong> ${word}</div>`);
+          lines.push(
+            `<div><strong>Odd one out:</strong> ${oddName} ${
+              oddOneOutId === myPlayerId ? "(YOU)" : ""
+            }</div>`
+          );
+          lines.push(
+            `<div><strong>Round winner:</strong> ${
+              groupWon ? "Group 🎉" : "Odd one out 😈"
+            }</div>`
+          );
+
+          if (scores && scores.length) {
+            lines.push(`<div style="margin-top:6px;"><strong>Scores:</strong></div>`);
+            scores.forEach((s, idx) => {
+              lines.push(
+                `<div>${idx + 1}. ${s.name}${
+                  s.playerId === myPlayerId ? " (YOU)" : ""
+                } – ${s.score} pts</div>`
+              );
+            });
+          }
+
+          if (votes && votes.length) {
+            lines.push(`<div style="margin-top:6px;"><strong>Votes:</strong></div>`);
+            votes.forEach((v) => {
+              const voter = players.find((p) => p.id === v.voterId);
+              const target = players.find((p) => p.id === v.targetPlayerId);
+              lines.push(
+                `<div>• ${voter ? voter.name : "?"} → ${
+                  target ? target.name : "?"
+                }</div>`
+              );
+            });
+          }
+
+          resultBox.innerHTML = lines.join("");
+          resultBox.style.display = "block";
+
+          if (groupWon) {
+            spawnConfetti();
+          } else {
+            triggerOddWinEffect();
+          }
+          return;
+        }
+
+        if (data.type === "game_over") {
+          const { winners, scores, roundNumber, maxRounds: mR } = data;
+          currentRoundNumber = roundNumber || currentRoundNumber;
+          maxRounds = mR || maxRounds;
+          applyScores(scores);
+
+          const lines = [];
+          lines.push(
+            `<div style="font-size:1.3rem;font-weight:800;margin-bottom:6px;text-align:center;">GAME OVER</div>`
+          );
+
+          if (winners && winners.length === 1) {
+            const w = winners[0];
+            lines.push(
+              `<div style="font-size:1.1rem;margin-bottom:4px;text-align:center;">Winner: <strong>${w.name}${
+                w.playerId === myPlayerId ? " (YOU)" : ""
+              }</strong> – ${w.score} pts</div>`
+            );
+          } else if (winners && winners.length > 1) {
+            lines.push(
+              `<div style="font-size:1rem;margin-bottom:4px;text-align:center;">Winners (tie):</div>`
+            );
+            winners.forEach((w) => {
+              lines.push(
+                `<div style="text-align:center;">• <strong>${w.name}${
+                  w.playerId === myPlayerId ? " (YOU)" : ""
+                }</strong> – ${w.score} pts</div>`
+              );
+            });
+          }
+
+          if (scores && scores.length) {
+            lines.push(`<div style="margin-top:8px;"><strong>Final Scores:</strong></div>`);
+            scores.forEach((s, idx) => {
+              lines.push(
+                `<div>${idx + 1}. ${s.name}${
+                  s.playerId === myPlayerId ? " (YOU)" : ""
+                } – ${s.score} pts</div>`
+              );
+            });
+          }
+
+          resultBox.innerHTML = lines.join("");
+          resultBox.style.display = "block";
+          voteStateText.textContent = "Game over – see winner and scores above.";
+
+          if (!endlessConfettiInterval) {
+            spawnConfetti();
+            endlessConfettiInterval = setInterval(spawnConfetti, 2500);
+          }
+
+          startRoundBtn.disabled = true;
+          startRoundBtn.textContent = "Game Finished";
+
+          return;
+        }
+
+        if (data.type === "round_reset") {
+          currentRoundNumber = data.gameRoundNumber || 0;
+          maxRounds = data.maxRounds || maxRounds;
+          applyScores(data.scores);
+          clearRoundState();
+          addMessage({
+            type: "system",
+            text: "Host reset the game. Scores cleared."
+          });
+          return;
+        }
+      });
+
+      socket.addEventListener("close", () => {
+        setStatus("Disconnected from server.");
+        startRoundBtn.disabled = true;
+        resetRoundBtn.disabled = true;
+      });
+
+      socket.addEventListener("error", (err) => {
+        console.error("WebSocket error:", err);
+        setStatus("WebSocket error. Check console.");
+      });
+    }
+
+    function startRound() {
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        setStatus("Not connected.");
+        return;
+      }
+      socket.send(JSON.stringify({ type: "start_round" }));
+    }
+
+    function resetRound() {
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        setStatus("Not connected.");
+        return;
+      }
+      socket.send(JSON.stringify({ type: "reset_round" }));
+    }
+
+    function submitClue() {
+      if (!socket || socket.readyState !== WebSocket.OPEN) return;
+      if (currentPhase !== "clue") {
+        setStatus("Not in clue phase.");
+        return;
+      }
+      const text = clueInput.value.trim();
+      if (!text) {
+        setStatus("Clue cannot be empty.");
+        return;
+      }
+      socket.send(JSON.stringify({ type: "submit_clue", text }));
+      clueInput.value = "";
+    }
+
+    function submitVote(targetPlayerId, buttonEl) {
+      if (!socket || socket.readyState !== WebSocket.OPEN) return;
+      if (currentPhase !== "vote") {
+        setStatus("Not in voting phase.");
+        return;
+      }
+      socket.send(
+        JSON.stringify({
+          type: "submit_vote",
+          targetPlayerId
+        })
+      );
+      youVoted = true;
+      selectedVoteTargetId = targetPlayerId;
+      if (buttonEl) {
+        buttonEl.classList.remove("pulse");
+        void buttonEl.offsetWidth;
+        buttonEl.classList.add("pulse");
+      }
+      updatePhaseUI();
+    }
+
+    joinBtn.addEventListener("click", () => {
+      connectAndJoin();
+    });
+
+    startRoundBtn.addEventListener("click", () => {
+      startRound();
+    });
+
+    resetRoundBtn.addEventListener("click", () => {
+      resetRound();
+    });
+
+    submitClueBtn.addEventListener("click", () => {
+      submitClue();
+    });
+
+    clueInput.addEventListener("keyup", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        submitClue();
+      }
+    });
+
+    initRoom();
+  </script>
+</body>
+</html>
