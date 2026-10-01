@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Knight's Tour — Tower Defense</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0e14; font-family: "Avenir Next", "Segoe UI", sans-serif; }
+  #app { position: fixed; inset: 0; }
+  .hud {
+    position: fixed; top: 16px; left: 16px; color: #e8e2d0;
+    background: rgba(15, 19, 28, 0.75); border: 1px solid rgba(217, 164, 65, 0.35);
+    border-radius: 10px; padding: 12px 16px; min-width: 190px; backdrop-filter: blur(6px);
+    user-select: none;
+  }
+  .hud h1 { margin: 0 0 6px; font-size: 17px; letter-spacing: 1px; color: #d9a441; }
+  .hud .stat { font-size: 13px; margin: 2px 0; color: #b9c2d0; }
+  .hud .stat b { color: #e8e2d0; }
+  #hp { color: #e06a6a; }
+  #message {
+    position: fixed; top: 38%; left: 50%; transform: translate(-50%, -50%);
+    color: #f4ead2; font-size: 42px; font-weight: 600; letter-spacing: 2px;
+    text-shadow: 0 2px 18px rgba(0,0,0,0.8); pointer-events: none; opacity: 0;
+    transition: opacity 0.3s ease; user-select: none; text-align: center;
+  }
+  #message.show { opacity: 1; }
+  #message small { display: block; font-size: 15px; font-weight: 400; color: #b9c2d0; margin-top: 8px; }
+
+  /* --- Card bar (bottom, Clash Royale conveyor: in from the right) --- */
+  #cards {
+    position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+    width: 788px; height: 150px; user-select: none; z-index: 5;
+    overflow: hidden;
+    background: rgba(15, 19, 28, 0.78);
+    border: 1px solid rgba(217, 164, 65, 0.35);
+    border-radius: 14px;
+    backdrop-filter: blur(6px);
+    box-shadow: inset 0 2px 14px rgba(0, 0, 0, 0.5);
+  }
+  .card {
+    width: 96px; height: 128px; border-radius: 12px; cursor: grab;
+    position: absolute; bottom: 10px;
+    background: linear-gradient(160deg, #273149 0%, #171d2b 70%);
+    border: 2px solid rgba(217, 164, 65, 0.55);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.55);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #e8e2d0;
+    transition: left 9.6s linear, opacity 0.35s ease;
+    touch-action: none;
+  }
+  /* The float only plays once a card has stopped moving on the conveyor */
+  .card.settled { animation: cardFloat 2.6s ease-in-out infinite; }
+  .card .icon { font-size: 30px; line-height: 1; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6)); }
+  .card .steps { font-size: 34px; font-weight: 700; line-height: 1.1; color: #fff; }
+  .card .name { font-size: 11px; letter-spacing: 1px; margin-top: 4px; color: #d9a441; }
+  .card .hint { font-size: 9px; color: #7a8496; margin-top: 2px; text-align: center; }
+  @keyframes cardFloat {
+    0%, 100% { margin-bottom: 0; }
+    50% { margin-bottom: 7px; }
+  }
+
+  #dragTip {
+    position: fixed; pointer-events: none; z-index: 10; display: none;
+    background: rgba(15, 19, 28, 0.9); border: 1px solid rgba(217, 164, 65, 0.5);
+    border-radius: 8px; padding: 6px 10px; color: #e8e2d0; font-size: 13px;
+    transform: translate(-50%, -140%); white-space: nowrap;
+  }
+  #dragTip b { color: #d9a441; }
+  #dragTip.bad { border-color: rgba(192, 69, 62, 0.7); color: #e06a6a; }
+
+  #overlay {
+    position: fixed; inset: 0; background: rgba(5, 7, 11, 0.78); z-index: 20;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #f4ead2; user-select: none; visibility: hidden; opacity: 0; transition: opacity 0.4s ease;
+  }
+  #overlay.show { visibility: visible; opacity: 1; }
+  #overlay h2 { font-size: 46px; letter-spacing: 3px; margin: 0 0 8px; }
+  #overlay p { color: #b9c2d0; margin: 4px 0 22px; }
+  #overlay button {
+    padding: 10px 26px; font-size: 15px; cursor: pointer; border-radius: 8px;
+    background: #1c2433; color: #e8e2d0; border: 1px solid #d9a441;
+  }
+  #overlay button:hover { background: #2a3550; }
+
+  .help {
+    position: fixed; bottom: 14px; right: 18px; max-width: 230px;
+    color: #7a8496; font-size: 11px; user-select: none; text-align: right;
+  }
+  #mergeHint {
+    position: fixed; top: 16px; right: 16px; max-width: 250px; color: #e8e2d0;
+    background: rgba(15, 19, 28, 0.75); border: 1px solid rgba(157, 78, 221, 0.45);
+    border-radius: 10px; padding: 10px 14px; backdrop-filter: blur(6px);
+    font-size: 12px; line-height: 1.5; user-select: none;
+  }
+  #mergeHint b { color: #b07ae8; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="hud">
+  <h1>KNIGHT DEFENSE</h1>
+  <div class="stat">Board HP: <b id="hp">100</b></div>
+  <div class="stat">Wave: <b id="wave">1</b></div>
+  <div class="stat">Kills: <b id="kills">0</b></div>
+  <div class="stat" id="status">Defend the board!</div>
+</div>
+<div id="message"></div>
+<div id="cards"></div>
+<div id="dragTip"></div>
+<div id="mergeHint">
+  <b>MERGE</b><br/>
+  Drag a tower onto another tower of the <b>same color</b> — the merge happens
+  where you drop it: +50% damage, +50% attack speed.<br/><br/>
+  <b>&#9889; LIGHTNING</b><br/>
+  Drag a lightning card onto a tower, then hop the gold path to finish
+  beside it — <b>bounces = steps you walked</b>. Its shots become bolts that
+  chain between enemies. Lightning towers only merge with other lightning
+  towers (+20% bounces).
+</div>
+<div id="overlay">
+  <h2>DEFEAT</h2>
+  <p>The board crumbled on wave <b id="finalWave">1</b> with <b id="finalKills">0</b> kills.</p>
+  <button id="restart">Fight again</button>
+</div>
+<div class="help">Click a tile to hop the knight &middot; drag a card onto the board, then hop the gold path yourself &middot; land on the purple tile to build &middot; shortcuts = weaker tower &middot; stuck = card lost &middot; scroll to zoom (camera drag off)</div>
+<script type="module" src="./td.js"></script>
+</body>
+</html>
