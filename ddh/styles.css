@@ -1,0 +1,441 @@
+:root {
+  --bg: #f4f6f9;
+  --panel: #ffffff;
+  --ink: #1d2733;
+  --muted: #5b6b7c;
+  --line: #dde4ec;
+  --primary: #1f6feb;
+  --primary-ink: #ffffff;
+  --danger: #c0392b;
+  --special: #7c3aed;
+  --duty: #1b7f4d;
+  --duty-bg: #e2f5ea;
+  --post: #8a6d00;
+  --post-bg: #fdf3d0;
+  --pre: #246e96;
+  --pre-bg: #e1f1fa;
+  --leave-bg: #fde8e6;
+  --leave-ink: #a93226;
+  --cover-bg: #ede7fb;
+  --cover-ink: #5b21b6;
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.5rem;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+
+.app-header h1 { margin: 0; font-size: 1.35rem; }
+.subtitle { margin: 0.15rem 0 0; color: var(--muted); font-size: 0.9rem; }
+.header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem 2rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.panel h2 { margin: 0 0 0.75rem; font-size: 1.1rem; }
+.panel h3 { margin: 1.25rem 0 0.4rem; font-size: 1rem; }
+
+.hint { margin: 0 0 0.75rem; color: var(--muted); font-size: 0.85rem; }
+.empty-note { color: var(--muted); font-style: italic; }
+
+/* ---------- Forms & buttons ---------- */
+
+.doctor-form,
+.schedule-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+}
+
+label > span {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+input[type="text"], input[type="month"], input[type="date"], select {
+  font: inherit;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  min-width: 0;
+}
+
+input:focus, select:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+
+.btn {
+  font: inherit;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
+.btn:hover { background: #f0f3f7; }
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-ink);
+}
+.btn-primary:hover { background: #185bc4; }
+.btn-small { padding: 0.2rem 0.55rem; font-size: 0.8rem; }
+.btn-danger { color: var(--danger); border-color: #e4b4ae; }
+.btn-danger:hover { background: var(--leave-bg); }
+
+.form-actions { display: flex; gap: 0.5rem; }
+
+.csv-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.file-btn { display: inline-block; cursor: pointer; }
+.csv-hint { margin: 0; flex-basis: 100%; }
+
+/* ---------- Tables ---------- */
+
+.table-wrap { overflow-x: auto; }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+th, td {
+  border: 1px solid var(--line);
+  padding: 0.45rem 0.6rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+thead th {
+  background: #eef2f7;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ---------- Badges & chips ---------- */
+
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge.year-1 { background: #e1f1fa; color: #1a5e82; }
+.badge.year-2 { background: #fdf3d0; color: #7a6000; }
+.badge.year-3 { background: #ede7fb; color: var(--special); }
+.badge.group { background: #eef2f7; color: var(--muted); border: 1px solid var(--line); }
+
+.chip {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.chip.duty { background: var(--duty-bg); color: var(--duty); }
+.chip.post-duty { background: var(--post-bg); color: var(--post); }
+.chip.pre-duty { background: var(--pre-bg); color: var(--pre); }
+.chip.leave-chip { background: var(--leave-bg); color: var(--leave-ink); }
+.chip.cover-chip { background: var(--cover-bg); color: var(--cover-ink); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.25rem 0 0.6rem; }
+
+/* ---------- Status filter ---------- */
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.25rem 0 0.5rem;
+  flex-wrap: wrap;
+}
+.filter-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.filter-bar button {
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
+.filter-bar button:hover { background: #f0f3f7; }
+.filter-bar button.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+td.filtered-out, .rotation-line.filtered-out, .slot.filtered-out { opacity: 0.22; }
+
+/* ---------- Assignment history ---------- */
+
+.history-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  max-width: 240px;
+  max-height: 5.5rem;
+  overflow-y: auto;
+}
+.hist {
+  display: inline-block;
+  background: #eef2f7;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0.08rem 0.4rem;
+  font-size: 0.74rem;
+  white-space: nowrap;
+}
+.hist-cover { background: var(--cover-bg); color: var(--cover-ink); border-color: #d6c9f2; }
+
+/* ---------- Leave chips in doctor table ---------- */
+
+.leave-list { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.35rem; }
+
+.leave-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--leave-bg);
+  color: var(--leave-ink);
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.78rem;
+}
+.leave-date button {
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0;
+  line-height: 1;
+}
+
+.leave-add { display: flex; gap: 0.3rem; align-items: center; }
+.leave-add input[type="date"] { padding: 0.2rem 0.35rem; font-size: 0.8rem; }
+
+.group-select { padding: 0.2rem 0.35rem; font-size: 0.82rem; }
+
+.actions-cell { white-space: nowrap; }
+.actions-cell .btn { margin-right: 0.3rem; }
+
+/* ---------- Room assignment cards ---------- */
+
+.assignments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 0.75rem;
+}
+
+.room-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.7rem;
+  background: #fafbfd;
+}
+.room-card.special { border-color: var(--special); background: #f7f4fd; }
+
+.room-card .room-name { font-weight: 700; font-size: 0.95rem; }
+.room-card .room-sub { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.4rem; }
+.room-card.special .room-sub { color: var(--special); font-weight: 600; }
+.room-card select { width: 100%; }
+
+.slot-row { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.3rem; }
+.slot-row .grp-tag { font-weight: 700; font-size: 0.78rem; color: var(--muted); width: 1em; }
+.slot-row select { flex: 1; min-width: 0; }
+
+.room-card.pinned { border-color: var(--primary); background: #f3f7fe; }
+.pin-row { display: flex; align-items: center; gap: 0.4rem; margin: 0.2rem 0 0.4rem; }
+.pin-row > span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.pin-row select { flex: 1; min-width: 0; }
+.pin-note { margin: 0.1rem 0 0.2rem; }
+
+/* ---------- Calendar ---------- */
+
+.calendar-wrap { max-height: 70vh; overflow: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+
+.calendar-table th, .calendar-table td { min-width: 160px; }
+.calendar-table thead th { position: sticky; top: 0; z-index: 3; }
+.calendar-table .date-col {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: #fff;
+  min-width: 90px;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.calendar-table thead .date-col { z-index: 4; background: #eef2f7; }
+.calendar-table .rotation-col { min-width: 120px; font-size: 0.78rem; white-space: nowrap; }
+
+.calendar-table tr.weekend .date-col { background: #f1f4f8; }
+
+.cell-doctor { font-weight: 600; }
+
+.slot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.18rem 0.2rem;
+  border-bottom: 1px dashed var(--line);
+}
+.slot:last-child { border-bottom: none; }
+.slot .cell-doctor { font-size: 0.85rem; }
+.slot-leave { background: var(--leave-bg); border-radius: 4px; }
+.slot-covered { background: var(--cover-bg); border-radius: 4px; }
+
+.cover-select { width: 100%; margin-top: 0.2rem; font-size: 0.8rem; }
+.unassigned { color: var(--muted); font-style: italic; }
+
+.rotation-line { display: flex; gap: 0.35rem; align-items: center; margin: 0.1rem 0; }
+.rotation-line .grp { font-weight: 700; width: 1.1em; }
+
+/* ---------- Toast ---------- */
+
+.toast {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--danger);
+  color: #fff;
+  padding: 0.6rem 1.1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  z-index: 50;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  max-width: 90vw;
+}
+.toast.ok { background: var(--duty); }
+
+.app-footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+  padding: 0 1rem 1.5rem;
+}
+
+/* ---------- Print ---------- */
+
+.print-title { display: none; }
+
+@media print {
+  @page { size: landscape; margin: 10mm; }
+
+  body { background: #fff; }
+  .app-header, #doctors-panel, .schedule-controls, .filter-bar, .legend,
+  .hint, .pin-row, .app-footer, .toast,
+  #schedule-panel > h2:first-child, #schedule-panel h3 { display: none !important; }
+
+  .print-title {
+    display: block;
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  main { max-width: none; padding: 0; }
+  .panel { border: none; padding: 0; }
+
+  /* Room assignment cards become a compact reference block */
+  .assignments-grid { grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin-bottom: 0.6rem; }
+  .room-card { padding: 0.3rem 0.45rem; background: #fff !important; }
+  .room-card select {
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 0.75rem;
+  }
+  .slot-row { margin-top: 0.05rem; }
+
+  /* Full calendar, no scrolling, no sticky */
+  .calendar-wrap { max-height: none; overflow: visible; border: none; }
+  .calendar-table { font-size: 0.68rem; }
+  .calendar-table th, .calendar-table td { min-width: 0; padding: 0.2rem 0.3rem; }
+  .calendar-table thead th { position: static; }
+  .calendar-table .date-col { position: static; }
+  .calendar-table tr { break-inside: avoid; }
+
+  /* The printout follows the on-screen filter: dimmed entries are omitted */
+  .filtered-out { display: none !important; }
+
+  /* No interactive bits on paper */
+  .slot .btn, .cover-select { display: none !important; }
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 640px) {
+  main { padding: 0.75rem; }
+  .panel { padding: 0.75rem; }
+  .doctor-form, .schedule-controls { flex-direction: column; align-items: stretch; }
+  .doctor-form label, .schedule-controls label { width: 100%; }
+  .doctor-form input, .doctor-form select { width: 100%; }
+  .app-header { padding: 0.75rem; }
+}

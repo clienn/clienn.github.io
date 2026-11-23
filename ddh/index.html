@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DDH Doctor Scheduler</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%231f6feb'/%3E%3Cpath d='M7 3h2v4h4v2H9v4H7V9H3V7h4z' fill='%23fff'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <h1>DDH Doctor Scheduler</h1>
+      <p class="subtitle">Monthly floor assignments, duty rotation &amp; leave coverage</p>
+    </div>
+    <div class="header-actions">
+      <button id="print-btn" class="btn" title="Print the monthly schedule">🖨 Print</button>
+      <button id="export-btn" class="btn btn-primary" title="Download this month's schedule as JSON">
+        Export month as JSON
+      </button>
+    </div>
+  </header>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <main>
+    <!-- ===================== Doctors ===================== -->
+    <section class="panel" id="doctors-panel">
+      <h2>Doctors</h2>
+
+      <form id="doctor-form" class="doctor-form" autocomplete="off">
+        <input type="hidden" id="doctor-id" />
+        <label>
+          <span>Name</span>
+          <input type="text" id="doctor-name" placeholder="e.g. Dr. Reyes" required maxlength="60" />
+        </label>
+        <label>
+          <span>Residency year</span>
+          <select id="doctor-year" required>
+            <option value="1">1st year</option>
+            <option value="2">2nd year</option>
+            <option value="3">3rd year</option>
+          </select>
+        </label>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="doctor-submit">Add doctor</button>
+          <button type="button" class="btn" id="doctor-cancel" hidden>Cancel edit</button>
+        </div>
+      </form>
+      <p class="hint">
+        Duty groups (A/B/C) are assigned automatically and balanced across doctors.
+        You can change a doctor's group any time using the dropdown in the table below.
+      </p>
+
+      <div class="csv-row">
+        <label class="btn btn-small file-btn">
+          Import doctors from CSV
+          <input type="file" id="csv-input" accept=".csv,text/csv" hidden />
+        </label>
+        <button type="button" id="csv-template-btn" class="btn btn-small">Download CSV template</button>
+        <span class="hint csv-hint">Columns: <strong>Name, Year (1–3), Group (A/B/C, optional)</strong>.
+          Doctors already in the list are matched by name and keep their leave dates; doctors missing
+          from the file are removed.</span>
+      </div>
+
+      <div class="table-wrap">
+        <table class="doctors-table" aria-label="Doctor list">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Residency year</th>
+              <th>Duty group</th>
+              <th>Leave dates</th>
+              <th>Assignment history</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="doctors-tbody"></tbody>
+        </table>
+        <p id="no-doctors" class="empty-note" hidden>No doctors yet — add one above.</p>
+      </div>
+    </section>
+
+    <!-- ===================== Month & assignments ===================== -->
+    <section class="panel" id="schedule-panel">
+      <h2>Monthly schedule</h2>
+      <h2 class="print-title" id="print-title"></h2>
+
+      <div class="schedule-controls">
+        <label>
+          <span>Month</span>
+          <input type="month" id="month-input" required />
+        </label>
+        <label>
+          <span>Group on <strong>Duty</strong> on the 1st</span>
+          <select id="anchor-group">
+            <option value="A">Group A</option>
+            <option value="B">Group B</option>
+            <option value="C">Group C</option>
+          </select>
+        </label>
+        <button type="button" id="generate-btn" class="btn btn-primary">⚡ Auto-generate schedule</button>
+      </div>
+      <p class="hint">
+        <strong>Auto-generate</strong> rebalances duty groups and fills all three rotation slots in
+        every room for the selected month (2nd years to the ER, 3rd years to the ICU, 1st/2nd years
+        preferred for general rooms; doctors matching the slot's group are picked first, but any
+        group can fill any slot). Everything can still be adjusted manually afterwards.
+      </p>
+
+      <h3>Room assignments for the month</h3>
+      <p class="hint">
+        The ER occupies all of Floor 1 (<strong>2nd-year residents only</strong>) and the ICU is on
+        Floor 2 (<strong>3rd-year residents only</strong>). General rooms (Floors 2–5) accept any
+        year; 1st and 2nd years are listed first. Each room has <strong>three rotation slots
+        (A/B/C)</strong> that cycle Duty → Post-duty → Pre-duty, so every room has someone on Duty
+        every day. A doctor from <strong>any group</strong> can take any slot — the slot, not their
+        badge group, sets their duty days for that room. Assigning a doctor to a slot reserves them
+        for that floor for the whole month — <strong>one floor per doctor</strong> (they can still
+        take one-day leave covers elsewhere). On general floors you can also reserve the
+        room for a <strong>single group</strong> for the month: its three slots (and leave covers)
+        may then only be filled with that group's doctors, one per slot, and those doctors can't
+        hold slots in other rooms (they stay available as one-day leave covers elsewhere).
+      </p>
+      <div id="assignments-grid" class="assignments-grid"></div>
+
+      <h3>Daily schedule</h3>
+      <div class="filter-bar" id="status-filter" role="group" aria-label="Filter by duty status">
+        <span class="filter-label">Show:</span>
+        <button type="button" data-filter="Duty" class="active">Duty</button>
+        <button type="button" data-filter="Post-duty">Post-duty</button>
+        <button type="button" data-filter="Pre-duty">Pre-duty</button>
+        <button type="button" data-filter="all">All</button>
+      </div>
+      <div class="legend">
+        <span class="chip duty">Duty</span>
+        <span class="chip post-duty">Post-duty</span>
+        <span class="chip pre-duty">Pre-duty</span>
+        <span class="chip leave-chip">On leave</span>
+        <span class="chip cover-chip">Covering</span>
+      </div>
+      <div class="table-wrap calendar-wrap">
+        <table class="calendar-table" aria-label="Daily schedule">
+          <thead id="calendar-head"></thead>
+          <tbody id="calendar-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    Data is saved automatically in this browser (local storage).
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
